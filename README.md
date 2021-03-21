@@ -59,7 +59,7 @@ fully respond to the keyboard on a Mac in a Terminal app window.
 
 If the TERM environment variable is set to a terminal type for which "e"
 has a built-in terminal description file, "e" will use the internal
-information.  Otherwise, "e" will use either `terminfo`` or `termcap`
+information.  Otherwise, "e" will use either `terminfo` or `termcap`
 terminal descriptions, depending on how it is compiled (see below).
 
 ### Filter Programs
