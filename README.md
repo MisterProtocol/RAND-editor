@@ -14,6 +14,8 @@ code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed below.
 
+### History
+
 The code in "e" is very old, and much of the reason for the creation
 of this repository is to preserve that history.  Consequently, there
 are many files in the distribution which are not involved in the build
@@ -42,6 +44,8 @@ and so forth.  Using these terminals, administrative assistance (then
 called secretaries) could begin doing useful work in "e" in about half an
 hour.
 
+### Terminal Handling
+
 All of this is by way of saying that, as "e" spread to different (some very
 different) types of terminals, it was necessary to provide "e" with
 information on how these terminals worked.  This split into two features:
@@ -58,6 +62,8 @@ has a built-in terminal description file, "e" will use the internal
 information.  Otherwise, "e" will use either `terminfo`` or `termcap`
 terminal descriptions, depending on how it is compiled (see below).
 
+### Filter Programs
+
 The editor uses external executable files as filters, which can process the
 text being edited.  The editor takes marked text, feeds it to the filter,
 and replaces the text with the filter's output.  There are three main
@@ -71,6 +77,8 @@ variable-width fonts and kerning, `just` is probably of little use, but
 sent to it.  `run` is a bit different.  It will run an arbitrary program
 given in its argument as a filter, replacing the input text with the output
 text.  `sort` is one possible argument, for example.
+
+### Makefiles
 
 There are two Makefiles of particular interest in this distribution.  One
 is the top-level Makefile, which is used to actually build the editor and
