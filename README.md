@@ -29,7 +29,7 @@ Therefore, there are a number of auxiliary files that the editor can use.
 Among these are terminal description files and keyboard description files.
 
 In its early days at RAND, the editor was intended for use not only by
-researchers, but also by support staff, who had no workd processing
+researchers, but also by support staff, who had no word processing
 experience whatsoever and had, to this point, used typewriters exclusively.
 Therefore, RAND special-ordered ASCII terminals with the keyboards rewired
 to send control characters whenever function keys or keys on the numeric
