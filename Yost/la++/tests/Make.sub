@@ -1,0 +1,23 @@
+
+T =  d
+CMD = d
+ARGS =
+
+all : $Tdone
+
+$Tdone : $Tref $Terrref
+	-rm -f $@
+	../test $(CMD) $(ARGS) > $Tout 2> $Terrout
+	sh -c 'echo "=diff $Tref    $Tout"    ; \
+		      diff $Tref    $Tout     ; d1=$$? ; \
+	       echo "=diff $Terrref $Terrout" ; \
+		      diff $Terrref $Terrout  ; d2=$$? ; \
+	       if test $$d1 = 0 && test $$d2 = 0 ; then : ; else exit 1 ; fi'
+	rm -f $Tout $Terrout
+	date > $@
+
+clean :
+	rm -f $Tdone $Tout $Terrout
+
+clobber : clean
+	rm -f $(CMD)

@@ -1,0 +1,34 @@
+
+
+^@ nul                                  esc @                                   esc `
+^A soh                                  esc A                                   esc a
+^B stx                                  esc B                                   esc b
+^C etx                                  esc C                                   esc c
+^D eot                                  esc D                                   esc d
+^E enq                                  esc E                                   esc e
+^F ack                                  esc F                                   esc f
+^G bel                                  esc G                                   esc g
+^H bs                                   esc H                                   esc h
+^I ht                                   esc I                                   esc i
+^J lf                                   esc J                                   esc j
+^K vt                                   esc K                                   esc k
+^L ff                                   esc L                                   esc l
+^M cr                                   esc M                                   esc m
+^N so                                   esc N                                   esc n
+^O si                                   esc O                                   esc o
+^P dle                                  esc P                                   esc p
+^Q dc1                                  esc Q                                   esc q
+^R dc2                                  esc R                                   esc r
+^S dc3                                  esc S                                   esc s
+^T dc4                                  esc T                                   esc t
+^U nak                                  esc U                                   esc u
+^V syn                                  esc V                                   esc v
+^W etb                                  esc W                                   esc w
+^x can                                  esc x                                   esc x
+^Y em                                   esc Y                                   esc y
+^Z sub                                  esc Z                                   esc z
+^[ esc                                  esc [                                   esc {
+^\ fs                                   esc \                                   esc |
+^] gs                                   esc ]                                   esc }
+^^ rs                                   esc ^                                   esc ~
+^_ us                                   esc _                                   esc del

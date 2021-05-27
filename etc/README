@@ -1,0 +1,4 @@
+
+Copy the keyboard files to $LIB (typically /usr/local/etc/e).
+
+Usage eg.: 'setenv EKBFILE $LIB/kb.sun'.

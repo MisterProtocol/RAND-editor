@@ -1,0 +1,6 @@
+
+Table of code size improvement by using registers:
+  Regs    %     text    data    bss     dec     hex
+    0   100.0   4048    20      0       4068    fe4
+    3    81.0   3280    20      0       3300    ce4
+    6    79.9   3236    20      0       3256    cb8

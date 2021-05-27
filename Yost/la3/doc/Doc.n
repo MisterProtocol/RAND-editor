@@ -1,0 +1,1172 @@
+\" troff -ms
+.if n .ds SQ "`
+.if t .ds SQ "\(sq
+.if n .nr LL 80m
+.if n .ds OQ ""
+.if n .ds CQ ""
+.if t .ds OQ "``
+.if t .ds CQ "''
+.ds DQ ""
+.if n .na
+.de Ia
+.br
+.if t .I \\$1
+.if n \\$1	\&
+..
+.de Ba
+.br
+.if t .B \\$1
+.if n \\$1	\&
+..
+.nr FM .9i
+.nr PS 11
+.nr VS 12.5
+.ND
+.TL
+.nf
+\*(OQLA\*(CQ, a Line-access Text File I/O Library
+.AU
+David Yost
+.AI
+LaurelArts
+8464 Kirkwood Drive
+Los Angeles, CA  90046
+213-650-1089
+.sp
+April, 1986
+.sp
+originally written for
+.sp .5
+The Rand Corporation
+1700 Main Street
+Santa Monica, CA  90406
+
+July, 1980
+.AB
+The Line Access file I/O library
+implements file editing primitives for text files.
+It was originally based on code extracted from the Rand Editor,
+enhanced and integrated into a stand-alone library.
+Today it is used in the Grand Editor, and work on it continues.
+The library provides access to text files by line position,
+and facilitates line insertion, deletion,
+and other modifications to files.
+It should simplify the implementation
+of any editor
+or other program which modifies text files
+or needs to do random line positioning in text files.
+.AE
+.SH
+Background
+.PP
+In 1980,
+I needed to do some major restructuring in the Rand Editor's
+internal architecture.
+It became evident that the editor would be more
+reliable,
+maintainable, and extendable if the code related to file I/O were
+rewritten and
+separated from the rest of the editor code.
+For the remainder of this paper, I will refer to my newer
+Grand Editor instead of the Rand Editor.
+.PP
+The result is a library of subroutines that does the file manipulation
+tasks required by a sophisticated editor.
+It is called the Line Access I/O library, or LA Library for short.
+You will be glad to know that you don't have to be a resident of LA
+or carry a LA Library card to use it.
+The library provides a set of primitives
+with which programs can access files by line position
+or character position and make changes to files.
+The Grand Editor can simultaneously
+work on multiple files possibly in multiple windows,
+can hold onto file positions even when surrounding text is inserted
+or deleted, and can move data between files.
+These features put great demands on the design of the LA Library.
+The result is therefore richer in capabilities than many other editors
+might ever need.
+.PP
+The LA Library was first conceived by the author in April of 1979.
+Richard Kiessig did the initial coding,
+and the author did additional coding and final checkout.
+The technique of using FSD structures (explained later)
+for editor file management was
+developed by
+Walter Bilofsky
+for the original Rand Editor in 1974.
+The FFIO cache buffering I/O Library through which the LA Library does its
+file I/O was developed by Bruce Borden for Rand in 1978.
+.PP
+If you have an application for the LA Library,
+please make contact with the author at the above address.
+We would like to set up a user's group to exchange
+comments, additions, and bug fixes.
+Also, we solicit comments on the documention.
+.SH
+Overview
+.PP
+When you open a file with the LA Library,
+the open routine scans the
+file for newline characters and builds a chain of
+\*(OQFile Segment Descriptor\*(CQ
+(FSD) structures in memory.  Each FSD describes a number of lines in the
+file, and contains the lengths of the lines pointed to.  To position by
+line number, the package walks through the chain of FSD structures.
+Line deletes are effected by breaking and reconnecting the FSD chain around
+the deleted lines.  Inserts are effected by writing the new text to a
+temporary file, creating an FSD for the new text, and inserting the FSD
+into the chain.
+.PP
+To modify a file, you call various LA primitives, such as \*(OQline
+replace\*(CQ, \*(OQline delete\*(CQ, etc.
+The virtual file as seen through the
+LA Library will appear to have been modified by these operations, but the the
+real file will be unchanged.  If you want to update it, you must use
+another LA primitive which writes out the virtual file to a system I/O
+channel.
+.PP
+The LA Library requires only that the files opened be readable;
+it is the calling program's responsibility to determine whether or not
+it has permissions to do the file renaming, creation, writing, etc. that
+will be necessary to save the updated versions of the files which are
+modified through the LA Library.
+.LP
+.sp 1v
+.if t .bd I 3
+.I
+The Calls
+.bd I
+.PP
+La_open is called to open a file for editing.  It returns a pointer to
+an \*(OQLa_stream\*(CQ structure,
+which is used in further calls to operate on that stream.
+If you need to work in different areas of a file at the
+same time, it is advisable to open one stream for each area of operation,
+since a separate seek position is maintained for each stream, and seeks can
+be expensive.
+.PP
+Here is a partial list of the LA functions.  For those operations such
+as seeking which can be line-oriented or byte-oriented, the names of the
+pair of functions will start with \*(OQla_l\*(CQ or \*(OQla_b\*(CQ,
+respectively.
+.IP
+.ta 12m
+.if t .bd I 3
+.Ia la_align
+Align the seek positions of two streams
+.Ia la_blank
+Insert blank lines
+.Ia la_bseek
+Seek to a byte offset.  Relative to beginning, current, or end
+.Ia la_bsize
+Return the size in bytes of the file
+.Ia la_bytepos
+Return the current byte position of the stream
+.Ia la_clone
+Clone a new stream with separate seek pointer
+.Ia la_close
+Close a stream
+.Ia la_clseek
+Seek in the neighborhood of the current line
+.Ia la_eof
+Return end-of-file status
+.Ia la_error
+Return last error code
+.Ia la_int
+Routine supplied by the user which is polled by some LA
+routines to determine if they should be aborted
+.Ia la_lcopy
+Copy some lines from one stream to another
+.Ia la_ldelete
+Delete lines, and move them elsewhere if desired
+.Ia la_lflush
+Write out from an La_stream to a system I/O channel
+.Ia la_lget
+Get a line from a stream into a buffer
+.Ia la_linepos
+Return the current line position of the stream
+.Ia la_linsert
+Insert the contents of a buffer into a file
+.Ia la_lreplace
+A delete followed by an insert
+.Ia la_lrsize
+Return the number of characters in the current line beyond the
+current postition
+.Ia la_lseek
+Seek to a line number.  Relative to beginning, current, or end
+.Ia la_lsize
+Return the size in lines of the file
+.Ia la_lwsize
+Return the number of characters in the current line
+.Ia la_open
+Open a file for use
+.br
+.bd I
+.LP
+.sp 1v
+.if t .bd I 3
+.I
+The Data Structures
+.bd I
+.PP
+When a file is opened, its device and inode number are checked by the FFIO
+Library to see if it has been opened already.
+If not, a new La_file structure is created for the file.
+An La_file structure contains pointers
+to the first and last of the chain of FSD structures for the file,
+the number of lines and the number of bytes in the file,
+the Ff_stream pointer for the file,
+pointers to a chain of La_stream structures associated with the La_file,
+and other information.
+.PP
+Associated with each La_file there are one or more La_stream structures.
+Each of these contains a pointer to its associated La_file
+structure and the seek position in terms of line position, byte position,
+and current position in the FSD chain for the file.
+.PP
+An \*(OQFSD chain\*(CQ is a linked list of FSD structures each of which
+describes a segment of the file, containing one or more lines of text.  An
+FSD structure contains forward and backward pointers to FSD's,
+the absolute position
+in the disk file where the segment can be found, a pointer to the La_file
+containing the Ff_stream handle for that system file, the number of lines
+described by the FSD, the number of \*(OQfsdbytes\*(CQ (explained below) in this
+structure, and the fsdbytes.
+.DS I
+.so Doc1.n
+.DE
+.LP
+FSD structures are always alloced, and the space allocated for an FSD is:
+.IP
+(sizeof (La_fsd) \- 1) + number-of-fsdbytes-required
+.PP
+The fsdbytes in an FSD hold the lengths (including newline) of the
+lines described by the FSD.  If a line is from 1 to 127 bytes long, then
+the line length is stored in one byte.  If the line length is greater than
+127, then it takes two bytes to store the line length, and the first byte
+reveals that fact by being < 0.  In this case, the formula for the length
+of the line is:
+.IP
+(\-byte[0] * 128) + byte[1]
+.LP
+The second byte will be positive and \(<= 127.  The maximum line length
+representable in this fashion is (128 * 128) + 127, or 16,511 bytes.
+.PP
+There is a special FSD format which can describe only one line per
+FSD.  It is used to describe a line which is too long to handle with the
+standard format, or one which is not terminated by a newline.  The latter
+case can happen only at the end of a file.  The LA Library will treat such
+a line as if it were terminated by a newline, and in no case will the LA
+Library write out a file without a terminating newline.  If there
+is only one line in the FSD and the first fsdbyte is 0, then it is a
+special FSD.  The second fsdbyte is 0 or 1 to indicate whether the line is
+or isn't terminated by a newline, respectively.  The next four fsdbytes
+form a long int containing the number of characters in the line.
+.PP
+(Possible future implementation:  if the fsdfile element of an fsd structure
+is NULL, then all the lines described by the fsd are blank, there are no
+fsdbytes, fsdpos is ignored, and there is no file containing
+the lines to which the fsd points.)
+.SH
+Using the LA Library
+.PP
+Any program using the LA Library must include the header file <la.h>
+which contains typedefs, macro definitions, and external declarations.
+Note that <la.h> includes <ff.h> which includes <stdio.h>.
+.LP
+The typedefs are:
+.IP
+.ta 12m
+.Ia La_stream
+The stream structure.  La_open returns a pointer to an La_stream.
+.Ia La_linepos
+Line offset into the file.
+Normally a
+.I short.
+Can be defined as a
+.I long.
+.Ia La_bytepos
+Byte offset into the file.  Type
+.I long.
+.Ia La_linesize
+Length of a line.
+Normally a
+.I short,
+can be defined as a
+.I long.
+.Ia La_flag
+Holds a YES (1) or a NO (0).
+.br
+.LP
+The defines are:
+.IP
+.ta 13m
+.Ba LA_LONGLINES
+Defined if the package is compiled to support lines longer
+than 16511 bytes.
+.Ba LA_MAXLINE
+Longest line allowed.  If LA_LONGLINES is defined then
+LA_MAXLINE is 0x7fffffff else it is 16511.
+.Ba LA_LONGFILES
+Defined if La_linesize is a long
+.Ba LA_BP
+Defined if byte position and file size are to be supported.
+.LP
+Defined functions are documented below.
+Various error codes are also defined.  See \*(OQla.h\*(CQ.
+.IP
+NOTE:
+.br
+A
+.I long
+on the target machine must be representable as an array of four
+.I chars
+for LA to work correctly as written.
+.PP
+Some aspects of the operation of the package are controlled by
+the contents of global data items which can be set by the user:
+.IP
+The maximum number of files the LA Library is allowed to have open is
+stored in
+\*(OQint la_maxchans\*(CQ.  The default is \*(OQ_NFILE\*(CQ from <stdio.h>.
+.IP
+A pointer to the name of the temporary file used by the package
+is in \*(OQchar *la_cfile\*(CQ.
+It points to the string \*(OQla_changes\*(CQ by default.
+It is recommended that you use mktemp() or equivalent to make a unique
+name.
+.IP
+The maximum length allowed in any line is stored in
+\*(OQLa_linesize la_maxline\*(CQ.
+Default is LA_MAXLINE.  An error will result if you try to open a file
+containing a line longer than la_maxline, or try to insert a line
+longer than la_maxline into a file.
+.PP
+Some other global data items are set by the package, and may be looked at
+by the user:
+.IP
+The La_stream pointer for the changes file is \*(OQLa_stream *la_chglas\*(CQ.
+.IP
+The Ff_stream pointer for the changes file is \*(OQFf_stream *la_chgffs\*(CQ.
+.IP
+A flag which is non-zero if the changes file has been opened by LA is
+\*(OQLa_flag la_chgopen\*(CQ.
+.IP
+The number of file descriptors in use by LA is in \*(OQint la_chans\*(CQ.
+.IP
+If the last LA error was not attributable to any La_stream, then it is
+stored in \*(OQint la_errno\*(CQ.   An example of an error of this type is a
+failed la_open.
+.SH
+Updating modified files
+.PP
+If you have modified a file, and you want to save the new version,
+you call la_lflush to write out the virtual file as seen through the
+LA Library to a real disk file.
+There is a catch here, however.
+You can't just do an la_lflush back onto the original file.  This is
+because you probably still have FSD's pointing into the original file, and
+as you wrote over the original, you would garble up the data that the FSD's
+point to.
+.PP
+There are two ways to update the original. The first is
+to rename the original to
+some a backup name, create a new file with the same name as the
+original, and do your la_lflush to the new file.
+Note that you now have a
+backup file if you want it, which you got simply by doing the rename.
+If you don't want the backup
+file to hang around, just delete it after you have done the la_lflush.
+This updating scheme is the preferred way you would update a file that has
+only one link.
+If the file has more than one link,
+this scheme would leave you with a multiple-link backup file, and
+a single-link new file.
+If this is what you want, fine.
+.PP
+However, if you want to preserve the links to the original
+when you do the update,
+you must copy the original to a backup file, repoint the FSD's to the new
+backup file, do a creat on the original file,
+and then do the la_lflush to the orignal file.
+To repoint the FSD's you call la_freplace with the name of the backup file.
+Now you have a single-link backup file, and the original still has all the
+links it had before the update.
+.PP
+There is one more issue involved in updating.
+If you did any LA calls which would copy or move text
+from one file to another,
+then you have to be sure that the backup files all exist until you have
+done all the updates you are going to do.  Then you can
+delete the backups if you wish.
+The reason for this is that file B may have FSD's pointing to the original
+version of file A, and if you update file A and delete the backup before
+you update file B, those FSD's will be pointing nowhere.
+.PP
+In the foregoing discussion, the important thing is that the originals
+of the edited files
+.I exist
+while doing the la_lflush calls.
+On unix, if you open a file and then unlink it, it will continue to exist
+with no name until you close it.
+You can use this trick to satisfy the requirement if you wish.
+.SH
+Error Conditions
+.PP
+In some cases, if a corruption of the data structures is detected, the
+package will abort via a call to la_abort (which the user can supply).
+In most cases, however, if an error occurs during the execution of
+a function, the function is aborted and things are restored to the way
+they were before the function was called.
+The package uses alloc and free, so one major
+source for errors is the out-of-heap-space condition.
+The other major source of errors is the out-of-disk-space condition.
+Since the disk I/O is cache buffered,
+disk write errors can be delayed.
+The usual C conventions for error returns are used.  NULL is returned
+instead of a pointer, \-1 is returned instead of a valid number of lines, etc.
+The error type is stored in the global int la_errno.
+The function la_error() should be called to read la_errno and clear it.
+.SH
+Insertions
+.PP
+Normally, if an insert is
+done to a file, the seek position of any stream pointing to a line at
+or after the line where the insert took place is adjusted forward so
+that the stream points to the same text as it did before the insert.
+Each stream has an \*(OQLA_STAY\*(CQ flag bit associated with it.
+If the stream's LA_STAY bit is set
+and its seek position is at the line where the insert happened,
+then its seek postion
+will stay at that line number and point to the beginning of the
+first line of the new, inserted text.
+.PP
+Three macro functions are provided to manipulate the LA_STAY flag
+bit of a stream: la_stayset, la_stayclr, and la_stay, which
+set, clear, and interrogate the LA_STAY bit, respectively.
+.SH
+Future Work
+.PP
+La_getc and la_putc macro calls may be useful.
+.PP
+A version of the library that keeps FSD's in a file instead of in memory
+would be helpful on machines with limited process data memory, such as
+PDP-11's without split instruction and data memory management,
+and many microprocessors. [in 1986 this one reads more like Deep Dark Past
+Work! -- D Yost, 1986]
+.br
+If the FFIO Library were modified to maintain multiple buffer pools,
+FSD's could be cached in a separate buffer pool.
+.br
+Another modification
+to FFIO that would probably be useful would be specifiable buffer sizes
+for each pool.
+.br
+FSD's could be limited to 128 bytes and aligned so as not to cross
+128-byte file boundaries, so that caching them would be easy with FFIO.
+.bp
+.SH
+The Calls in Detail
+.PP
+.de F1
+.KS
+.nf
+.ta 4m 8m 12m 16m 20m 24m 28m 32m 36m 40m
+..
+.de F2
+.if n .sp 1v
+.if t .sp .5v
+.fi
+.na
+..
+.de F3
+.KE
+.if n .sp 2v
+.if t .sp 1.5v
+..
+.de F4
+.if n .sp 1v
+.if t .sp .5v
+..
+.de F5
+.KE
+.if n .sp 1v
+.if t .sp .5v
+..
+.F1
+la_abort (string)
+	char *string;
+.F2
+This is a routine that is called if a disastrous error condition
+occurs within the LA Library.  No such condition should ever happen,
+but there are still some checks in the code just in case.
+If the user chooses to supply his own version of this routine,
+it should either exit or abort.
+The one supplied in the library calls \fIabort\fR(2).
+.F3
+.F1
+la_linepos
+la_align (olas, nlas)
+	La_stream *olas;
+	La_stream *nlas;
+.F2
+Align the seek position of nlas to the position of olas.
+Both olas and nlas must be streams into the same file.
+Returns the current seek position or \-1 if error.
+.F3
+.F1
+La_linepos
+la_blank (plas, nlines)
+	La_stream *plas;
+	La_linepos nlines;
+.F2
+The current position in plas is set to the beginning of the
+current line, if not there already.
+Inserts nlines new blank lines at the current position in plas.
+Returns number of blank lines inserted; 0 if error.
+.F3
+.F1
+La_bytepos
+la_bseek (plas, nchars, type)
+La_stream *plas;
+La_bytepos nchars;
+int type;
+.F2
+Seek to the byte position in the file. Seek type is 0 for relative to
+beginning, 1 for relative to current, or 2 for relative to end.
+Forward seeks are limited at end of file.
+If you want to seek beyond the current end of file,
+you'll have to explicitly
+make the file longer with a call to la_blank.
+Returns current byte position.
+Not available if LA_BP is not defined.
+.br
+(Not implemented yet)
+.F3
+.F1
+La_bytepos
+la_bsize (plas)
+	La_stream *plas;
+.F2
+Returns size in bytes of the file.
+.br
+(Macro if LA_BP defined, otherwise a real function.)
+.F3
+.F1
+La_bytepos
+la_bytepos (plas)
+	La_stream *plas;
+.F2
+Returns the current byte position in plas.
+Useless if LA_BP is not defined.
+.br
+(Macro)
+.F3
+.F1
+int
+la_chan (plas)
+	La_stream *plas;
+.F2
+Returns the channel number (file descriptor) of the system open
+associated with plas.  Returns \-1 if none.
+.br
+(Macro)
+.F3
+.F1
+la_cleanse (plas)
+	La_stream *plas;
+.F2
+Finds all FSD's pointing to the same file as plas.
+Copies the data for them to the changes file,
+and repoints the FSD's to the appropriate positions in the changes file.
+The purpose is to make it permissible to close plas
+and free up a system I/O channel.
+See la_close.
+.br
+(Not implemented yet)
+.F3
+.F1
+La_stream *
+la_clone (oldlas, newlas)
+	La_stream *oldlas;
+	La_stream *newlas;
+.F2
+Open a new La_stream into the same file as oldlas.
+If newlas is non-NULL,
+it is used as the address of the La_stream structure for this stream,
+otherwise one will be alloced for you.
+The seek position of
+the new stream will be initialized to the same position as the old
+stream, but the new stream will have a distinct seek pointer from the
+old stream.  Here the obvious analogy between la_clone and the unix
+\*(OQdup\*(CQ call breaks down.
+.F3
+.F1
+La_linepos
+la_close (plas)
+	La_stream *plas;
+.F2
+Close the La_stream.
+La_close may or not let you succeed in closing the stream.
+If it returns 0,
+then the stream is closed,
+and if it had been alloced by the la_open it is freed.
+If it returns > 0,
+then it is returning the number of FSD's still linked to the file,
+and that means the stream,
+which is the only stream pointing at the file,
+is still active, that is, it was not closed.
+A \-1 return means an error.
+If the stream was the only stream for this file, and la_close
+returns 0, then all FSD's pointing at the file have been freed and the
+file is actually closed, freeing up a system I/O channel.
+See la_cleanse.
+.F3
+.F1
+La_linesize
+la_clseek (plas, nchars)
+	La_stream *plas;
+	La_linesize nchars;
+.F2
+If nchars is positive,
+move the seek pointer forward no farther than the beginning of the
+next line.
+If nchars is negative and we are at the beginning of a line,
+move the seek pointer                                             
+backwards no farther than the beginning of the previous line,
+If nchars is negative and we are not at the beginning of a line,
+move the seek pointer                                             
+backwards no farther than the beginning of the current line.
+If nchars == 0, pointer is advanced to beginning of next line.
+Returns number of character positions moved (including newline).
+.F3
+.F1
+La_linepos
+la_eof (plas)
+	La_stream *plas;
+.F2
+Returns 1 if at end of file on plas; else 0.
+.br
+(Macro)
+.F3
+.F1
+la_error ()
+.F2
+Returns la_errno and resets la_errno to 0.
+La_errno is a positive value corresponding to the type of the last error
+that occurred.
+.F3
+.F1
+La_linepos
+la_finsert (plas, stchar, nchars, stline, nlines, filename, pffs, chan)
+	La_stream *plas;
+	La_bytepos stchar;
+	La_bytepos nchars;
+	La_linepos stline;
+	La_linepos nlines;
+	char *filename;
+	Ff_stream *pffs;
+	int chan;
+.F2
+Insert a file into plas before the current line.
+.br
+(Not finished yet.)
+.F3
+.F1
+la_freplace (filename, plas)
+	char *filename;
+	La_stream *plas;
+.F2
+If you copy the original file pointed to by plas to another file,
+you can use la_freplace to make all the FSD's pointing to the original
+file point to the new file.
+Returns a YES if all went OK, or NO if error.
+To understand why this function is used, read the section above on updating
+files.
+.F3
+.F1
+la_int ()
+.F2
+User should supply his own version of this routine.
+Returns non-0 if you want to cancel interruptable LA operations.
+The routines in the LA Library which are interruptable in this
+way are:
+.nf
+		la_lflush
+		la_parse, which is called by:
+			la_open
+			la_lrcollect
+			la_linsert, which is called by:
+				la_blank
+				la_lreplace
+.F3
+.F1
+La_linepos
+la_lcollect (state, buf, nchars)
+	int state;
+	char *buf;
+	int nchars;
+.F2
+Sometimes you need to insert a number of lines into a file,
+and they can't simply be copied from one file to another all at once
+but have to be made up by hand one at a time.
+This can be accomplished with repeated calls to la_linsert,
+but that will create a small FSD for each line.
+La_lcollect and its companion la_lrcollect provide a way of
+grouping newly-created lines into larger FSD's.
+To insert a group of lines, you call la_lcollect once for each line.
+On the first call of the group, set state to 1.  On subsequent calls,
+set state to 0.  Finally, call la_lrcollect to actually
+parse all of the lines and insert them.
+On each call, a buffer of nchars (\ \(>=\ 0\ ) will be collected.
+Returns 0 if OK, \-1 if error.
+The error number, if any, is stored in la_errno.
+.F3
+.F1
+La_linepos
+la_lrcollect (plas, nlines, dlas)
+	La_stream *plas;
+	La_linesize *nlines;
+	La_stream *plas;
+.F2
+This routine is called
+to replace existing lines with collected lines.
+Lines are collected with la_lcollect and la_tcollect.
+If nlines > 0,
+then nlines lines will be deleted from the
+current position of plas and, if dlas is non-NULL, inserted at the
+current position in dlas, and *nlines is set to the number of lines
+actually deleted.
+Then the collected lines, if any, are inserted at the
+current position of plas.
+If all went OK, returns number of lines inserted.
+If there is any error, then no deletion or insertion takes place, and
+la_lrcollect returns \-1.
+Collection is always in one of two states:
+DORMANT or COLLECTING.
+If the state is DORMANT, it is set to COLLECTING on
+a call to la_tcollect or la_lcollect
+and stays in the COLLECTING state during subsequent calls to la_lcollect
+until la_lrcollect is called.
+If la_lrcollect fails for a reason such as
+out-of-heap-space or disk space,
+then collection is left in the COLLECTING
+state so that you can try again.
+If it fails for a more fatal reason,
+or if it succeeds,
+the state is restored to DORMANT.
+.F3
+.F1
+int
+la_tcollect (pos)
+	long pos;
+.F2
+Sets things up so that la_lrcollect will pick up everything from pos
+to the end of the changes file.
+Returns 0 if pos is off the end of the changes file, else 1.
+.F3
+.F1
+La_linepos
+la_lcopy (slas, dlas, nlines)
+	La_stream *slas;
+	La_stream *dlas;
+	La_linepos nlines;
+.F2
+The current position in each stream is set to the beginning of the
+current line, if not there already.
+Insert a copy of nlines lines from the current position in slas
+(source stream)
+at the current position in dlas (destination stream).
+Returns number of lines actually copied or \-1 if out of FSD space.
+.F3
+.F1
+La_linepos
+la_lcount (plas, num, mode)
+	La_stream *plas;
+	La_linepos num;
+	int mode;
+.F2
+Returns the number of lines forward (mode == 1) or backward (mode == \-1)
+from the current position or num, whichever is less.
+If mode is 2 or \-2, returns the number of lines in num paragraphs
+forward or backward where a paragraph is delimited by blank lines or
+a line beginning with a form-feed.  Blank lines before the first
+start of paragraph are included in the count.
+(Backward paragraph scanning is not implemented yet.)
+.F3
+.F1
+La_linepos
+la_ldelete (slas, nlines, dlas)
+	La_stream *slas;
+	La_linepos nlines;
+	La_stream *dlas;
+.F2
+The current position in each stream is set to the beginning of the current
+line, if not there already.
+Delete the lines after the current
+position in slas.
+If any other La_streams are pointing beyond the deleted area,
+their current positions are adjusted to point to the same
+text they were pointing to before the delete.
+If any other La_streams
+are pointing inside the deleted area, their current position pointers
+are set to the beginning of the deleted area.
+If any La_stream has reserved lines inside the deleted area,
+its number of reserved lines is cleared.
+If dlas is non-NULL, then insert the deleted lines
+at the current position there, otherwise free up the FSD chain of the
+deleted lines.
+Returns number of lines actually deleted or \-1 if out of FSD space.
+.F3
+.F1
+La_linepos
+la_lflush (plas, start, nlines, chan, oktoint, timeout)
+	La_stream *plas;
+	La_linepos start, nlines;
+	int chan;
+	int oktoint;
+	unsigned int timeout;
+.F2
+Writes out nlines of plas from start line to system channel (file descriptor)
+chan.
+If oktoint is non-0, la_int will be called before each block is written out
+during the flush,
+and if it returns non-0, the flush will be aborted.
+If oktoint is non-0 and timeout is > 0,
+then if any write takes longer than timeout seconds to complete,
+it is aborted.
+At that time la_int is called, and if it returns non-0 the flush is
+aborted, else the write is retried.
+Timeout should be at least 5 for efficiency reasons.
+Does not move the seek position of plas.
+Returns number of lines written, and
+if that equals min (nlines, la_linesize (plas)), all went OK.
+Else, part of the next line may have been written out.
+Use la_error () to find out what went wrong.
+.F3
+.F1
+La_linesize
+la_lget (plas, buf, nchars)
+	La_stream *plas;
+	char *buf;
+	int nchars;
+.F2
+Reads up to nchars from the current seek position into buf,
+up to and including the first newline.
+Advance the seek pointer by the number transferred.
+Returns number of chars read; 0 on end of file, \-1 on error.
+.F3
+.F1
+La_linepos
+la_linepos (plas)
+	La_stream *plas;
+.F2
+Returns the current line position in plas.
+.br
+(Macro)
+.F3
+.F1
+La_linepos
+la_linsert (plas, buf, nchars)
+	La_stream *plas;
+	char *buf;
+	int nchars;
+.F2
+The current position in plas is set to the beginning of the
+current line, if not there already.
+Insert nchars characters from buf before the current line in plas.
+If nchars == 0 la_linsert does nothing.
+If nchars > 0, a newline must be
+the last character in buf (buf[nchars\-1] == '\\n').
+The number of lines
+added to the file is the number of newlines in buf.
+All La_streams pointing to this file at or after the position of the
+insert are adjusted forward so that they point to the same text they
+pointed to before the insert
+(see la_stay for an exception to this).
+Returns number of lines inserted if OK; \-1 if error.
+.F3
+.F1
+La_linesize
+la_lmax (plas)
+	La_stream *plas;
+.F2
+Returns the maximum length of any line in the file.
+Only useful after
+la_open, la_linsert, or la_lreplace, which may increase this value for
+a file, but will never decrease it.
+Other file modifications make it
+unreliable.
+.br
+(Macro)
+.F3
+.F1
+La_linesize
+la_lpnt (plas, buf)
+	La_stream *plas;
+	char **buf;
+.F2
+Get the block containing the byte at the current seek position into
+the cache and set buf to point to that byte.
+Be careful not to do any other LA or FF I/O while reading data
+in the block pointed to, because it is not locked in the cache
+and could be pulled out from under you.
+If you are worried about it, use la_lget instead.
+Returns the number of characters to end of line or end of block,
+whichever is smaller, and advances the seek pointer by that number.
+Returns number of chars pointed to; 0 on end of file, \-1 on error.
+.F3
+.F1
+La_linepos
+la_lreplace (plas, buf, nchars, nlines, dlas)
+	La_stream *plas;
+	char *buf;
+	int nchars;
+	La_linepos nlines;
+	La_stream *dlas;
+.F2
+Does an la_linsert followed by an la_ldelete.
+.nf
+	la_linsert (plas, buf, nchars)
+	la_ldelete (plas, dlas, nlines)
+.F2
+If the delete fails, then the insert is rescinded.
+Returns the number of lines deleted, or \-1 if error.
+.F3
+.F1
+La_linesize
+la_lrsize (plas)
+	La_stream *plas;
+.F2
+Returns the number of characters remaining in the current line after
+the current position.
+The terminating newline is included in the count.
+.F3
+.F1
+La_linesize
+la_lwsize (plas)
+	La_stream *plas;
+.F2
+Returns the number of characters in the whole current line (including
+newline).
+.F3
+.F1
+La_linepos
+la_lseek (plas, nlines, type)
+	La_stream *plas;
+	La_linepos nlines;
+	int type;
+.F2
+Seek to the line position in the file.
+Seek type is 0 for relative to
+beginning, 1 for relative to current, or 2 for relative to end.
+Seek pointer is always left at the beginning of a line.
+Forward seeks are limited to end of file.
+If you want to seek beyond the current end of file,
+you'll have to explicitly
+make the file longer with a call to la_blank.
+Returns current line position.
+.F3
+.F1
+La_linepos
+la_lsize (plas)
+	La_stream *plas;
+.F2
+Returns the number of lines in the file.
+.br
+(Macro)
+.F3
+.F1
+La_linepos
+la_ltrunc (nlines)
+	int nlines;
+.F2
+Returns nlines or the largest number of lines a file can have,
+whichever is smaller.
+.br
+(Macro)
+.F3
+.F1
+int
+la_modified (plas)
+	La_stream *plas;
+.F2
+Returns 1 if file has been modified, or 0 if not.
+.br
+(Macro)
+.F3
+.F1
+la_domodify (plas)
+	La_stream *plas;
+.F2
+Set the LA_MODIFIED bit for the file.
+.br
+(Macro)
+.F3
+.F1
+la_unmodify (plas)
+	La_stream *plas;
+.F2
+Clear the LA_MODIFIED bit for the file.
+.br
+(Macro)
+.F3
+.F1
+la_nstreams (plas)
+	La_stream *plas;
+.F2
+Returns the number of streams (including this one) that point to the
+same file.
+.br
+(Macro)
+.F3
+.F1
+La_stream *
+la_open (filename, mode, plas, offset, ffstream, chan)
+	char *filename;
+	char *mode;
+	long offset;
+	La_stream *plas;
+	Ff_stream *ffstream;
+	int chan;
+.F2
+Open the named file in the mode specified, and create a chain of FSD
+structures which describe it.
+There is no provision to specify \*(OQread\*(CQ
+or \*(OQwrite\*(CQ mode, since you have to be able to read the file to do this
+open, and since write permission on the file is irrelevent to whether
+or not you can modify it with LA Library calls.
+Hence, all La_streams
+are both readable and writable.
+The \*(OQmode\*(CQ argument is a string containing one of the following
+letters:
+.nf
+	'n' (new)  New or scratch file.
+	'c' (create if necessary)  Try to open a file named filename,
+		but if there isn't one, treat the open as if it had a 'n'
+		specifier.
+.F2
+If \*(OQplas\*(CQ is non-NULL, it is used as the address of the La_stream
+structure for this stream, otherwise one will be alloced for you.
+.F4
+If you specify \*(OQnew\*(CQ mode,
+.in +4m
+that means that you are opening a new or scratch file which will be
+initially empty, and that you mean to ignore whether or not there
+already exists a file by that (possibly null) name.  Thus, the
+\*(OQffstream\*(CQ and \*(OQchan\*(CQ arguments are ignored.
+The \*(OQoffset\*(CQ
+argument is also ignored.
+.in -4m
+else
+.in +4m
+The opening of an existing file involves associating a La_stream
+structure with an Ff_stream structure, which is in turn associated
+with a system channel.
+.in -4m
+If filename is a null string or null pointer, then
+.in +4m
+If ffstream is non-NULL,
+.in +4m
+it will be assumed that an ff_open has already taken
+place for the file, and the ffstream is to be used for
+the file.  The \*(OQchan\*(CQ argument is then ignored.
+.in -4m
+else
+.in +4m
+it is assumed that \*(OQchan\*(CQ is already open, and that
+it is to be used, and an ff_fdopen will take place.
+.in -4m
+else
+.in +4m
+an ff_open takes place for \*(OQfilename\*(CQ.  The \*(OQffstream\*(CQ
+and \*(OQchan\*(CQ arguments are ignored.
+.in -4m
+Start line 0 at \*(OQoffset\*(CQ in the file.
+.in -4m
+.F4
+If this is the first la_open call, the changes file will be created.
+The name of the changes file is pointed to by the global char pointer
+\*(OQla_cfile\*(CQ.
+.F4
+Returns an La_stream pointer or NULL if error.
+Error code is stored in la_errno.
+.F5
+.F1
+Examples:
+	\*(OQX\*(CQ arguments are ignored.
+	\*(OQL\*(CQ arguments can be \*(OQ(La_stream *) 0\*(CQ or \*(OQplas\*(CQ.
+.so Doc2.n
+.F5
+.F1
+La_stream *
+la_other (plas)
+	La_stream *plas;
+.F2
+If La_nstreams (plas) > 1, returns another La_stream pointing to
+the same file, otherwise returns NULL.
+Useful for closing all streams pointing to a file.
+.F3
+.F1
+la_setrlines (plas, nlines)
+	La_stream *plas;
+	La_linepos nlines;
+.F2
+Set the number of \*(OQreserved lines\*(CQ to nlines.
+Each stream can have a number of \*(OQreserved lines\*(CQ ahead of its
+current seek position.
+If any operation alters those lines, then
+the number is reset to 0.
+This is useful for providing temporary storage buffers,
+such as \*(OQQ-buffers\*(CQ in some
+editors or the \*(OQclose buffer\*(CQ, etc. in the Grand Editor.
+All you do is write the lines to a file,
+point a special stream at the lines,
+and reserve the lines in that stream.
+In case
+you allow modifications on the file where those buffers reside,
+you will know that a modification took place, because the number will
+have been cleared.
+.F3
+.F1
+int
+la_stayset (plas)
+	La_stream *plas;
+.F2
+Set the LA_STAY flag bit in plas.
+See the section above on inserting text.
+(Opposite of la_stayclr.)
+.br
+(Macro)
+.F3
+.F1
+int
+la_stayclr (plas)
+	La_stream *plas;
+.F2
+Clear the LA_STAY flag bit in plas.
+See the section above on inserting text.
+(Opposite of la_stayset.)
+.br
+(Macro)
+.F3
+.F1
+int
+la_stay (plas)
+	La_stream *plas;
+.F2
+Returns 1 if LA_STAY is set in plas, else 0.
+See the section above on inserting text.
+.br
+(Macro)
+.F3
+.F1
+int
+la_sync (flg)
+	La_flag flg;
+.F2
+Force all of the cached buffers to be written out.
+If flg is non-0
+do a system sync() call as well.
+(Actually a macro translation to ff_sync.)
+.F3

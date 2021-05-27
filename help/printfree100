@@ -1,0 +1,23 @@
+   +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+        +-----+-----+-----+-----+
+   |don't|CHGW | ALT | RED |CAPS |CCASE|AUTO |CLTAB|TABSR|TRACK|RANGE| UPA | DNA | LTA | RTA | CMD |<-- s ->|     |-SRCH|REPL |+SRCH|
+   |touch|-PAGE|+PAGE|-LINE|+LINE| LW  | RW  |OPEN |CLOSE|MARK |PICK |  ^  |  |  |     |     | CMD |    h   |SPLIT|INSMD|DELCH|HELP |
+   |block| F1  | F2  | F3  | F4  | F5  | F6  | F7  | F8  | F9  | F10 |  |  |  V  | <-  | ->  |home |    i   | clr |line | char|print|
+   +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+    f   +-----+-----+-----+-----+
+   |CTRQT|     |     |     |     |     |     |     |     |     |     |     |     |cCMD | BSP | CMD |    t   |     |     |     |     |
+   | esc |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  |  -  |  =  |  `  | bsp |break|    e   |  7  |  8  |  9  |  -  |
+   +-----+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+    d   +-----+-----+-----+-----+
+   |  -TAB  |     |cCGW |eERAS|cRED |cTABS|cCLRT|cHELP|cTAB |cOVLY|cCOVR|     |     |     | DEL |           |     |     |     |     |
+   |   TAB  |eQUIT|     |     |     |     |     |     |     |     |     |     |     |     |     |           |     |     |     |     |
+   |   tab  |  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |  [  |  ]  |     |rubot|           |  4  |  5  |  6  |  ,  |
++--+--+-----+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+     +-----+           +-----+-----+-----+-----+
+|     |        |     |     |cCNTR|cCAPS|cHOME| cLTA| cCR |cUPA |cRTA |     |     |   CR   |     |           |     |     |     |     |
+|     |        |eABRT|eSPLT|     |eFILL|     |     |eJOIN|eJUST|     |     |     |        |     |           |     |     |     |     |
+| ctrl|caps lok|  A  |  S  |  D  |  F  |  G  |  H  |  J  |  K  |  L  |  ;  |  '  | return |  \  |           |  1  |  2  |  3  |     |
++-----+--------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-----+--+--+--+           +-----+-----+-----+     |
+      |           |cSTOP|cEXIT|cCLER| cDNA|cLWRD|cRWRD| cCR |     |     |     |        | CR  |              |           |     |     |
+      |           |eSTOP|eEXIT|     |     |eBOX |     |     |     |     |     |        |     |              |           |     |     |
+      |   shift   |  Z  |  X  |  C  |  V  |  B  |  N  |  M  |  ,  |  .  |  /  |  shift | lf  |              |     0     |  .  |enter|
+      +-----------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+--------+-----+              +-----------+-----+-----+
+ Commands of the form cXXXX perform XXXX when used with ctrl key.
+ Commands of the form eXXXX perform XXXX when used following the ESC key.
+ Commands on function keys have shifted and normal forms.

@@ -1,0 +1,136 @@
+    (1)                        specific function keys (2)
+verbose   command         standard     free100 (3)  vt100 (4)      effect
+-------   -------         -------------------------------------    ------
+	  <CMD>           <^A>         <HOM>        <ENTER>        the "gold key". Entry to verbose commands,
+								   modifies other commands.
+-auto     <AUTO>          n/a          <~F6>        <^K>           reset auto-fill mode
+-blot     <CMD><BLOT>     n/a          n/a          <ENTER><^L>
+-close    <CMD><CLOSE>    <^A><^V>     <HOM><F8>    <ENTER><PF4>   insert the contents of the close buffer
+-command
+-dword                                                             reinsert the last deleted word (see dword)
+-erase    <CMD><ERASE>    <^A><^X><^E> <HOM><^E>    <ENTER><^E>    insert the contents of the erase buffer
+-join     <SPLIT>                                                  break the current line
+-macro                                                             unimplemented
+-mark     <CMD><MARK>     <^A><^U>     <HOM><F9>    <ENTER><kp3>   reset mark mode
+-pick     <CMD><PICK>     <^A><^P>     <HOM><F10>   <ENTER><kp,>   <PUT>; insert the contents of the pick buffer
+-range    <RANGE>         n/a          <~F10>       <^]>           reset the range mode
+-re       <REXP>          n/a          n/a          n/a            turn off regular-expression mode
+-regexp   <REXP>          n/a          n/a          n/a            turn off regular-expression mode
+-replace  ????
+-search   <-SRCH>         <^T>         <~LINE>      <kp1>          search backwards toward bof
+-split    <JOIN>          <^X><^J>     <^J>         <ESC><J>       join next line to current line
+-tab      <CMD><SCTAB>    <^X><^U>     <~TAB>       <PF3>          clear the tab stop at the current position
+-tabfile                                                           set tabs according to file spec
+-tabs     <CLRTAB>        <^Y>         <~F7>        <^Y>           reset all tab stops
+-track    <TRACK>         n/a          <~F9>        <^V>           reset the track mode
+-update
+-window                                                            remove the last window created
+?range    <CMD><RANGE>    n/a          n/a          n/a            what is the current range setting?
+?set                                                               display the current set values
+auto      <AUTO>          n/a          <~F6>        <^K>           set auto-fill mode
+b         <EXIT>          n/a           <^X> or <ESC><X>           normal exit from editor
+blot      <BLOT>          n/a          n/a          <^L>
+box       <BOX>           n/a          <ESC><B>     <ESC><B>       draw box
+bye       <EXIT>          n/a           <^X> or <ESC><X>           normal exit from editor
+call
+caps      <CAPS>          n/a          <~F4>        <^F>           switch alphas to capital case
+ccase     <CCASE>         n/a          <~F5>        <^A>           toggle case of alpha characters
+center    <CENTER>        n/a          <^D>         <^D>           center a line
+clear                                                              unimplemented
+close     <CLOSE>         <^V>         <F8>         <PF4>          delete a line from the file, enter into close buffer
+command
+cover     <COVER>         n/a          <^P>         <^P>           lay data in buffer over current data
+delete                                                             delete a file
+dword                                                              delete the word the cursor is on
+e                                                                  set an alternate file in current window
+edit                                                               set an alternate file in current window
+endm                                                               unimplemented
+erase     <ERASE>         <^E>         <^E>         <^E>           remove characters in current line
+exit      <EXIT>          n/a           <^X> or <ESC><X>           exit from editor
+feed
+fill      <FILL>          n/a          <ESC><F>     <ESC><F>       fill text in current paragraph
+goto      "number"                                                 move window to given line number
+help      <HELP>          n/a          <PRINT>      ??             request screen help display
+insert    <CMD><PICK>     <^A><^P>     <HOM><^P>    <ENTER><kp,>   insert buffer contents, making room
+join      <JOIN>          <^X><^J>     <ESC><J>     <ESC><J>       join next line to current line
+justify   <JUST>          n/a          <ESC><K>     <ESC><K>       justify text in current paragraph
+logoff                                                             normal exit and logout
+logout                                                             normal exit and logout
+macro                                                              unimplemented
+mark      <MARK>          <^U>         <F9>         <kp3>          set mark mode at current position
+name
+open      <OPEN>          <^O>         <F7>         <kp->          open a new line above current line
+overlay   <OLAY>          n/a          <^O>         <^O>           replace data in file with buffer data
+pick      <PICK>          <^P>         <F10>        <kp,>          place data in file into pick buffer
+print
+range     <RANGE>         n/a          <~F10>       ??             set range mode
+re        <REXP>                                                   toggle regular expression mode
+redraw    <REDR>          n/a          <~F3>        <^R>           redraw the screen
+regexp    <REXP>                                                   toggle regular expression mode
+replace   <REPL>          <^X><^R>     <~CHAR>      <kp6>          replace string found in search
+run                                                                run a shell command, insert output in file
+save                                                               save the current file to disk
+search    <+SRCH>         <^Y>         <~PRINT>     <kp2>          search foreward toward eof
+set                                                                set new value for set variable
+shell
+split     <SPLIT>         <^X><^S>     <ESC><S>     <ESC><S>       split current line
+stop      <STOP>          n/a           <^Z> or <ESC><Z>           suspend editor and run shell
+tab       <SCTAB>         <^X><^T>     <~F8>        <^T>           set a tab stop at the current position
+tabfile                                                            set tabs to file spec
+tabs                                                               set tab stops every nth column
+track     <TRACK>         n/a          <~F9>        <^V>           set track mode
+underlay  <CMD><OLAY>     n/a          <HOM><^O>    <ENTER><^O>    lay data in buffer underneath file data
+undo                                                               unimplemented
+update
+window                                                             create a new window
+	  <+LINES>        <^F>         <F4>         <kp8>          move window foreward 1/3 screen
+	  <-LINES>        <^D>         <F3>         <kp7>          move window backward 1/3 screen
+	  <+PAGE>         <^R>         <F2>         <kp5>          move window foreward a full screen
+	  <-PAGE>         <^E>         <F1>         <kp4>          move window backward a full screen
+	  <+WORD>         <^N>         <^N>         <^N>           move to start of next word to the right
+	  <-WORD>         <^B>         <^B>         <^B>           move to start of next word to the left
+	  <ALT>           <^X><^A>     <~F2>        <kp9>          switch to alternate file in current window
+	  <BSP>           <^H>         <BKSP>       <BKSP>         backspace
+	  <CHGWDW>        <^X><^W>     <~F1>        <^W>           switch active window to next in list <CMD>                                                    gold key; begin verbose command
+	  <CTRLQ>         <^X><^C>     <ESC><ESC>   <ESC><ESC>     insert control character
+	  <DELCH>         <^W>         <CHAR>       <kp.>          delete character at current position
+	  <HOME>          <^G>         <^G>         <^G>           move cursor to ul corner of current window
+	  <INSMOD>        <ESC>        <LINE>       <kp0>          enter insert mode
+	  <INT>           <^\>         <^\>         <^\>           interrupt playback
+	  <WLEFT>         <^X><^H>     <F5>         <PF1>          move window to left 16 columns
+	  <WRITE>         <^X><^H>     <F6>         <PF2>          move window to right 16 columns
+	  <TAB>           <TAB>        <TAB>        <TAB>          move cursor to next tab stop
+	  <-TAB>          <^X><^U>     <~TAB>       <PF3>          move cursor to previous tab stop
+
+
+Selected verbose command syntax:
+
+	<CMD>"close area"<RET> or <CMD>"area"<CLOSE> will close an area. (open, pick, erase)
+		area --> 7l is 7 lines, 5p is 5 paragraphs
+	<CMD>"edit filename"<RET> will edit the named file. (window, save)
+	<CMD>"run command-with-options"<RET> will execute the command. Stdout will be inserted in window.
+	<CMD>"fill width=n area"<RET> sets the right margin, then fills area. (justify)
+	<CMD>"n"<+PAGE> will move the window n lines. (-page)
+	<CMD>"exit [quit|nosave|dump|abort]"<RET> exits with various options.
+	<CMD>"replace area [interactive|show] /string1/string2/"<RET>
+	<CMD>"pattern"<+/-SCH> will search for the pattern.
+	<CMD>"tabs n"<RET> sets tabs at every n columns. (-tabs)
+	<CMD>"set var [value]"<RET> sets the value into var. Var can be:
+		+/-/line, +/-/page, left/right/window, bell/nobell/vbell, lmargin/rmargin/width, worddelim
+
+Notes:
+	1 - Verbose commands are entered in the form:              3 - On the Freedom 100, the <HOM> key refers to
+								       the key labeled CLR/HOME. <HOME> is                                          LR
+		<CMD>"command options"<RETURN>                         EOP/CLR/EOL, <LINE> is DEL/LINE/INS, and
+								       <CHAR> is DEL/CHAR/INS.  The function keys are
+	2 - Function key notation: <X> means typing key X,             <F1> through <F10> which may be shifted.
+	    <^X> means X with control shift, and <~X>
+	    means X with uppercase shift. <ESC> is the             4 - The vt100 uses the keypad for function keys.
+	    same as <^[>, and <TAB> is <^I>. n/a means                 The top row is <PF1> through <PF4>, the
+	    that that function is not available as a                   remainder are <kp0> through <kp9>, <kp.>,
+	    "function key", although still available as a              <kp,>, and <kp->. <ENTER> is also on the
+	    verbose command.                                           keypad.
+
+Other terminals:
+	adm5, adm3a - use the standard keyboard.
+	tv910 - use the standard keyboard, except that "home" is <DELCH>, "clear/space" is <OPEN>.

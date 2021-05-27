@@ -1,0 +1,97 @@
+A new version of E (19) has been installed on the ISL Vaxes and Suns.
+Should you encounter any problems, the old version may be accessed by
+invoking "e18".
+
+
+Brief Summary of e19 changes
+----------------------------
+
+
+1.  HELP FACILITY
+
+    Type "<CMD>help" to enter help mode.  In help mode, whenever any
+    function key or CTRL sequence is pressed, a message describing the
+    function is displayed.  Type a <RETURN> to exit help mode.
+
+
+
+2.  WORD PROCESSING MODE
+
+    Two new features are available in WP mode: (a) word wrap, and
+    (b) support for a "left margin".
+
+    Type "<CMD>wp" to enter word proc mode, "<CMD>-wp" to exit.
+    In this mode, "WP" is displayed at the bottom of the screen.
+
+    a) word wrap
+
+       Text that extends past the right margin is automatically placed
+       at the left margin.  The right margin (default = 74) is displayed
+       on the right side of the bottom border with a "+", and is set by
+       "<CMD>set width nn" (or "<CMD> set rmar nn").
+
+    b) left margin
+
+       The left margin is set by "<CMD>set lmar nn".  Any left
+       margin setting is displayed on the left side of the bottom border
+       with a "+".  In WP mode, a <RETURN> moves the cursor to the left
+       margin, rather then the left edge of the screen.
+
+
+
+3.  DELETE WORD
+
+    There is a new command to delete words.  The decision as to where to
+    place this key is still being worked on with CSD (for compatibility).
+    For now, the sequence "<CTRL-X><CTRL-N>" will work on Ambassadors,
+    XLs, Suns, or any terminal using the standard keyboard.
+    On the XLs and Suns, "<SHIFT><DEL CHAR>" may also be used.
+
+    This command will delete the word the cursor is on, or the next
+    word if the cursor is positioned on 'white space'.
+
+
+4.  RIGHT MARGIN BEHAVIOR
+
+    The behavior at the right margin has been changed to offer two
+    modes.  (1) nostick mode - typing or moving the cursor past the
+    rt. margin will automatically shift the window as if the
+    <WIN RT> key had been pressed.  (2) stick mode - typing past the
+    rt margin will give the "stuck at rt margin" msg, and moving
+    the cursor past the rt margin will do nothing (it used to move
+    1 space).  The default is nostick mode, which makes sense now that
+    word wrap is implemented.  One may use "<cmd>set [no]stick" to
+    switch modes, or use the "-stick" argument when envoking E.
+
+
+5.  GOTO
+
+    The goto command may also be specified as "<CMD>nn" in addition to the
+    previous "<CMD>g nn".
+
+
+6.  -STATE OPTION
+
+    E can be called up with the state file from a previous E session.
+    Example:
+
+	% e -state=statefile
+
+    This option causes the initial state of the editor to be read from the
+    indicated file.  Thus, a user may create an editor state, with
+    alternate files, windows, cursor positioned, etc, etc, and then exit
+    from the editor and rename the statefile (usually ".es1") to another
+    name.  Subsequent calls upon E with the state option addressing the
+    renamed state file will cause the editor to be reset to that state.
+    The named file is only used to set up the initial state; it therefore
+    will not be subsequently changed by the editor.  This allows the user
+    to create canned editor environments containing files, windows, cursor
+    positions, etc.
+
+
+7.  TAB SETTINGS
+
+    Individual tab settings are displayed across the top border with a "+".
+
+
+

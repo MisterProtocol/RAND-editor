@@ -1,0 +1,469 @@
+%!PS-Adobe-1.0
+%%Creator: kiwi:terry (Terry West)
+%%Title: x.t (ditroff)
+%%CreationDate: Tue Mar  8 14:56:05 1994
+%%EndComments
+% lib/psdit.pro -- prolog for psdit (ditroff) files
+% Copyright (c) 1984, 1985 Adobe Systems, Inc. All Rights Reserved.
+
+/$DITroff 140 dict def $DITroff begin
+/xi
+ {dolandscape 0 ne {90 rotate} {0 72 11 mul translate}ifelse
+  72 resolution div dup neg scale 0 0 moveto
+  /fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def
+  F /firstpage true def /pagesave save def}def
+/arctoobig 90 def /arctoosmall .05 def
+/m1 matrix def /m2 matrix def /m3 matrix def /oldmat matrix def
+/tan{dup sin exch cos div}def
+/point{resolution 72 div mul}def
+/dround	{transform round exch round exch itransform}def
+/xT{/devname exch def}def
+/xr{/mh exch def /my exch def /resolution exch def}def
+/xp{}def
+/xs{docsave restore end}def
+/xt{showpage}def
+/xf{/fontname exch def /slotno exch def fontnames slotno get fontname eq not
+ {fonts slotno fontname findfont put fontnames slotno fontname put}if}def
+/xH{/fontheight exch def}def
+/xS{/fontslant exch def}def
+/s{/fontsize exch def /fontheight fontsize def}def
+/f{/fontnum exch def}def
+/F {fontheight 0 le {/fontheight fontsize def}if
+    fonts fontnum get fontsize point 0 0 fontheight point neg 0 0 m1 astore
+    fontslant 0 ne{1 0 fontslant tan 1 0 0 m2 astore m3 concatmatrix}if
+    makefont setfont .04 fontsize point mul 0 dround pop setlinewidth
+   } def
+/X{exch currentpoint exch pop moveto show}def
+/N{3 1 roll moveto show}def
+/Y{exch currentpoint pop exch moveto show}def
+/S{show}def
+/MX{currentpoint exch pop moveto}def
+/MY{currentpoint pop exch moveto}def
+/MXY{moveto}def
+/cb{pop}def	% action on unknown char -- nothing for now
+/n{}def /w{}def
+/p{pop firstpage not{showpage}if pagesave restore /pagesave save def
+   /firstpage false def}def
+/abspoint{currentpoint exch pop add exch currentpoint pop add exch}def
+/distance{dup mul exch dup mul add sqrt}def
+/dstroke{currentpoint stroke moveto}def
+/Dl{2 copy gsave rlineto stroke grestore rmoveto}def
+/arcellipse{/diamv exch def /diamh exch def oldmat currentmatrix pop
+ currentpoint translate 1 diamv diamh div scale /rad diamh 2 div def
+ currentpoint exch rad add exch rad -180 180 arc oldmat setmatrix}def
+/Dc{dup arcellipse dstroke}def
+/De{arcellipse dstroke}def
+/Da{/endv exch def /endh exch def /centerv exch def /centerh exch def
+ /cradius centerv centerv mul centerh centerh mul add sqrt def
+ /eradius endv endv mul endh endh mul add sqrt def
+ /endang endv endh atan def
+ /startang centerv neg centerh neg atan def
+ /sweep startang endang sub dup 0 lt{360 add}if def
+ sweep arctoobig gt
+ {/midang startang sweep 2 div sub def /midrad cradius eradius add 2 div def
+  /midh midang cos midrad mul def /midv midang sin midrad mul def
+  midh neg midv neg endh endv centerh centerv midh midv Da
+  currentpoint moveto Da}
+ {sweep arctoosmall ge
+  {/controldelt 1 sweep 2 div cos sub 3 sweep 2 div sin mul div 4 mul def
+  centerv neg controldelt mul centerh controldelt mul
+  endv neg controldelt mul centerh add endh add
+  endh controldelt mul centerv add endv add
+  centerh endh add centerv endv add rcurveto dstroke}
+ {centerh endh add centerv endv add rlineto dstroke}ifelse}ifelse}def
+
+/Barray 200 array def % 200 values in a wiggle
+/D~{mark}def
+/D~~{counttomark Barray exch 0 exch getinterval astore /Bcontrol exch def pop
+ /Blen Bcontrol length def Blen 4 ge Blen 2 mod 0 eq and
+ {Bcontrol 0 get Bcontrol 1 get abspoint /Ycont exch def /Xcont exch def
+  Bcontrol 0 2 copy get 2 mul put Bcontrol 1 2 copy get 2 mul put
+  Bcontrol Blen 2 sub 2 copy get 2 mul put
+  Bcontrol Blen 1 sub 2 copy get 2 mul put
+  /Ybi /Xbi currentpoint 3 1 roll def def 0 2 Blen 4 sub
+  {/i exch def
+   Bcontrol i get 3 div Bcontrol i 1 add get 3 div
+   Bcontrol i get 3 mul Bcontrol i 2 add get add 6 div
+   Bcontrol i 1 add get 3 mul Bcontrol i 3 add get add 6 div
+   /Xbi Xcont Bcontrol i 2 add get 2 div add def
+   /Ybi Ycont Bcontrol i 3 add get 2 div add def
+   /Xcont Xcont Bcontrol i 2 add get add def
+   /Ycont Ycont Bcontrol i 3 add get add def
+   Xbi currentpoint pop sub Ybi currentpoint exch pop sub rcurveto
+  }for dstroke}if}def
+end
+/ditstart{$DITroff begin
+ /nfonts 22 def
+ /fonts[nfonts{0}repeat]def
+ /fontnames[nfonts{()}repeat]def
+1(Times-Roman)xf
+2(Times-Italic)xf
+3(Times-Bold)xf
+4(Times-BoldItalic)xf
+5(Helvetica)xf
+6(Helvetica-Oblique)xf
+7(Helvetica-Bold)xf
+8(Helvetica-BoldOblique)xf
+9(Courier)xf
+10(Courier-Bold)xf
+11(Courier-Oblique)xf
+12(Courier-BoldOblique)xf
+13(Symbol)xf
+/docsave save def
+}def
+
+% character outcalls
+/oc 
+  {/pswid exch def /cc exch def /name exch def
+   /ditwid pswid fontsize mul resolution mul 72000 div def
+   /ditsiz fontsize resolution mul 72 div def
+   ocprocs name known{ocprocs name get exec}{name cb}
+   ifelse}def
+/fractm [.65 0 0 .6 0 0] def
+/fraction
+ {/fden exch def /fnum exch def gsave /cf currentfont def
+  cf fractm makefont setfont 0 .3 dm 2 copy neg rmoveto
+  fnum show rmoveto currentfont cf setfont(\244)show setfont fden show 
+  grestore ditwid 0 rmoveto} def
+
+/ocb
+ {/s2 .5 dm def /s4 .25 dm def
+  2 setlinejoin gsave currentpoint newpath dround translate 0 0 moveto}def
+/oce {grestore ditwid 0 rmoveto}def
+/dm {ditsiz mul}def
+/4p {pop pop pop pop}def
+
+/ocprocs 50 dict def ocprocs begin
+%begin Pubs APS accent changes
+(UD) {ocb 0 -.21 dm rmoveto(\310)show oce}def % upper dieresis
+(Aa) {ocb 0 -.21 dm rmoveto(\302)show oce}def % upper acute
+(UB) {ocb 0 -.21 dm rmoveto(\306)show oce}def % upper breve
+(UH) {ocb 0 -.21 dm rmoveto(\317)show oce}def % upper caron
+(UC) {ocb 0 -.21 dm rmoveto(\303)show oce}def % upper circumflex
+(Ga) {ocb 0 -.21 dm rmoveto(\301)show oce}def % upper grave
+(UM) {ocb 0 -.21 dm rmoveto(\305)show oce}def % upper macron
+(Ub) {ocb 0 -.21 dm rmoveto(\312)show oce}def % upper ring
+(U~) {ocb 0 -.21 dm rmoveto(\304)show oce}def % upper tilde
+%end Pubs accent changes
+(14) {(1)(4)fraction}def
+(12) {(1)(2)fraction}def
+(34) {(3)(4)fraction}def
+(13) {(1)(3)fraction}def
+(23) {(2)(3)fraction}def
+(18) {(1)(8)fraction}def
+(38) {(3)(8)fraction}def
+(58) {(5)(8)fraction}def
+(78) {(7)(8)fraction}def
+
+(sq) 
+ {gsave /len .64 dm def .08 dm 0 rmoveto currentpoint dround newpath moveto
+  len 0 rlineto 0 len neg rlineto len neg 0 rlineto closepath stroke oce}def
+(bx)
+ {gsave /len .64 dm def .08 dm 0 rmoveto currentpoint dround newpath moveto
+  len 0 rlineto 0 len neg rlineto len neg 0 rlineto closepath fill oce}def
+(ci)
+ {gsave .5 dm -.36 dm rmoveto currentpoint newpath .33 dm 0 360 arc 
+  .05 dm setlinewidth stroke oce}def
+(bv) {ocb s4 -.8 dm moveto 0 ditsiz rlineto stroke oce}def
+(br) {ocb 0 -.75 dm moveto 0 ditsiz rlineto stroke oce}def
+(sr) {gsave 0 .06 dm rmoveto(\326)show oce}def
+(rn) {gsave -.51 dm .06 dm rmoveto(\140)show oce}def
+(is) {gsave 0 .15 dm rmoveto(\362)show oce}def
+(ru) {ocb .5 dm 0 rlineto stroke oce}def
+(lt)% left top curly
+ {ocb s4 .2 dm moveto 0 -.55 dm rlineto currentpoint pop
+  -.8 dm 2 copy exch s4 add exch s4 arcto 4p stroke oce}def
+(lb)% left bot curly
+ {ocb s4 -.8 dm moveto 0 .55 dm rlineto currentpoint pop
+  .2 dm 2 copy exch s4 add exch s4 arcto 4p stroke oce}def
+(rt)% right top curly
+ {ocb s4 .2 dm moveto 0 -.55 dm rlineto currentpoint pop
+  -.8 dm 2 copy exch s4 sub exch s4 arcto 4p stroke oce}def
+(rb)% right bot curly
+ {ocb s4 -.8 dm moveto 0 .55 dm rlineto currentpoint pop
+  .2 dm 2 copy exch s4 sub exch s4 arcto 4p stroke oce}def
+(lk)% left mid curly
+ {ocb /s3 -.3 dm def s4 -.8 dm moveto s4 s3 0 s3 s4 arcto pop pop ditsiz 
+  add s4 s3 4 2 roll s4 arcto 4p s4 .2 dm lineto stroke oce}def
+(rk)% right mid curly
+ {ocb /s3 -.3 dm def s4 -.8 dm moveto s4 s3 s2 s3 s4 arcto pop pop ditsiz 
+  add s4 s3 4 2 roll s4 arcto 4p s4 .2 dm lineto stroke oce}def
+(lf)% left floor
+ {ocb s4 -.8 dm moveto 0 ditsiz rlineto s4 0 rlineto stroke oce}def
+(rf)% right floor
+ {ocb s4 -.8 dm moveto 0 ditsiz rlineto s4 neg 0 rlineto stroke oce}def
+(lc)% left ceil
+ {ocb s4 .2 dm moveto 0 ditsiz neg rlineto s4 0 rlineto stroke oce}def
+(rc)% right ceil
+ {ocb s4 .2 dm moveto 0 ditsiz neg rlineto s4 neg 0 rlineto stroke oce}def
+end
+
+ditstart
+(psc+)xT
+576 1 1 xr
+1(Times-Roman)xf
+2(Times-Italic)xf
+3(Times-Bold)xf
+4(Times-BoldItalic)xf
+5(Helvetica)xf
+6(Helvetica-Oblique)xf
+7(Helvetica-Bold)xf
+8(Helvetica-BoldOblique)xf
+9(NewCenturySchlbk-Roman)xf
+10(NewCenturySchlbk-Bold)xf
+11(NewCenturySchlbk-Italic)xf
+12(NewCenturySchlbk-BoldItalic)xf
+13(Courier)xf
+14(Courier-Bold)xf
+15(Courier-Oblique)xf
+16(Courier-BoldOblique)xf
+17(Helvetica-Narrow)xf
+18(Helvetica-Narrow-Oblique)xf
+19(Helvetica-Narrow-Bold)xf
+20(Helvetica-Narrow-BoldOblique)xf
+21(Symbol)xf
+/dolandscape 0 def
+xi
+%%EndProlog
+
+%%Page: 1 1
+1 p
+10 s 0 xH 0 xS 1 f F
+10 s 0 xH 0 xS 1 f F
+1298 96(E)N
+1367(STANDARD)X
+1823(KEYBOARD)X
+555 288(\(extend\))N
+1201(\303X)X
+2055(|)X
+2211(\303@)X
+2586(CMD)X
+555 384(+LINE)N
+1201(\303F)X
+2055(|)X
+2211(\303A)X
+2586(CMD)X
+555 480(+PAGE)N
+1201(\303R)X
+2055(|)X
+2211(\303B)X
+2586(-WORD)X
+555 576(+SRCH)N
+1201(\303Y)X
+2055(|)X
+2211(\303C)X
+2586(BSP)X
+555 672(+TAB)N
+1201(\303I)X
+2055(|)X
+2211(\303D)X
+2586(-LINE)X
+555 768(+WORD)N
+1201(\303N)X
+2055(|)X
+2211(\303E)X
+2586(-PAGE)X
+555 864(-LINE)N
+1201(\303D)X
+2055(|)X
+2211(\303F)X
+2586(+LINE)X
+555 960(-PAGE)N
+1201(\303E)X
+2055(|)X
+2211(\303G)X
+2586(HOME)X
+555 1056(-SRCH)N
+1201(\303T)X
+2055(|)X
+2211(\303H)X
+2586(LEFT)X
+555 1152(-TAB)N
+1201(\303X-\303U)X
+2055(|)X
+2211(\303I)X
+2586(+TAB)X
+555 1248(-WORD)N
+1201(\303B)X
+2055(|)X
+2211(\303J)X
+2586(DOWN)X
+555 1344(ALT)N
+1201(\303X-\303A)X
+1418(or)X
+1505(\303_)X
+1592(or)X
+1679(\303/)X
+2055(|)X
+2211(\303K)X
+2586(UP)X
+555 1440(BSP)N
+1201(\303C)X
+2055(|)X
+2211(\303L)X
+2586(RIGHT)X
+555 1536(CHG)N
+744(WIN)X
+1201(\303X-\303W)X
+2055(|)X
+2211(\303M)X
+2586(RETURN)X
+555 1632(CLOSE)N
+1201(\303V)X
+2055(|)X
+2211(\303N)X
+2586(+WORD)X
+555 1728(CMD)N
+1201(\303A)X
+1306(or)X
+1393(NULL)X
+1627(or)X
+1714(\303@)X
+2055(|)X
+2211(\303O)X
+2586(OPEN)X
+555 1824(CTRLCHAR)N
+1201(\303X-\303C)X
+2055(|)X
+2211(\303P)X
+2586(PICK)X
+555 1920(DELCHAR)N
+1201(\303W)X
+2055(|)X
+2211(\303Q)X
+2586(\(not)X
+2735(used\))X
+555 2016(DOWN)N
+1201(\303J)X
+2055(|)X
+2211(\303R)X
+2586(+PAGE)X
+555 2112(ERASE)N
+1201(\303X-\303E)X
+1409(or)X
+1496(\303\303)X
+2055(|)X
+2211(\303S)X
+2586(\(not)X
+2735(used\))X
+555 2208(HOME)N
+1201(\303G)X
+2055(|)X
+2211(\303T)X
+2586(-SRCH)X
+555 2304(INSERT)N
+1201(\303Z)X
+1297(or)X
+1384(ESC)X
+1550(or)X
+1637(\303[)X
+2055(|)X
+2211(\303U)X
+2586(MARK)X
+555 2400(INT)N
+1201(\303\\)X
+2055(|)X
+2211(\303V)X
+2586(CLOSE)X
+555 2496(JOIN)N
+1201(\303X-\303J)X
+2055(|)X
+2211(\303W)X
+2586(DELCHAR)X
+555 2592(LEFT)N
+1201(\303H)X
+2055(|)X
+2211(\303X)X
+2586(\(extend\))X
+555 2688(MARK)N
+1201(\303U)X
+2055(|)X
+2211(\303Y)X
+2586(+SRCH)X
+555 2784(OPEN)N
+1201(\303O)X
+2055(|)X
+2211(\303Z)X
+2586(INSMODE)X
+555 2880(PICK)N
+1201(\303P)X
+2055(|)X
+2211(\303[)X
+2586(INSERT)X
+555 2976(REPL)N
+1201(\303X-\303R)X
+1413(or)X
+1500(\303])X
+2055(|)X
+2211(\303\\)X
+2586(INT)X
+555 3072(RETURN)N
+1201(\303M)X
+2055(|)X
+2211(\303])X
+2586(REPL)X
+555 3168(RIGHT)N
+1201(\303L)X
+2055(|)X
+2211(\303\303)X
+2586(ERASE)X
+555 3264(SPLIT)N
+1201(\303X-\303B)X
+2055(|)X
+2211(\303_)X
+2586(ALT)X
+555 3360(TABS)N
+1201(\303X-\303T)X
+2055(|)X
+2211(\303/)X
+2586(ALT)X
+555 3456(UP)N
+1201(\303K)X
+2055(|)X
+2211(\303X-\303A)X
+2586(ALT)X
+555 3552(WIN)N
+736(LEFT)X
+1201(\303X-\303H)X
+2055(|)X
+2211(\303X-\303C)X
+2586(CTRLCHAR)X
+555 3648(WIN)N
+736(RIGHT)X
+1201(\303X-\303L)X
+2055(|)X
+2211(\303X-\303E)X
+2586(ERASE)X
+2055 3744(|)N
+2211(\303X-\303H)X
+2586(WIN)X
+2767(LEFT)X
+2055 3840(|)N
+2211(\303X-\303J)X
+2586(JOIN)X
+2055 3936(|)N
+2211(\303X-\303L)X
+2586(WIN)X
+2767(RIGHT)X
+2055 4032(|)N
+2211(\303X-\303R)X
+2586(REPL)X
+2055 4128(|)N
+2211(\303X-\303B)X
+2586(SPLIT)X
+2055 4224(|)N
+2211(\303X-\303T)X
+2586(TABS)X
+2055 4320(|)N
+2211(\303X-\303U)X
+2586(-TAB)X
+2055 4416(|)N
+2211(\303X-\303W)X
+2586(CHG)X
+2775(WIN)X
+2878 MX
+
+%%Trailer
+xt
+
+xs

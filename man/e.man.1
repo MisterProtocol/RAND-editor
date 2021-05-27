@@ -1,0 +1,2641 @@
+.if t .po 1i
+.TH E 1 Rand
+.SH NAME
+e \- the Rand editor, E
+.SH SYNOPSIS
+.B e
+[ options ] [ mainfile [ altfile ] ]
+.SH DESCRIPTION
+The Rand editor
+.I E
+is a full screen editor which treats a text file as a
+two-dimensional surface with text on it.  Among its more
+unusual features are manipulating rectangular areas of text,
+editing several files at once, and displaying text in one or
+more windows.  While it is not as powerful as
+.I Emacs,
+or as widely used as
+.I Vi,
+most people at Rand prefer its easy to learn commands and
+use it to edit both programs and text.
+.I E
+is a complete rewrite of the Rand
+.I NED
+editor of several years back.  The current version (E19) has been
+improved to take advantage of terminals that have the ability to
+do local insert/delete line, and it can now use
+.I termcap
+so that most terminals with direct cursor addressing can be used.
+.PP
+Please note that this manual entry does not try to be either a
+tutorial or a full reference manual for the editor.  Rand users
+should initially learn
+.I E
+by reading the CSD document
+.I Self Teaching Guide to Text Processing,
+available from the CSD documentation center.  There is currently
+no tutorial available for non-Rand users.
+There is a draft reference manual available,
+.I The Rand Editor, E, April 1984
+that is included in the E/MH distribution for non-Rand users.
+.PP
+The
+.I mainfile
+on the command line is the file which is initially displayed
+in the editor.  If the file doesn't exist, the user will be asked if
+it should be created.  If in addition, an
+.I altfile
+is specified on the command line, it will be read in as the
+initial alternate file.  If no filenames are present on the
+command line,
+.I e
+will attempt to continue from your previous editing session.
+To do this it saves "state" in a file called '.es1' in your
+current working directory.
+Before invoking the editor, be
+sure and specify your terminal type by setting the
+.SM TERM
+environment variable.
+.PP
+Refer to section
+.SM RECENT CHANGES
+for a list of new changes to E.
+
+.SH OPTIONS
+The currently available command line options are:
+.TP
+.B \-help
+.br
+This causes a display of the currently available
+options and their values along with the version number
+of the editor.
+.TP
+.BR \-bullets " or " \-nobullets
+.br
+Options \-bullets and \-nobullets forces border bullets on or off
+regardless of line speed or terminal type.  Line speeds of 1200
+baud and slower and some terminal types set border bullets off in
+the absence of these options.
+.TP
+.B \-inplace
+.br
+Option \-inplace preserves file links except for singly\-linked
+files.  From within the editor, link preservation can be
+turned on and off, even for singly\-linked files, by the update
+command.
+.TP
+.B \-terminal=termtype
+.br
+Option \-terminal=termtype identifies the terminal type explicitly.
+In the absence of the \-terminal option the terminal type is retrieved
+from the
+.SM TERM
+environment variable.
+.PP
+.RS
+If there is no compiled\-in code for the terminal, the termcap entry
+for the terminal type will be used and the "standard" keyboard will
+be assigned.  Refer to
+.SM "TERMINALS SUPPORTED"
+section of this document for terminals that can
+be supported by compiled\-in code (varies with installation).
+.RE
+.PP
+.B \-keyboard=termtype
+.br
+.B \-dkeyboard=termtype
+.RS
+Option \-keyboard=termtype sets the keyboard type to "termtype".  It
+overrides any "\-terminal=" argument and also any
+.SM EKBD
+environment variable.
+.RE
+.ne 2v
+.TP
+.B \-dtermcap
+.br
+Option \-dtermcap forces
+.I E
+to use the termcap entry for the terminal
+identified by the
+.SM TERM
+variable or \-terminal option, disregarding
+any applicable compiled-in code.
+.TP
+.B \-notracks
+.br
+Option \-notracks will allow you to edit a file without using or
+disturbing the work files (keys, state, and change files) from your
+previous session.
+.TP
+.B \-replay=filename
+.br
+Option \-replay=filename allows you to replay with a specified keys
+file, where "filename" represents that keys file.  Use \-silent when
+the replay display is not desired.  The message "***replay
+completed" or "***replay aborted" signals the end of the replay.
+The
+.SM <INT>
+key can be used to stop the replay short of completion.
+Files .ec1* and .ek1* must not be present if the replay is to
+work.
+.TP
+.B \-norecover
+.br
+Option \-norecover will open the edit session as defined by the .es1
+state file, ignoring any recovery processing of a prior crashed or
+aborted session.
+.TP
+.B \-regexp
+.br
+Option \-regexp enables regular expression
+pattern matching for searching
+and replacing.  This mode is also enabled by the "re[gexp]" command.
+In regular expression mode, "RE"
+is displayed at the bottom of the screen.  The command "\-re[gexp]"
+returns to non-regular expression mode.
+The regular expressions recognized are
+essentially the same as that for \fIed\fR.
+.TP
+.B \-state=filename
+.br
+Option \-state=filename causes the initial state of the editor to be
+read from the indicated "state" file.  The state file from a previous
+\fIE\fR session (with alternate files, windows, cursor positioning,
+etc.) may be saved by exiting, and renaming the state file (".es1").
+.TP
+.B \-[no]stick
+.br
+Option \-stick sets the behavior at the right margin to stop in response
+to text or a <RIGHT\ ARROW>.  \-nostick is the default, and will automatically
+shift the window right in response to text or the <RIGHT\ ARROW> key.
+.TP
+.B \-readonly
+.br
+Option \-readonly will prohibit any changes to the file(s).
+.TP
+.B \-noreadonly
+.br
+Option \-noreadonly will disable the (new e19) mechanism
+preventing changes to
+files lacking write permission, that you could previously change
+because you had write permission in the directory.
+.TP
+.B \-noprofile
+.br
+Option \-noprofile will prevent reading of the ".e_profile".
+(See \fIcaveat\fR under
+.SM STARTUP FILE.
+.TP
+.B \-profile=file
+.br
+Specifies the profile to be used in lieu of the default "./.e_profile" or
+"~/.e_profile".
+See
+.SM "STARTUP FILE"
+in a later section.
+.SH ENVIRONMENT VARIABLES
+The
+.SM TERM
+environment variable defines the terminal type.  Refer to
+.SM "TERMINALS SUPPORTED"
+for those terminal which
+.I e
+has terminal specific code compiled in.  If there is no compiled
+in code for the terminal
+.I e
+will look in "/etc/termcap" for
+a definition of the terminal.  The \-dtermcap option will force
+.I e
+to use the "termcap" definition.
+.PP
+The environment variable
+.SM EKBD
+defines the keyboad type if different from the
+.SM TERM
+type.
+.PP
+The
+.SM EDITALT
+environment variable will be used as the name
+of the alternate file.  If an alternate filename is given on both
+the command line and with the
+.SM EDITALT
+variable, the command line file is used.
+The
+.SM EPROFILE
+environment variable will be used as the name of the "startup" file, in lieu
+of "./.e_profile" or "~/.e_profile".  The command line option
+\-profile=file wins if both are used.
+.SH FILES
+.I E
+creates and maintains several ".e" files.  They are used
+to keep track of the current editing session and can normally
+be ignored by the user.  The following information is for the
+curious.
+.PP
+File .es1 contains state information on the last edit session.  It
+is created or updated at the end of a normally terminated edit
+session.
+.PP
+File .ec1 indicates the last edit session in this directory
+crashed.
+.PP
+File .ek1 contains a history of the last edit sessions keyboard
+inputs.  The .ek1 file is updated at regular intervals so that a
+mimimum of work is lost on edit or system crashes.
+.PP
+File .ek1b is the .ek1 file prior to a recovery replay.
+.PP
+The presence of any .ek1* file indicates that the last session in
+this directory abnormally terminated and that the next edit session
+will do recovery processing unless option \-norecover is used.
+File .ek1 means abort, .ec1 means crash.
+.PP
+Note that if the login user is not the owner of the current
+directory the above files will be suffixed with the login users
+name.  If the user has no write permission in the current
+directory, these files are created in the directory /tmp/etmp.
+.PP
+There are also a few utility files in the directory /etc/e.
+.SH RECENT CHANGES
+.nr x \n(.i
+.nr y \w'\(bu\0\0'
+.de bu
+.in \\nxu+\\nyu
+.ti \\nxu
+\(bu\0\0\c
+..
+E19 changes include:
+.bu
+a word processing mode (WP) that currently features "word wrap" and support
+for a "left margin";
+.bu
+a "startup" file mechanism (e.g., ~/.e_profile) to individually tailor
+options; also provides support for "editor scripts"
+.bu
+a delete word function;
+.bu
+options to control the behavior when text is typed past the right edge of
+the window;
+.bu
+an alternate syntax for the "goto" command;
+.bu
+display of tab settings on the top border, and left and
+right margin (width) settings on the bottom border;
+.bu
+an option for invoking \fIE\fR with a previous state file;
+.bu
+a new help facility;
+.bu
+improved support for the "track" command;
+.bu
+a new command "caps" to convert lower case to upper case;
+.bu
+a new command "ccase" to reverse the case of the affected text;
+.bu
+changes to \fIfill/just\fR to no longer filter out CTRL chars,
+and (by default) not split hyphenated words at the end of a line;
+.bu
+a new "\-readonly" option to prevent unintentional changes; files
+that are not writable cannot be modified;
+.bu
+improved VT100 terminal support; and terminal drivers for the Beehive
+MicroBee, Televideo 910, Liberty Freedom 100, and Wyse 50.
+.bu
+the sequence "<CMD><WINRIGHT>" now shifts the window far enough right to
+display the end of the current line (previously, this sequence would set
+the left edge of the window at the cursor position).
+.bu
+bug fix: if an \fIaltfile\fR was specified on the command line,
+and the environment variable EDITALT was set, the \fIaltfile\fR is now used
+.PP
+E18 changes include:
+.bu
+support for regular expression searching and replacing;
+.bu
+implementation of the
+.SM +WORD
+and
+.SM \-WORD
+functions;
+.bu
+a new \fBset\fR command to individually tailor various parameters (e.g.,
+the number of cols a <WIN RIGHT> will shift;
+.bu
+support for symbolic links (the link is read and the referenced file is used);
+.bu
+now runs on System III, System V, and 68000s;
+.bu
+commands that specify filenames (e.g., "
+.SM CMD:
+e \fIfile\fR expands a leading "~" to the appropriate home directory;
+.bu
+compiled in code for Ann Arbor Ambassadors now downloads the
+standard keyboard into the function keys;
+.bu
+support added for Sun2 workstation;
+.SH COMMANDS
+The following commands are available to the user by opening the
+command line via the
+.SM <CMD>
+key and entering the command.  The
+entered command is parsed and executed when the
+.SM <RETURN>
+key is typed.
+
+In the following discussion, pound sign ("#") introduces a comment,
+brackets ("[","]") indicate options, and vertical bar ("|")
+indicates optional choices.
+
+There are two types of areas: a range of lines (indicated by
+<range>) and a marked retangle of text (indicated by <rectangle>).
+Some commands will take either type of area, this is indicated by
+<area>.
+A <range> can be specified either by marking
+or by a number followed by "l" for lines or "p" for paragraphs;
+rectangular areas must be marked.  The default range is one line
+for most commands (fill, adjust and center default to one
+paragraph).
+.PP
+.TP
+b | bye | ex | exit [ nosave | quit | abort | dump ]
+.br
+Exit the editor.  The different exit options affect
+whether or not the editor updates the edited files
+or not, and whether the ".e" state files are changed.
+The following table give the complete exit story.
+.ta \w'exit nosave\ \ 'u +\w'Saves\ \ 'u +\w'Update\ \ 'u +\w'Keys\ file\ \ 'u
+.RS
+.sp
+	Saves	Update	Remove	Remove
+.br
+	Files	State	Keys\ file	Change file
+.br
+.sp
+exit	 X	 X	 X	 X
+.br
+exit nosave	 -	 X	 X	 X
+.br
+exit quit	 -	 -	 X	 X
+.br
+exit abort	 -	 -	 -	 X
+.br
+exit dump	 -	 -	 -	 -
+.RE
+.ta \w'underlay\ \ \ \ 'u
+.sp
+blot	adjust | close | erase | pick | run | box
+.br
+\-blot	adjust | close | erase | pick | run | box
+.br
+cover	adjust | close | erase | pick | run | box
+.br
+insert	adjust | close | erase | pick | run | box
+.br
+overlay	adjust | close | erase | pick | run | box
+.br
+underlay	adjust | close | erase | pick | run | box
+.RS
+.PP
+All of these commands take the named buffer (one of
+adjust, close, erase, pick, run, or box) and add or
+merge it into the current file.
+.PP
+Insert takes the named buffer, moves the existing text
+to make room for it, and then inserts it at the
+current text location.  It is identical to the \-pick
+command, except that now the other named buffers can
+also be inserted.
+.PP
+Cover places the named buffer over top of the text without
+moving anything.
+.PP
+Overlay is like cover, except that only the printing
+characters in the buffer clobber the original text.
+.PP
+Underlay is the reverse of overlay, i.e. the buffer covers
+only the non-printing characters of the original text.
+.PP
+Blot is like overlay except that positions in the file
+corresponding to printing characters in the buffer are erased.
+.PP
+\-blot is like blot except that positions in the file
+corresponding to blanks in the buffer are erased.
+.RE
+.TP
+box <rectangle>
+.br
+Draws a box around the rectangle with "+", "|", and "-" characters.
+.PP
+caps <rectangle>
+.br
+.RS
+Caps changes the "target text" to all upper case characters (only the
+characters a-z are affected).  The \fImark\fR command is first used
+to define the "target text".
+.RE
+.PP
+ccase <rectangle>
+.br
+.RS
+Ccase changes all upper case to lower case and vice versa.  The
+affected area is first defined by the \fImark\fR command.
+.RE
+.PP
+center  [<range>] width=n
+.br
+fill    [<range>] width=n
+.br
+justify [<range>] width=n
+.br
+.RS
+These commands all act upon the range of text and
+then replace them with the modified results.  Center
+centers the text around the column (width/2), fill
+places as many words as possible on each line, and
+justify is like fill except that it also provides a
+smooth right-margin by embedding blanks.  The old text
+is saved in the adjust buffer.  As of e19, fill/just
+no longer
+filters out CTRL characters, and no longer splits
+hyphenated words at the end of a line.  The command
+"CMD: set hy" will reinstate splitting.
+.RE
+.PP
+close [<area>]
+.br
+\-close
+.br
+.RS
+Close deletes the text from the file and remembers it
+in a "close buffer", \-close puts the close buffer
+back into the file at the current cursor position.
+.RE
+.PP
+command
+.br
+\-command
+.br
+.RS
+Usually you issue commands one at a time by typing
+the
+.SM <CMD>
+key, the command, and then
+.SM <RETURN>.
+The "command" command places you in a mode where
+you can keep typing commands without hitting the
+.SM <CMD>
+key each time.  To return to normal edit mode,
+issue the \%\-command command.
+.RE
+.TP
+delete
+.br
+Tells the editor to delete the current file on exit.
+.PP
+dword
+.br
+\-dword
+.br
+.RS
+Delete word.  If the cursor is "on" a word, that word
+is deleted, othwise the next word is deleted.
+The deleted word can be restored by \-dword.
+.RE
+.TP
+e | edit  [<filename>]
+.br
+If no filename is specified, the alternate file (if
+any) is brought up in the current window.  Otherwise
+the specified file is displayed.  If \fIfilename\fR
+begins with "~" or "~/", the appropriate home
+directory is prepended.
+.PP
+erase  [<area>]
+.br
+\-erase
+.br
+.RS
+Erase replaces the area by blanks and puts the contents
+into an "erase" buffer; \-erase inserts the contents of this
+buffer at the current cursor position.
+.RE
+.TP
+feed [<range>] command-string
+A Unix shell is started with the command-string, and the
+text in <range> is supplied to the shell as the standard
+input.  Any results of the command are inserted before
+the first line in the range.
+.TP
+goto [ b | line\-number | e | rb | re ]
+.br
+Goto is a quick way of moving around a file.  Goto 'b'
+moves to the beginning of the file, 'e' moves to the end.
+A line-number goes to that line of the file; 'rb' and 're'
+move to the beginning or end of a marked range (see the
+range command).  A short-cut to goto line-number \fIn\fR
+is "CMD: \fIn\fR<RETURN>".
+.PP
+join | \-split
+.br
+split | \-join
+.br
+.RS
+Join (or \-spilt) combines two lines, split (or \-join)
+breaks a line in two.
+.RE
+.TP
+name <newfilename>
+.br
+Tells the editor to rename the current file to newfilename
+when it exits.
+.TP
+open [<area>]
+.br
+Move existing text to make room for <area> worth of
+blank lines (or a rectangle of blanks).
+.PP
+pick [<area>]
+.br
+\-pick
+.br
+.RS
+Pick copies the <area> to a pick buffer, \-pick
+inserts the pick buffer at the current cursor position.
+.RE
+.PP
+range [<range>]
+.br
+\-range
+.br
+\?range
+.br
+.RS
+The range command is another method of limiting the
+range of some commands (notably the replace, fill,
+justify and center commands).  \-range turns it off,
+\?range tells you the line numbers of the range area.
+.RE
+.TP
+redraw | red
+.br
+The redraw command is used to erase and redraw the editor
+windows in case something has happened to it (for example,
+line noise on dialup lines, or messages from the operator).
+.PP
+replace  [<range>] [<option>] /search-string/replace-string/
+.br
+\-replace [<range>] [<option>] /search-string/replace-string/
+.br
+.RS
+The replace command searches forward over the range
+replacing the search-string
+with the replace-string; \-replace searches backwards
+doing the same thing.  The '/' delimiter can be replaced by
+other symbols if the search or replace strings contain a slash.
+Any non-control, non-alphanumeric character can be used as the
+delimiter.
+.PP
+Two options can also be specified, they are
+.I show
+and
+.I interactive.
+The
+.I show
+option allows the user to see the replacements as they occur.  The
+.I interactive
+option additionally allows the user control over whether or not
+to make each replacement by displaying the search-string and allowing
+the user to hit the <REPL> key to do replacement, or the
+.ie t <\(+-SRCH>
+.el <+/-SRCH>
+key to skip the replacement.
+.RE
+.TP
+regexp
+.br
+\-regexp
+.RS
+The "regexp" command enters regular expression mode (for searching
+and replacing); "\-regexp" exits regular expression mode.
+While in regular expression mode, "RE" is displayed at the bottom
+of the screen.
+.RE
+.TP
+run [<range>] command-string
+.br
+The run command is similar to the feed command, except
+that the marked text is deleted and
+replaced by the results of running the
+command-string.
+.TP
+save <newfilename>
+.br
+Immediately write a copy of the file to newfilename.
+.PP
+set \fIoption\fR
+.br
+?set
+.br
+.RS
+used to set various options:
+.ds t \t
+.nr ,i \w'wordelim \fImode\fR'u+1P
+.ta \n(,iu +1P
+.nf
+.sp 4p
++line \fIn\fR\*tsets the <+line> key to \fIn\fR lines
+\-line \fIn\fR\*tsets the <\-line> key to \fIn\fR lines
+line \fIn\fR\*tsets the <+line> and <\-line> keys to \fIn\fR lines
++page \fIn\fR\*tsets the <+page> key to \fIn\fR screens
+\-page \fIn\fR\*tsets the <\-page> key to \fIn\fR screens
+page \fIn\fR\*tsets the <\-page> and <+page> keys to \fIn\fR screens
+?\*tdisplays the values of several options (same as the "?set" command)
+bell\*tenable the bell
+nofilldot\*ta fill cmd with no parameters will stop at a line beginning
+\*t  with a period (this is the new default)
+filldot\*tfill will not stop at lines beginning with a period (as before)
+nobell\*tdisable the bell
+hy\*tenables splitting of hyphenated words by fill/just
+nohy\*tdisables splitting of hyphenated words by fill/just (default)
+left \fIn\fR\*tsets the <window left> key to \fIn\fR cols
+lmar \fIn\fR\*tsets the left margin to \fIn\fR
+right \fIn\fR\*tsets the <window right> key to \fIn\fR cols
+rmar \fIn\fR\*tsets the right margin (linewidth) to \fIn\fR
+window \fIn\fR\*tsets the <window left> and <window right> keys to \fIn\fR cols
+width \fIn\fR\*tsets the linewidth to \fIn\fR cols (for fill, etc.)
+wordelim \fImode\fR\*tsets the action of the <+word> and <\-word> keys.
+.br
+.fi
+.in \n(.iu+\n(,iu
+If mode is \fIwhitespace\fR (the default), words are delimited by blanks
+and newlines, and the cursor advances to the first character following
+the delimiter.
+If mode is \fIalphanum\fR, words are delimited by all
+special characters in addition to blanks and newlines,
+and the cursor advances to the first alphanumeric character
+following the delimiter.
+.fi
+.br
+.sp 6p
+.in
+The "line", "page", and "window" options may be individually set in
+different windows.
+.RE
+.TP
+stop
+.br
+Use 'job control' to suspend the editor.  Returns control
+to the shell, resume with the 'fg' command.  Works only
+under Berkeley versions
+.SM 4.xBSD.
+.PP
+tab  [ column ... ]
+.br
+\-tab [ column ... ]
+.br
+.RS
+Tab sets tabs in the specified columns; \-tab
+removes tabs in specified columns.
+.RE
+.PP
+tabs n
+.br
+\-tabs
+.br
+.RS
+Tabs sets tabs every nth column, and \-tabs
+removes all tabs.
+.RE
+.PP
+tabfile tabfilename
+.br
+\-tabfile tabfilename
+.br
+.RS
+Tabfile sets tabs (\-tabfile clears tabs) at every
+column listed in the tabfilename.
+.RE
+.PP
+track
+.br
+\-track
+.br
+.RS
+The track command is used to scroll the main and
+alternate files together.  This is normally used
+to visually compare the main file and the alternate
+file by rapidly changing between them and
+watching what changes on the screen (similar to
+blink-comparators as used in astronomy).  The \-track
+command turns off the tracking mode.
+As of e19,
+the TRACK flag has been
+made part of the state of each window, so that the TRACK mode can be
+reestablished following an interruption, and the TRACK command has been
+changed so that it toggles the TRACK mode, in the same way as does
+INSERT.
+.RE
+.TP
+update | \-update [ inplace | \-inplace | \-readonly]
+.br
+The update command tells the editor what to do on
+exit with the current file.  The update command
+can be used to specify whether or not to break
+links, the \-update command causes any changes to
+the current file to be ignored.
+The \-\fIreadonly\fR option is used to enable modifications to
+files which (1) you own but lack write permission on,
+or, (2) to override a "\-readonly" invocation argument.
+.PP
+w | window [filename]
+.br
+\-w | \-window
+.br
+.RS
+The window command will create a new window at the
+current cursor position (as long as the cursor
+is along the top or left margins).
+If a filename is specified, that
+file is displayed in the new window, otherwise the
+current file is used.  The \-window command deletes
+the current window.
+.RE
+.PP
+wp
+.br
+\-wp
+.br
+.RS
+The \fIwp\fR command enters word procesing mode, \fI\-wp\fR
+exits.  A
+.SM WP
+is displayed at the bottom of the screen in word processing mode.
+.SM WP
+mode enables power typing or "word wrap", where any text that is
+entered past the right margin (see "set rmar" above) is automatically
+placed on the following line at the left margin (see "set lmar" above).
+.SM WP
+mode also moves the cursor to the left margin in response to a <RETURN>.
+If
+.SM WP
+mode is entered while a marked area is in effect, the boundaries of
+the marked area become the left and right margin settings.
+.RE
+.SH FUNCTION KEYS
+E supports a set of \fIfunctions\fR that are normally executed by hitting one
+of the terminal functions keys, or by typing a specific control- or
+escape sequence.  Details of what \fIE-functions\fR are emitted for a specific
+terminal's function key layout are hard to document generally, since each
+site usually tailor's this to their liking.  Your system administrator should
+be able to provide a mapping.  Also, see the following sections
+\fIStandard Editior Keyboard\fR and \fITerminals/Keyboards Supported\fR.
+Note that some \fIE-functions\fR require first pressing the <CMD> key
+followed by another <KEY>.  Refer to the previous section "COMMANDS" for
+a discussion of the following functions:
+<CLOSE>, <OPEN>, <PICK>, <ERASE>, and <MARK> which
+are normally implemented on function keys.  The sequences <CMD><CLOSE>,
+<CMD><PICK> and <CMD><ERASE> are documented above as \fI\-close, \-pick, \fRand
+\fI\-erase\fR.
+.TP .75i
+.ie t \{\
+. ds UA \(ua
+. ds LA \(<-
+. ds RA \(->
+. ds DA \(da
+.\}
+.el \{\
+. ds UA UP-ARROW
+. ds LA LT-ARROW
+. ds RA RT-ARROW
+. ds DA DN-ARROW
+.\}
+<\*(LA> | <\*(UA> | <\*(DA> | <\*(RA>
+The arrow keys move one space (or line) in the indicated direction.  An <\*(UA> on
+the top line of the window (or <\*(DA> on the bottom line) scrolls the window
+down (or up) one line.  A <\*(LA> at the left edge of a window does nothing.
+A <\*(RA> at the right edge of a window does nothing if option \%\-\fIstick\fR
+is set, otherwise the window is shifted right (16 spaces by default).
+.TP
+<+LINE>, <+LINE>
+scrolls window down/up about 1/4 the window size.
+.TP
+<CMD><+LINE>, <CMD><\-LINE>
+makes the current
+cursor line the top (or bottom) line of the window.
+.TP
+<+PAGE>, <\-PAGE>
+scrolls window down/up a full "page".
+.TP
+<CMD><+PAGE>, <CMD><\-PAGE>
+moves to the end/beginning of the file.
+.TP
+<+SRCH>, <\-SRCH>
+searches in the indicated direction for the next occurrence of the "search string".
+The \fIsearch string\fR is set by <CMD>\|search string\|\c
+.ie t <\(+-SRCH>.
+.el <+/-SRCH>.
+.TP
+<CMD><+SRCH>, <CMD><\-SRCH>
+sets the "search string" to the current cursor word, and performs a search
+in the indicated direction.
+.TP
+<+TAB>, <\-TAB>
+tabs in indicated direction.
+.TP
+<+WORD>, <\-WORD>
+moves to next/previous word.
+.TP
+<ALT>
+switch to alternate file, also "<CMD>e<RETURN>".
+.TP
+<BS>
+backspace, moves left and erases previous character.
+<CMD><BS>
+deletes text from the beginning of the line up to the current cursor character.
+In \fIinsert mode\fR, the rest of the line is moved left.
+.ne 3v
+.TP
+<CHWIN>
+change to next window.
+.ne 2v
+.TP
+<CTRLCHAR>
+used to enter non-ascii characters (\e000\-\e037) in text.
+.TP
+<DELCHAR>
+deletes cursor character.
+.TP
+<CMD><DELCHAR>
+deletes text from the cursor to the end of the line.
+.TP
+<HOME>
+moves to upper left corner of window.
+.TP
+<INSERT>
+toggles \fIinsert\fR mode.
+.TP
+<INT>
+Interrupts the operation of various functions: e.g., searches.
+.TP
+<MARK>
+used to define a range of lines or rectangular area of text.  A simple
+<MARK> will start by defining one \fIline\fR.  Moving the cursor up/down will
+extend the defined range of \fIlines\fR (as will other keys like <+LINE>
+<+PAGE>).  When full lines are \fImarked\fR, the message "MARK \fIn\fR" is displayed
+at the bottom of the screen.  Rectangular areas of text are marked by first
+marking one or more lines, then moving the cursor left or right.  When a
+rectangular area is marked, the message "MARK \|\fIn\fR\|x\|\fIm\fR" is
+displayed.
+.TP
+<CMD><MARK>
+cancels any mark in affect.
+.TP
+<REPL>
+Executes the "replacement" while doing an interactive replace command.
+.TP
+<RETURN>
+Positions cursor at column 1 on the next line.  A <RETURN> on the bottom line
+of a window is equivalent to a <+LINE>.  In WP mode, a <RETURN> positions the
+cursor at the current \fIleft margin\fR on the next line, which may automatically
+shift the window left.
+.TP
+<WINLEFT>, <WINRIGHT>
+Shifts the window left/right (16 spaces by default).
+.TP
+<CMD><WINLEFT>
+Shifts the window all the way back to column 1.
+.TP
+<CMD><WINRIGHT>
+Shifts the window as far right as necessary to display the end of the line.
+.bp
+.SH STANDARD EDITOR KEYBOARD
+.PP
+There is now a "standard" E keyboard, that is designed to be usable
+on all video display terminals.  Either say "e \-keyboard=standard" or
+"setenv
+.SM EKBD
+standard" before running E to select this keyboard.
+This is also the keyboard that E will use if there is no specific knowledge
+of your type of terminal compiled into the editor.
+.PP
+This keyboard layout is designed to be used on terminals with no
+function keys. "^H" means control\-H, and "^X\-^U" means control\-X
+followed by control\-U.  The ALT entry gives you a choice of "^/"
+or "^_" because one or the other or both will not work on some
+terminals. ("_" is correct ASCII.)
+.sp 2
+.ds f. e.stdkey.tbl
+.ps 8
+.vs 10
+.if t \{\
+.TS
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
+..
+.nf
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 50 51 52 53 54
+.nr 50 0
+.nr 38 \w(extend)    
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+LINE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+PAGE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+SRCH       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+TAB        
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+WORD       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-LINE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-PAGE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-SRCH       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-TAB        
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-WORD       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wALT         
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wBSP         
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCHG WIN     
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCLOSE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCMD         
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCTRLCHAR    
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wDELCHAR     
+.if \n(50<\n(38 .nr 50 \n(38
+.50
+.rm 50
+.nr 51 0
+.nr 38 \w ^X                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^F                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^R                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^Y                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^I                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^N                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^D                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^E                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^T                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^U                
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^B                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^A or ^_ or ^/    
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^C                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^W                
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^V                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^A or NULL or ^@     
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^C                
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^W                   
+.if \n(51<\n(38 .nr 51 \n(38
+.51
+.rm 51
+.nr 52 0
+.nr 38 \w DOWN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w ERASE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w HOME        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w INSERT      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w INT         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w JOIN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w LEFT        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w MARK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w OPEN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w PICK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w REPL        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w RETURN      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w RIGHT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w SPLIT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w TABS        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w UP          
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w WIN LEFT    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w WIN RIGHT   
+.if \n(52<\n(38 .nr 52 \n(38
+.52
+.rm 52
+.nr 53 0
+.nr 38 \w ^J
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^E or ^^
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^G
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^Z or ESC or ^[
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^\e
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^J
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^H
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^U
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^O
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^P
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^R or ^]
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^M
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^L
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^B
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^T
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^K
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^H
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^L
+.if \n(53<\n(38 .nr 53 \n(38
+.53
+.rm 53
+.nr 38 \w\s+4\fBE STANDARD KEYBOARD\s0\fP-\n(50-2n-\n(51-2n-\n(52-2n-\n(53
+.if \n(38>0 .nr 38 \n(38/3
+.if \n(38<0 .nr 38 0
+.nr 51 +\n(38
+.nr 52 +\n(38
+.nr 53 +\n(38
+.nr 54 0
+.54
+.rm 54
+.nr 38 1n
+.nr 49 0
+.nr 40 \n(49+((2*\n(38)/2)
+.nr 50 +\n(40
+.nr 41 \n(50+((4*\n(38)/2)
+.nr 51 +\n(41
+.nr 42 \n(51+((4*\n(38)/2)
+.nr 52 +\n(42
+.nr 43 \n(52+((4*\n(38)/2)
+.nr 53 +\n(43
+.nr 44 \n(53+((4*\n(38)/2)
+.nr 54 +\n(44
+.nr 54 (\n(44+\n(53)/2
+.nr TW \n(54
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 32 file e.stdkey.tbl is too wide - \n(TW units
+.nr #I \n(.i
+.in +(\n(.lu-\n(TWu-\n(.iu)/2u
+.fc  
+.nr #T 0-1
+.nr #b 0-1
+.nr #a 0-1
+.eo
+.de T#
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
+.ls 1
+.if \n(#T>=0 .nr #b \n(#T
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'|0'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(41u+|\n(50u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(42u+|\n(51u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(43u+|\n(52u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(44u+|\n(53u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.ls
+..
+.ec
+.sp 2p
+.ta \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\s+4\fBE STANDARD KEYBOARD\s0\fP
+.sp 4p
+.mk #b
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'(extend)    \h'|\n(41u' ^X                   \h'|\n(42u' DOWN        \h'|\n(43u' ^J
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+LINE       \h'|\n(41u' ^F                   \h'|\n(42u' ERASE       \h'|\n(43u' ^X-^E or ^^
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+PAGE       \h'|\n(41u' ^R                   \h'|\n(42u' HOME        \h'|\n(43u' ^G
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+SRCH       \h'|\n(41u' ^Y                   \h'|\n(42u' INSERT      \h'|\n(43u' ^Z or ESC or ^[
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+TAB        \h'|\n(41u' ^I                   \h'|\n(42u' INT         \h'|\n(43u' ^\e
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+WORD       \h'|\n(41u' ^N                   \h'|\n(42u' JOIN        \h'|\n(43u' ^X-^J
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-LINE       \h'|\n(41u' ^D                   \h'|\n(42u' LEFT        \h'|\n(43u' ^H
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-PAGE       \h'|\n(41u' ^E                   \h'|\n(42u' MARK        \h'|\n(43u' ^U
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-SRCH       \h'|\n(41u' ^T                   \h'|\n(42u' OPEN        \h'|\n(43u' ^O
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-TAB        \h'|\n(41u' ^X-^U                \h'|\n(42u' PICK        \h'|\n(43u' ^P
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-WORD       \h'|\n(41u' ^B                   \h'|\n(42u' REPL        \h'|\n(43u' ^X-^R or ^]
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'ALT         \h'|\n(41u' ^X-^A or ^_ or ^/    \h'|\n(42u' RETURN      \h'|\n(43u' ^M
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'BSP         \h'|\n(41u' ^C                   \h'|\n(42u' RIGHT       \h'|\n(43u' ^L
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CHG WIN     \h'|\n(41u' ^X-^W                \h'|\n(42u' SPLIT       \h'|\n(43u' ^X-^B
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CLOSE       \h'|\n(41u' ^V                   \h'|\n(42u' TABS        \h'|\n(43u' ^X-^T
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CMD         \h'|\n(41u' ^A or NULL or ^@     \h'|\n(42u' UP          \h'|\n(43u' ^K
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CTRLCHAR    \h'|\n(41u' ^X-^C                \h'|\n(42u' WIN LEFT    \h'|\n(43u' ^X-^H
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DELCHAR     \h'|\n(41u' ^W                   \h'|\n(42u' WIN RIGHT   \h'|\n(43u' ^X-^L
+.sp 2p
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
+.fc
+.nr T. 1
+.T# 1
+.in \n(#Iu
+.35
+.nr #d 0
+.TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-28
+
+.TS
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
+..
+.nf
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 58 59 60 61 62 63 64 65 66
+.nr 58 0
+.nr 38 \w^@ 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^A 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^B 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^C 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^D 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^E 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^F 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^G 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^H 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^I 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^J 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^K 
+.if \n(58<\n(38 .nr 58 \n(38
+.58
+.rm 58
+.nr 59 0
+.nr 38 \w CMD     
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w CMD     
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w -WORD   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w BSP     
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w -LINE   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w -PAGE   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w +LINE   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w HOME    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w LEFT    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w +TAB    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w DOWN    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w UP      
+.if \n(59<\n(38 .nr 59 \n(38
+.59
+.rm 59
+.nr 60 0
+.nr 38 \w ^L    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^M    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^N    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^O    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^P    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^Q    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^R    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^S    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^T    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^U    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^V    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^W    
+.if \n(60<\n(38 .nr 60 \n(38
+.60
+.rm 60
+.nr 61 0
+.nr 38 \w RIGHT      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w RETURN     
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w +WORD      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w OPEN       
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w PICK       
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w (not used) 
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w +PAGE      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w (not used) 
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w -SRCH      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w MARK       
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w CLOSE      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w DELCHAR    
+.if \n(61<\n(38 .nr 61 \n(38
+.61
+.rm 61
+.nr 62 0
+.nr 38 \w  ^X    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^Y    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^Z    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^[    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^\e   
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^]    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^^    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^_    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^/    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^X-^A 
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^X-^C 
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^X-^E 
+.if \n(62<\n(38 .nr 62 \n(38
+.62
+.rm 62
+.nr 63 0
+.nr 38 \w (extend)  
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w +SRCH     
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w INSMODE   
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w INSERT    
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w INT       
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w REPL      
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ERASE     
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ALT       
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ALT       
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ALT
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w CTRLCHAR
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ERASE
+.if \n(63<\n(38 .nr 63 \n(38
+.63
+.rm 63
+.nr 64 0
+.nr 38 \w ^X-^H 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^J 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^L 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^N 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^R 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^B 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^T 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^U 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^W 
+.if \n(64<\n(38 .nr 64 \n(38
+.64
+.rm 64
+.nr 65 0
+.nr 38 \w WIN LEFT
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w JOIN
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w WIN RIGHT
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w DEL WORD
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w REPL
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w SPLIT
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w TABS
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w -TAB
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w CHG WIN
+.if \n(65<\n(38 .nr 65 \n(38
+.65
+.rm 65
+.nr 66 0
+.66
+.rm 66
+.nr 38 1n
+.nr 57 0
+.nr 40 \n(57+((2*\n(38)/2)
+.nr 58 +\n(40
+.nr 41 \n(58+((4*\n(38)/2)
+.nr 59 +\n(41
+.nr 42 \n(59+((4*\n(38)/2)
+.nr 60 +\n(42
+.nr 43 \n(60+((4*\n(38)/2)
+.nr 61 +\n(43
+.nr 44 \n(61+((4*\n(38)/2)
+.nr 62 +\n(44
+.nr 45 \n(62+((4*\n(38)/2)
+.nr 63 +\n(45
+.nr 46 \n(63+((4*\n(38)/2)
+.nr 64 +\n(46
+.nr 47 \n(64+((4*\n(38)/2)
+.nr 65 +\n(47
+.nr 48 \n(65+((4*\n(38)/2)
+.nr 66 +\n(48
+.nr 66 (\n(48+\n(65)/2
+.nr TW \n(66
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 53 file e.stdkey.tbl is too wide - \n(TW units
+.nr #I \n(.i
+.in +(\n(.lu-\n(TWu-\n(.iu)/2u
+.fc  
+.nr #T 0-1
+.nr #b 0-1
+.nr #a 0-1
+.eo
+.de T#
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
+.ls 1
+.if \n(#T>=0 .nr #b \n(#T
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'|0'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(41u+|\n(58u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(42u+|\n(59u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(43u+|\n(60u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(44u+|\n(61u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(45u+|\n(62u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(46u+|\n(63u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(47u+|\n(64u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(48u+|\n(65u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.ls
+..
+.ec
+.mk #b
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
+.sp 2p
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^@ \h'|\n(41u' CMD     \h'|\n(42u' ^L    \h'|\n(43u' RIGHT      \h'|\n(44u'  ^X    \h'|\n(45u' (extend)  \h'|\n(46u' ^X-^H \h'|\n(47u' WIN LEFT
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^A \h'|\n(41u' CMD     \h'|\n(42u' ^M    \h'|\n(43u' RETURN     \h'|\n(44u'  ^Y    \h'|\n(45u' +SRCH     \h'|\n(46u' ^X-^J \h'|\n(47u' JOIN
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^B \h'|\n(41u' -WORD   \h'|\n(42u' ^N    \h'|\n(43u' +WORD      \h'|\n(44u'  ^Z    \h'|\n(45u' INSMODE   \h'|\n(46u' ^X-^L \h'|\n(47u' WIN RIGHT
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^C \h'|\n(41u' BSP     \h'|\n(42u' ^O    \h'|\n(43u' OPEN       \h'|\n(44u'  ^[    \h'|\n(45u' INSERT    \h'|\n(46u' ^X-^N \h'|\n(47u' DEL WORD
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^D \h'|\n(41u' -LINE   \h'|\n(42u' ^P    \h'|\n(43u' PICK       \h'|\n(44u'  ^\e   \h'|\n(45u' INT       \h'|\n(46u' ^X-^R \h'|\n(47u' REPL
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^E \h'|\n(41u' -PAGE   \h'|\n(42u' ^Q    \h'|\n(43u' (not used) \h'|\n(44u'  ^]    \h'|\n(45u' REPL      \h'|\n(46u' ^X-^B \h'|\n(47u' SPLIT
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^F \h'|\n(41u' +LINE   \h'|\n(42u' ^R    \h'|\n(43u' +PAGE      \h'|\n(44u'  ^^    \h'|\n(45u' ERASE     \h'|\n(46u' ^X-^T \h'|\n(47u' TABS
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^G \h'|\n(41u' HOME    \h'|\n(42u' ^S    \h'|\n(43u' (not used) \h'|\n(44u'  ^_    \h'|\n(45u' ALT       \h'|\n(46u' ^X-^U \h'|\n(47u' -TAB
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^H \h'|\n(41u' LEFT    \h'|\n(42u' ^T    \h'|\n(43u' -SRCH      \h'|\n(44u'  ^/    \h'|\n(45u' ALT       \h'|\n(46u' ^X-^W \h'|\n(47u' CHG WIN
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^I \h'|\n(41u' +TAB    \h'|\n(42u' ^U    \h'|\n(43u' MARK       \h'|\n(44u'  ^X-^A \h'|\n(45u' ALT\h'|\n(46u'\h'|\n(47u'
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^J \h'|\n(41u' DOWN    \h'|\n(42u' ^V    \h'|\n(43u' CLOSE      \h'|\n(44u'  ^X-^C \h'|\n(45u' CTRLCHAR\h'|\n(46u'\h'|\n(47u'
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^K \h'|\n(41u' UP      \h'|\n(42u' ^W    \h'|\n(43u' DELCHAR    \h'|\n(44u'  ^X-^E \h'|\n(45u' ERASE\h'|\n(46u'\h'|\n(47u'
+.sp 2p
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
+.fc
+.nr T. 1
+.T# 1
+.in \n(#Iu
+.35
+.nr #a 0
+.TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-19
+.\}
+.if n \{\
+.TS
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
+..
+.nf
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 52 53 54 55 56
+.nr 52 0
+.nr 38 \w(extend)    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+LINE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+PAGE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+SRCH       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+TAB        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+WORD       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-LINE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-PAGE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-SRCH       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-TAB        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-WORD       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wALT         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wBSP         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCHG WIN     
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCLOSE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCMD         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCTRLCHAR    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wDELCHAR     
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wDOWN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wERASE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wHOME        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wINSERT      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wINT         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wJOIN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wLEFT        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wMARK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wOPEN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wPICK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wREPL        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wRETURN      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wRIGHT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wSPLIT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wTABS        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wUP          
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wWIN LEFT    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wWIN RIGHT   
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.52
+.rm 52
+.nr 53 0
+.nr 38 \w ^X                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^F                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^R                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^Y                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^I                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^N                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^D                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^E                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^T                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^U                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^B                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^A or ^_ or ^/     
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^C                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^W                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^V                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^A or NULL or ^@      
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^C                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^W                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^J                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^E or ^^           
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^G                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^Z or ESC or ^[       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^\e                   
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^J                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^H                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^U                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^O                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^P                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^R or ^]           
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^M                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^L                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^B                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^T                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^K                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^H                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^L                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.53
+.rm 53
+.nr 54 0
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.54
+.rm 54
+.nr 55 0
+.nr 38 \w ^@    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^A    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^B    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^C    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^D    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^E    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^F    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^G    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^H    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^I    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^J    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^K    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^L    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^M    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^N    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^O    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^P    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^Q    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^R    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^S    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^T    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^U    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^V    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^W    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^Y    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^Z    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^[    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^\e   
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^]    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^^    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^_    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^/    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^A 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^C 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^E 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^H 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^J 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^L 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^R 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^B 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^T 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^U 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^W 
+.if \n(55<\n(38 .nr 55 \n(38
+.55
+.rm 55
+.nr 56 0
+.nr 38 \w CMD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CMD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -WORD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w BSP
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -LINE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -PAGE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +LINE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w HOME
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w LEFT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +TAB
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w DOWN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w UP
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w RIGHT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w RETURN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +WORD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w OPEN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w PICK
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w (not used)
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +PAGE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w (not used)
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -SRCH
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w MARK
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CLOSE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w DELCHAR
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w (extend)
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +SRCH
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w INSMODE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w INSERT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w INT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w REPL
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ERASE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ALT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ALT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ALT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CTRLCHAR
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ERASE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w WIN LEFT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w JOIN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w WIN RIGHT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w REPL
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w SPLIT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w TABS
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -TAB
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CHG WIN
+.if \n(56<\n(38 .nr 56 \n(38
+.56
+.rm 56
+.nr 38 \wE STANDARD KEYBOARD-\n(52-2n-\n(53-2n-\n(54-2n-\n(55-2n-\n(56
+.if \n(38>0 .nr 38 \n(38/4
+.if \n(38<0 .nr 38 0
+.nr 53 +\n(38
+.nr 54 +\n(38
+.nr 55 +\n(38
+.nr 56 +\n(38
+.nr 38 1n
+.nr 51 0
+.nr 40 \n(51+((0*\n(38)/2)
+.nr 52 +\n(40
+.nr 41 \n(52+((4*\n(38)/2)
+.nr 53 +\n(41
+.nr 42 \n(53+((4*\n(38)/2)
+.nr 54 +\n(42
+.nr 43 \n(54+((4*\n(38)/2)
+.nr 55 +\n(43
+.nr 44 \n(55+((4*\n(38)/2)
+.nr 56 +\n(44
+.nr TW \n(56
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 106 file e.stdkey.tbl is too wide - \n(TW units
+.fc  
+.nr #T 0-1
+.nr #a 0-1
+.eo
+.de T#
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
+.ls 1
+.ls
+..
+.ec
+.ta \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'E STANDARD KEYBOARD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'\h'|\n(42u'\h'|\n(43u'\h'|\n(44u'
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'(extend)    \h'|\n(41u' ^X                    \h'|\n(42u'|\h'|\n(43u' ^@    \h'|\n(44u' CMD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+LINE       \h'|\n(41u' ^F                    \h'|\n(42u'|\h'|\n(43u' ^A    \h'|\n(44u' CMD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+PAGE       \h'|\n(41u' ^R                    \h'|\n(42u'|\h'|\n(43u' ^B    \h'|\n(44u' -WORD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+SRCH       \h'|\n(41u' ^Y                    \h'|\n(42u'|\h'|\n(43u' ^C    \h'|\n(44u' BSP
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+TAB        \h'|\n(41u' ^I                    \h'|\n(42u'|\h'|\n(43u' ^D    \h'|\n(44u' -LINE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+WORD       \h'|\n(41u' ^N                    \h'|\n(42u'|\h'|\n(43u' ^E    \h'|\n(44u' -PAGE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-LINE       \h'|\n(41u' ^D                    \h'|\n(42u'|\h'|\n(43u' ^F    \h'|\n(44u' +LINE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-PAGE       \h'|\n(41u' ^E                    \h'|\n(42u'|\h'|\n(43u' ^G    \h'|\n(44u' HOME
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-SRCH       \h'|\n(41u' ^T                    \h'|\n(42u'|\h'|\n(43u' ^H    \h'|\n(44u' LEFT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-TAB        \h'|\n(41u' ^X-^U                 \h'|\n(42u'|\h'|\n(43u' ^I    \h'|\n(44u' +TAB
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-WORD       \h'|\n(41u' ^B                    \h'|\n(42u'|\h'|\n(43u' ^J    \h'|\n(44u' DOWN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'ALT         \h'|\n(41u' ^X-^A or ^_ or ^/     \h'|\n(42u'|\h'|\n(43u' ^K    \h'|\n(44u' UP
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'BSP         \h'|\n(41u' ^C                    \h'|\n(42u'|\h'|\n(43u' ^L    \h'|\n(44u' RIGHT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CHG WIN     \h'|\n(41u' ^X-^W                 \h'|\n(42u'|\h'|\n(43u' ^M    \h'|\n(44u' RETURN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CLOSE       \h'|\n(41u' ^V                    \h'|\n(42u'|\h'|\n(43u' ^N    \h'|\n(44u' +WORD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CMD         \h'|\n(41u' ^A or NULL or ^@      \h'|\n(42u'|\h'|\n(43u' ^O    \h'|\n(44u' OPEN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CTRLCHAR    \h'|\n(41u' ^X-^C                 \h'|\n(42u'|\h'|\n(43u' ^P    \h'|\n(44u' PICK
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DELCHAR     \h'|\n(41u' ^W                    \h'|\n(42u'|\h'|\n(43u' ^Q    \h'|\n(44u' (not used)
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DOWN        \h'|\n(41u' ^J                    \h'|\n(42u'|\h'|\n(43u' ^R    \h'|\n(44u' +PAGE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'ERASE       \h'|\n(41u' ^X-^E or ^^           \h'|\n(42u'|\h'|\n(43u' ^S    \h'|\n(44u' (not used)
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'HOME        \h'|\n(41u' ^G                    \h'|\n(42u'|\h'|\n(43u' ^T    \h'|\n(44u' -SRCH
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'INSERT      \h'|\n(41u' ^Z or ESC or ^[       \h'|\n(42u'|\h'|\n(43u' ^U    \h'|\n(44u' MARK
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'INT         \h'|\n(41u' ^\e                   \h'|\n(42u'|\h'|\n(43u' ^V    \h'|\n(44u' CLOSE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'JOIN        \h'|\n(41u' ^X-^J                 \h'|\n(42u'|\h'|\n(43u' ^W    \h'|\n(44u' DELCHAR
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'LEFT        \h'|\n(41u' ^H                    \h'|\n(42u'|\h'|\n(43u' ^X    \h'|\n(44u' (extend)
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'MARK        \h'|\n(41u' ^U                    \h'|\n(42u'|\h'|\n(43u' ^Y    \h'|\n(44u' +SRCH
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'OPEN        \h'|\n(41u' ^O                    \h'|\n(42u'|\h'|\n(43u' ^Z    \h'|\n(44u' INSMODE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'PICK        \h'|\n(41u' ^P                    \h'|\n(42u'|\h'|\n(43u' ^[    \h'|\n(44u' INSERT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'REPL        \h'|\n(41u' ^X-^R or ^]           \h'|\n(42u'|\h'|\n(43u' ^\e   \h'|\n(44u' INT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'RETURN      \h'|\n(41u' ^M                    \h'|\n(42u'|\h'|\n(43u' ^]    \h'|\n(44u' REPL
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'RIGHT       \h'|\n(41u' ^L                    \h'|\n(42u'|\h'|\n(43u' ^^    \h'|\n(44u' ERASE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'SPLIT       \h'|\n(41u' ^X-^B                 \h'|\n(42u'|\h'|\n(43u' ^_    \h'|\n(44u' ALT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'TABS        \h'|\n(41u' ^X-^T                 \h'|\n(42u'|\h'|\n(43u' ^/    \h'|\n(44u' ALT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'UP          \h'|\n(41u' ^K                    \h'|\n(42u'|\h'|\n(43u' ^X-^A \h'|\n(44u' ALT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'WIN LEFT    \h'|\n(41u' ^X-^H                 \h'|\n(42u'|\h'|\n(43u' ^X-^C \h'|\n(44u' CTRLCHAR
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'WIN RIGHT   \h'|\n(41u' ^X-^L                 \h'|\n(42u'|\h'|\n(43u' ^X-^E \h'|\n(44u' ERASE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^H \h'|\n(44u' WIN LEFT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^J \h'|\n(44u' JOIN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^L \h'|\n(44u' WIN RIGHT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^R \h'|\n(44u' REPL
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^B \h'|\n(44u' SPLIT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^T \h'|\n(44u' TABS
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^U \h'|\n(44u' -TAB
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^W \h'|\n(44u' CHG WIN
+.fc
+.nr T. 1
+.T# 1
+.35
+.TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-50
+.\}
+.ps 10
+.vs 12
+.bp
+.ps 10
+.vs 12
+.SH TERMINALS/KEYBOARDS SUPPORTED
+.sp
+This is installation specific information with the actual terminal
+types defined varying across the host cpu's versions of the editor.
+Now that the editor can be driven from termcap and the standard
+keyboard, many sites will wish to delete specific terminal type
+support to save memory.  Code is provided with E for the
+following terminals and may be compiled into your version.
+.sp
+
+.ds f. e.term.tbl
+.TS
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
+..
+.nf
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 46 47
+.nr 46 0
+.nr 38 \wDESCRIPTION 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wAnn Arbor S001901/2 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wNew ann arbor (Model Q2878) 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wAnn Arbor Ambassador 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \w and Ann Arbor XLs 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wBeehive MicroBee 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wTermcap terminal 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wINTERACTIVE Systems Intext2 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wLear Siegler ADM3a 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wLiberty Freedom 100 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wHeathkit H19 & H89 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wINTERACTIVE Systems Intext 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wPerkin Elmer 1251 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wStandard keyboard 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wDEC VT100  (needs termcap) 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wLear Siegler ADM31 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wLear Siegler ADM42 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wConcept 100 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wDatamedia DM4000 
+.if \n(46<\n(38 .nr 46 \n(38
+.nr 38 \wWyse 50 
+.if \n(46<\n(38 .nr 46 \n(38
+.46
+.rm 46
+.nr 47 0
+.nr 38 \w TERMINAL TYPE
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w aa, aa0, annarbor, default
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w aa1
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w aaa, ambas, ambassador, aaa-N
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w (N is one of 18,20,22,24,26,28,
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w  30,36,40,48 or 60 )
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w microb
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w [from /etc/termcap]
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w intext2, T_2intext
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w 3a, adm3a, la
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w fr10, free100
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w h19, k1
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w in, intext
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w po
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w standard
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w vt100, vt100w (wide)
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w 31, adm31, l1
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w adm42, l4
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w c100, co, concept, concept100
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w dm4000
+.if \n(47<\n(38 .nr 47 \n(38
+.nr 38 \w wyse50, wyse50w (wide)
+.if \n(47<\n(38 .nr 47 \n(38
+.47
+.rm 47
+.nr 38 1n
+.nr 45 0
+.nr 40 \n(45+((0*\n(38)/2)
+.nr 46 +\n(40
+.nr 41 \n(46+((6*\n(38)/2)
+.nr 47 +\n(41
+.nr TW \n(47
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 28 file e.term.tbl is too wide - \n(TW units
+.fc  
+.nr #T 0-1
+.nr #a 0-1
+.eo
+.de T#
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
+.ls 1
+.ls
+..
+.ec
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DESCRIPTION \h'|\n(41u' TERMINAL TYPE
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Ann Arbor S001901/2 \h'|\n(41u' aa, aa0, annarbor, default
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'New ann arbor (Model Q2878) \h'|\n(41u' aa1
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Ann Arbor Ambassador \h'|\n(41u' aaa, ambas, ambassador, aaa-N
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u' and Ann Arbor XLs \h'|\n(41u' (N is one of 18,20,22,24,26,28,
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'  30,36,40,48 or 60 )
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Beehive MicroBee \h'|\n(41u' microb
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Termcap terminal \h'|\n(41u' [from /etc/termcap]
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'INTERACTIVE Systems Intext2 \h'|\n(41u' intext2, T_2intext
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Lear Siegler ADM3a \h'|\n(41u' 3a, adm3a, la
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Liberty Freedom 100 \h'|\n(41u' fr10, free100
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Heathkit H19 & H89 \h'|\n(41u' h19, k1
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'INTERACTIVE Systems Intext \h'|\n(41u' in, intext
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Perkin Elmer 1251 \h'|\n(41u' po
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Standard keyboard \h'|\n(41u' standard
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DEC VT100  (needs termcap) \h'|\n(41u' vt100, vt100w (wide)
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Lear Siegler ADM31 \h'|\n(41u' 31, adm31, l1
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Lear Siegler ADM42 \h'|\n(41u' adm42, l4
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Concept 100 \h'|\n(41u' c100, co, concept, concept100
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Datamedia DM4000 \h'|\n(41u' dm4000
+.ta \n(46u \n(47u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'Wyse 50 \h'|\n(41u' wyse50, wyse50w (wide)
+.fc
+.nr T. 1
+.T# 1
+.35
+.TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-27
+.SH STARTUP FILE
+.sp
+As a means of individually tailoring various options on startup, E will
+run commands specified in a "profile" file.  The order in which E
+decides which "profile" file to run, is:  command line option
+\-profile=\fIfile\fR,
+environment variable
+.SM EPROFILE,
+a "safe" ./.\fIe_profile\fR,
+and if none of these exist, ~/.\fIe_profile\fR.
+("./.e_profile" is deemed to be safe if you are not the super-user, you own
+the file, and it's not writable by everyone else.)
+If the first line of the profile file begins with the keyword "options:",
+then the rest of the line is treated as if typed as initial arguments
+to E.  The options must currently all be on one line.
+.sp
+Profile format notes:
+.bu
+blank lines and lines beginning with # are ignored
+.bu
+E function keys are denoted by "<keyword>";  use "\e<" to insert a "<" in text;
+"<#keyword>" may be used to repeat \fIkeyword\fR #-times
+.bu
+keywords:
+.nf
+.ta .5i 1.5i 2.5i 3.5i
+.ds t \t
+\*t<+line> \*t<bksp>  \*t<home>     \*t<right>*
+\*t<+page> \*t<cchar> \*t<insmd>    \*t<split>
+\*t<+sch>  \*t<chwin> \*t<int>      \*t<srtab>
+\*t<+tab>  \*t<close> \*t<join>     \*t<tab>
+\*t<+word> \*t<cmd>   \*t<left>*    \*t<up>*
+\*t<\-line>\*t<dchar> \*t<mark>     \*t<wleft>
+\*t<\-page>\*t<down>* \*t<open>     \*t<wright>
+\*t<\-sch> \*t<dword> \*t<pick>     \*t<null>
+\*t<\-tab> \*t<edit>  \*t<replace>  \*t<undef>
+\*t<\-word>\*t<erase> \*t<ret>
+.sp 2p
+\*t(*=cursor motion)
+.fi
+.bu
+essentially anything that can be typed at E can be inserted in the
+".e_profile".  Thus, application specific editor scripts can be created.
+.bu
+note that various
+.SM CMD
+options end with a <ret>, others don't; e.g., "<cmd>tabs 4<ret>", but
+"<cmd><+page>".
+.bu
+E looks for a "profile" file and
+examines the "options:" line \fIbefore\fR processing any command line arguments,
+thus command line options override any options specified in the
+"options:" line.  \fICaveat\fR: if the \-profile=file argument is used, any
+"options:" in a profile file will have already been processed.  This is
+a "cart before the horse" problem....
+.bu
+any format errors will terminate reading of the profile file, and continue
+the E session;
+.ne 4v
+.bu
+example:
+.nf
+.RS
+options: \-regex \-stick
+<cmd>tabs 4<ret>
+<cmd>set window 40<ret>
+.RE
+.fi
+.SH BUGS
+.sp
+By far the worst problem with E is its treatment of tabs.
+E is a "whitespace" editor, all whitespace is considered
+equal.  On any line that E modifies, it will compress
+multiple initial blanks to tabs, strip trailing blanks,
+and convert any embedded tabs to blanks.  This is acceptable
+for most editing, but some programs expect real tab characters
+as input, for example tbl(1) and some nroff commands.
+
+
+.SH SEE ALSO
+.sp
+.I
+SELF-TEACHING GUIDE TO RAND'S TEXT PROCESSOR,
+October 1983, Computer Services Department, The Rand Corporation
+.sp
+.I
+THE RAND EDITOR, E,
+April 1984, Computer Services Department, The Rand Corporation.
+
+
+.SH SPONSOR
+The Rand Corporation.
+
+
+
+

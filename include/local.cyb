@@ -1,0 +1,24 @@
+/* system environment stuff for Cyb MC68000 (sysIII and sysV) */
+
+/* fine index strchr            /* */
+/* fine rindex strrchr          /* */
+/* fine NOIOCTL_H               /* there is no ioctl.h (??? jdg) */
+#define RDNDELAY                /* read call has NDELAY capability */
+/* fine EMPTY                   /* can implement empty(fd) subroutine call */
+#define LINKS                   /* file system has links */
+#define CANFORK                 /* system has fork() */
+/* fine VFORK                   /* system has vfork() */
+#define ABORT_SIG SIGTRAP       /* which signal does abort() use */
+#define SIGARG                  /* signal catch routine has sig num as arg */
+#define SIG_INCL <signal.h>
+#define SGTT_INCL <sgtty.h>
+#define TTYNAME                 /* use ttyname function */
+/* define TTYN                  /* use ttyn function */
+#define SHORTUID                /* uid is a short, not a char (v7+) */
+#define ENVIRON                 /* getenv() is implemented */
+/* define VAX_MONITOR             /* use monitor() routine for vax */
+#define SIGNALS                 /* system has signals */
+
+
+#define SIGCHLD SIGCLD
+#define CBREAK

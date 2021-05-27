@@ -1,0 +1,318 @@
+Digest of Changes Made to the Rand editor (Rand release v1.8):
+
+This delivered tar tape contains the same contents as the equivalent
+subdirectory on the Rand distribution, except that:
+
+	An additional subdirectory, "help", holds the terminal-particular
+help routines and data files.
+
+	The subdirectory formerly named e18 is renamed e19, because the
+revision number had to be upped when a change was made to the state file
+layout.  This change is reflected in several places.
+
+	A subdirectory to the main directory, "learn", contains a set of
+learn program lessons comprising a tutorial on the e editor.
+
+	The subdirectory "term" has been moved to be a subdirectory within
+each e version directory. The reason for this is that it seems the terminal
+stuff is changing as much as the source files, and therefore each version
+should have its own terminal stuff.
+
+	I've built a Makefile at the top level to do an overall job at
+building and installing the editor.  It also passes certain strings down
+to its callees, because I got tired of setting and resetting ranlib in
+each library directory.
+
+                                   NOTE
+
+Most of the changes below were added with defines for optionally including
+them or not, as desired. There are some interactions, but a small attempt
+has been made to keep them as independent as possible. Most testing has
+occured with all LMC options on. I would recommend that LMCV19 be used if
+any others are; beyond that, its all yours.
+
+
+                                  CHANGES
+
+A. First of all, I have created a new revision number (e19) from the Rand
+   1.8 release of the editor.  The reason for this new revision number is
+   that I have had to add several new data items to the state file format;
+   this seems to require a new revision (see pres.c).  The changes which
+   have been made are that the auto-linefeed state and an associated
+   variable called autolmarg have been added; and a flag word has been
+   added to each window to maintain the TRACK state across sessions (see G.
+   and J. below).  This change is effected by defining LMCV19 in e.h.
+
+B. Here at Martin Marietta (or rather, there, as I don't work there no
+   more) we have a VAX with vt100 crts.  I have therefore aimed a lot of
+   our use of the e editor towards that crt (and I was also forced to
+   consider the vt52 {yech}).  I have built a very good (in my humble
+   opinion) handler for the vt100, and a so-so (considering the lack of
+   features) handler for the vt52.  I have also made some changes to the
+   termcap entries for these terminals, to make "rain" work correctly and
+   to insure the terminal is correctly initialized.
+
+   Because the vt100 has a wide mode, I have invented a new crt type called
+   the vt100w, and have used the ini0 entry in the vt100 handler to set the
+   appropriate screen width. This assumes the -AB option is available on
+   the vt100.
+
+   Of late we have become involved in a terminal evaluation binge. Most of
+   these terminals have been vt100 look-alikes. Their names have been added
+   to e.tt.c, equating them to the vt100 (and vt100w). One completely
+   different terminal, the Beehive MicroBee, has been added, with its own
+   handler, and a handler for the Televideo 910, which is only slightly
+   different from the standard handler. (This is later...) Other new
+   terminal handlers are for the Televideo 910 (dumb) and the Liberty
+   Electronics Freedom 100 (not quite as dumb, but cheap).
+
+   Last, but not least, is the Wyse 50.  It is interesting because the
+   bottom status line can be loaded with the function key names, and they
+   switch when the shift key is used.  Snazzy.  I use the keyboard init
+   and end routines to set the line and clear it.  The end routine also
+   fork-execs /etc/e/setwyse50, which is a utility which reads a user's
+   file .wy50{w} and programs the function keys and labels, presumably the
+   way the user wants them normally. setwyse50.c is included in the help
+   subdirectory.
+
+C. I am a techno-junkie and love function keys, and so I have implemented
+   as many functions as possible as function keys on the keyboard.  This
+   has forced me to use the vt100 (and Freedom 100 fcn keys) keypad,
+   almost all of the control keys, and a number of escape sequences to
+   implement all the functions.  This in turn makes the editor more
+   difficult to break into, but once the learning curve is defeated, the
+   editor is much more responsive and easy to use.  Besides, all the typed
+   commands are also available to those who enjoy typing.
+
+   A number of functions which formerly were only available through the
+   command line may now be obtained through the use of control keys
+   (sometimes with options defaulted).  These include:
+
+	redraw          -tabs           exit            exit abort
+	center          fill            justify         exit quit
+	clear (unimpl)  track, -track   box             range, -range, ?range
+	cover pick      overlay pick    underlay pick   blot, -blot pick
+
+   and the new functions:
+
+	help (l)        ccase           caps            autofill
+
+   This change has required some changes to the "command" routine within
+   e.cm.c, in order to fake the commands from the function keys.
+   It is selected with LMCCMDS.
+
+D. A help feature has been incorporated into e.  Functionally, the
+   commands "help (r)" (as in right) and "help l" (can you guess?) invoke a
+   display of, respectively, the right side of the keyboard and keypad (if
+   any) and the left side of the keyboard of the terminal in use.  Once
+   this is displayed, the help mode prints out verbal descriptions of the
+   functions of any function key combination typed, until the carriage
+   return is typed.  The screen is repainted and the cursor returned to
+   the point at which help was invoked.
+
+   In order to perform this service, a terminal-dependent routine is
+   called to paint the keyboard on the screen (there exists a general
+   purpose routine, help_std.c., located in e.h.c).  The reason for the
+   terminal dependence hook is that some crt's can go into 132 column
+   mode; it would be possible to show the entire keyboard in one swell
+   foop.  One or two datafiles with names of the form k{r,l}.termname are
+   kept in /etc/e for the use of these routines.  These terminal-dependent
+   routines call a terminal independent routine (morehelp in e.h.c) which
+   explains each key as it is depressed following the display of the
+   keyboard.  It uses a datafile in /etc/e named helpkeys, which contains
+   the verbal explanation of each function key.  When the carriage return
+   is finally pressed, return is made to e.cm.c, where we fall through a
+   case label into the redraw code.
+
+   If the l?.termname file requested does not exist, a message to that
+   effect is output. The user may still, however, get the verbal
+   descriptions.
+
+   Additional entries in the S_term table were made following tt_erase,
+   to support this function:
+
+		......
+	       /* tt_erase   */    (int (*) ()) 0,
+   ========>   /* tt_so      */    term_so,            <=============
+   ========>   /* tt_soe     */    term_soe,           <=============
+   ========>   /* tt_help    */    help_std,           <=============
+	       /* tt_nleft   */    1,
+		......
+
+   The tt_so entry is a routine which sets standout mode, while tt_soe ends
+   it. Tt_help is the machine-dependent routine which is used to paint the
+   help screen.   If LMCLDC is defined, the terminal line-drawing
+   character set is used to show the help file.  See e19/term/Doc for
+   descriptions of file formats.
+
+   I made this change to all the terminal handlers in term, making the
+   entry null in most cases.  Define LMCHELP to get this goodie.
+
+E. A goto command may be done more easily with the command string:
+   <CMD>linenumber<CR>. Define LMCGO (presumes LMCCMDS).
+
+F. Two new commands have been implemented for case changes: "ccase" and
+   "caps". Caps, as its name implies, changes the target text to all upper
+   case characters (note that only the characters a-z are affected). Ccase,
+   on the other hand, changes all upper case to lower case and vice versa.
+   These commands may be used with rectangular marking in order to affect
+   an entire area.  By default, the target is the single character under
+   the cursor. When used in this default mode, the cursor is moved to the
+   right one character each time the command is invoked. This is, of
+   course, most useful when these commands are implemented as function
+   keys.  Define LMCCASE for these functions.
+
+G. A new function, call auto, has been added to allow "power typing" to be
+   done. When this mode is invoked, typing past the right margin causes a
+   the line to be automatically split at the previous blank or dash, and
+   the remainder to be moved to the next line, starting at the left margin.
+   The cursor is adjusted, and character fill-in proceeds as if nothing has
+   happened. Automatic scrolling and line opening is done as required.
+
+   The right margin alluded to above is none other than the center, fill,
+   and justify width. The left margin is another variable used only with
+   this command. It is set with the use of the mark function immediately
+   prior to setting the auto mode. The auto mode is alternately set and
+   reset by <AUTO>, or with "auto" and "-auto" commands. There is a flag in
+   the status line which tells whether the AUTO mode is in force.
+
+   As an example, if the string pxxx means position the cursor to column
+   xxx, the command string: p40<MARK>p70<CMD><AUTO> causes the auto mode to
+   be entered with the left margin set to col 40 and the right margin set
+   to col 70. The default left margin is zero, and the default right margin
+   is 78, so the command: p4<MARK><AUTO> is the one I used to set up the
+   editing session for this file.
+
+   This method of setting the right margin may also be used with the fill,
+   justify, and center commands, since they are all implemented as function
+   keys. (i.e., p30<CMD><FILL> will do the same as <CMD>"fill w=30").
+   Conversely, the command <CMD>"auto w=40" is valid.
+
+   An "AUTO" flag is displayed in the flag line when the auto mode is
+   selected.
+
+   One warning - keep then entire range of fillable page, from left margin
+   to right margin, on the screen simultaneously. Attempting to force left-
+   right movement of the window causes problems. Define LMCAUTO for this.
+
+H. I have added an option to the e invocation, of the form:
+   "-state=filename", which causes the initial state of the editor to be
+   read from the indicated file. Thus, a user may create an editor state,
+   with alternate files, windows, cursor positioned, etc, etc, and then
+   exit from the editor and rename the statefile to another name.
+   Subsequent calls upon e with the state option addressing the renamed
+   state file will cause the editor to be reset to that state. The named
+   file is only used to set up the initial state; it therefore will not be
+   subsequently changed by the editor. This allows the user to create
+   canned editor environments containing files, windows, cursor positions,
+   etc. This may be had with LMCSTATE.
+
+I. In line with the above changes, I have added the following data to the
+   state file:
+
+	autofill - a flag which gives the auto mode state;
+	autolmarg - the left autofill margin - included only if autofill is
+		    YES;
+	for each window, winflgs - the state of the TRACK mode bit.
+
+   In order to implement that last, the argument list to editfile and
+   setupwindow had to be changed to include winflgs as an argument.
+   Define LMCV19 for these changes.
+
+   Two changes have been made to the TRACK command: the TRACK flag has been
+   made part of the state of each window, so that the TRACK mode can be
+   reestablished following an interruption, and the TRACK command has been
+   changed so that it toggles the TRACK mode, in the same way as does
+   INSERT.  The -TRACK command is still functional. Both J. and K. (below)
+   may be used if LMCTRAK is defined.
+
+K. The RANGE command has been changed so that repeated calls to range
+   toggle the range mode.
+
+L. The tab and margin settings are noted on the window top and bottom
+   borders. The BTMCH and TTMCH characters in e.t.h are used for the bottom
+   and top tab indicators, respectively, and as the top and bottom margin
+   indicators, also respectively. Available with LMCMARG.
+
+M. I have slightly changed stdinlex.c so that creating keyboard handlers
+   that are only slightly different from the standard keyboard is
+   facilitated.  See tv910.c for an example. I have included stdinlex.c
+   back into std.c and commented out the #include statement for it in e.tt.c.
+
+N. Some miscellaneous changes: cosmetic, more explanatory error messages,
+   etc.
+
+O. Since e18 came out with +WORD and -WORD, I decided that a delete word
+   function might be a good idea. DWORD deletes the word that the cursor
+   is on, -DWORD replaces it. The word definition sets apply to DWORD as
+   well. Select with LMCDWORD.
+
+P. It seems to me that the desire to use a visible bell as opposed to
+   a noisy one should be expressed through an environmental variable
+   which is handled by the applications program. S'be't. If the
+   environmental variable VBELL is defined, that's what you get (providing
+   your termcap or terminal def supports it). Of course, that adds another
+   line to the S_term table:
+
+	/* tt_help  */
+	/* tt_vbel  */
+	/* tt_nleft */
+
+   This should arguably be done in the tty handler, but I'm not going to
+   get caught in that whirlpool...
+   Use LMCVBELL.
+
+Q. I like the new SET command, so naturally I had to "fix" it...
+   I added the left margin variable (autolmarg) in as "lmargin", and
+   added an alias for the linewidth as rmargin. I also put a thing in to
+   override the the visible bell selection made in P above.
+
+R. I have completely restructured pres.c. I believe that it is the same
+   functionally (except that I added the version 19 stuff). However,
+   I don't have any early version state files to test it with.
+
+S. Having eventually tired of building terminal handlers, I have decided
+   that the real way to go is to 1) get rid of screen handlers in favor of
+   the tcap handler, and 2) get rid of most of the keyboard handlers by
+   using the code in e.it.c and e.iit.c. Part 1) involves some additions to
+   tcap.c to pick up some formerly unused capabilities, and inventing or
+   adapting some others of my own. Eric Negaard@aerospace invented a set of
+   capabilities to use the line drawing set found on most crts; I added the
+   Xc (for extra character) for the bullets, and also the xv capability
+   (found on the vt100 only) which says "don't use column 80". On those
+   handlers which use tcap.c, the handler has regressed to become a
+   keyboard handler only, and the termcap entry that I use with that
+   terminal is included as comment in the handler. The line drawing stuff
+   is invoked by defining LMCLDC.
+
+   As for step 2), I haven't yet done anything. Soon, maybe.
+
+T. Documentation. Due to popular demand, a comprehensive list of commands
+   and how to "do" them on various terminals is in help/commandlist.
+   A number of keyboard layouts, in printable form, are also in
+   help/print*.
+
+U. I think that the "stuck at right margin" feature really stucks.  As
+   you may have guessed, I "fixed" it.  Now, when the cursor encounters
+   the right margin it will automatically move the window defrwin places
+   to the right.  This works for either characters or cursor movements
+   occuring on the right margin, or cursor movements on the left margin.
+   This seems much more reasonable to me than either the stuck or the old
+   right-one-space trick, or even the current ignore-it.  The old stuck
+   feature can be forced by use of the -stick option.  The default action
+   is for -nostick, which can easily be changed by altering the preset in
+   e.x.c for the variable "optstick".  Available with LMCSRMFIX.
+
+   Oh, yes, I also removed the incomprehensible fiddling with redit in
+   e.p.c (remember, "I cleaned up & this stuff was left over" jazz?)
+   because it is the only place where redit was changed so as not to
+   shadow rtext.  Of course, it was immediately fixed again, but I bashed
+   it anyway.  No need for further confusion.  BTW, couldn't we make that
+   relationship explicit with a define, rather than wasting space in the
+   window structure?  Same for tedit = ledit = 0 and bedit = btext.
+
+V. In line with the -dt option (short for -dtermcap) to get the termcap
+   screen handler, I added the -dk (short for -dkeyboard) which is
+   equivalent to -keyboard=standard. This allows those who must use a
+   number of different crts to easily default to the standard keyboard.
+   Select with LMCOPT.

@@ -1,0 +1,220 @@
+#
+#       Top level installation makefile for the Rand Editor (e).
+#
+#       The two high level makes are:
+#
+#       make sys5.install
+#       make bsd.install
+
+
+#
+# These macros need to be set to the eventual resting place for the binary
+# and man pages before bsd.install or s5.install is invoked.
+#ORG = /usr/local
+ORG = /usr/rand
+BIN = $(ORG)/bin
+MAN = $(ORG)/man
+LIB = $(ORG)/lib/e
+TMP = /tmp/etmp
+DOC = $(MAN)/man1/e.1
+LEARN = $(LIB)/learn
+NAME = e
+OWNER = bin
+GROUP = staff
+
+# RAND CHANGES 88/89:
+#    Do all makes from this top level makefile.  Usually:
+#       make clean; make e19; make install.e19
+#    -DWPMODESET will bring up E in WP mode by default.
+#    -DSUNOS4 for SunOS4.x
+#    -DETC=... completely defines the old /etc/e directory.  The default
+#       is /usr/local/lib/e.
+#    -DFSYNCKEYS will frequently do an fsync on the keystroke file.
+#    -DASCIIKEYINFO .ek? file info at beginning is all ascii
+#    -DHOSTTMPNAMES tmp files created with hostname, eg: ".ek1.hostname"
+#    -DSAVETMPFILES .e{s,k,c}* are renamed ,.e{s,k,c}*.pid on exit
+#    -DBUILTINFILL uses inline fill/just/center code instead of
+#       ETC/{fill,center,just}  (THIS DOES NOT WORK YET! 9/89)
+#-------------------------------------------------------------------------
+
+
+S5DEFINES = -DUNIXV7 -DETC="'\"$(LIB)\"'" -DASCIIKEYINFO -DSYSIII -DSYSV \
+	  -DSAVETMPFILES \
+	  -DCBREAK -Dindex=strchr -DTERMSIM -DTERMCAP -DFILELOCKING
+BSDDEFINES = -DUNIXV7 -DETC="'\"$(LIB)\"'" -DASCIIKEYINFO -DFSYNCKEYS \
+	  -DHOSTTMPNAMES -DSAVETMPFILES -DFILELOCKING -DFLOCK -DBCOPY \
+	  -DTERMCAP
+S5CFLAGS   = -g # -O
+BSDCFLAGS  = -g # -O
+S5LDFLAGS  = -g
+BSDLDFLAGS = -g
+S5LIBS     = s5.libtmp s5.fflib s5.lalib
+BSDLIBS    = bsd.libtmp bsd.fflib bsd.lalib
+LOCALINCL = ../include/
+MANPATH = /usr/local/man/man1
+
+empty:
+	@echo "you must type one of:"
+	@echo "    $(MAKE) sys5"
+	@echo "    $(MAKE) bsd"
+	@echo "    $(MAKE) sys5.install"
+	@echo "    $(MAKE) bsd.install"
+	@echo "    $(MAKE) clean"
+
+sys5:   $(S5LIBS)
+	cd e19; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"CFLAGS=$(S5DEFINES) $(S5CFLAGS)" \
+		"LDFLAGS=$(S5LDFLAGS)" \
+		"NEWVERSION=vers.s5.sh" \
+		le
+
+bsd:    $(BSDLIBS)
+	cd e19; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"CFLAGS=$(BSDDEFINES) $(BSDCFLAGS)" \
+		"LDF=$(BSDLDF)" \
+		"NEWVERSION=vers.bsd.sh" \
+		le
+
+s5.lalib:
+	cd la1; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"CFLAGS=$(S5DEFINES) $(S5CFLAGS)" \
+		"LDFLAGS=$(S5LDFLAGS)" \
+		"RANLIB=@echo archived"
+
+bsd.lalib:
+	cd la1; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"DEFS=$(BSDDEFINES) $(BSDCFLAGS)" \
+		"LDFLAGS=$(BSDLDFLAGS)" \
+		"RANLIB=ranlib"
+
+s5.fflib:
+	cd ff3; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"ETC=$(LIB)" \
+		"CFLAGS=$(S5DEFINES) $(S5CFLAGS)" \
+		"LDFLAGS=$(S5LDFLAGS)" \
+		"RANLIB=@echo archived"
+
+bsd.fflib:
+	cd ff3; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"ETC=$(LIB)" \
+		"CFLAGS=$(BSDDEFINES) $(BSDCFLAGS)" \
+		"LDFLAGS=$(BSDLDFLAGS)" \
+		"RANLIB=ranlib"
+
+s5.libtmp:
+	cd lib; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"CFLAGS=$(S5DEFINES) -DMEMSET $(S5CFLAGS)" \
+		"LDFLAGS=$(S5LDFLAGS)" \
+		"RANLIB=@echo"
+
+bsd.libtmp:
+	cd lib; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"CFLAGS=$(BSDDEFINES) -DMEMSET $(BSDCFLAGS)" \
+		"LDFLAGS=$(BSDLDFLAGS)" \
+		"RANLIB=ranlib"
+
+sys5.install:   sys5 s5.help s5.man s5.tmp
+	mv $(BIN)/$(NAME) $(BIN)/$(NAME).old
+	ln e19/le $(NAME)
+	install -u $(OWNER) -g $(GROUP) -f $(BIN) $(NAME)
+	strip $(BIN)/$(NAME)
+	chmod 755 $(BIN)/$(NAME)
+	rm -f $(NAME)
+
+bsd.install:   bsd bsd.help bsd.man bsd.tmp
+	mv $(BIN)/$(NAME) /$(BIN)/$(NAME).old
+	ln e19/le $(NAME)
+	install -s -o $(OWNER) -g $(GROUP) -m 755 $(NAME) $(BIN)
+	rm -f $(NAME)
+
+
+s5.help: etc help
+	chown $(OWNER) $(LIB)/*
+
+bsd.help: etc help
+	/etc/chown $(OWNER) $(LIB)/*
+
+etc:
+	-mkdir $(LIB)
+	chown $(OWNER) $(LIB)
+	chmod 755 $(LIB)
+	cp help/Crashdoc $(LIB)
+	cp help/errmsg $(LIB)
+	cp help/recovermsg $(LIB)
+	chmod 444 $(LIB)/*
+	cd fill; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"ETC=$(LIB)" \
+		"DFS=$(LIBDFS)" \
+		"CCF=$(LIBCCF)"
+	cp fill/fill $(LIB)
+	ln $(LIB)/fill $(LIB)/just
+	cp fill/center $(LIB)
+	cp fill/run $(LIB)
+	chmod 755 $(LIB)/fill $(LIB)/just $(LIB)/center $(LIB)/run
+
+help:   etc
+	cp help/helpkey $(LIB)
+	cp help/k?.* $(LIB)
+	ln $(LIB)/kl.vt100 $(LIB)/kl.vt100w
+	ln $(LIB)/kl.vt100 $(LIB)/kl.tab132
+	ln $(LIB)/kl.vt100 $(LIB)/kl.tab132w
+	ln $(LIB)/kl.vt100 $(LIB)/kl.cit101
+	ln $(LIB)/kl.vt100 $(LIB)/kl.cit101w
+	ln $(LIB)/kl.free100 $(LIB)/kl.fr100
+	ln $(LIB)/kl.wy50 $(LIB)/kl.wy50w
+	ln $(LIB)/kr.vt100 $(LIB)/kr.vt100w
+	ln $(LIB)/kr.vt100 $(LIB)/kr.tab132
+	ln $(LIB)/kr.vt100 $(LIB)/kr.tab132w
+	ln $(LIB)/kr.vt100 $(LIB)/kr.cit101
+	ln $(LIB)/kr.vt100 $(LIB)/kr.cit101w
+	ln $(LIB)/kr.free100 $(LIB)/kr.fr100
+	ln $(LIB)/kr.wy50 $(LIB)/kr.wy50w
+	ln $(LIB)/kl.tv910 $(LIB)/kr.tv910
+	ln $(LIB)/kl.standard $(LIB)/kr.standard
+	chmod 444 $(LIB)/k?.* $(LIB)/helpkey
+
+s5.tmp:
+	-mkdir $(TMP)
+	chown $(OWNER) $(TMP)
+	chgrp $(GROUP) $(TMP)
+	chmod 777 $(TMP)
+
+bsd.tmp:
+	-mkdir $(TMP)
+	/etc/chown $(OWNER) $(TMP)
+	chgrp $(GROUP) $(TMP)
+	chmod 777 $(TMP)
+
+bsd.man:
+	cd man; $(MAKE) "MANPATH=$(MANPATH)" install
+
+s5.man:
+	cd man; $(MAKE) "MANPATH=$(MANPATH)" install
+
+s5.clean: clean
+
+s5.lint:
+	cd e19; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+		"CFLAGS=$(S5DEFINES) $(S5CFLAGS)" \
+		"LINTFLAGS=$(S5LINTFLAGS)" \
+		lint
+
+learn:
+	cp doc/man/e.1 $(DOC)
+	-mkdir $(LEARN)
+	chmod 755 $(LEARN)
+	chown $(OWNER) $(LEARN)
+	cp learn/* $(LEARN)
+	chmod 644 $(LEARN)/*
+	chown $(OWNER) $(LEARN)/*
+	@echo "*** Remember to edit /usr/lib/learn/*info to advertize"
+	@echo "*** the e editor lessons."
+
+clean:
+	cd e19; $(MAKE) clean
+	cd fill; $(MAKE) clean
+	cd la1; $(MAKE) clean
+	cd ff3; $(MAKE) clean
+	cd lib; $(MAKE) clean
+	-rm -f ,* #* a.out .e?1*
+

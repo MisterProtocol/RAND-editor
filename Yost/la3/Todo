@@ -1,0 +1,28 @@
+
+Todo 870113
+    Set it up so these are larger, as allowed by the machine
+    LA_FSDLMAX  127     /* max for fsdnlines */
+    LA_FSDBMAX  255     /* max for fsdbytes */
+    LA_FSDNBMAX 32767   /* max for fsdnbytes */
+
+lablank.c
+labreak.c
+labsize.c
+laclseek.c
+ladeb.c
+lafins.c
+lafrpl.c
+lalcnt.c
+lalcol.c
+lalcopy.c
+laldel.c
+lalflush.c
+lalget.c
+lalink.c
+lalins.c
+lalpnt.c
+lalrpl.c
+lalrsize.c
+lalseek.c
+lalwsize.c
+laother.c

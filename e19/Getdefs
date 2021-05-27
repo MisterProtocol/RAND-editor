@@ -1,0 +1,13 @@
+#! /bin/csh -f
+rm -f Defs Ifs Defines X
+grep   "#[ 	]*define " e*.[hc] > Defs
+sed -e "/#[ 	]*ifdef[ 	]*\([^ ]*\)/ w Ifs" \
+    -e "/#[ 	]*ifndef[ 	]*\([^ ]*\)/ w Ifs" \
+	e*.[hc] > /dev/null
+sed -e "s/#[ 	]*[^ ]*[ 	]*\([^ ]*\).*/\1/" Ifs | sort | uniq > X
+foreach i (`cat X`)
+	echo "=========> $i <=========" >> Defines
+	fgrep $i Defs >> Defines
+	echo "" >> Defines
+end
+rm -f X Defs Ifs

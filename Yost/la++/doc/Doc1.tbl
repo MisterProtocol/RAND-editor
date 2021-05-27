@@ -1,0 +1,21 @@
+.TS
+tab (~);
+l s s
+lw(4m) l l
+lw(4m) l l
+lw(4m) l l
+lw(4m) l l
+lw(4m) l l
+lw(4m) l l
+lw(4m) l l
+l s.
+typedef struct lafsd {
+~struct lafsd~*fsdback;
+~struct lafsd~*fsdforw;
+~long~fsdpos;
+~struct lafile~*fsdfile;
+~short~fsdnbytes;
+~char~fsdnlines;
+~char~fsdbytes[1]; /* actually [fsdnbytes] */
+}\ La_fsd;
+.TE

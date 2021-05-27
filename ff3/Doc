@@ -1,0 +1,132 @@
+FFIO(VII)                   27 July 78                  FFIO(VII)
+
+
+NAME
+    FFIO -- "fast file" direct access i/o package
+
+
+SYNOPSIS
+    #include ffio.h
+
+    typedefs:
+	Ff_stream ff stream structure - one per open
+	Ff_file   ff file structure - one per unique file
+	Ff_buf    ff buffer structure
+	Ff_stats  ff satistics structure
+
+    Returns     Name      Args
+    -------     ----      ----
+    -1 / int    ff_alloc  (int num, int arena);
+    -1 / 0      ff_close  (Ff_stream *ptr);
+    -1 / int    ff_fd     (Ff_stream *ptr);
+    -1 / 0      ff_flush  (Ff_stream *ptr);
+    -1 / int    ff_free   (int num, int arena);
+    -1 / char   ff_getc   (Ff_stream *ptr);
+    -1 / long   ff_grow   (Ff_stream *ptr);
+    0  / Ff_stream *ptr ff_open   (char filename, int mode, int arena);
+    0  / Ff_stream *ptr ff_fdopen (int chan, int mode, int arena);
+    -1 / long   ff_pos    (Ff_stream *ptr);
+    -1 / int    ff_putc   (char, Ff_stream *ptr);
+    -1 / int    ff_read   (Ff_stream *ptr, char *buf, int size,
+			   int breakcount, char *breakset);
+    -1 / long   ff_seek   (int ptr, long pos, whence);
+    -1 / long   ff_size   (Ff_stream *ptr);
+    -1 / int    ff_sync   (int syssync);
+    -1 / int    ff_use    (int num, int arena);
+    -1 / int    ff_write  (Ff_stream *ptr, char buf, int num);
+    -1 / int    ff_point  (Ff_stream *ptr, long pos, char **buf, int num);
+
+    Ff_stats {
+	    int     fs_seek,        /* Total seek sys calls */
+		    fs_read,        /*       read  "    "   */
+		    fs_write;       /*       write "    "   */
+    } ff_stats;
+
+DESCRIPTION
+
+     The ffio package is intended for random access file I/O.  It should
+not be used with data stream "files" such as standard input and output or
+pipes; for these, the stdio getc/putc routines are more efficient.
+
+     Ffio manages a pool of data buffers which are shared among the opened
+files.  File blocks are read in and written out automatically and only when
+necessary (although ff_flush may be used to force data to be written out).
+If data being read is already in an incore buffer, or if data being written
+out goes into a file block which is already buffered in core, then no
+actual Unix system calls (seek, read, write) are performed.  When a new
+buffer is needed, ffio takes the least recently used one; if it contains
+output data, then the buffer is first written to its file.
+
+     Ff_use and ff_alloc cause ffio to expand the size of the buffer pool.
+(If neither routine is ever called, ffio will automatically allocate one
+buffer.) Ff_alloc uses the malloc() routine to obtain memory for the
+buffer; its argument is a count of the number of buffers to add to the
+pool.  Ff_use adds permanent storage (i.e., memory which is allocated at
+compile time) into the pool.  Its argument is a pointer into the memory to
+be used for one buffer, which must be FF_BUF bytes long.  Ff_free takes a
+count as its argument and removes the indicated number of buffers from the
+pool (and calls the free() routine).  Only buffers acquired through
+ff_alloc can be freed.  Each of these routines returns the total number of
+buffers in the pool.
+
+     Ff_open takes the same arguments as the open system call. (However
+the file must be accessible for reading as well as writing if it is to be
+written.)  Ff_open normally returns a pointer to an FFstream.  To obtain
+the file descriptor, call ff_fd.  Ff_size takes the pointer handle as its
+argument and returns a long integer which is the size of the file; note
+that this number may be less than the size returned with a stat/fstat,
+since ffio may not have written out data produced by the program.  It also
+may be because the file has been appended to by some other process since it
+was opened.  Should this be the case, if you want ffio's notion of the size
+of the file to grow to be updated to the actual size of the file, call
+ff_grow.
+
+     Ff_getc takes a pointer handle as its argument and returns a
+character.  Ff_read is like the read system call; it places characters into
+the memory pointed at by buf.  Up to count characters will be transfered.
+However, transfer can be conditionally terminated according to the contents
+of breakset.  Breakset is a pointer to a string of characters.  Transfer
+will terminate after the first character which is a member of that string.
+Breakcount is the number of characters in Breakset, so that Therefore, to
+read a "line" of data, the call might be: ff_read (ff_handle, &buffer,
+sizeof buffer, 1, "\n").  Ff_read returns the number of characters actually
+read.  If the buffer pointer passed to ff_read is NULL, the internal file
+position will be updated appropriately, but no data will be returned.
+
+     Ff_point is like ff_read, except instead of copying data, it returns
+a pointer to the data and a count of the number of bytes accessible from
+there, up to the number requested.
+
+     Ff_putc is like a standard putc routine.  Ff_write is like the Unix
+write system call.  However, both take ffio pointer handles instead of
+channel/file descriptors.  Ff_flush overrides ffio output management and
+forces data to be written to the indicated file.
+
+     Ff_pos takes a pointer handle as its argument and returns a long
+integer which is the current position in the indicated file.  Ff_seek sets
+the current position in the indicated file a la lseek and returns the
+resulting seek position.
+
+     Ff_sync writes out all the dirty buffers in the cache, and if the
+argument is non-0, does a system sync call as well.
+
+     For information purposes, ffio keeps track of the total number of
+system seek, read, and write calls actually performed in the global
+structure ff_stats.
+
+     Mods to make ffio work on VMS files under EUNICE onr VMS are available
+from The Wollongong Group, distributors of EUNICE (as of 12/83).
+
+FILES
+     libff.a
+     libff/ff.h
+
+
+BUGS
+     Multiple buffer pools, or arenas, are not implemented yet.
+
+
+AUTHORS
+     Bruce Borden       the code (July 1978)
+     Dave Crocker       documentation
+     David Yost         more work (1979, 1980, 1983)

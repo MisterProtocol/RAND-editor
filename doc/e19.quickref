@@ -1,0 +1,76 @@
+Brief Summary of e19 changes
+----------------------------
+
+
+1.  HELP FACILITY
+
+    Type "<CMD>help" to start up.  In response to a function or
+    or CTRL key, a message describing the function is display.
+    Type a <RETURN> to return to the editing session.
+
+
+
+2.  WORD PROCESSING MODE
+
+    Two new features are available in WP mode: (a) word wrap, and
+    (b) support for a "left margin".
+
+    Type "<CMD>wp" to enter word proc mode, "<CMD>-wp" to exit.
+    In this mode, a "WP" is displayed at the bottom of the screen.
+
+    a) word wrap
+
+       Text that extends past the right margin is automatically placed
+       at the left margin.  The right margin (default = 74) is displayed
+       on the bottom border with a "+", and is set by "<CMD>set width nn"
+       (or "<CMD> set rmar nn").
+
+    b) left margin
+
+       The left margin is set by "<CMD>set lmar nn".  Any left
+       margin setting is displayed on the bottom border with a "+".
+       In WP mode, a <RETURN> moves the cursor to the left margin,
+       rather then the left edge of the screen.
+
+    c) If WP is entered with a marked area, the left margin and right
+       margin are set to the left and right edges of the rectangle.
+
+
+3.  DELETE WORD
+
+    "SHIFT<DEL CHAR>"  will delete the word the cursor is on, or the next
+    word if the cursor is positioned on 'white space'.
+
+
+4.  RIGHT MARGIN BEHAVIOR
+
+    The behavior at the right margin has been changed to offer two
+    modes.  (1) nostick mode - typing or moving the cursor past the
+    rt. margin will automatically shift the window as if the
+    <WIN RT> key had been pressed.  (2) stick mode - typing past the
+    rt margin will give the "stuck at rt margin" msg, and moving
+    the cursor past the rt margin will do nothing (it used to move
+    1 space).  The default is nostick mode, which makes sense now that
+    word wrap is implemented.  One may use "<cmd>set [no]stick" to
+    switch modes, or use the "-stick" argument when envoking E.
+
+
+5.  GOTO
+
+    Can now do "<CMD>nn" in addition to the previous "<CMD>g nn".
+
+
+6.  -STATE OPTION
+
+    E can be called up with the state file from a previous session
+    to automatically initialize an edit session.  This can be useful
+    useful e.g., for composing a message with the cursor positioned at the
+    proper place to start filling in the "To:" address.
+
+
+7.  FILL/JUST
+
+    The default operation of fill/just has been changed to not split
+    hyphenated words at the end of a line.  A "CMD: set hy" will reinstate
+    splitting, and "CMD: set nohy" will set nosplitting.  Also, control
+    characters are no longer filtered out.

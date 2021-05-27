@@ -1,0 +1,297 @@
+~0
+CMD - This key is the primary key for changing the effects of other keys on
+    the keyboard.  When this key is depressed, the cursor goes to the
+    bottom of the screen and "CMD:" appears.  A string-type command or a
+    function key may be entered.  For example, the +PAGE key may be
+    preceeded by the CMD key, causing the editor to display the top of the
+    current file.
+~1
+WIN LEFT - This key causes the window to move to the left 16 spaces.  If the
+    leftmost column is already column one, this key has no effect.  If
+    preceeded by the CMD key, the window is moved all the way to the left.
+~2
+ALT - This key switches the window between the current file and its
+    alternate file.
+~3
+INT - This key causes the an interruption in whatever may be going on in
+    the editor.  It may be used for halting a fill or justify command, or a
+    replay.
+~4
+OPEN - This key causes a single blank line to be opened above the cursor's
+    current position.
+~5
+-SRCH - This key causes the editor to search the buffer from the current
+    cursor location backwards to find a match for the contents of the match
+    buffer.  If preceeded by the CMD key, -SRCH will first load the search
+    buffer with the word that it is resting on (from the cursor loc to the
+    next white space), and then search backwards for it.
+~6
+CLOSE - This key will copy the current line (or area) to the close buffer
+    and remove it from the screen.  If MARK is used to delimit an area, the
+    material to the right of the closed area will move to the left, filling
+    it in.  If preceeded by the CMD key, CLOSE becomes UNCLOSE, returning
+    the contents of the close buffer (same action as "insert close").
+~7
+MARK - This key will mark the cursor's current location.  This key is
+    generally used to mark the top-left corner of a rectangular area before
+    moving the cursor to the bottom-right corner (+1) and using OPEN,
+    CLOSE, PUT, etc.  If preceeded by the CMD key, any marking is removed
+    (UNMARK).
+~8
+LEFT ARROW - This key causes the cursor position to be shifted one
+    character position to the left, without destroying any data on the
+    screen.  When used following the CMD key, it becomes >LEFT, which moves
+    the cursor to the left edge of the window.
+~9
+TAB - This key causes the cursor to be advanced to the next tab stop to the
+    right.  If there is no tab stop to the right of the current cursor
+    position, TAB is a no-operation.  When the editor is entered, tab stops
+    are established by default to columns 1, 9, 17,..., and may be changed
+    with the S/RTAB key and the typed commands "tab" and "tabs".
+~10
+DOWN ARROW - This key causes the cursor to be moved down one character
+    position.  If the cursor was on the last line of the window, the window
+    is redrawn to include the next line.  When used following CMD, this key
+    becomes >DOWN, which moves the cursor straight down to the last line
+    displayed on the window.
+~11
+HOME - This key moves the cursor to the uppermost left character position
+    on the current window.  When used following CMD, it becomes >HOME,
+    which moves the cursor the leftmost position on the last line displayed
+    in the current window.
+~12
+PICK - This key will cause the area described (see MARK) to be copied to
+    the pick buffer, and no change to the screen occurs.  When this key
+    follows the CMD key, it becomes PUT, which causes the contents of the
+    the pick buffer to be copied into the text at the current cursor
+    position.  Any text formerly residing there is moved down if the pick
+    buffer contains whole lines, or to the right, if the buffer contains an
+    area.
+~14
+UP ARROW - This key causes the cursor to be moved up one character
+    position.  If the cursor was on the first line of the window, the
+    window is redrawn to include the preceeding line.  When used following
+    CMD, this key becomes >UP, which moves the cursor straight up to the
+    top line displayed on the window.
+~15
+INSRT - This key causes the editor to enter/exit the text-insert mode, in
+    which data entered on the keyboard is inserted into the current line,
+    rather than overwriting the data at the current cursor location.  The
+    INSERT flag will appear on the info line at the bottom of the screen
+    when the editor is in the insert mode.
+~16
+REPL - This key is used with the interactive replace command to cause the
+    actual replacement to take place.  In normal operation, an interactive
+    replacement command of the form CMD "replace interactive /str1/str2/"
+    RETURN (usually abbreviated to CMD "rep i /str1/str2/" RETURN) is
+    executed, and then the +SRCH and -SRCH keys are used to position the
+    cursor at the occurance of str1 where the replacement is desired.  If
+    REPL is pressed at this time, str2 is substituted for str1 at that
+    location.
+~17
+-PAGE - This key will cause the window to move upwards in the text by one
+    window length, bringing the data preceeding the current window into
+    view.  When used following the CMD key, it becomes >-PAGE, which sets
+    the window such that the first line in the file is at the top of the
+    window.
+~18
++SRCH - This key causes the editor to search the buffer from the current
+    cursor location forwards to find a match for the contents of the match
+    buffer.  If preceeded by the CMD key, +SRCH will first load the search
+    buffer with the word that it is resting on (from the cursor loc to the
+    next white space), and then search forwards for it.
+~19
+WIN RIGHT - This key will cause the window to be moved to the right 16
+    character positions in the text.  If used following the CMD key +WIN
+    RIGHT causes the window to be moved to the right until the end of the
+    longest line if the current window is exposed.
+~20
++LINES - This key causes the window to be moved downwards in the text about
+    a third of the current window's length.
+~21
+DELCH - This keys causes the character at the current cursor position to be
+    closed (that is, deleted, with the characters to the right moving left
+    to fill in the space).  If used following the CMD key, it becomes
+    +DELCH, which closes the current character and all characters to the
+    right of it on the line.
+~22
+RWORD - This key causes the cursor to seek to the right for the beginning
+    of the next word.  If there is no word to the right on the current
+    line, the search continues on the next line.
+~23
+-LINES - This key causes the window to be moved upwards in the text about a
+    third of the current window's length.
+~24
+LWORD - This key causes the cursor to seek to the left for the beginning of
+    the previous word. If no word exists to the left of the cursor, it will
+    "wrap around" to the last word of the preceeding line.
+~25
++PAGE - This key will cause the window to move downwards in the text by one
+    window length, bringing the data following the current window into
+    view.  When used following the CMD key, it becomes >+PAGE, which sets
+    the window such that the last line in the file is in view.
+~26
+CWDW - This key causes the current window to be moved into the background,
+    and the next window (in the sense of creation order) to be moved into
+    the foreground for editing.
+~27
+S/RTAB - This key causes a tab stop to be set at the column that the cursor
+    is on.  If the key is preceeded by the CMD key, any tab stop at the
+    cursor's location is reset.
+~28
+CTRLQ - This key causes the next character (in the ascii range @-_) to be
+    converted into a control character (in the range NUL-US) and inserted
+    into the buffer, regardless of its meaning to the editor.  Normally,
+    the use of this key causes some kind of offbeat character to appear on
+    the screen, and then the letter itself.  For example, the sequence
+    CTRLQ-G causes a BEL character to be entered into the text.  When text
+    containing control characters is edited, the embedded control
+    characters are displayed in the same manner (the exception is HT
+    (ctrl-I), which is expanded to blanks by the editor).
+~29
+-TAB - This character causes the cursor to be moved backwards to the next
+    preceeding tab stop on the current line.  If there is no tab stop to
+    the left of the cursor, no action takes place.
+~30
+BS - This character has many uses, depending on whether it was preceeded by
+    the CMD key, and whether the editor is in insert mode:
+
+    non-insert mode   no CMD key     replace the character to the left of the
+				     cursor with a blank.
+		      CMD key        replace all characters to the left of the
+				     cursor with blanks.
+    insert mode       no CMD key     close the character to the left of the
+				     cursor position.
+		      CMD key        close all the characters to the left of
+				     the cursor location.
+~31
+RIGHT ARROW - This key causes the cursor position to be shifted one
+    character position to the right, without destroying any data on the
+    screen.  When used following the CMD key, it becomes >RIGHT, which
+    moves the cursor to the right of the last nonblank characteron the
+    line.  If it was allready in that position, >RIGHT moves the cursor to
+    the right margin.
+~129
+ERASE - This key will erase the contents of the current line, leaving the
+    blank line in the text.  If this key follows the CMD key, an UNERASE is
+    done, copying the latest erased data back into the text.
+~130
+This key (whatever it was) is not implemented as an editor command.
+~131
+SPLIT - This key splits the current line into two, breaking the text just
+    preceeding the cursor's current location.  If preceeded by the CMD key,
+    the SPLIT becomes a JOIN (see JOIN).
+~132
+JOIN - This key causes the next line of text to be appended to the current
+    line.  Any white space at the beginning of the next line is deleted,
+    and a single space is inserted between the lines.  If this key is
+    preceeded by the CMD key, the JOIN becomes a SPLIT (see SPLIT).
+~133
+EXIT - This key causes the editor to update the edited file and return
+    control to the shell.
+~134
+ABORT - This key causes the editor to not update the current file, but
+    simply close all files and return to the shell.  If the editor is
+    invoked in the same directory afterwards, the editor will sense that
+    the last time it was invoked it aborted, and request from the user what
+    he wishes to do about that.
+~135
+REDRAW - This key will cause the screen to be redrawn.
+~136
+CTABS - This key causes all tab stops to be deleted.
+~137
+CENTER - This key will cause the current line to be centered within the
+    current declared width of the file (default is 75 characters).
+~138
+FILL - This key will cause the lines from the current line to the next
+    blank line to be filled within the current page width (default is 75
+    characters).
+~139
+JUST - This key will cause the lines from the current line to the next
+    blank line to be justified within the current page width (default is 75
+    characters).
+~140
+CLEAR - This key is as yet unimplemented.
+~141
+TRACK - This key causes the track mode to be alternately entered and
+    exited.  In the track mode any window movement command (+PAGE, RITE,
+    etc.) will cause the same action to be taken on the current file and
+    its alternate file at the same time, and thus they track one another.
+    The presence of the track mode is indicated on the info line.
+~142
+BOX - This key causes a box to be drawn enclosing the marked area (see
+    MARK).  The box is drawn with the characters +, -, and |.  Where a '-'
+    is to replace a '|' character (or vice versa) a '+' is used instead.
+~143
+STOP - This key causes the editor to be placed in the stop state, awaiting
+    a fg command to restart it.  Control is turned over to the C-shell.
+~144
+QUIT - This key causes the editor to be exited with no memory of the
+    editing session.  All editing done during the session is lost.
+~145
+COVER - This key causes the current contents of the pick buffer to "cover"
+    the text at the current cursor location.  The buffer data replaces the
+    text data over the entire extent of the buffer.  If this key follows
+    the CMD key, it becomes an PUT operation (see PICK).
+~146
+OLAY - This key causes the data in the pick buffer to overlay the text data
+    at the current cursor location.  By this is meant that nonblank
+    characters in the buffer replace text data.  If this key follows CMD,
+    the effect is an ULAY (underlay), in which the buffer data replaces
+    only blank data in the text.
+~147
+BLOT - This key causes the data in the pick buffer to blot the data in the
+    text at the cursor's current location.  Blotting causes all data in the
+    text which matches nonblank data in the buffer to be replaced with
+    blanks.  If the CMD key preceeds this key, The effect is -BLOT, in
+    which the blanks in the buffer cause blanks in the text.
+~148
+HELP - This key starts the help sequence.  What happens after it is pressed
+    depends on the terminal that is being used, since the editor tailors
+    the help sent to the terminal in use.  This key also may be used
+    following the CMD key, which generally delivers some additional help
+    features.
+~149
+CCASE - This key will cause the character under the cursor (or marked area)
+    to change case.  This applies only to those characters which are
+    alphabetic - no other characters area affected.  The cursor is moved
+    to the right.
+~150
+CCAP - This key will cause the character under the cursor (or marked area)
+    to be switched to upper case if it alphabetic and lower case.  No other
+    characters are affected.  The cursor is moved to the right.
+~151
+AUTOF - This key alternately sets and resets the autofill mode, as
+    signified in the info line.  Setting the autofill mode causes text
+    typed into the editor to be line-filled automatically.  This means that
+    as the words are typed, the one which causes the line to be too long
+    will be erased from the current line, a new line opened, and that word
+    and subsequent words will continue on that line.  Resetting the mode
+    will cause data to be entered ontil the right margin is met, whereupon
+    an error message will be displayed and no further text will be
+    accepted.
+
+    The left and right margins to be filled between may be set as follows:
+    the left margin is by default the leftmost column of the window, but it
+    may be changed by marking the desired column before entering AUTOF. The
+    right margin is by default the current value of the linewidth, which
+    defaults to 72, but may be reset to some other value by the "width=xx"
+    option on the center, fill, or justify command.  If the CMD key is
+    pressed before AUTOF, the location of the cursor at that time is made
+    the right margin.  Note that doing so does not change the linewidth
+    used for the center, fill, and justify commands.
+~152
+RANGE - This key, used with the <MARK> function, is used to delineate a
+    range of lines within a file within which search and replace functions
+    are to be limited. <RANGE> toggles the range mode; a flag at the bottom
+    of the screen shows the state of the mode, preceeded by a <, =, or >,
+    indicating respectively that the current line is before, within, or
+    after the current range. If <RANGE> is used without <MARK>, the last
+    range defined is reused (if one exists). The key sequence <CMD><RANGE>
+    will display the line numbers that the range currently subsumes and the
+    number of lines included. These will change when lines are added and/or
+    deleted within the range.
+~154
+DWORD - This key will delete the next word.  If there's no text remaining
+    on the current line, a search is made for the next word, and that
+    word is deleted.

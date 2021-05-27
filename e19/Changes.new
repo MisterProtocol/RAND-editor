@@ -1,0 +1,7 @@
+
+3/18/92     Terry
+
+    Added support for a E_ETCDIR environment variable so users can
+    move E to other sites and run out their home dir.
+
+macros, recorded keystrokes.

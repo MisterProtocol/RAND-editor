@@ -1,0 +1,133 @@
+.ds f. Doc1.tbl
+.TS
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
+..
+.nf
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 48 49 50
+.nr 48 0
+.48
+.rm 48
+.nr 38 4mn
+.if \n(48<\n(38 .nr 48 \n(38
+.nr 49 0
+.nr 38 \wstruct lafsd
+.if \n(49<\n(38 .nr 49 \n(38
+.nr 38 \wstruct lafsd
+.if \n(49<\n(38 .nr 49 \n(38
+.nr 38 \wlong
+.if \n(49<\n(38 .nr 49 \n(38
+.nr 38 \wstruct lafile
+.if \n(49<\n(38 .nr 49 \n(38
+.nr 38 \wshort
+.if \n(49<\n(38 .nr 49 \n(38
+.nr 38 \wchar
+.if \n(49<\n(38 .nr 49 \n(38
+.nr 38 \wchar
+.if \n(49<\n(38 .nr 49 \n(38
+.49
+.rm 49
+.nr 38 \w}\ La_fsd;-\n(48-3n-\n(49
+.if \n(38>0 .nr 38 \n(38/1
+.if \n(38<0 .nr 38 0
+.nr 49 +\n(38
+.nr 50 0
+.nr 38 \w*fsdback;
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w*fsdforw;
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wfsdpos;
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w*fsdfile;
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wfsdnbytes;
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wfsdnlines;
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wfsdbytes[1]; /* actually [fsdnbytes] */
+.if \n(50<\n(38 .nr 50 \n(38
+.50
+.rm 50
+.nr 38 \wtypedef struct lafsd {-\n(48-3n-\n(49-3n-\n(50
+.if \n(38>0 .nr 38 \n(38/2
+.if \n(38<0 .nr 38 0
+.nr 49 +\n(38
+.nr 50 +\n(38
+.nr 38 1n
+.nr 47 0
+.nr 40 \n(47+((0*\n(38)/2)
+.nr 48 +\n(40
+.nr 41 \n(48+((6*\n(38)/2)
+.nr 49 +\n(41
+.nr 42 \n(49+((6*\n(38)/2)
+.nr 50 +\n(42
+.nr TW \n(50
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 21 file Doc1.tbl is too wide - \n(TW units
+.fc  
+.nr #T 0-1
+.nr #a 0-1
+.eo
+.de T#
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
+.ls 1
+.ls
+..
+.ec
+.ta \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'typedef struct lafsd {
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'struct lafsd\h'|\n(42u'*fsdback;
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'struct lafsd\h'|\n(42u'*fsdforw;
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'long\h'|\n(42u'fsdpos;
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'struct lafile\h'|\n(42u'*fsdfile;
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'short\h'|\n(42u'fsdnbytes;
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'char\h'|\n(42u'fsdnlines;
+.ta \n(48u \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'char\h'|\n(42u'fsdbytes[1]; /* actually [fsdnbytes] */
+.ta \n(49u \n(50u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'}\ La_fsd;\h'|\n(42u'
+.fc
+.nr T. 1
+.T# 1
+.35
+.TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-20

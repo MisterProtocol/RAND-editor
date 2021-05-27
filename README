@@ -1,0 +1,26 @@
+Installation instructions:
+
+1.  In ./include, install the appropriate "localenv.h" and "c_env.h".
+
+    For solaris:        ln -s local.linux localenv.h
+
+    For solaris:        ln -s local.solaris localenv.h
+
+    For bsd/sunos4.1.x: ln -s local.bsdsun localenv.h
+
+    c_env.h is the same for solaris and bsd on Sparc.
+
+2.  In e19/e.tt.c, built-in terminal types may be added/deleted.
+    But, keyboard files is the recommended way to go, see etc/README.
+
+    (no changes needed at RAND).
+
+3.  In Makefile,
+
+    (a) set ORG to /usr/local (or wherever local software is installed)
+    (b) if compiling for solaris of sysV, set S5DEFINES as described in
+    Makefile.
+
+3.  Type "make linux",  "make bsd" or "make sys5".
+
+4.  Make sys5.install or bsd.install

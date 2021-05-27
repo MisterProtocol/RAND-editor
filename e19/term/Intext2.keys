@@ -1,0 +1,41 @@
+
+Intext2 Keys
+
+All keys have same obvious meaning except:
+
+ Key                          Meaning
+
+ Control A                    left window
+ Control D or Down Arrow      move down
+ Control H or BS              back space
+ Control I or tab             tab
+ Control J or Line Feed       command
+ Control L or Left Arrow      move left
+ Control M or Return or Enter return
+ Control P or PICK            pick
+ Control R or Right Arrow     move right
+ Control S                    right window
+ Control U or Up Arrow        move up
+ Control Z                    change window
+ Control FS or QUOTE          quote
+ MTAB                         backtab
+ LEFT                         Window left
+ RIGHT                        Window right
+ PUT                          Mark
+ First Blank                  Plus line
+ Second Blank                 Minus line
+ REPLCE                       Replace
+ CH_WIN                       Change window
+ USE or Control B             Alternate File
+ BREAK or <LINE FEED>         Command
+ Control C                    Interrupt
+ MARGIN                       Dollar Sign
+ LEFT                         Don't touch
+ Right                     Don't touch
+ $                         Don't touch (but if you do, hit 2 more times)
+ +LINE                     Don't touch
+ -LINE                     Don't touch (but if you do, hit +LINE till things
+					look normal)
+ Print                     Don't touch (but if you do hit <CLEAR> 2 times
+				       and exit, though screen won't look
+				       normal)

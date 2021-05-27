@@ -1,0 +1,3 @@
+set env variable to location of keyboard file
+
+EKBFILE=/home/terry/kb.sun

@@ -1,0 +1,12 @@
+.in +2m
+.TS
+tab (~);
+l1 l1 l1 l1 l1 l1.
+la_open (\*(DQtest\*(DQ,~\*(DQ\*(DQ,~(La_stream *) 0,~(long) 0,~X,~X);
+la_open (\*(DQtest\*(DQ,~\*(DQ\*(DQ,~plas,~(long) 0,~X,~X);
+la_open (\*(DQtest\*(DQ,~\*(DQc\*(DQ,~L,~(long) 0,~X,~X);
+la_open (X,~\*(DQn\*(DQ,~L,~X,~X,~X);
+la_open (NULL,~\*(DQ\*(DQ,~L,~(long) 0,~ffstreamptr,~X);
+la_open (NULL,~\*(DQ\*(DQ,~L,~(long) 0,~(Ff_stream *) 0,~chan);
+.TE
+.in -2m

@@ -1,0 +1,109 @@
+.ps 8
+.vs 10
+.if t \{\
+.TS
+tab(!), center;
+c s s s
+| l | l || l | l |.
+.sp 2p
+\s+4\fBE STANDARD KEYBOARD\s0\fP
+.sp 4p
+_
+(extend)    ! ^X                   ! DOWN        ! ^J
++LINE       ! ^F                   ! ERASE       ! ^X-^E or ^^
++PAGE       ! ^R                   ! HOME        ! ^G
++SRCH       ! ^Y                   ! INSERT      ! ^Z or ESC or ^[
++TAB        ! ^I                   ! INT         ! ^\e
++WORD       ! ^N                   ! JOIN        ! ^X-^J
+-LINE       ! ^D                   ! LEFT        ! ^H
+-PAGE       ! ^E                   ! MARK        ! ^U
+-SRCH       ! ^T                   ! OPEN        ! ^O
+-TAB        ! ^X-^U                ! PICK        ! ^P
+-WORD       ! ^B                   ! REPL        ! ^X-^R or ^]
+ALT         ! ^X-^A or ^_ or ^/    ! RETURN      ! ^M
+BSP         ! ^C                   ! RIGHT       ! ^L
+CHG WIN     ! ^X-^W                ! SPLIT       ! ^X-^B
+CLOSE       ! ^V                   ! TABS        ! ^X-^T
+CMD         ! ^A or NULL or ^@     ! UP          ! ^K
+CTRLCHAR    ! ^X-^C                ! WIN LEFT    ! ^X-^H
+DELCHAR     ! ^W                   ! WIN RIGHT   ! ^X-^L
+.sp 2p
+_
+.TE
+
+.TS
+tab(!), center;
+| l | l || l | l || l | l || l | l |.
+_
+.sp 2p
+^@ ! CMD     ! ^L    ! RIGHT      !  ^X    ! (extend)  ! ^X-^H ! WIN LEFT
+^A ! CMD     ! ^M    ! RETURN     !  ^Y    ! +SRCH     ! ^X-^J ! JOIN
+^B ! -WORD   ! ^N    ! +WORD      !  ^Z    ! INSMODE   ! ^X-^L ! WIN RIGHT
+^C ! LEFT    ! ^O    ! OPEN       !  ^[    ! INSERT    ! ^X-^N ! DEL WORD
+^D ! -LINE   ! ^P    ! PICK       !  ^\e   ! INT       ! ^X-^P ! PLAY
+^E ! -PAGE   ! ^Q    ! (not used) !  ^]    ! REPL      ! ^X-^R ! RECORD
+^F ! +LINE   ! ^R    ! +PAGE      !  ^^    ! ERASE     ! ^X-^B ! SPLIT
+^G ! HOME    ! ^S    ! (not used) !  ^_    ! ALT       ! ^X-^T ! TABS
+^H ! BSP     ! ^T    ! -SRCH      !  ^/    ! ALT       ! ^X-^U ! -TAB
+^I ! +TAB    ! ^U    ! MARK       !  ^X-^A ! ALT       ! ^X-^W ! CHG WIN
+^J ! DOWN    ! ^V    ! CLOSE      !  ^X-^C ! CTRLCHAR
+^K ! UP      ! ^W    ! DELCHAR    !  ^X-^E ! ERASE
+.sp 2p
+_
+.TE
+.\}
+.if n \{\
+.TS
+tab(!);
+c s s s s
+l l c l l.
+E STANDARD KEYBOARD
+
+(extend)    ! ^X                    !|! ^@    ! CMD
++LINE       ! ^F                    !|! ^A    ! CMD
++PAGE       ! ^R                    !|! ^B    ! -WORD
++SRCH       ! ^Y                    !|! ^C    ! BSP
++TAB        ! ^I                    !|! ^D    ! -LINE
++WORD       ! ^N                    !|! ^E    ! -PAGE
+-LINE       ! ^D                    !|! ^F    ! +LINE
+-PAGE       ! ^E                    !|! ^G    ! HOME
+-SRCH       ! ^T                    !|! ^H    ! LEFT
+-TAB        ! ^X-^U                 !|! ^I    ! +TAB
+-WORD       ! ^B                    !|! ^J    ! DOWN
+ALT         ! ^X-^A or ^_ or ^/     !|! ^K    ! UP
+BSP         ! ^C                    !|! ^L    ! RIGHT
+CHG WIN     ! ^X-^W                 !|! ^M    ! RETURN
+CLOSE       ! ^V                    !|! ^N    ! +WORD
+CMD         ! ^A or NULL or ^@      !|! ^O    ! OPEN
+CTRLCHAR    ! ^X-^C                 !|! ^P    ! PICK
+DELCHAR     ! ^W                    !|! ^Q    ! (not used)
+DOWN        ! ^J                    !|! ^R    ! +PAGE
+ERASE       ! ^X-^E or ^^           !|! ^S    ! (not used)
+HOME        ! ^G                    !|! ^T    ! -SRCH
+INSERT      ! ^Z or ESC or ^[       !|! ^U    ! MARK
+INT         ! ^\e                   !|! ^V    ! CLOSE
+JOIN        ! ^X-^J                 !|! ^W    ! DELCHAR
+LEFT        ! ^H                    !|! ^X    ! (extend)
+MARK        ! ^U                    !|! ^Y    ! +SRCH
+OPEN        ! ^O                    !|! ^Z    ! INSMODE
+PICK        ! ^P                    !|! ^[    ! INSERT
+REPL        ! ^X-^R or ^]           !|! ^\e   ! INT
+RETURN      ! ^M                    !|! ^]    ! REPL
+RIGHT       ! ^L                    !|! ^^    ! ERASE
+SPLIT       ! ^X-^B                 !|! ^_    ! ALT
+TABS        ! ^X-^T                 !|! ^/    ! ALT
+UP          ! ^K                    !|! ^X-^A ! ALT
+WIN LEFT    ! ^X-^H                 !|! ^X-^C ! CTRLCHAR
+WIN RIGHT   ! ^X-^L                 !|! ^X-^E ! ERASE
+	    !                       !|! ^X-^H ! WIN LEFT
+	    !                       !|! ^X-^J ! JOIN
+	    !                       !|! ^X-^L ! WIN RIGHT
+	    !                       !|! ^X-^R ! REPL
+	    !                       !|! ^X-^B ! SPLIT
+	    !                       !|! ^X-^T ! TABS
+	    !                       !|! ^X-^U ! -TAB
+	    !                       !|! ^X-^W ! CHG WIN
+.TE
+.\}
+.ps 10
+.vs 12

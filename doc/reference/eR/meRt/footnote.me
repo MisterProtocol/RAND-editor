@@ -1,0 +1,78 @@
+.nr _0 \n(c.
+.\" This version has had comments stripped; an unstripped version is available.
+.de (f
+.ds * \v'-0.4m'\s-2\\n($f\\*]\k*
+.ec
+.if "\\n(.z"|f" .tm Line \\n(c. -- Illegal footnote nesting
+.nr _D \\n(dn
+.nr _0 1v+\\n(nlu
+.ev 2
+.in 0
+.\".xl \\n($lu-\\n(fuu
+.xl \\n(LLu
+.ft \\*(ff
+.ps \\n(fpu
+.vs \\n(fvu
+.da |f
+.if !\\n(?f \
+\{\
+.       nr _b +\n(.Vu
+.	$s
+.\}
+.ft \\*(ff
+.ps \\n(fpu
+.vs \\n(fvu
+.br
+.if \\n(.p-\\n(_b-\\n(_0-\\n(.h-1v-\\n(fs<0 \
+\{\
+.       if \n@>2 .tm             >> (f: no room on page for any footnotes
+.	da\"
+.	bc
+.	if !\\n(?f \
+.		rm |f
+.	in 0
+.	da |f
+.	if !\\n(?f \
+.		$s
+.	br
+.\}
+.sp \\n(fsu
+.nr ?f 1
+.fi
+.ti \\n(fiu
+.if \n@>2 \{\
+.  tm        << .p=\\n(.p, _b=\\n(_b _0=\\n(_0 .h=\\n(.h .V=\\n(.V fs=\\n(fs
+.  nr A7 \\n(.p-\\n(_b-\\n(_0-\\n(.h-1v-\\n(fs
+.  tm        << (f $f=\\n($f ?f=\\n(?f room left=\\n(A7
+.  rr A7
+.\}
+.rr _0
+..
+.de )f
+.if \n@>2       << )f:
+.if \\n* \
+.	nr $f +1
+.ds * \\*[\\n($f\\*]\k*
+.rr *
+.in 0
+.da
+.ev
+.if \\n(_w<\\n(dl \
+.       nr _w \\n(dl                    \" diversion length
+.nr _b +\\n(dn
+.if n \
+\{\
+.       nr F9 \\n(_bu%40u       \"trw
+.       if \\n(F9 .nr _b +\\n(F9
+.       rr F9
+.\}
+.ch @f -\\n(_bu
+.if \\n(.p-\\n(_b<=\\n(nl \
+\{\
+.       if n .ch @f \\n(nlu+40u         \"trw
+.       if t .ch @f \\n(nlu+\n(.Vu      \"trw
+.\}
+.nr dn _D
+.rr _D
+..
+.nr c. \n(_0

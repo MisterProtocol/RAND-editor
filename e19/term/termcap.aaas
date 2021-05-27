@@ -1,0 +1,62 @@
+#
+#  The following "aaas-" are for the Ann Arbor Ambassador and XL series
+#  terminals for use with the Rand Editor (E, v19 or later).  They differ
+#  from the standard "aaa-" termcap entries in that the function and cursor
+#  keys are downloaded with E's "standard keyboard" by tset
+#  (from /usr/lib/tabset/aaas).
+#
+#
+n2|aaas-unk|ann arbor ambassador and XL (internal - don't use this directly):\
+	:if=/usr/lib/tabset/aaas:\
+	:cr=^M:do=^J:nl=^J:bl=^G:al=3\E[L:am:le=^H:bs:\
+	:cd=275\E[J:ce=5\E[K:cl=275\E[H\E[J:cm=\E[%i%d;%dH:co#80:\
+	:dc=4\E[P:dl=3\E[M:ho=\E[H:ic=4\E[@:\
+	:md=\E[1m:mr=\E[7m:mb=\E[5m:mk=\E[8m:me=\E[m:\
+	:ku=^K:kd=^J:kl=^C:kr=^L:kh=^G:ko=cl,dc,dl,ce,cd:\
+	:ch=\E[%i%d`:\
+	:ul:ei=:im=:pt:bw:bt=\E[Z:\
+	:mi:nd=\E[C:se=\E[m:so=\E[7m:ue=\E[m:us=\E[4m:up=\EM:
+n3|aaas-18|ann arbor ambassador/18 lines:\
+	:ti=\E[2J\E[18;0;0;18p:te=\E[60;0;0;18p\E[18;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;18p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#18:tc=aaas-unk:
+n4|aaas-20|ann arbor ambassador/20 lines:\
+	:ti=\E[2J\E[20;0;0;20p:te=\E[60;0;0;20p\E[20;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;20p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#20:tc aaas-unk:
+n5|aaas-22|ann arbor ambassador/22 lines:\
+	:ti=\E[2J\E[22;0;0;22p:te=\E[60;0;0;22p\E[22;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;22p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#22:tc=aaas-unk:
+n6|aaas-24|ann arbor ambassador/24 lines:\
+	:ti=\E[2J\E[24;0;0;24p:te=\E[60;0;0;24p\E[24;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;24p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#24:tc=aaas-unk:
+n7|aaas-26|ann arbor ambassador/26 lines:\
+	:ti=\E[2J\E[26;0;0;26p:te=\E[60;0;0;26p\E[26;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;26p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#26:tc=aaas-unk:
+n8|aaas-28|ann arbor ambassador/28 lines:\
+	:ti=\E[2J\E[28;0;0;28p:te=\E[60;0;0;28p\E[28;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;28p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#28:tc=aaas-unk:
+n9|aaas-30|ann arbor ambassador/30 lines:\
+	:ti=\E[2J\E[30;0;0;30p:te=\E[60;0;0;30p\E[30;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;30p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#30:tc=aaas-unk:
+nA|aaas-36|ann arbor ambassador/36 lines:\
+	:ti=\E[2J\E[36;0;0;36p:te=\E[60;0;0;36p\E[36;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;36p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#36:tc=aaas-unk:
+nB|aaas-40|ann arbor ambassador/40 lines:\
+	:ti=\E[2J\E[40;0;0;40p:te=\E[60;0;0;40p\E[40;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;40p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#40:tc=aaas-unk:
+nC|aaas|aaas-48|ann arbor ambassador/48 lines:\
+	:ti=\E[2J\E[48;0;0;48p:te=\E[60;0;0;48p\E[48;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;48p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#48:tc=aaas-unk:
+nD|aaas-60|ann arbor ambassador/60 lines:\
+	:ti=\E[2J\E[60;0;0;60p:te=\E[60;0;0;60p\E[60;1H\E[J:\
+	:is=\EP`+x~M\E\\\E[m\E7\E[60;0;0;60p\E[3g\E[f\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E[8a\EH\E8\E[>6h\E[1Q:\
+	:li#60:tc=aaas-unk:

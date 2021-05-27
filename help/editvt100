@@ -1,0 +1,3 @@
+sed -f editvt100.sed etc_e_kb.vt100 > kbtemp
+sed -f editvt100.sed etc_e_kp.vt100 | shuffle -k 132 kbtemp - > printvt100
+rm kbtemp

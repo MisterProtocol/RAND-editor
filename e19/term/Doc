@@ -1,0 +1,236 @@
+
+	Copyright abandoned, 1983, The Rand Corporation
+
+   Instructions for writing a terminal handler file for E
+
+When E starts up, the terminal type is determined, and the "term"
+structure for the terminal is copied to the master term structure.
+Thereafter, all terminal dependent values are pulled from that structure
+and all terminal-dependent functions are done by indirect calls on
+routines whose addresses are in that structure.
+Similarly for the "kbd" structure.
+
+/************************************/
+/*
+/*  INPUT
+/*
+/************************************/
+
+What follows is a discussion of the members of a kbd structure.
+See e.tt.h for the declaration of struct kbd, which is typedeffed S_kbd.
+
+For each type terminal supported, there is an input lexical translation
+routine.  The parameter declarations are:
+
+int kb_inlex () - get keys and map them into internal codes.
+
+Inlex converts raw characters as received from a terminal keyboard into
+canonical characters for processing by the editor.  Ascii printing
+characters are simply passed through with 0 in the most significant bit.
+The canonical characters for function keys are macros, CCHOME, CCDELCH,
+etc., defined in "e.h".  Some terminals send multi-character sequences
+when special function keys are pressed.  Since the canonical codes are
+always single characters, inlex must collapse those sequences into their
+corresponding single canonical characters.
+
+Lexp is a pointer to a string of characters to be converted.  Count is a
+pointer to a pointer to an int containing the number of characters to be
+converted.
+
+Inlex converts lexp in place, so that the resulting canonical character
+string starts at lexp.  If there is a partial multi-character sequence at
+the end of lexp, then it is left unconverted and moved if necessary so
+that it is at the end of the converted characters.  Inlex stores the
+number of remaining unconverted characters in *count (0 if none), and
+returns the number of converted characters.
+
+NOTE:   You can get cute and translate a number of input characters into
+	a greater number of translated characters, but this may cause buffer
+	overrun under some circumstances.  This input translation procedure
+	will have to be redesigned to support that type of behavior.
+
+The following 2 calls are used to download the keyboard.
+int kb_init () - initialization sequence, if required.
+	term.tt_ini0() is called before this.
+int kb_end  () - end sequence, if required.
+
+/************************************/
+/*
+/*  OUTPUT
+/*
+/************************************/
+
+What follows is a discussion of the members of a term structure.
+See e.tt.h for the declaration of struct term, which is typedeffed S_term.
+
+The following elements of S_term deal with output.  Two globals are
+available if you need them: ocol and olin, which tell the column and line
+position of the terminal at the time the function is called.  Your
+routines may look at them, but they must not change them.
+
+int tt_ini0 () - initialization sequence, if required.
+      This sends no codes to the terminal.  You can allow the
+      same terminal type to be selected with several names, and
+      in this routine, you can look at the name, and determine
+      things like how many lines to use.  This is called before
+      kbd.kb_init().
+int tt_ini1 () - initialization sequence, if required.
+      This sends codes to the terminal to do things like
+      enable cursor addressing, etc.
+int tt_end () - ending sequence, if required.  Note that after this
+      sequence has been sent to the terminal, the cursor will be
+      addressed to the lower left corner of the screen, and a newline
+      will be output to scroll the screen one line.
+int tt_left ()  - move cursor left
+int tt_right () - move cursor right
+int tt_dn ()    - move cursor down
+int tt_up ()    - move cursor up
+int tt_cret ()  - carriage return = move cursor all the way to the left
+int tt_nl ()    - newline = move to col 0 in next line
+int tt_clear () - clear the screen
+int tt_hm ()    - move cursor to upper left corner
+int tt_bsp ()   - move cursor left and erase the character there
+int tt_addr (lin, col) - address the cursor to lin and col. first line
+      is 0; same for col
+int tt_lad (lin) - address the cursor to lin, staying in the same column
+int tt_cad (lin) - address the cursor to col, staying in the same line
+int tt_xlate (chr) - translate the character.  If it is a printing char
+      (32 <= chr < 127), and the terminal requires special action for
+      printing characters, then this is the routine where it is handled.
+      If chr >= 127, then the character is a special printing character,
+      such as escape char, bullet, border, etc. and it is handled in this
+      routine.  After displaying the character, the cursor must be
+      in the character position to the right of the displayed character.
+      See standard.c for an example.
+
+For the following, you must have both or neither or ins/del line.
+If defwin is defined then both ins and del line must be defined.
+Also, if defwin is defined, then all ins/del and clreol functions
+must work within the defined window only.
+
+The following four functions request that 'num' things be handled;
+return the actual number done (possibly less than num).
+
+int tt_insline (num) - insert 'num' lines at current line.  NULL if no
+      such function.
+int tt_delline (num) - delete 'num' lines from current line.  NULL if no
+      such function.
+int tt_delchar (num) - delete 'num' chars from current char.  NULL if no
+      such function.
+int tt_inschar (num) - insert 'num' chars at current char.  NULL if no
+      such function.
+int tt_clreol (num) - clear to end of line.  NULL if no such function.
+int tt_vscroll (top, bottom, num) - vertically scroll a full-width part
+      of the screen, from line # top through bottom inclusive. Scroll
+      it num lines (>0, reverse scroll; <0, normal scroll). Return YES
+      if the cursor position remains unmoved; else NO.
+int tt_deflwin (top, nlines) - Define a full-width window of nlines lines.
+      It is assumed that inserts and deletes work only within
+      the defined window.  NULL if no such function. (currently unused)
+int tt_erase (number) - Erase number characters starting at the current
+      position.  Number will never try to erase more than to end of line.
+      Must not move cursor.
+#ifdef LMCHELP (if you will)
+int tt_so () - turns on the standout mode for the terminal. This allows
+      some fanciness in the help screen displays. If the screen has magic
+      cookies (ie, leaves a space when changing modes), leave this defined
+      as a null function.
+int tt_soe () - reset standout mode.
+int tt_help (file) - points to a routine which displays the keyboard with
+      legends on the screen.  Defaults to help_std in e.h.c if the entry
+      is zero.  The file argument is the keyboard name appended to
+      "/etc/e/k[lr].", which should be one of the indicated pair of files
+      which describe, respectively, the left and right halves of the
+      keyboard pictorially. help_std does a standard transformation on the
+      data in the /etc/e file; the purpose of this argument is to allow
+      for fancier representations on smarter terminals.  For example,
+      help_vt100 makes use of the 132 column mode.
+
+      The standard transformation mentioned above consists in copying the
+      file from the disk to the screen exactly, except for the control
+      characters ^N, ^O, ^P, and ^Q. ^N starts a graphics mode, in which
+      the following characters are converted to the appropriate graphics
+      characters (default in parentheses):
+
+	E - lower left corner (+)       J - vertical line (|)
+	F - upper left corner (+)       K - horizontal line (-)
+	G - upper right corner (+)      L - right join (+)
+	H - lower right corner (+)      M - left join (+)
+	I - cross (+)                   N - top join (+)
+					O - bottom join (+)
+
+      All other characters are themselves. The ^O ends the graphics mode,
+      restoring normal copying. The ^P character turns on standout mode;
+      ^Q resets it.
+#endif LMCHELP
+#ifdef LMCVBELL
+int tt_vbell - does a visible bell (usually reversing the whole screen for
+      200 ms or so).  Must leave cursor untouched.
+#endif
+
+For all of the following, give the number of characters required to do the
+      function.
+
+char tt_nleft
+char tt_nright
+char tt_ndn
+char tt_nup
+char tt_nnl
+char tt_nbsp
+char tt_naddr
+char tt_nlad
+char tt_ncad
+
+char tt_wl - 0, 1, 2, or 3: if cursor is in leftmost column, and a
+	     tt_lt () is done, then the cursor will be
+	      1: in the rightmost column of the previous line
+	      2: in the rightmost column of the same line
+	      3: in the same place
+	      0: none of the above
+char tt_cwr - 0, 1, 2, or 3: if cursor is in rightmost column, and a
+	      tt_rt () is done, then the cursor will be
+	      1: in the leftmost column of the next line
+	      2: in the leftmost column of the same line
+	      3: in the same place
+	      0: none of the above
+char tt_pwr - 0, 1, 2, or 3: if cursor is in rightmost column, and a
+	      printing char is output, then the cursor will be
+	      1: in the leftmost column of the next line
+	      2: in the leftmost column of the same line
+	      3: in the same place
+	      4: 2 - but if next chr is printing chr will put it at 1
+	      0: none of the above
+char tt_axis - 0, 1, 2, or 3
+	      1: terminal is capable of separate line cursor addressing
+	      2: terminal is capable of separate column cursor addressing
+	      3: both 1 and 2
+	      0: none of the above
+tt_bullets - the terminal can do bullets
+tt_prtok   - printing characters don't need any special treatment
+
+
+/************************************/
+/*
+/*  GENERAL PARAMETERS
+/*
+/************************************/
+
+tt_width - the number of columns on the screen
+	   N.B.: be sure that MAXWIDTH in e.t.h
+	   == maximum of the widths for each terminal
+tt_height - the number of lines on the screen
+
+
+/************************************/
+/*
+/*  CONVENTIONS
+/*
+/************************************/
+
+std_inlex() is a standard inlex routine used for the adm3a, adm31, and others.
+If you want to use it, see how it is used for those terminals.
+
+In standard.c are some arrays that you may want to use.
+
+Use existing terminal files as a guide.
+

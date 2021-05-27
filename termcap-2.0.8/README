@@ -1,0 +1,104 @@
+From: Miquel van Smoorenburg <miquels@cistron.nl>
+
+Even better. I have a patch for termcap.c that will solve the problem:
+
+- it deletes capabilities that start with '.' as used in the new
+  termcap files - those are commented out capabilities.
+- it tries to translate escaped characters before putting them
+  in the buffer as opposed to doing at in tgetstr.
+
+Now the Linux and other entries fit in 1024 bytes.
+
+H.J. Lu
+hjl@gnu.ai.mit.edu
+04/15/96
+-----
+I copied the termcap info stuff as well as termcap.src from
+the GNU termcap 1.3. But I didn't copy the source code. The
+Linux termcap 2.0.7 is different from the GNU termcap 1.3. But
+they share the same API/ABI. The linux entry in the new termcap
+is larger than 1024 chars. But your application may only have
+a 1024 byte buffer. You may see
+
+tgetent: warning: termcap entry too long
+
+message when you run it in the Linux console. You can pass NULL to
+tgetent () to let termcap malloc the buffer. elm and zsh are two
+applications I know which use termcap and have this problem.
+
+
+H.J. Lu
+hjl@gnu.ai.mit.edu
+04/05/96
+----
+I decided to reissue libtermcap and make it ELF only since ncurses
+is an overkill for termcap. You need to install binutils 2.6.0.2 or
+above, gcc 2.7.2 or above and libc 5.2.18 or above to compile/install
+this termcap library. There are no code changes from libtermcap 2.0.3
+which was included in libc 5.0.9 last time.
+
+H.J. Lu
+hjl@gnu.ai.mit.edu
+12/25/95
+-----
+This is the new termcap library for Linux. It consists of
+two source files:
+
+1. termcap.c   -  written form scratch by me
+2. tparam.c    -  this is the the GNU emacs or glibc tparam.c
+
+The new tgetent in termcap.c checks for overflow of the
+termcap buffer, which most applications assume is 1024 characters.
+Furthermore it eliminates duplicate entries and checks for
+loops caused by the include capability "tc=".
+
+The termcap.c code falls under the LGPL.
+(Library version of GNU Public License).
+
+If you create termcap files with many levels of indirection
+(with the tc= variable) this code will work allright, but the
+internal buffer of software that uses it's own tgetent() function
+will probably overflow, if it even supports "tc". It is therefore
+always a good idea to include a "eval `tset -s $TERM`" in your
+/etc/profile (assuming that tset uses the new termcap library!),
+because that initializes the TERMCAP variable. The whole, small
+termcap entry will then be stored in TERMCAP. Most if not all
+tgetent() implementations check for a TERMCAP environment variable
+first before searching /etc/termcap.
+
+20-Oct-1994 Miquel van Smoorenburg, miquels@ow.org
+
+
+The original README and NEWS files are included below.
+
+========== Original README ===========
+
+This is the GNU termcap library -- a library of C functions that
+enable programs to send control strings to terminals in a way
+independent of the terminal type.  Most of this package is also
+distributed with GNU Emacs, but it is available in this separate
+distribution to make it easier to install as -ltermcap.
+
+The GNU termcap library does not place an arbitrary limit on the size
+of termcap entries, unlike most other termcap libraries.
+
+See the file INSTALL for compilation and installation instructions.
+
+Please report any bugs in this library to bug-gnu-emacs@prep.ai.mit.edu.
+You can check which version of the library you have by using the RCS
+`ident' command on libtermcap.a.
+
+=========== Original NEWS ===========
+
+Major changes in release 1.2:
+
+For `%.', only set the high bit on NUL.
+Fix a file descriptor and memory leak.
+Add const in termcap.h prototypes.
+Configuration improvements.
+
+Major changes in release 1.1:
+
+Fix portability problems.
+Improve configuration and installation.
+Fix compiler warnings.

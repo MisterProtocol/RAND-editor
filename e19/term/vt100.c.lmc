@@ -1,0 +1,271 @@
+/*
+ *      vt100 keyboard handler (output handled by tcap.c)
+ *
+ *      The termcap in use with this keyboard handler follows:
+ *
+    d2|vt100w|vt-100w|pt100w|pt-100w|dec vt100 in 132 col mode with -AB option:\
+	    :co#132:\
+	    :is=\E>\E[?1;4l\E[?3;7;8h\E[r\E(B\E)0^O:\
+	    :rs=\E>\E[?1;4l\E[?3;7;8h\E[r\E(B\E)0^O:\
+	    :tc=vt100common:
+    ds|vt100s|vt-100s|pt100s|pt-100s|dec vt100 in 132 col mode without -AB option:\
+	    :co#132:li#14:\
+	    :is=\E>\E[?1;4l\E[?3;7;8h\E[;14r\E(B\E)0^O:\
+	    :rs=\E>\E[?1;4l\E[?3;7;8h\E[;14r\E(B\E)0^O:\
+	    :ll=1\E[14H:\
+	    :tc=vt100w:
+    d1|vt100g|vt-100g|pt100g|pt-100g|generic dec vt100:\
+	    :tc=vt100common:
+    dj|vt100|vt100 with status line on line 24:\
+	    :li#23:hs:ws#80:\
+	    :is=\E>\E[?1;3;4l\E[?7;8h\E[;23r\E(B\E)0^O:\
+	    :rs=\E>\E[?1;3;4l\E[?7;8h\E[;23r\E(B\E)0^O:\
+	    :ll=1\E[23H:cl=50\E7\E[23;80H\E[1J\E8:\
+	    :es=:ds=:ts=4\E7\E[24;H\E[1K:fs=1\E8:\
+	    :tc=vt100common:
+    dx|vt100common|common code for vt100:\
+	    :co#80:li#24:vt#3:bs:ms:pt:xv:\
+	    :is=\E>\E[?1;3;4l\E[?7;8h\E[r\E(B\E)0^O:\
+	    :rs=\E>\E[?1;3;4l\E[?7;8h\E[r\E(B\E)0^O:\
+	    :if=/usr/lib/tabset/vt100:\
+	    :rf=/usr/lib/tabset/vt100:\
+	    :do=30^J:cr=1^M:nd=1\E[C:up=1\E[A:nl=30^J:\
+	    :ho=1\E[H:ll=1\E[24H:le=1^H:ta=1^I:bl=1^G:\
+	    :cs=1\E[%i%d;%dr:cm=1\E[%i%d;%dH:sf=30\ED:sr=30\EM:\
+	    :ce=2\E[K:cd=45\E[J:cl=45\EH\E[J:\
+	    :vs=\E[?7l:ve=\E[?7h:\
+	    :as=1^N:ae=1^O:\
+	    :ks=1\E=:ke=1\E>:\
+	    :sc=1\E7:rc=1\E8:\
+	    :so=1\E[7m:se=1\E[m:\
+	    :us=1\E[4m:ue=1\E[m:\
+	    :mb=1\E[5m:md=1\E[1m:me=1\E[m:mr=1\E[7m:\
+	    :ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:kb=^H:\
+	    :k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:\
+	    :l1=PF1:l2=PF2:l3=PF3:l4=PF4:\
+	    :Gs=1^N:Ge=1^O:Tl=l:Tr=k:Tj=w:Bl=m:Br=j:Bj=v:\
+		:Lj=t:Rj=u:Cj=n:Hl=q:Vl=x:Xc=`:
+*/
+
+#define CTRL(x) ((x) & 31)
+#define _BAD_ CCUNAS1
+#define WIDEVT 131
+#define NARROWVT 79
+
+extern Cmdret help_vt100();
+
+in_vt100 (lexp, count)
+char *lexp;
+int *count;
+{
+    Reg1 int chr;
+    Reg2 int nr;
+    Reg3 char *icp;
+    Reg4 char *ocp;
+
+    icp = ocp = lexp;
+    nr = *count;
+    for (; nr > 0; nr--)
+    {
+	/* RAW MODE on V7 inputs all 8 bits so we and with 0177 */
+	if ((chr = *icp++ & 0177) >= 040)
+	{
+	    if (chr == 0177)         /* DEL KEY KLUDGE FOR NOW */
+		*ocp++ = CCBACKSPACE;
+	    else
+		*ocp++ = chr;
+	}
+	else if (chr == 033)
+	{
+	    if (nr < 2)           /* need at least esc-x */
+	    {
+		icp--;            /* backout to before esc */
+		goto nomore;
+	    }
+	    nr--; chr = *icp++ & 0177;   /* count off the esc */
+	    switch (chr) {
+	    case '[':
+		if (nr < 2)       /* need at least [-x */
+		{
+		    icp -= 2;     /* back out to before esc */
+		    nr++;
+		    goto nomore;
+		}
+		nr--; switch (chr = *icp++ & 0177)   /* count off the [ */
+		{
+		case 'A':
+		    *ocp++ = CCMOVEUP;
+		    break;
+
+		case 'B':
+		    *ocp++ = CCMOVEDOWN;
+		    break;
+
+		case 'C':
+		    *ocp++ = CCMOVERIGHT;
+		    break;
+
+		case 'D':
+		    *ocp++ = CCMOVELEFT;
+		    break;
+
+		default:
+		    *ocp++ = CCUNAS1;
+		    break;
+		}
+		break;
+
+	    case 'O':
+		if (nr < 2)
+		{
+		    icp -= 2;
+		    nr++;
+		    goto nomore;
+		}
+		nr--; chr = *icp++ & 0177;
+		if ('l' <= chr && chr <= 'y') Block
+		{
+		    static char xlt[] =
+		    {
+			CCPICK         , /* l  , */
+			CCOPEN         , /* m  - */
+			CCDELCH        , /* n  . */
+			CCUNAS1        , /* o    */
+			CCINSMODE      , /* p  0 */
+			CCMISRCH       , /* q  1 */
+			CCPLSRCH       , /* r  2 */
+			CCMARK         , /* s  3 */
+			CCMIPAGE       , /* t  4 */
+			CCPLPAGE       , /* u  5 */
+			CCREPLACE      , /* v  6 */
+			CCMILINE       , /* w  7 */
+			CCPLLINE       , /* x  8 */
+			CCSETFILE      , /* y  9 */
+		    };
+		    *ocp++ = xlt[chr - 'l'];
+		}
+		else if ('M' <= chr && chr <= 'S') Block
+		{
+		    static char xlt[] =
+		    {
+			CCCMD          , /* M  ENTER */
+			CCUNAS1        , /* N        */
+			CCUNAS1        , /* O        */
+			CCLWINDOW      , /* P  PF1   */
+			CCRWINDOW      , /* Q  PF2   */
+			CCBACKTAB      , /* R  PF3   */
+			CCCLOSE        , /* S  PF4   */
+		    };
+		    *ocp++ = xlt[chr - 'M'];
+		}
+		else
+		    *ocp++ = CCUNAS1;
+		break;
+	    case 'a':                    /* characters following esc */
+		*ocp++ = CCABORT;
+		break;
+	    case 'b':
+		*ocp++ = CCBOX;
+		break;
+	    case 'f':
+		*ocp++ = CCFILL;
+		break;
+	    case 'j':
+		*ocp++ = CCJOIN;
+		break;
+	    case 'k':
+		*ocp++ = CCJUSTIFY;
+		break;
+	    case 'q':
+		*ocp++ = CCQUIT;
+		break;
+	    case 's':
+		*ocp++ = CCSPLIT;
+		break;
+	    case 'x':
+		*ocp++ = CCEXIT;
+		break;
+	    case 'z':
+		*ocp++ = CCSTOPX;
+		break;
+	    case 033:
+		*ocp++ = CCCTRLQUOTE;
+		break;
+	    default:
+		*ocp++ = CCUNAS1;
+		break;
+	    }
+	}
+	else                       /* control characters */
+	    if ('\0' <= chr && chr <= '\037') Block
+	    {
+		static char xlt[] =
+		{
+		    CCCMD,          /* ^@ */
+		    CCCCASE,        /* ^A */
+		    CCLWORD,        /* ^B */
+		    CCCLEAR,        /* ^C */
+		    CCCENTER,       /* ^D */
+		    CCERASE,        /* ^E */
+		    CCCAPS,         /* ^F */
+		    CCHOME,         /* ^G */
+		    CCBACKSPACE,    /* ^H */
+		    CCTAB,          /* ^I */
+		    CCRETURN,       /* ^J */
+		    CCAUTOFILL,     /* ^K */
+		    CCBLOT,         /* ^L */
+		    CCRETURN,       /* ^M */
+		    CCRWORD,        /* ^N */
+		    CCOVERLAY,      /* ^O */
+		    CCCOVER,        /* ^P */
+		    CCUNAS1,        /* ^Q    must be left unassigned */
+		    CCREDRAW,       /* ^R */
+		    CCUNAS1,        /* ^S    must be left unassigned */
+		    CCTABS,         /* ^T */
+		    CCHELP,         /* ^U */
+		    CCTRACK,        /* ^V */
+		    CCCHWINDOW,     /* ^W */
+		    CCEXIT,         /* ^X */
+		    CCCLRTABS,      /* ^Y */
+		    CCSTOPX,        /* ^Z */
+		    CCUNAS1,        /* ^[    must be left unassigned */
+		    CCINT,          /* ^\ */
+		    CCUNAS1,        /* ^] */
+		    CCCTRLQUOTE,    /* ^^ */
+		    CCRANGE         /* ^_ */
+		};
+		*ocp++ = xlt [chr - '\0'];  /* Yeh, I know... */
+	    }
+	    else
+		*ocp++ = CCUNAS1;
+    }
+nomore:
+    Block {
+	int conv;
+	*count = nr;     /* number left over - still raw */
+	conv = ocp - lexp;
+	while (nr-- > 0)
+	    *ocp++ = *icp++;
+	return conv;
+    }
+}
+
+ki_vt100 ()
+{
+    /* This is called "Just in case." */
+    static char ini[] = {033, '=', 033, ')', '0'};
+    fwrite (ini, sizeof ini, 1, stdout);
+}
+
+ke_vt100 ()
+{
+    static char end[] = {033,'>'};
+    fwrite (end, sizeof end, 1, stdout);
+}
+
+S_kbd kb_vt100 = {
+/* kb_inlex */  in_vt100,
+/* kb_init  */  ki_vt100,
+/* kb_end   */  ke_vt100,
+};
+

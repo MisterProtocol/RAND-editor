@@ -1,0 +1,50 @@
+--------
+
+10/2/81
+
+Termcap change: terminals that have the "nc"
+`feature' should now work with E.
+
+--------
+It used to be possible to generate lines with trailing tabs. No more.
+
+-------
+
+BUGS:
+-----
+On systems without exclusive open, some other sort of interlocking method
+  should be attempted, to determine if multiple users are working in the
+  same directory
+
+No allocs should take place from the time that the user issues the "exit"
+  command until E exits, because if an out-of-heapspace occurs during that
+  time you're screwed.
+
+Line number should be updated on a replace with the show option.
+
+Command line doesn't get flushed out during replay of replace commands.
+
+Fix what happens when command line too long.
+
+Should catch attempted replaces that will loop.
+
+Still, if you hold down the <CLOSE> key until all lines are closed,
+you can be left with lines on the screen.
+
+Fixed:
+------
+
+window comand writes first line of new window on CMD line
+  if alt window cursor was on first line.
+(fixed 6/11/81)
+
+2/7/81 <CMD><DELCHR> seems to pick up a lot of spaces after the end
+of the line, which you notice when you go to put the erase buffer.
+
+If a -update comand has been issued for a file, a 'save' command is
+a no-op, and you are not told.
+
+Close rectangle doesn't work if CCHAR appears in the text.
+
+Blot-@'s can remain on the screen image after a ^B; redraw doesn't help.
+

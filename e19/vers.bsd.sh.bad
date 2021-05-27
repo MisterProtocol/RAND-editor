@@ -1,0 +1,11 @@
+ver=e.r.c
+mv -f $ver ,$ver
+
+string0="E19 version of `/bin/date`"
+string1="made in `/bin/pwd` by `whoami` (`hostname`!`whoami`)"
+
+echo "short revision = -19;" >> $ver
+echo "static char whatstr[] = { '@', '(', '\#', ')' } ;" >> $ver
+echo 'char verstr[] = "\' >> $ver
+echo "$string0\n\\" >> $ver
+echo "$string1"'\n";' >> $ver

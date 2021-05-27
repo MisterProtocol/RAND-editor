@@ -1,0 +1,28 @@
+.TS
+tab(|);
+c c
+l
+l l.
+DESCRIPTION | TERMINAL TYPE
+
+Ann Arbor S001901/2 | aa, aa0, annarbor, default
+New ann arbor (Model Q2878) | aa1
+Ann Arbor Ambassador | aaa, ambas, ambassador, aaa-N
+ and Ann Arbor XLs | (N is one of 18,20,22,24,26,28,
+|  30,36,40,48 or 60 )
+Beehive MicroBee | microb
+Termcap terminal | [from /etc/termcap]
+INTERACTIVE Systems Intext2 | intext2, T_2intext
+Lear Siegler ADM3a | 3a, adm3a, la
+Liberty Freedom 100 | fr10, free100
+Heathkit H19 & H89 | h19, k1
+INTERACTIVE Systems Intext | in, intext
+Perkin Elmer 1251 | po
+Standard keyboard | standard
+DEC VT100  (needs termcap) | vt100, vt100w (wide)
+Lear Siegler ADM31 | 31, adm31, l1
+Lear Siegler ADM42 | adm42, l4
+Concept 100 | c100, co, concept, concept100
+Datamedia DM4000 | dm4000
+Wyse 50 | wyse50, wyse50w (wide)
+.TE

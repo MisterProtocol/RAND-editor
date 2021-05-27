@@ -1,0 +1,21 @@
+KKKNKKKKKNKKKKKNKKKKKG          FKKKKKKNKKKKKKNKKKKKKNKKKKKKG
+   J     J     J     J          J LWDW J RWDW J -TAB JCLOSE J  Commands of the
+   J     J     J     J          J      J      J      J      J  form cXXXX
+u  J  d  J  l  J  r  J          J pf1  J pf2  J pf3  J pf4  J  perform XXXX when
+KKKIKKKKKIKKKKKIKKKKKIKKKKKG    MKKKKKKIKKKKKKIKKKKKKIKKKKKKL  used with the
+   J     JcCTLQJ BS  J     J    J-LINE J+LINE J ALT  J OPEN J  ctrl key.
+   J     J     J     J     J    J      J      J      J      J
+K  J  =  J  `  Jbksp JbreakJ    J  7   J  8   J  9   J  K   J
+NKKOKKNKKOKKNKKOKKNKKOKKNKKO    MKKKKKKIKKKKKKIKKKKKKIKKKKKKL  Commands of the
+J     J     J     J BS  J       J-PAGE J+PAGE J REPL J PICK J  form eXXXX
+J     J     J     JcRANGJ       J      J      J      J      J  perform XXXX when
+J  [  J  ]  J     J del J       J  4   J  5   J  6   J  ,   J  used after
+OKKNKKOKKNKKH CR  MKKKKKL       MKKKKKKIKKKKKKIKKKKKKIKKKKKKL  pressing esc.
+   J     J        JcINT J       J-SRCH J+SRCH J MARK J      J
+   J     J        J     J       J      J      J      J      J
+;  J  '  J return J  \  J       J  1   J  2   J  3   J      J
+NKKOKKNKKOKKKKKKKKONKKKKON      MKKKKKKOKKKKKKIKKKKKKL CMD  J
+J     J            J CR  J      J    INSMD    J DCH  J      J
+J     J            J     J      J             J      J      J
+J  /  J    shift   J lf  J      J      0      J  .   J enterJ
+OKKKKKOKKKKKKKKKKKKOKKKKKO      EKKKKKKKKKKKKKOKKKKKKOKKKKKKH

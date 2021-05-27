@@ -1,0 +1,19 @@
+if test -f Calls
+then    mv Calls ,Calls
+fi
+
+: ,,Calls should really be some sort of named pipe!
+
+rm -f ,,Calls
+
+for i
+do
+    echo $i: >> ,,Calls
+    unifdef -l -uCOMMENT `cat Ifdefs` $i \
+    | sed -e "/extern.*()/s/.*//" \
+    | ccalls >> ,,Calls
+done
+
+prcalls ,,Calls > Calls
+
+rm -f ,,Calls

@@ -1,0 +1,53 @@
+
+State file format:
+----- ---- ------
+Note: indented items are present only if the preceding entry is non-0
+Strings include trailing null byte.
+
+    short           revision number (negative int)
+    short           number of characters in terminal type string
+     char[]          terminal type
+    Uchar           number of screen lines
+    Uchar           number of screen columns
+    long            time of start of session
+    short           number of tabstops
+     short[]         tabstops
+    short           width for fill/just/center
+    short           searchstring length
+     char[]          search string
+    char            insert mode flag
+    char            regular expression mode
+/*  char            borderbullets       <- todo in next version (e19) */
+    char            flag: curmark follows
+     long            curmark->mrkwinlin
+     short           curmark->mrkwincol
+     char            curmark->mrklin
+     short           curmark->mrkcol
+    char            number of windows
+    char            current window
+    struct {
+	char        previous window
+	char        top     margin
+	short       left    margin
+	char        bottom  margin
+	short       right   margin
+	short       plus line
+	short       minus line
+	short       plus page
+	short       minus page
+	short       window left
+	short       window right
+	short        altwksp file name length
+	 char[]      altwksp file name
+	 long        winlin
+	 short       wincol
+	 char        cursorlin
+	 short       cursorcol
+	short       wksp file name length
+	char[]      wksp file name
+	long        winlin
+	short       wincol
+	char        cursorlin
+	short       cursorcol
+    } windows[number_of_windows]
+

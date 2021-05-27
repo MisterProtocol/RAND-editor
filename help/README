@@ -1,0 +1,34 @@
+Files in this directory:
+
+	kl.???? - keyboard left displays, configured for standard display.
+	kr.???? - same, but right half.
+	helpkey - text messages describing keystroke functions, used
+		by morehelp() in e.h.c.
+	print???? - a printable display of a keyboard.
+	dk - a program that displays a keyboard file directly.
+	Crashdoc, recovermsg, errmsg - error handling text files (belong
+		in /etc/e).
+
+The k?.* files contain the display keyboards, with standard encodings for
+line-drawing and enhanced-mode.  These are a bit difficult to create, but
+well worth the effort (anyone thirsting for a medium-small programming
+job?  Build an editor to do that :-)).  There are four control characters
+embedded within the files:
+
+	Ctrl-N = enter line-drawing mode. The following characters (up
+		to the next crtl-O) are in the range E through O, or
+		blanks. The characters represent line-drawing characters
+		as follows:
+
+			E - upper left corner   F - upper right corner
+			G - lower left corner   H - lower right corner
+			I - cross               J - vertical line
+			K - horizontal line     L - left join
+			M - right join          N - bottom join
+			O - top join
+
+	Ctrl-O = exit from line drawing mode.
+	Ctrl-P = Enter enhanced mode. Enhance the following characters
+		until ctrl-Q is encountered. Enhancement may be bold or
+		reversed video, depending on the terminal used.
+	Ctrl-Q = Exit enhanced mode.

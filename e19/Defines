@@ -1,0 +1,205 @@
+=========> ALLOWNROFF <=========
+
+=========> BIGADDR <=========
+
+=========> CBREAK <=========
+
+=========> CLEARONEXIT <=========
+e.h:/* #define CLEARONEXIT          /* if defined, clears screen on exit    */
+
+=========> CMDVERALLOC <=========
+e.m.h:#define CMDVERALLOC     58
+
+=========> COMMENT <=========
+
+=========> DEBUGALLOC <=========
+
+=========> DEBUG_KBFILE <=========
+
+=========> DUMB <=========
+e.d.c:#define DUMB    /* define this until e is smart about insert/delete and  */
+
+=========> E14 <=========
+
+=========> EMPTY <=========
+
+=========> ENVIRON <=========
+
+=========> KBFILE <=========
+e.c:#define OPTKBFILE      10
+e.h:#define KBFILE          /* -kbfile option */
+
+=========> LA_LONGFILES <=========
+
+=========> LA_LONGLINES <=========
+
+=========> LMCAUTO <=========
+e.h:#define LMCAUTO         /* power typing mode */
+e.h:#define LMCV19          /* forced by V19 or LMCAUTO */
+
+=========> LMCCASE <=========
+e.h:#define LMCCASE         /* CCASE and CCAPS commands */
+
+=========> LMCCMDS <=========
+e.h:#define LMCCMDS         /* enable function key extensions */
+
+=========> LMCHELP <=========
+e.h:#define LMCHELP         /* help function */
+
+=========> LMCLDC <=========
+e.h:#define LMCLDC          /* Tcap.c uses line drawing defs for windows */
+
+=========> LMCMARG <=========
+e.h:#define LMCMARG         /* tab and margin tics (cute) */                         /* define this for version 18 state file; see below */
+
+=========> LMCOPT <=========
+e.h:#define LMCOPT          /* -dk for keyb=standard */
+
+=========> LMCSTATE <=========
+e.h:#define LMCSTATE        /* -state option */
+
+=========> LMCTRAK <=========
+e.h:#define LMCTRAK         /* make TRACK and RANGE commands toggle */
+
+=========> LMCV19 <=========
+e.h:#define LMCV19          /* Version 19 state file */
+e.h:#define LMCV19          /* forced by V19 or LMCAUTO */
+
+=========> LMCVTAB <=========
+
+=========> MESG_NO <=========
+e.h:/* #define MESG_NO                 /* if messages to be disallowed during edit */
+
+=========> NDIR <=========
+
+=========> NOIOCTL_H <=========
+
+=========> NOSIGNEDCHAR <=========
+
+=========> PROFILE <=========
+
+=========> RDNDELAY <=========
+e.t.c:# define RDNDELAY
+
+=========> RENAME <=========
+e.h:#define RENAMED  01000  /* exists and we will rename it on exit            */
+
+=========> RUNSAFE <=========
+e.h:/* #define RUNSAFE              /* see e.ru.c */
+
+=========> SHORTUID <=========
+
+=========> SIGARG <=========
+e.h:/* #define SIGARG               /* if signal# passed as arg to signal(SIG) */
+
+=========> SIGCHLD <=========
+
+=========> SIGNALS <=========
+
+=========> SIGTSTP <=========
+
+=========> SUN <=========
+
+=========> SYMLINKS <=========
+
+=========> SYSIII <=========
+
+=========> SYSSELECT <=========
+
+=========> S_IFLNK <=========
+
+=========> TERMCAP <=========
+e.c:#define OPTDTERMCAP    13
+
+=========> TESTRDNDELAY <=========
+
+=========> TIOCGETC <=========
+
+=========> TIOCGLTC <=========
+
+=========> TIOCSETC <=========
+
+=========> TIOCSLTC <=========
+
+=========> TTYN <=========
+
+=========> TTYNAME <=========
+
+=========> T_2intext <=========
+
+=========> T_31 <=========
+
+=========> T_3a <=========
+e.tt.c:#define T_3a        3   /* adm3a.c      Lear Siegler ADM3a */
+
+=========> T_a1 <=========
+e.tt.c:#define T_a1        2   /* ambas.c      Ann Arbor Ambassador */
+
+=========> T_aa <=========
+e.tt.c:#define T_aa        1   /* annarbor.c   Ann Arbor 4080 */
+
+=========> T_adm42 <=========
+
+=========> T_c100 <=========
+
+=========> T_dm4000 <=========
+
+=========> T_dy <=========
+
+=========> T_free100 <=========
+e.tt.c:#define T_free100   19  /* free100.c    Freedom 100 */
+
+=========> T_h19 <=========
+e.tt.c:#define T_h19       7   /* h19.c        Heathkit H19 & H89 */
+
+=========> T_intext <=========
+
+=========> T_mbee <=========
+
+=========> T_po <=========
+e.tt.c:#define T_po        12  /* po.c         Perkin Elmer 1251 and Owl */
+
+=========> T_sun2 <=========
+e.tt.c:#define T_sun2      14  /* sun2.c       Sun */
+
+=========> T_tcap <=========
+e.tt.c:#define T_tcap      0   /* tcap.c       Termcap terminal -- must be 0 */
+
+=========> T_tv910 <=========
+e.tt.c:#define T_tv910     18  /* tv910.c      Televideo 910 - another disgustingly
+
+=========> T_vt100 <=========
+e.tt.c:#define T_vt100     13  /* vt100.c      DEC VT100 -- needs termcap */
+e.tt.c:#define T_vt100w    15  /* vt100.c      DEC VT100 in 132 col mode */
+
+=========> T_vt52 <=========
+
+=========> UNIXV6 <=========
+
+=========> UNIXV7 <=========
+
+=========> UNSCHAR <=========
+e.h:# define UNSCHAR
+
+=========> V19 <=========
+e.h:#define V19             /* force version 19 */
+e.h:#define LMCV19          /* Version 19 state file */
+e.h:#define LMCV19          /* forced by V19 or LMCAUTO */
+
+=========> VAX_MONITOR <=========
+
+=========> VBSTDIO <=========
+
+=========> VFORK <=========
+
+=========> WIDE <=========
+e.t.h:#define WIDE
+
+=========> WINDOWSTUFF <=========
+
+=========> YES <=========
+e.fi.c:#define ENDPAR YES
+e.h:#define YES 1
+
+=========> lint <=========
+

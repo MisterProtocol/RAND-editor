@@ -1,0 +1,23 @@
+   FKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKNK
+   J     JCHGW J ALT J RED JCAPS JCCASEJAUTO JCLTABJTABSRJTRACKJRANGEJ<-shifted
+   J     J-PAGEJ+PAGEJ-LINEJ+LINEJ LW  J RW  JOPEN JCLOSEJMARK JPICK J<-normal
+   JblockJ F1  J F2  J F3  J F4  J F5  J F6  J F7  J F8  J F9  J F10 J
+   MKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKIK
+   JeCTQTJ     J     J     J     J     J     J     J     J     J     J
+   J esc J  1  J  2  J  3  J  4  J  5  J  6  J  7  J  8  J  9  J  0  J
+   MKKKKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNK
+   J  -TAB  J     J     J     J     J     JcCLRTJ     J     JcOVLYJcCOVRJ
+   J   TAB  JeQUITJ     JcERASJ     J     J     J     J     J     J     J
+   J   tab  J  Q  J  W  J  E  J  R  J  T  J  Y  J  U  J  I  J  O  J  P  J
+FKKOKKNKKKKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOK
+J     J        J     J     JcCNTRJ     JcHOMEJ     J     J     J     J
+J     J        JeABRTJeSPLTJ     JeFILLJ     J     JeJOINJeJUSTJ     J
+J ctrlJcaps lokJ  A  J  S  J  D  J  F  J  G  J  H  J  J  J  K  J  L  J
+EKKKKKIKKKKKKKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNKKOKKNK
+      J           J     JcEXITJcCLERJ     JcLWRDJcRWRDJ     J     J     J
+      J           JeSTOPJeEXITJ     J     JeBOX J     J     J     J     J
+      J   shift   J  Z  J  X  J  C  J  V  J  B  J  N  J  M  J  ,  J  .  J
+      EKKKKKKKKKKKOKKKKKOKKKKKOKKKKKOKKKKKOKKKKKOKKKKKOKKKKKOKKKKKOKKKKKOK
+ Commands of the form cXXXX perform XXXX when used with ctrl key.
+ Commands of the form eXXXX perform XXXX when used following the ESC key.
+ Commands on TAB key and function keys have shifted and normal forms.

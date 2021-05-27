@@ -1,0 +1,2 @@
+.if t .so /usr/lib/tmac/tmac.eRt
+.if n .so /usr/lib/tmac/tmac.eRn

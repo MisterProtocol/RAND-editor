@@ -1,0 +1,9 @@
+Mon Dec 5 11:42:30 PST 1988 begin
+make 
+../tools/cc  -O  -I. -I../ff3/ -I../include  -c laopen.c ; mv laopen.o o/
+/bin/sh -c "if test -r libla.a ; then mv -f libla.a ,libla.a ; fi"
+ar r libla.a o/laopen.o  o/laalign.o  o/lablank.o  o/labsize.o  o/laclseek.o  o/ladeb.o  o/laerr.o  o/lafrpl.o  o/lalcnt.o  o/lalcopy.o  o/lalflush.o  o/lalget.o  o/lalpnt.o  o/lalrpl.o  o/laldel.o  o/lalcol.o  o/lalins.o  o/labreak.o  o/laclose.o  o/lalink.o  o/lalrsize.o  o/lalseek.o  o/lalwsize.o  o/lacfile.o  o/laint.o  o/laother.o  o/laabort.o
+ar: creating libla.a
+../tools/ranlib libla.a
+Done
+Mon Dec 5 11:42:51 PST 1988 end

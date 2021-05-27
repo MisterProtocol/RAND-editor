@@ -1,0 +1,5 @@
+short revision = -19;
+static char whatstr[] = { '@', '(', '\#', ')' } ;
+char verstr[] = "\
+E19 version of Tue Nov 21 09:35:27 PST 2006\n\
+made in /home/terry/src/e19+.elf/e19 by terry (tw3.trwest.org!terry)\n";

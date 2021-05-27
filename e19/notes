@@ -1,0 +1,36 @@
+#define Char  int
+#define UChar unsigned int
+#define Short int
+#define Uint unsigned int
+#define Uchar unsigned char
+
+/* For each type there is Type and Atype.
+/* use AType for array and structure member declarations,
+/* and use Type everywhere else
+/**/
+typedef Char  Flag;             /* YES or NO */
+typedef char  AFlag;            /* YES or NO */
+typedef Char  Small;            /* small integer that will fit into char */
+typedef char  ASmall;           /* small integer that will fit into char */
+
+from ../la1/la.h:
+typedef long La_linesize;    /* must not be unsigned */
+typedef long La_linepos;        /* must not be unsigned */
+
+typedef La_linepos Nlines;      /* number of lines in a file */
+typedef La_linepos ANlines;     /* number of lines in a file */
+typedef La_linesize Ncols;      /* number of columns in a line */
+typedef La_linesize ANcols;     /* number of columns in a line */
+
+typedef Char  Fd;               /* unix file descriptor */
+typedef char  AFd;              /* unix file descriptor */
+typedef Char  Fn;               /* index into files we are editing */
+typedef char  AFn;              /* index into files we are editing */
+typedef Small Cmdret;           /* comand completion status */
+
+e.t.h:
+typedef Short Scols;            /* number of columns on the screen */
+typedef short AScols;           /* number of columns on the screen */
+typedef Char Slines;            /* number of lines on the screen */
+typedef char ASlines;           /* number of lines on the screen */
+

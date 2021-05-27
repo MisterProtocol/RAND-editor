@@ -1,0 +1,25 @@
+
+
+This file contains overall comments about E.
+
+The 'Comments' file is a compendium of the
+comments which precede each routine in the editor.
+
+Further essential documentation is contained in comments preceding
+global data declarations in the various '.h' files, especially 'e.h'.
+
+The file State.fmt tells the format of the state file.
+
+The editor calls routines in the LA Package which call the FFIO Package.
+These two are I/O subroutine libraries whose source and object are
+found in parallel directories whose names are in Makefile.
+Modern Version 7 C as described in "The C Programming Language" by
+Kernighan and Ritchie is assumed.
+
+All functions which return values are declared with an explicit type.
+The types of returns possible from the function are implicit in the
+declaration.  For example, functions declared as type 'Cmdret' will
+return a value which is a possible command return value.  These are
+found in e.cm.h.
+
+In many routines, the argument 'puflg' means do a new putup () when done.

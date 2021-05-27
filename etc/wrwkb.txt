@@ -1,0 +1,199 @@
+# ----------------------------------------------------------------------------
+#   wrwkb - Rand Editor keyboard file.
+#       WRW 3 Dec 2011
+#       Started with linuxkb and vt200kbn.
+#       Trying to get back to something similar to what I had at Bell Labs.
+#       Going beyond that with a lot of thought to full use of keyboard, assigning
+#       keys not used before.
+
+#   Useful commands
+#       help keymap     # Show current keymap
+#       build-kbfile    # Build keyboard
+
+#   Commands to play with a bit.
+#       <cover | overlay | underlay | blot | -blot | insert >
+#           <adjust | close | erase | pick | run | box>
+
+# -----------------------------------------------------------------------------
+#   Directive is: #!noX11  Do not use the X11 server to get the keyboard mapping
+#       I.e., #! introduces directives. Others are "#!comment" and "#!-comment"
+#       What difference does X11 keymap make? Use it for now.
+# /// !noX11
+
+# Cursor mode setting:
+# Ref to 'consoles_codes' man page and
+#   /etc/termcap file for the linux console entry :
+#       h: set mode
+#       l: reset mode
+#       ?25: visible cursor
+#       ve=\E[?25h\E[?0c set the cursor to visible underline
+#       vi=\E[?25l\E[?1c set the cursor to invisible
+#       vs=\E[?25h\E[?8c set the cursor to visible block
+#       Esc=     DECPAM   Set application keypad mode
+#       Esc>     DECPNM   Set numeric keypad mode
+
+#   Application keypad mode causes the numeric keypad to send unique codes.
+#   Looks like have to have both <kbinit> and <kbend> defined for either to be effective
+
+#   Set application keypad mode, (\E[2l ???), visible underline
+<kbinit>:^["="^["[2l"^["[?25h"^["[?0c"
+
+# Set numeric keypad mode, (\E[2l ???)
+<kbend>:^[">"^["[2l"
+
+# ------------------------------------------------------------------------------------
+# Graphical border character settings:
+#   With Konsole on Mint 17.1 I had to change graphenter and graphleave to values found online for vt100
+#       No idea how original values ever worked. Maybe they didn't.
+
+#   ^O Activate graphics set G0
+#   ^N Activate graphics set G1
+
+#   ESC ( B               G0 chars set Select default (ISO 8859-1 mapping)
+#   ESC ( 0               G0 char set Select VT100 graphics mapping
+#   ESC ) B               G1 chars set Select default (ISO 8859-1 mapping)
+#   ESC ) 0               G1 char set Select VT100 graphics mapping
+
+#   graphenter and graphleave took a long time to get working on both
+#       X window terminals and the virtual console.
+
+#<utf8>:<0>
+#<graphenter>:^[")0"^N
+#<graphleave>:^["(B"^O
+#<graphchar>:<1>
+
+# ------------------------------------------------------------------------------------
+
+# I couldn't get this and others to modify the border graphic chars. Ok after fixed graph enter and leave.
+# Not important, works fine as is.
+# <lmch>:<0x61>
+# <rmch>:<0x62>
+# <tmch>:"t"
+# <bmch>:"b"
+
+# ----------------------------------------------------------------
+#   <ctrl> Alpha
+
+^A:<cmd>
+^B:<-word>
+^C:<erase>
+^D:<-line>
+^E:<-page>
+^F:<+line>
+^G:<srtab>
+^H:<left>
+^I:<+tab>
+^J:<down>
+^K:<up>
+^L:<right>
+^M:<ret>
+^N:<+word>
+^O:<open>
+^P:<pick>
+^Q:<dword>
+^R:<+page>
+^S:<split>
+^T:<-sch>
+^U:<mark>
+^V:<close>
+^W:<dchar>
+^X:<join>
+^Y:<+sch>
+^Z:<int>
+
+# ----------------------------------------------------------------
+#   Remaining <ctrl> characters
+
+# ^@:"ctrl @"   Nul - This crahses e. ^@ is 0x00, string terminator, probably the problem.
+# ^[:"ctrl ["   Esc - Invalid, Esc introduces other commands
+
+#   That leaves these 4 <ctrl> characters to use.
+
+^]:<wleft>
+# <ctrl>right square
+^\:<wright>
+# <ctrl>back slash
+
+# ^^:"ctrl ^"
+# ^^:<erase>      Can't remember binding for these so don't use
+# ^_:"ctrl _"
+# ^_:<edit>
+
+# ----------------------------------------------------------------
+#   Miscellaneous keys
+
+<0177>:<bksp>               # BackSpace key
+^["[3~":<dchar>             # Delete key
+^["[Z":<-tab>               # Back tab
+^["OD":<left>               # Left arrow
+^["OC":<right>              # Right arrow
+^["OA":<up>                 # Up arrow
+^["OB":<down>               # Down arrow
+
+^["[5~":<-page>             # Pg Up
+^["[6~":<+page>             # Pg Down
+^["OH":<cmd><-page>         # Home
+^["OF":<cmd><+page>         # End
+^["[2~":<insmd>             # Insert
+
+# ----------------------------------------------------------------
+#   Function keys
+
+^["OP":<tick>               # F1
+^["OQ":<cmd>"tick"<ret>     # F2
+^["OR":<cmd>"-tick"<ret>    # F3
+^["OS":<range>              # F4
+
+^["[15~":<redraw>           # F5
+^["[17~":<replace>          # F6
+^["[18~":<track>            # F7
+^["[19~":<chwin>            # F8
+
+^["[20~":<edit>             # F9
+^["[21~":<flist>            # F10
+^["[23~":<fnavigate>        # F11
+^["[24~":<help>             # F12
+
+# ----------------------------------------------------------------
+#   <ctrl> Function keys. Some not used yet. Think about
+#  Total Len of 30 ok, 40 probably causes buffer overflow. /// Look at.
+
+^["O1;5Q":"# --------------------------"<ret>    # <ctrl>F2
+^["O1;5R":"/* --------------------- */ "<ret>    # <ctrl>F3
+^["O1;5S":"<ctrl>F4"
+
+^["[15;5~":"<ctrl>F5"
+^["[17;5~":"<ctrl>F6"
+^["[18;5~":"<ctrl>F7"
+^["[19;5~":"<ctrl>F8"
+
+^["[20;5~":"<ctrl>F9"
+^["[21;5~":"<ctrl>F10"
+^["[23;5~":"<ctrl>F11"
+^["[24;5~":"<ctrl>F12"
+
+^["[5;5~":"<ctrl>Page Up"
+# "<ctrl>Home"  Not distinct from non-ctrl
+# "<ctrl>End"   Not distinct from non-ctrl
+^["[6;5~":"<ctrl>Page Down"
+# "<ctrl>Insert" Nothing, another app eating?
+^["[3;5~":"<ctrl>Delete"
+
+# ----------------------------------------------------------------
+#   These were defined. I rarely ever used them, couldn't remember them.
+
+# ^X^A:<edit>
+# ^X^C:<cchar>
+# ^X^E:<erase>
+# ^X^H:<wleft>
+# ^X^I:<ccase>
+# ^X^J:<join>
+# ^X^L:<wright>
+# ^X^N:<fnavigate>
+# ^X^S:<split>
+# ^X^T:<tick>
+# ^X^U:<caps>
+# ^X^W:<chwin>
+
+# ----------------------------------------------------------------
+

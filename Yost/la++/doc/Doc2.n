@@ -1,0 +1,171 @@
+.ds f. Doc2.tbl
+.in +2m
+.TS
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
+..
+.nf
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 54 55 56 57 58 59
+.nr 54 0
+.nr 38 \wla_open (\*(DQtest\*(DQ,
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \wla_open (\*(DQtest\*(DQ,
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \wla_open (\*(DQtest\*(DQ,
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \wla_open (X,
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \wla_open (NULL,
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \wla_open (NULL,
+.if \n(54<\n(38 .nr 54 \n(38
+.54
+.rm 54
+.nr 55 0
+.nr 38 \w\*(DQ\*(DQ,
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w\*(DQ\*(DQ,
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w\*(DQc\*(DQ,
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w\*(DQn\*(DQ,
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w\*(DQ\*(DQ,
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w\*(DQ\*(DQ,
+.if \n(55<\n(38 .nr 55 \n(38
+.55
+.rm 55
+.nr 56 0
+.nr 38 \w(La_stream *) 0,
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \wplas,
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \wL,
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \wL,
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \wL,
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \wL,
+.if \n(56<\n(38 .nr 56 \n(38
+.56
+.rm 56
+.nr 57 0
+.nr 38 \w(long) 0,
+.if \n(57<\n(38 .nr 57 \n(38
+.nr 38 \w(long) 0,
+.if \n(57<\n(38 .nr 57 \n(38
+.nr 38 \w(long) 0,
+.if \n(57<\n(38 .nr 57 \n(38
+.nr 38 \wX,
+.if \n(57<\n(38 .nr 57 \n(38
+.nr 38 \w(long) 0,
+.if \n(57<\n(38 .nr 57 \n(38
+.nr 38 \w(long) 0,
+.if \n(57<\n(38 .nr 57 \n(38
+.57
+.rm 57
+.nr 58 0
+.nr 38 \wX,
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \wX,
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \wX,
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \wX,
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \wffstreamptr,
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w(Ff_stream *) 0,
+.if \n(58<\n(38 .nr 58 \n(38
+.58
+.rm 58
+.nr 59 0
+.nr 38 \wX);
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \wX);
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \wX);
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \wX);
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \wX);
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \wchan);
+.if \n(59<\n(38 .nr 59 \n(38
+.59
+.rm 59
+.nr 38 1n
+.nr 53 0
+.nr 40 \n(53+((0*\n(38)/2)
+.nr 54 +\n(40
+.nr 41 \n(54+((2*\n(38)/2)
+.nr 55 +\n(41
+.nr 42 \n(55+((2*\n(38)/2)
+.nr 56 +\n(42
+.nr 43 \n(56+((2*\n(38)/2)
+.nr 57 +\n(43
+.nr 44 \n(57+((2*\n(38)/2)
+.nr 58 +\n(44
+.nr 45 \n(58+((2*\n(38)/2)
+.nr 59 +\n(45
+.nr TW \n(59
+'\".if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 11 file Doc2.tbl is too wide - \n(TW units
+.fc  
+.nr #T 0-1
+.nr #a 0-1
+.eo
+.de T#
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
+.ls 1
+.ls
+..
+.ec
+.ta \n(54u \n(55u \n(56u \n(57u \n(58u \n(59u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'la_open (\*(DQtest\*(DQ,\h'|\n(41u'\*(DQ\*(DQ,\h'|\n(42u'(La_stream *) 0,\h'|\n(43u'(long) 0,\h'|\n(44u'X,\h'|\n(45u'X);
+.ta \n(54u \n(55u \n(56u \n(57u \n(58u \n(59u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'la_open (\*(DQtest\*(DQ,\h'|\n(41u'\*(DQ\*(DQ,\h'|\n(42u'plas,\h'|\n(43u'(long) 0,\h'|\n(44u'X,\h'|\n(45u'X);
+.ta \n(54u \n(55u \n(56u \n(57u \n(58u \n(59u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'la_open (\*(DQtest\*(DQ,\h'|\n(41u'\*(DQc\*(DQ,\h'|\n(42u'L,\h'|\n(43u'(long) 0,\h'|\n(44u'X,\h'|\n(45u'X);
+.ta \n(54u \n(55u \n(56u \n(57u \n(58u \n(59u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'la_open (X,\h'|\n(41u'\*(DQn\*(DQ,\h'|\n(42u'L,\h'|\n(43u'X,\h'|\n(44u'X,\h'|\n(45u'X);
+.ta \n(54u \n(55u \n(56u \n(57u \n(58u \n(59u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'la_open (NULL,\h'|\n(41u'\*(DQ\*(DQ,\h'|\n(42u'L,\h'|\n(43u'(long) 0,\h'|\n(44u'ffstreamptr,\h'|\n(45u'X);
+.ta \n(54u \n(55u \n(56u \n(57u \n(58u \n(59u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'la_open (NULL,\h'|\n(41u'\*(DQ\*(DQ,\h'|\n(42u'L,\h'|\n(43u'(long) 0,\h'|\n(44u'(Ff_stream *) 0,\h'|\n(45u'chan);
+.fc
+.nr T. 1
+.T# 1
+.35
+.TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-9
+.in -2m

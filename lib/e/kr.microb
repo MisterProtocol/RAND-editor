@@ -1,0 +1,20 @@
+     --+-----+-----+-----+-----+-----+-----+-----+-----+
+       |-SRCH|+SRCH|LWORD|RWORD|CLOSE|OPEN |DELCH|INSRT|
+       | f13 | f14 | f15 | f16 |dline|iline|dchar|ichar|
+     ==+================================================
+       |AUTOF|-TAB | TAB |LARRO|DARRO|HOME |UARRO|RARRO|
+       |asend|b-tab| tab | <-- |  V  |home |  ^  | --> |
+     --+-----+-----+-----+-----+-----+-----+-----+-----+
+      ---+-----+-----+-----+   +-----+-----+-----+-----+  The functions on
+         |     |     | xBS |   |     |     |     |xSTOP|  the keys preceeded
+         |  ^  |  \  | bs  |   |  7  |  8  |  9  | ce  |  by an 'x' indicate
+    --+--+-----+-----+-----+   +-----+-----+-----+-----+  that the function
+      |  xCR   |RANGE|xCMD |   |     |     |     |     |  is invoked by just
+      | return |  _  |break|   |  4  |  5  |  6  |  -  |  typing the key;
+    --+--+     +-----+-----+   +-----+-----+-----+-----+  the rest may be
+         |     |     |     |   |     |     |     |     |  invoked with
+         |     |  [  |  ]  |   |  1  |  2  |  3  | xCR |  <CTRL>+key.
+    --+--+-----+-----+-----+   +-----+-----+-----+     |
+      |        |xCLER|     |   |           |     |enter|
+      |  shift |cleof|clear|   |     0     |  .  |     |
+    --+--+-----+-----+-----+   +-----------+-----+-----+

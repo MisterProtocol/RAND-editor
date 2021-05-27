@@ -1,0 +1,19 @@
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-
+|  e  |     |     |     |     |     |     |     |     |     |     |     |
+|     |     |     |     |     |     |     |     |     |     |     |     |
+| ESC |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  |  _  |
++-----+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-
+|  +TAB  |c-TAB|cCHGW|cERAS|cREDR|cTBSR|cCLTB|cHELP|+TAB |cO/UL|cCOVR|     |
+|        |eQUIT|     |     |     |     |     |     |     |     |     |     |
+|  TAB   |  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |  [  |
++-----+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-
+|  c  |     |cCCAS|eSPLT|cCENT|cCCAP|cHOME| cBS |eJOIN|eJUST|cBLOT|     |
+|     | cap |eABRT|     |     |eFILL|     |     |     |cAUTO|     |     |
+| CTRL| lock|  A  |  S  |  D  |  F  |  G  |  H  |  J  |  K  |  L  |  "  |
++-----+-----+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-
+|     |        |eSTOP|eEXIT|cCLER|cTRAK|cLWRD|cRWRD| cCR |eLEFT|eRITE|     |
+|     |        |cSTOP|cEXIT|     |     |eBOX |     |     |     |     |     |
+|SCRL |  SHIFT |  Z  |  X  |  C  |  V  |  B  |  N  |  M  |  ,  |  .  |  /  |
++-----+--------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-
+ cXXXX on key <x> means the function XXXX is invoked by <CTRL+x>
+ eXXXX on key <x> means the function XXXX is invoked by [ESC+x]

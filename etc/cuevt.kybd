@@ -1,0 +1,106 @@
+<kbinit>:<esc>"="
+<kbend>:<esc>">"
+^M:<ret>
+#
+# F1 thru F10
+<esc>"OP":<close>
+<esc>"OQ":<cmd><close>
+<esc>"OR":<cmd><dchar>
+<esc>"OS":<cmd>"-er"<ret>
+<esc>"[16~":<split>
+<esc>"[17~":<join>
+<esc>"[18~":<pick>
+<esc>"[19~":<cmd><pick>
+<esc>"[21~":<open>
+#
+# keypad
+<esc>"Ow":<home>
+<esc>"Ox":<up>
+<esc>"Oy":<-page>
+<esc>"Ot":<left>
+<esc>"Ou":""
+<esc>"Ov":<right>
+<esc>"Oq":<cmd><right>
+<esc>"Or":<down>
+<esc>"Os":<+page>
+<esc>"On":<dchar>
+<esc>"Op":<ins>
+#
+# ctrl-F1 thru ctrl-F10
+<esc>"[32~":<dword>
+<esc>"[33~":<cmd><dword>
+<esc>"[34~":<replace>
+<esc>"[35~":<int>
+#<esc>"[36~":
+#<esc>"[37~":
+#<esc>"[38~":
+#<esc>"[39~":
+#<esc>"[40~":
+<esc>"[41~":<redraw>
+#
+# alt-F1 thru alt-F10
+<esc>"[42~":<erase>
+<esc>"[43~":<cmd><erase>
+<esc>"[44~":<wleft>
+<esc>"[45~":<wright>
+<esc>"[46~":<chwin>
+<esc>"[47~":<cmd>"ce"<ret>
+<esc>"[48~":<cmd>"ju"<ret>
+<esc>"[49~":<cmd>"fi"<ret>
+<esc>"[50~":<edit>
+#<esc>"[51~":
+#
+# ctrl keypad
+<esc>"[53~":<-sch>
+<esc>"[54~":<+sch>
+<esc>"[56~":<+line>
+<esc>"[70~":<-line>
+<esc><esc>:<cmd>
+#
+^@:<cmd>
+^A:<cmd>
+^B:<-word>
+# "RAND" keyboard -- ^C = <left>
+#^C:<left>
+# for ESP compatibility:
+^C:<cchar>
+^D:<-line>
+^E:<-page>
+^F:<+line>
+^H:<bksp>
+^I:<tab>
+^J:<down>
+^L:<right>
+^N:<+word>
+^O:<open>
+^P:<pick>
+^R:<+page>
+^T:<-Sch>
+^K:<mark>
+^V:<close>
+^U:<up>
+^W:<dchar>
+^Y:<+sch>
+^Z:<ins>
+# new usage:
+^\:<int>
+^]:<replace>
+# new use
+#^^:<ccase>
+#^_:<edit>
+^X^A:<edit>
+^X^B:<split>
+^X^C:<cchar>
+^X^N:<dword>
+^X^E:<erase>
+^X^F:<redraw>
+^X^H:<wleft>
+^X^I:<-tab>
+^X^J:<join>
+^X^L:<wright>
+^X^R:<replace>
+^X^T:<srtab>
+^X^U:<-tab>
+^X^W:<chwin>
+# for SAS compatibility (^X is not a sequence initializer)
+<esc>^I:<-tab>

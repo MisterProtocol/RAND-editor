@@ -1,0 +1,30 @@
+
+/* system environment stuff for 4.2+bsd (sun) */
+
+#define index strchr            /* */
+#define rindex strrchr          /* */
+/* fine NOIOCTL_H               /* there is no ioctl.h */
+/* fine RDNDELAY                /* read call has NDELAY capability */
+#define EMPTY                   /* can implement empty(fd) subroutine call */
+#define LINKS                   /* file system has links */
+#define CANFORK                 /* system has fork() */
+#define VFORK                   /* system has vfork() */
+#define ABORT_SIG SIGILL        /* which signal does abort() use */
+#define SIGARG                  /* signal catch routine has sig num as arg */
+#define SIG_INCL <signal.h>
+#define SGTT_INCL <sgtty.h>
+#define TTYNAME                 /* use ttyname function */
+/* define TTYN                  /* use ttyn function */
+/* #define SHORTUID                /* uid is a short, not a char (v7+) */
+#define ENVIRON                 /* getenv() is implemented */
+#define VAX_MONITOR             /* use monitor() routine for vax */
+#define SIGNALS                 /* system has signals */
+#define SYMLINKS                /* 4.2 symbolic links */
+#define NDIR                    /* 4.2 dirrectory routines */
+#define SYSMKDIR                /* use mkdir(name, mode) system call */
+#define SYSRMDIR                /* use rmdir(name) system call */
+#define SYSFCHOWN               /* use fchown(fd, ...) system call */
+#define SYSFCHMOD               /* use fchmod(fd, ...) system call */
+#define CLR_SUID_ON_WRITE       /* modifying a file clrs suid and sgid bits */
+#define SYSSELECT               /* system has berkeley select system call */
+#define RENAME                  /* system has berkeley rename system call */

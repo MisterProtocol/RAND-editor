@@ -1,0 +1,23 @@
+
+Relies on the move and fill routines.
+
+There is supposed to be a limit to the number of characters in an fsd so that
+a short can hold that number.  Why did I do this?
+
+Flag to pick and delete to force writing to changes file.
+
+On VMUNIX, parsing should be done with ordinary reads, a buffer should be
+alloced to hold the entire file, and vreads should be done for the file.
+
+CMD-DELCHR seems to flush cline after writing out the erased text to the #o
+file.
+
+How is the error condition handled where the file the FSD points to has
+been deleted and/or ff_closed?
+
+la_verify should look through a table of valid streams, not walk through
+from la_firststream, because if one of the streams is corrupted, unpredictable
+things can happen.  The table would have to be maintained by la_open and
+la_close and be realloced as necessary to grow it.
+
+Chars should not be assumed to be signed in fsd's.

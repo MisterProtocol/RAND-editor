@@ -1,0 +1,54 @@
+Terminals- this is what makes E a better editor than EDT. The ability to
+run on an adm3, and also a vt100, and make use of the features on both.
+
+There is a lot of stuff in here. Because the terminal drivers change almost
+as much as the code, I have made the term directory a subdirectory of the
+source directory. I have eliminated some old stuff, left some others.
+Some notes about what is left follow.
+
+Philosophy - I have been attempting to suppress the terminal drivers as
+much as possible by pressing in two directions: making the termcap output
+driver and termcap entries as complete as possible, and bringing up the
+general input driver (e.iit.c and e.it.c). The former is further along
+than the latter; that accounts for the Termcap files herein for those
+terminals which work well with termcap. These should be used in place of
+the termcap entries in /etc/termcap. How you do that is up to you.
+
+Doc             How to Write a Terminal Driver for E (kind of).
+		Updated to e19.
+
+Intext2.keys
+Keyboard        Standard keyboard layout (pictorial)
+Keyboard.aaa
+Makefile
+Termcap.vt100   Termcap entry for vt100 assumed by E.
+adm31.c         adm31 driver
+adm3a.c         adm3a driver
+adm42.c         adm42 driver
+xl.c            ambassador and XL driver
+annarbor.c      ann arbor models Q2878 and 4080
+c100.c          concept 100 driver (UDel)
+dm4000.c
+dy.c            Dave Yost's terminal (Sierra ?)
+eoldfix.h       needed by e14 version.
+h19.c           Heathkit 19 driver
+info200.c       out of date. Rewrite needed.
+intext.c        Interactive INtext terminal
+intext2.c       INtext2.
+po.c            PE 1251 and Owl terminal.
+standard.c      Standard keyboard. Includes old stdinlex.c
+sun2.c          Sun2 keyboard.
+tcap.c          Termcap terminal (output side).
+vt100.c         vt100 driver as distributed
+vt100d.c        vt100 from UDel - out of date.
+z19.c           Zenith 19 - out of date.
+
+
+The following terminal drivers have been contributed from
+from outside users, and have not been tested at Rand.
+
+vt100.c.lmc     vt100 keyboard driver (uses termcap for output) (lmc)
+vt52.c          DEC vt52 (lmc)
+tv910.c         Televideo 910  (lmc)
+mbee.c          Microbee. (lmc)
+free100.c       keyboard for Freedom 100 (lmc)

@@ -1,0 +1,51 @@
+#include <sys/types.h>
+#include <ff.h>
+
+/*LINTLIBRARY*/
+
+Ff_stream ff_streams[NOFFFDS];
+Ff_file   ff_files[NOFILE];
+Ff_rbuf   ff_flist;
+Ff_stats  ff_stats;
+int     ldiv (a, b, c) long a; int b, *c; { if (a && b && c); return 0; }
+Ff_stream *ff_open(path, mode, arena) char *path; short mode; int arena;
+	{ if (path && mode && arena); return 0; }
+Ff_stream *ff_gfil(fnp, mode) Ff_file *fnp; int mode;
+	{ if (fnp && mode); return 0; }
+int     ff_alloc (nbuf, arena) register int nbuf; int arena;
+	{ if (nbuf && arena); return 0; }
+Ff_buf  *ff_putblk(fb, flg) register Ff_buf *fb; int flg;
+	{ if (fb && flg); return fb; }
+Ff_buf  *ff_getblk(afp, blk) Ff_file *afp; long blk;
+	{ if (afp && blk); return 0; }
+Ff_buf  *ff_gblk(afp, blk, rdflg) Ff_file *afp; long blk;
+	{ if (afp && blk && rdflg); return 0; }
+int     ff_close(afp) Ff_stream *afp;
+	{ if (afp); return 0; }
+int      ff_fd(ff) register Ff_stream *ff;
+	{ if (ff); return 0; }
+int     ff_flush(ff) register Ff_stream *ff;
+	{ if (ff); return 0; }
+int     ff_free (nbuf, arena) register int nbuf; int arena;
+	{ if (nbuf && arena); return 0; }
+int     ff_getc(ff) register Ff_stream *ff;
+	{ if (ff); return 0; }
+long    ff_pos(ff) register Ff_stream *ff;
+	{ if (ff); return 0; }
+int     ff_putc(chr, ff) register Ff_stream *ff; char chr;
+	{ if (chr && ff); return 0; }
+/* VARARGS4 */
+int     ff_read(afp, buf, count, brkcnt, brklst) Ff_stream *afp; char *buf,
+	*brklst; int brkcnt;
+	{ if (afp && buf && count && brkcnt && brklst); return 0; }
+long    ff_seek(ff, pos, whence) Ff_stream *ff; long pos; int whence;
+	{ if (ff && pos & whence); return 0; }
+long    ff_size(ff) register Ff_stream *ff;
+	{ if (ff); return 0; }
+	ff_sort(fp) register Ff_file *fp;
+	{ if (fp); return; }
+int     ff_use (cp, arena) register char *cp; int arena;
+	{ if (cp && arena); return 0; }
+int     ff_write(ff, buf, count) register Ff_stream *ff; char *buf; int count;
+	{ if (ff && buf && count); return count; }
+

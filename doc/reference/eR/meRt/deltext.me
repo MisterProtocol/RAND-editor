@@ -1,0 +1,21 @@
+.nr _0 \n(c.
+.\" This version has had comments stripped; an unstripped version is available.
+.de (d
+.vs 12p         \"trw
+.am |d )d
+.sp \\n(bsu
+..
+.de )d
+.vs
+.if \\n# \
+.	nr $d +1
+.ds # [\\n($d]\k#
+.rr #
+..
+.de pd
+.|d
+.rm |d
+.nr $d 1 1
+.ds # [1]\k#
+..
+.nr c. \n(_0

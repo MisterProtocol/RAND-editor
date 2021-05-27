@@ -1,0 +1,4 @@
+#
+foreach i (la.h la*.c)
+  cff -l $i | pr -F -h $i >>,pr
+  end

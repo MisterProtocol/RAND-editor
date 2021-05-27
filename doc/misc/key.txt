@@ -1,0 +1,45 @@
+                      ESTANDARDKEYBOARD
+          (extend)   ˆX            |  ˆ@    CMD
+          +LINE      ˆF            |  ˆA    CMD
+          +PAGE      ˆR            |  ˆB    -WORD
+          +SRCH      ˆY            |  ˆC    BSP
+          +TAB       ˆI            |  ˆD    -LINE
+          +WORD      ˆN            |  ˆE    -PAGE
+          -LINE      ˆD            |  ˆF    +LINE
+          -PAGE      ˆE            |  ˆG    HOME
+          -SRCH      ˆT            |  ˆH    LEFT
+          -TAB       ˆX-ˆU         |  ˆI    +TAB
+          -WORD      ˆB            |  ˆJ    DOWN
+          ALT        ˆX-ˆA or ˆ_ or ˆ/|ˆK   UP
+          BSP        ˆC            |  ˆL    RIGHT
+          CHGWIN     ˆX-ˆW         |  ˆM    RETURN
+          CLOSE      ˆV            |  ˆN    +WORD
+          CMD        ˆAorNULLorˆ@  |  ˆO    OPEN
+          CTRLCHAR   ˆX-ˆC         |  ˆP    PICK
+          DELCHAR    ˆW            |  ˆQ    (not used)
+          DOWN       ˆJ            |  ˆR    +PAGE
+          ERASE      ˆX-ˆE or ˆˆ   |  ˆS    (not used)
+          HOME       ˆG            |  ˆT    -SRCH
+          INSERT     ˆZ or ESC or ˆ[| ˆU    MARK
+          INT        ˆ\            |  ˆV    CLOSE
+          JOIN       ˆX-ˆJ         |  ˆW    DELCHAR
+          LEFT       ˆH            |  ˆX    (extend)
+          MARK       ˆU            |  ˆY    +SRCH
+          OPEN       ˆO            |  ˆZ    INSMODE
+          PICK       ˆP            |  ˆ[    INSERT
+          REPL       ˆX-ˆR or ˆ]   |  ˆ\    INT
+          RETURN     ˆM            |  ˆ]    REPL
+          RIGHT      ˆL            |  ˆˆ    ERASE
+          SPLIT      ˆX-ˆB         |  ˆ_    ALT
+          TABS       ˆX-ˆT         |  ˆ/    ALT
+          UP         ˆK            |  ˆX-ˆA ALT
+          WINLEFT    ˆX-ˆH         |  ˆX-ˆC CTRLCHAR
+          WINRIGHT   ˆX-ˆL         |  ˆX-ˆE ERASE
+                                   |  ˆX-ˆH WINLEFT
+                                   |  ˆX-ˆJ JOIN
+                                   |  ˆX-ˆL WINRIGHT
+                                   |  ˆX-ˆR REPL
+                                   |  ˆX-ˆB SPLIT
+                                   |  ˆX-ˆT TABS
+                                   |  ˆX-ˆU -TAB
+                                   |  ˆX-ˆW CHGWIN

@@ -1,0 +1,2838 @@
+
+
+
+
+
+
+
+
+                                _T_E_X_T__P_R_O_C_E_S_S_I_N_G
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               THE RAND EDITOR, E
+
+
+                                  ** Draft **
+
+                                   APRIL 1984
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          COMPUTER SERVICES DEPARTMENT
+                              THE RAND CORPORATION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -1-
+
+
+                                _I_.___I_N_T_R_O_D_U_C_T_I_O_N
+
+
+     This reference manual presents many of the functions and commands that
+     are available in "E".  The level of description used here assumes some
+     prior experience with an editor.
+
+
+
+
+     _K_E_Y_S_T_R_O_K_E__S_Y_N_T_A_X
+
+          EXAMPLES in this document use different typefaces and symbols to
+     denote the keystrokes you must make on your terminal keyboard:
+
+
+          <BRACKETS>     Angled brackets indicate that you must press a key
+                         with a particular label on it.  Thus if you are
+                         told to press
+
+                                   <CMD>
+
+                         you must press the key with the label CMD on it.
+                         NOTE: all the terminal keyboards at Rand have had
+                         special keytops made for this editor.  Users of
+                         unmodified terminals should consult their local
+                         experts for directions on what keys perform which
+                         functions inside of "E", or use the "E" standard
+                         keyboard control characters.
+
+
+          |KEY+KEY|      Vertical lines indicate that you must hold down
+                         the first key and then press the second one.  Thus
+                         if you are told to press
+
+                                   |CTRL+B|
+
+                         you must hold down the CTRL key and then press the
+                         B key.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -2-
+
+
+                             _I_I_.___T_H_E__R_A_N_D__E_D_I_T_O_R__E
+
+
+
+
+
+     _A_B_O_R_T_I_N_G__A__C_O_M_M_A_N_D
+
+          A command can be aborted or stopped before it is completed by
+     pressing <INT>.  This method is effective for aborting commands that
+     take some time to execute such as fill, justify, and search.  Commands
+     that happen instantaneously, such as open and close, usually cannot be
+     aborted.
+
+     A command that has been typed but not executed (i.e., <RETURN> has not
+     yet been pressed), can be aborted by backspacing over the command and
+     erasing it.  The command mode can then be turned off by pressing
+     <RETURN>.
+
+
+
+
+     _A_B_O_R_T_I_N_G__A__S_E_S_S_I_O_N
+
+          To abort an entire editing session press <CMD> exit abort
+     <RETURN> (where exit abort can be abbreviated ex a).  Exiting a file
+     with the abort option looses all work done during the editing session.
+
+     If a user aborts a session and then types e, the Editor will prompt
+     the user with four options, one of which is a visible replay (option
+     2).  The user can initiate the replay, watch it occur, and interrupt
+     it before the end by pressing <INT>, thus saving some of the work.
+     (See also _E_X_I_T and _R_E_C_O_V_E_R_Y.)
+
+
+
+
+     _A_L_T_E_R_N_A_T_E__F_I_L_E
+
+          An alternate file can be created while in the Editor, by press-
+     ing: <CMD> e _f_i_l_e_n_a_m_e <RETURN>.  This causes the current file to
+     become the alternate file, and _f_i_l_e_n_a_m_e to become the current file.
+     To alternate between these two files, a user presses <ALT>.  A user
+     can also alternate between these two files by pressing <CMD> e
+     <RETURN>.  A number of files can be used in the alternate mode,
+     although you must press <CMD> e  and type in the filename you wish to
+     change to.
+
+     Work done in alternate files will all be saved upon exiting from the
+     session.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -3-
+
+
+     _A_R_E_A
+
+          An area is any part of a file; it can be as small as one charac-
+     ter and as large as the entire file.
+
+     The area may be a default area such as the default area for the fill
+     command (1 paragraph), or the area may be explicitly defined in the
+     instruction as for example, fill _2_l, which will fill 2 lines, or fill
+     _5_p which will fill 5 paragraphs.  In defining an area, the letter "p"
+     defines paragraphs and the letter "l" (ell) defines lines.
+
+     An area can also be defined by cursor movements or arrow keys.  An
+     area defined by cursor movements must be marked.  The marked area can
+     be a few words, a single line, several paragraphs, or a rectangle.  An
+     area is marked by pressing <MARK> and moving the cursor.  Cursor move-
+     ment is accomplished by </->>, </<->, </|^>, </>, <RETURN>, <+PAGE>,
+     <-PAGE>, <+LINE>, <-LINE>, and certain sequences involving <+SCH> and
+     <-SCH>.  A marked area can be used as the area for <OPEN>, <CLOSE>,
+     <PICK> and <ERASE>.  If that marked area is a series of lines or para-
+     graphs, the marked area can also be used as the area for fill, jus-
+     tify, center, and replace.
+
+
+
+
+     _<_A_R_R_O_W__K_E_Y_S_>
+
+          The arrow keys are represented in this publication as </->>,
+     </<->, </|^>, and </>.  These keys move the cursor without changing the
+     text the cursor moves past (as opposed to <SPACE BAR> and <BSP>).
+
+     When the cursor is at the right side of the window, and </->> is
+     pressed, the window is moved so that the cursor remains visible.  This
+     also occurs when the cursor is at the top, bottom, or left edge of the
+     window.  At the left edge though, the cursor (and the window) cannot
+     go to the left of column 1.  At the top, the cursor cannot go higher
+     than line 1.
+
+     When <CMD> is pressed and then an arrow key is pressed, the cursor
+     moves to the edge of the window in the direction desired.  For exam-
+     ple, the keystroke sequence <CMD> </->> first moves the cursor to the
+     end of the text on the line, and if pressed a second time, moves the
+     cursor to the right edge of the window.  The keystroke sequence <CMD>
+     </<-> moves the cursor to the left edge of the window.  The keystroke
+     sequence <CMD> </|^> will take the cursor to the top of the window in
+     the same column.  The keystroke sequence <CMD> </> stops at the bottom
+     of the window, in the same column, if the file extends to the bottom
+     of the window.  If the file does not extend to the bottom of the win-
+     dow, <CMD> </>, first stops at the end of the file, and if pressed
+     again, goes to the bottom edge of the window.
+
+     Arrow keys generally will work only if the version of the editor that
+
+
+
+
+
+
+
+
+
+
+
+                                      -4-
+
+
+     you are using has been compiled to support your terminal type.
+
+
+
+
+     _B_A_C_K_S_P_A_C_E
+
+          To backspace the cursor and erase a character, press <BSP>.  To
+     backspace the cursor without erasing, press </<->.
+
+     Backspace characters can be added to a text line by pressing <CNTL
+     CHAR> |SHIFT+H|.  The first keystroke combination generates a small,
+     bright block.  The second keystroke combination signals the Editor to
+     put a backspace character in the text.  This backspace character can
+     be part of an underlining process. (See also <_B_S_P>, and _U_N_D_E_R_L_I_N_I_N_G.)
+
+
+
+
+     _B_A_C_K_U_P__F_I_L_E
+
+          If a user edits a file and exits normally from the Editor, a copy
+     of the file as it existed before the editing session is kept by the
+     Editor.  The Editor does this by copying the existing file and renam-
+     ing the copy with the same name as the original but with a comma in
+     front of it.  For example, a file named _m_e_m_o, is backed up as a file
+     named ,_m_e_m_o.  These files are called comma files.  If the user exits
+     with the abort option, exit abort, or if the system crashes, no backup
+     file is created (and any previous backup file is left untouched).  The
+     comma file is made in the same user directory that the original file
+     is in.  All comma files are deleted automatically late each evening.
+
+     A comma file is created to protect the user from inadvertent mistakes.
+     For example, if a user begins to edit the same file again later in the
+     day and discovers that the previous editing session contained a seri-
+     ous error, the user would have several choices.  First, the user could
+     exit with the abort option and copy the comma file into the current
+     file.  For example, % cp ,_m_e_m_o _m_e_m_o.  Or the user, without exiting
+     from the Editor, could call up the backup file as the alternate file
+     and restore that section of the file that contained the editing error.
+     (See _M_O_V_I_N_G _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S.)
+
+
+
+
+
+     _B_A_C_K_W_A_R_D__S_E_A_R_C_H
+
+          To search backward in the file for a word or series of words,
+     press <CMD> _w_o_r_d <-SCH>.  To find additional occurrences, continue
+     pressing <-SCH> until the message "Search key not found" appears on
+     the screen.
+
+
+
+
+
+
+
+
+
+
+
+                                      -5-
+
+
+     _B_O_X
+
+          The box command draws a box around a specified area, just inside
+     the marked or specified area.  The "|" and "-" characters are used for
+     the vertical and horizontal markings and corners are displayed as "+".
+     First mark off the area using <MARK> </<-> </>.  Then press <CMD> box
+     <RETURN>.  Horizontal and vertical lines can be drawn using the box
+     command by marking one direction only.
+
+
+
+
+
+     _<_B_S_P_>
+
+          This is the backspace key.  This key has different functions
+     depending on whether the Editor is in Edit Mode or Insert Mode and
+     whether the <CMD> key is pressed.  The functions are:
+
+          Edit Mode:
+
+                  <BSP>                  Moves the cursor to the left one column
+                                         and blanks out any character there.
+
+                  <CMD> <BSP>            Blanks out all characters between the
+                                         cursor and the left margin.  Leaves the
+                                         cursor where it is.  (Deleted
+                                         characters placed in the erase buffer.)
+          Insert Mode:
+
+                  <BSP>                  Moves the cursor to the left one column
+                                         and deletes any character there.  The
+                                         text to the right of the cursor is moved
+                                         over one character to the left (following
+                                         the cursor).
+
+                  <CMD> <BSP>            Deletes all of the characters between the
+                                         cursor and the left margin.  Moves the
+                                         cursor and the remaining text to the right
+                                         margin.  (Deleted characters are placed in
+                                         the close buffer.)
+
+     (See also _B_A_C_K_S_P_A_C_E.)
+
+
+
+
+     _C_E_N_T_E_R
+          The center command moves the text contained on a line to the
+     center of the line so that the number of blanks on either side of the
+     text is the same.  The line length by which the center is determined
+     is the "width" specified in the last center, fill, or justify command,
+
+
+
+
+
+
+
+
+
+
+
+                                      -6-
+
+
+     or the default width of 75.  The format of the command is, <CMD>
+     center _n <RETURN>, where _n is the optional number of lines to center.
+     If _n is omitted, one line is centered, the line where the cursor is.
+
+
+
+
+     _C_H_A_N_G_E_S__F_I_L_E_S
+
+          The change file is maintained for the benefit of the user.  It
+     contains all of the text that has been centered, closed, picked,
+     filled, and justified.  A user can access the text in this file by
+     referencing a file by pressing <CMD> e #p (all information that has
+     been picked), or  e #o (all information that has been closed, deleted,
+     erased, filled, or justified).  This brings the text from the change
+     file into the editing window as an alternate file, and text can then
+     be copied using the pick key.  The user can return to the original
+     file by pressing <ALT>, and restore the text that was copied by press-
+     ing <CMD> <PICK>.
+
+
+
+
+     _C_H_A_N_G_I_N_G__F_I_L_E_S
+
+          To alternate between the current file and the alternate file,
+     press <ALT>.  (See also _A_L_T_E_R_N_A_T_E _F_I_L_E.)
+
+
+
+
+     _C_H_A_N_G_I_N_G__W_I_N_D_O_W_S
+
+          If there are two windows, then pressing <CHG WIN> moves the Edi-
+     tor between windows.  If there are more than two windows, then press-
+     ing <CHG WIN> moves the Editor from window to window in the order that
+     the windows were created.  To move to a specific window press <CMD> _n
+     <CHG WIN>, where _n is the window number.  (See also _W_I_N_D_O_W.)
+
+
+
+
+     _<_C_L_O_S_E_>
+
+          The close key removes a line or lines from the file and places
+     those lines in the close buffer.  The most recently closed line or
+     lines can be restored to the file by pressing <CMD> <CLOSE>.
+
+     Pressing the close key by itself results in the closing of one line.
+     More than one line can be closed by pressing <CMD> _n <CLOSE>, where n
+     is the number of lines to remove.
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -7-
+
+
+     The mark function can be used with the close function to close a few
+     characters, a few words, a few lines, a few paragraphs, or a rectan-
+     gle.  To mark and close, press <MARK> _c_u_r_s_o_r _m_o_v_e_m_e_n_t_s <CLOSE>.
+
+     Material copied from the close buffer is placed in the change file.
+
+     Note that pressing <CMD> <BSP> while in Insert Mode replaces the con-
+     tents of the close buffer with newly deleted text.  (See also _C_H_A_N_G_E
+     _F_I_L_E and _C_L_O_S_E.)
+
+
+
+
+     _C_L_O_S_E
+
+          The close command may be used instead of the close key to remove
+     space.  To close out an area, the user presses <CMD> close _n <RETURN>
+     (close may be abbreviated clo), where _n is an optionally entered
+     number of lines.  The default area is one line.
+
+     Text closed with either the close command or the close key may be
+     placed anywhere in the file by moving the cursor to that place and
+     pressing <CMD> <CLOSE> or <CMD> -close <RETURN>.
+
+     Note that pressing <CMD> <BSP> while in Insert Mode replaces the con-
+     tents of the close buffer with the newly deleted text.  (See also
+     <_C_L_O_S_E>.)
+
+
+
+
+     _C_L_O_S_E__B_U_F_F_E_R
+
+          The close buffer is a place in the Editor where the last closed
+     line(s) is saved.  Text is also placed in the close buffer when <CMD>
+     <BSP> is pressed while in Insert Mode.  Material remains in the close
+     buffer until the close key is used to remove line(s) or until the file
+     is exited.  (See also _C_L_O_S_E and <_C_L_O_S_E>.)
+
+
+
+
+     _<_C_M_D_>
+
+          This key puts the Editor in the command mode so that commands may
+     be typed to the Editor followed by <RETURN>.  This key is also used as
+     part of many keystroke sequences that perform special editor func-
+     tions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -8-
+
+
+     _C_O_M_B_I_N_I_N_G__F_I_L_E_S
+
+          Files can be combined using the Unix cat command.  Files can also
+     be combined using the Editor to pick text from an alternate file.
+     (See _M_O_V_I_N_G _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S.)
+
+
+
+
+     _C_O_M_B_I_N_I_N_G__L_I_N_E_S
+
+          Two adjacent lines can be combined using the join command.  (See
+     _J_O_I_N.)
+
+
+
+
+     _C_O_M_M_A__F_I_L_E_S
+
+          See _B_A_C_K_U_P _F_I_L_E.
+
+
+
+
+     _C_O_M_M_A_N_D__M_O_D_E
+
+          The command mode is initiated by pressing <CMD>.  On some termi-
+     nals this key is labeled <ARG>, <BRK>, or <BRK/CMD>.  The prompt
+     "CMD:" appears below the window and a command can be entered.  The
+     command line may be edited by using <INSERT>, <BSP>, </->>, and </<->.
+
+     The last command executed can be recovered to the command line by
+     pressing <CMD> <CMD> <ALT>.  This can then be edited and executed
+     again.
+
+     To negate a command, the user can backspace over the command, thus
+     erasing it, and then cancel the command mode by pressing <RETURN>.  To
+     cancel a command, either a partially typed command or an executing
+     command, the user presses <INT>.
+
+
+
+
+     _C_O_P_Y_I_N_G__F_I_L_E_S
+
+          A file can be copied outside the Editor by use of the Unix copy
+     command, cp.
+
+     While in the Editor, information can be copied from one file to
+     another by editing the first file, bringing up the second file as an
+     alternate file, by pressing <CMD> e _n_e_w_f_i_l_e_n_a_m_e <RETURN> and copying
+     information using the pick key, then alternating files by pressing
+
+
+
+
+
+
+
+
+
+
+
+                                      -9-
+
+
+     <ALT> and placing that information into the first file by pressing
+     <CMD> <PICK>.
+
+     A copy of the current file can be saved with a different name (as a
+     new file) by pressing <CMD> save _n_e_w_f_i_l_e_n_a_m_e <RETURN>. (See also _M_O_V_-
+     _I_N_G _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S and _S_A_V_E )
+
+
+
+
+     _C_O_P_Y_I_N_G__T_E_X_T
+
+          Text can be copied within a file by using the pick key.  Text can
+     also be copied from one file to another.  (See _C_O_P_Y_I_N_G _F_I_L_E_S, _M_O_V_I_N_G
+     _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S and <_P_I_C_K>.)
+
+
+
+
+     _C_R_A_S_H_E_S_,__R_E_C_O_V_E_R_Y__F_R_O_M
+
+          If E crashes while editing, then the user, while in the same
+     directory, types (in response to the Unix prompt of "%") e <RETURN>.
+     The Editor will prompt the user with four options.  (See _R_E_C_O_V_E_R_Y.)
+
+
+
+
+     _C_R_E_A_T_I_N_G__F_I_L_E_S
+
+          If a file does not exist, it can be created by typing e _f_i_l_e_n_a_m_e
+     <RETURN> in response to the Unix prompt of "%".  Then in response to
+     the E prompt of "Do you want to create _f_i_l_e_n_a_m_e?", type y for yes).
+     (Filenames of no more than 12 letters or numbers are recommended.)
+     (See _F_I_L_E_N_A_M_E.)
+
+     A copy of the current file can be saved with a different name (as a
+     new file) by pressing <CMD> save _n_e_w_f_i_l_e_n_a_m_e <RETURN>.  (See _S_A_V_E.)
+
+
+
+
+
+     _C_R_E_A_T_I_N_G__W_I_N_D_O_W_S
+
+          To create a window, the cursor must be either on the left or the
+     top edge of the window but not in the top left-hand corner.  A new
+     window can be created with a different file in it by pressing <CMD> w
+     _f_i_l_e_n_a_m_e <RETURN>.  A new window can be created with the current file
+     in it by pressing <CMD> window <RETURN> (where window can be abbrevi-
+     ated w).  (See _D_E_L_E_T_I_N_G _W_I_N_D_O_W_S, _W_I_N_D_O_W_S.)
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -10-
+
+
+     _<_C_T_R_L_>
+
+          This key is the "control" key.  It shifts the keyboard into a
+     third case, in which many of the keys generate special codes.  Press-
+     ing this key by itself does not generate a code; another key must be
+     pressed with it.  For example, |CTRL+A| requires that the <CTRL> key
+     be pressed and held, then press the <A> key.  (This command will move
+     the window to the left.)  Many of these control functions have been
+     replaced on the newer terminals with function keys.
+
+
+
+
+     _C_U_R_R_E_N_T__W_I_N_D_O_W
+
+          The current window contains the cursor and is the window in which
+     editing can be done.   The current window is outlined in bolder
+     colons/semicolons; the alternate windows are outlined in dots. (See
+     also _C_H_A_N_G_I_N_G _W_I_N_D_O_W_S and _W_I_N_D_O_W.)
+
+
+
+
+     _C_U_R_S_O_R
+
+          The cursor is the character similar to an underline or block
+     character that the Editor uses to mark locations on the screen.  The
+     cursor marks the position where the next character typed will be
+     placed (and where it will print).  To emphasize the cursor position,
+     the Editor sometimes prints four bright blocks at the four edges of
+     the screen.  These four bright blocks "target" the cursor.
+
+
+
+
+     _C_U_R_S_O_R__M_O_V_E_M_E_N_T__<_/__->>, </<->, </|^>, </>
+
+          The notation _c_u_r_s_o_r _m_o_v_e_m_e_n_t is used to indicate any movement of
+     the cursor.  This movement can be performed by pressing <-PAGE>,
+     <+PAGE>, <-LINE>, <+LINE>, </->>, </<->, </|^>, </>, <RETURN>, <BSP>,
+     and <SPACE BAR>, and by some command sequences which include the
+     <+SCH> and <-SCH> keys.  Most frequently _c_u_r_s_o_r _m_o_v_e_m_e_n_t is used in
+     marking a series of lines or paragraphs or a rectangular area.
+
+
+
+
+     _<_D_E_L__C_H_A_R_>
+
+          This key is located next to <INSERT> and is sometimes marked
+     <DEL>.  This key deletes the character the cursor is on and moves the
+     characters to the right of the cursor one space to the left.
+
+
+
+
+
+
+
+
+
+
+
+                                      -11-
+
+
+     Characters deleted with the del char key cannot be recovered.
+
+     To delete the character at the cursor and all of the characters to the
+     right on the same line, press <CMD> <DEL CHAR>.  Characters deleted in
+     this manner enter the erase buffer.
+
+
+
+
+     _D_E_L_E_T_E
+
+          This command deletes the current file, that is, the file being
+     edited.  This is useful when creating and editing multiple windows and
+     files.  The current file is deleted (not only within the Editor but
+     within the file system) by pressing <CMD> delete <RETURN>.  Be CAREFUL
+     to make sure you want to delete the file with this command; there is
+     no recovery.  This command takes effect upon normal exit from the Edi-
+     tor.  To negate this command (and the entire editing session), the
+     user must exit with the abort option exit abort.  (See _E_X_I_T.)
+
+
+
+
+     _D_E_L_E_T_I_N_G__T_E_X_T
+
+          Single characters can be deleted by using the <DEL CHAR> key.
+     This key deletes the character at the cursor.  The character at the
+     cursor and all the characters to the right can be deleted by pressing
+     <CMD> <DEL CHAR>.  Characters can be erased by pressing the space bar
+     or <BSP>.  (The backspace key has several deleting functions; see
+     <_B_S_P>.)  Characters deleted using <CMD> <DEL CHAR> enter the erase
+     buffer.
+
+     A line of text can be deleted by pressing <CLOSE>.  Several lines of
+     text can be deleted by pressing <CMD> _n <CLOSE> or
+     <CMD> close _n <RETURN>, where _n is the number of lines to delete.  The
+     most recent line or set of lines deleted in this fashion may be
+     returned to the file (in the same place or in other places) by press-
+     ing <CMD> <CLOSE> or <CMD> -close <RETURN>.
+
+     A rectangular area can be deleted by first marking the area and then
+     pressing <CLOSE>.  An area is marked by moving the cursor to one
+     corner of the area, pressing <MARK>, and then moving the cursor to the
+     opposite corner of the area.  At this point the <CLOSE> key can be
+     pressed.  (See <MARK>.)
+
+
+
+
+     _D_E_L_E_T_I_N_G__W_I_N_D_O_W_S
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -12-
+
+
+          The last window created can be removed from the screen by press-
+     ing <CMD> -window <RETURN> (where -window can be abbreviated -w).
+     (See _C_R_E_A_T_I_N_G _W_I_N_D_O_W_S and _W_I_N_D_O_W_S.)
+
+
+
+
+     _<_D_O_W_N__A_R_R_O_W_>
+
+          See <_A_R_R_O_W _K_E_Y_S>.
+
+
+
+
+     _._e_c_1
+
+          This is the filename of the change file if the user owns the
+     directory.  In this file are all changes made during the current edit-
+     ing session.  This file exists only during an editing session and is
+     deleted automatically when you exit from the file.  If you "crash" or
+     "exit abort" from the file, it is saved for recovery purposes.
+
+
+
+
+     _._e_k_1
+
+          This is the filename of the keystroke file if the user owns the
+     directory.  In this file are all changes made during the current edit-
+     ing session.  This file exists only during an editing session and is
+     deleted automatically when you exit from the file.  If you "crash" or
+     "exit abort" from the file, it is saved for recovery purposes.
+
+
+
+
+     _._e_k_1_b
+
+          This is the filename of the backup keystroke file used during
+     recovery if the user owns the directory.
+
+
+
+
+     _._e_s_1
+
+          This is the filename of the state file if the user owns the
+     directory.  This file is created every time you exit from the editor
+     and keeps track of the last file edited, and your cursor location upon
+     exiting.  This allows you to type e and be able to edit the last file
+     you worked on without specifying a filename.
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -13-
+
+
+     _E
+
+          The name of the Editor is E.  To work in a file, a user types e
+     or e _f_i_l_e_n_a_m_e.
+
+
+
+
+     _E_D_I_T__M_O_D_E
+
+          Edit mode is the mode of the Editor in which new text that is
+     typed overlays any existing text.  Edit mode is the default mode of
+     the Editor, the mode the Editor is in after the user types e _f_i_l_e_n_a_m_e.
+     (See also _C_O_M_M_A_N_D _M_O_D_E and _I_N_S_E_R_T.)
+
+
+
+
+     _E_F_F_I_C_I_E_N_C_Y
+
+          The Editor works most efficiently if it is exited every half
+     hour.  This practice is also recommended as a precaution against sys-
+     tem failures in which all editing during a session can be destroyed.
+
+
+
+
+     _E_R_A_S_E
+
+          A line or area can be erased (blanked out) by pressing <CMD>
+     erase _a_r_e_a <RETURN> (where erase can be abbreviated er).  The default
+     area is one line.  The erased text from the last erase command is held
+     in the erase buffer from where it can be retrieved using the -erase
+     command.
+
+     Note that <CMD> <DEL CHAR> while in edit mode, replace the contents of
+     the erase buffer with newly deleted text.
+
+
+
+
+     _<_E_R_A_S_E_>
+
+          Ambassador terminals have an erase key which can be used instead
+     of the erase command.  Pressing <ERASE> will erase one line.  More
+     than one line may be erased by pressing <CMD> _n <ERASE>, where n is
+     the number of lines to be erased or by using mark and <ERASE>.  Erased
+     text may be retrieved from the erase buffer by <CMD> <ERASE>.
+
+     Note that <CMD> <DEL CHAR> while in edit mode, replace the contents of
+     the erase buffer with newly deleted text.
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -14-
+
+
+     _-_E_R_A_S_E
+
+          The last text erased using the erase command can be inserted into
+     the file by pressing <CMD> -erase <RETURN> (where -erase may be abbre-
+     viated -er).  This insertion moves existing text to the right and,
+     consequently, entering the command erase followed by the command
+     -erase may not restore the text to its original position.
+
+     Note that <CMD> <DEL CHAR> while in edit mode, replaces the contents
+     of the erase buffer with newly deleted text.
+
+
+
+
+     _E_R_A_S_I_N_G__E_X_T_R_A_N_E_O_U_S__C_H_A_R_A_C_T_E_R_S
+
+          Occasionally extraneous characters appear in the editing window,
+     characters that are not part of the edited file (for example, a mes-
+     sage from the system operator).  Sometimes these characters are called
+     "noise" or "garbage" characters.  To remove these characters, press
+     <CMD> redraw <RETURN> (where redraw can be abbreviated red).  This
+     command redraws the window and clears it of extraneous characters.
+
+
+
+
+     _E_R_A_S_I_N_G__T_E_X_T
+
+          Normally text is erased by spacing over it with the space bar or
+     backspacing over it with <BSP>.  The backspace key has several
+     options.  Text can also be erased using the erase command or <ERASE>.
+     Text to the right of the cursor can be erased using <CMD> <DEL CHAR>.
+     (See also <_B_S_P>, <_D_E_L _C_H_A_R>, _D_E_L_E_T_I_N_G _T_E_X_T, _E_R_A_S_E and <ERASE>.)
+
+
+
+
+     _E_X_E_C_U_T_E__A__F_U_N_C_T_I_O_N
+
+          Some UNIX commands can be executed while in the editor by press-
+     ing
+
+          <CMD> run _a_r_e_a _c_o_m_m_a_n_d <RETURN>
+
+     For example, to run the Unix command "ls" and have the output included
+     in the file being edited, press <CMD> run _l_s <RETURN>.
+
+     Note that the output from a command can vary depending on when it is
+     run, and consequently a replay of the editing session that includes a
+     run command can produce disastrous results.
+
+     For knowledgeable Unix users only: area is passed to the standard
+
+
+
+
+
+
+
+
+
+
+
+                                      -15-
+
+
+     input of the command and is replaced by the output of the command.
+     (See also _A_R_E_A)
+
+
+
+
+     _E_X_I_T
+          A user can exit from the Editor by pressing <CMD> exit <RETURN>
+     (where exit may be abbreviated ex or b).  A user can exit from the
+     Editor and abort the editing session by pressing <CMD> exit abort
+     <RETURN>.  A user can then replay that session by returning to the
+     same directory and typing e.  The Editor will prompt the user with
+     four options, one of which is a visible replay (option 2).  The user
+     can initiate the replay, watch it occur, and then interrupt it before
+     it ends by pressing <INT> thus only saving that work which you saw
+     replayed.
+
+     Note that a replay of a short session is difficult to interrupt unless
+     the user has good reflexes.
+
+     You may also exit from the editor with the following options:  exit
+     nosave which exits you from the file without saving it; exit quit
+     which is like exit abort, but deletes the keystroke file; exit dump
+     which is similar to exit abort.
+
+
+
+
+     _F_I_L_E_N_A_M_E
+
+          A filename can be up to 14 characters long, but filenames of 12
+     characters or less are recommended for several practical reasons which
+     will not be detailed here.  Filenames can contain any letter or
+     number.  If a blank is placed in a filename, the characters up to the
+     blank are used as the filename; the characters after the blank may be
+     treated as another filename or treated as an argument, or ignored,
+     depending on how the filename is being used.  The Unix operating sys-
+     tem attaches special meaning to certain characters in the filenames.
+     A filename beginning with a period (".") should be avoided, as well as
+     a filename beginning with a comma (",") and files named core and
+     a.out.
+
+     It is highly recommended that filenames contain only numbers and lower
+     case letters.
+
+     Filenames under the 4.2BSD version of Unix can be much longer than 14
+     characters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -16-
+
+
+     _F_I_L_E_S
+
+          A file is a collection of text saved on a disk pack with an indi-
+     vidual identifying name.  Files can be created using the Editor, e
+     _f_i_l_e_n_a_m_e, or by various Unix commands such as cp _f_i_l_e_a _f_i_l_e_b.  (See
+     also _A_L_T_E_R_N_A_T_E _F_I_L_E, _B_A_C_K_U_P _F_I_L_E, _C_R_E_A_T_I_N_G _F_I_L_E_S, and _F_I_L_E_N_A_M_E.)
+
+
+
+
+     _F_I_L_L
+
+          The fill command moves words so that each line is filled with
+     words up to, but not beyond, the right margin. (The right margin is
+     set by the "width" entered in the last fill, center, or justify com-
+     mand, or is the default width of 75.) A paragraph is filled by moving
+     the cursor to the first line of a paragraph and pressing <CMD> fill
+     <RETURN> (where fill can be abbreviated fi).  The format of the fill
+     command if you wish to keep the default line length of 72 is:
+
+          <CMD> fill area <RETURN>
+
+     The format of the file command if you wish to change the line width
+     is:
+
+          <CMD> fill width= _n_n  _a_r_e_a <RETURN>
+
+     The area is defined by a number followed by a p (standing for number
+     of paragraphs, i.e., 3p) or l (standing for number of lines, i.e.,
+     20l).
+
+     If the width=_n option (replace _n with the number of characters wide)
+     is specified, that width stays in effect until another width is speci-
+     fied.  (See also _J_U_S_T_I_F_Y and _W_I_D_T_H.)
+
+
+
+
+     _F_U_N_C_T_I_O_N__K_E_Y_S
+          A function key is a key that performs a function when pressed,
+     for example, <CLOSE>.  Many keys have their functions marked on the
+     top of the key.  Those keys with functions marked on the front face
+     require an additional key be pressed, usually the <CTRL> key.  Some
+     functions require that the <CMD> key be pressed first and then the
+     function key.  For the use of any particular function key, see the
+     name of that key.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -17-
+
+
+     _G_O_T_O
+
+          The cursor can be moved to a specific line number in the file by
+     pressing <CMD> goto _n <RETURN> (goto may be abbreviated go or g) and
+     where _n is the line number.  The goto command has a default line
+     number of 1, which allows the user to go to the beginning of the file.
+     The goto command also allows the use of b to go to the beginning of
+     the file, and e to go to the end of the file.  Consequently, g, g b
+     and g 1 all go to line one.  And g e goes to the last line in the
+     file.
+
+     There is another mechanism for going to the front and the end of the
+     file.  Pressing <CMD> <-PAGE> moves the cursor to line 1.  Pressing
+     <CMD> <+PAGE> moves the cursor to the last line of the file.
+
+
+
+
+     _<_H_O_M_E_>
+
+          Pressing <HOME> moves the cursor to the upper left corner of the
+     current window.  Pressing <CMD> <HOME> moves the cursor to the lower
+     left corner.
+
+
+
+
+     _<_I_N_S_E_R_T_>
+
+          This key is used to put the Editor into and out of the Insert
+     Mode.  When the Editor is in Insert Mode, the word "INSERT" is printed
+     below the window as a reminder.  A number of functions behave dif-
+     ferently in Insert Mode.  Most importantly, text typed while in Insert
+     Mode is inserted into the line moving existing text to the right
+     rather than replacing existing text.  Insert Mode is turned off by
+     pressing <INSERT> again.  (See also ,<_B_S_P>, _C_O_M_M_A_N_D _M_O_D_E,> and _E_D_I_T
+     _M_O_D_E.)
+
+
+
+
+     _I_N_T_E_R_A_C_T_I_V_E__R_E_P_L_A_C_E
+
+          See _R_E_P_L_A_C_E.
+
+
+
+
+     _J_O_I_N
+
+          The join command joins two lines together.  The line the cursor
+     is located on is lengthened by appending the line below it.  If the
+
+
+
+
+
+
+
+
+
+
+
+                                      -18-
+
+
+     next line(s) is blank, it will go to the next line of text and add it.
+     The joined line is added after the end of text on the line where the
+     cursor is.  To use the command, the user types <CMD> join <RETURN>
+     (where join may be abbreviated jo).  (See also _S_P_L_I_T.)
+
+     You may also mark two points you want joined with <MARK>.  All text
+     deleted by the operation is saved in the close buffer.
+
+
+
+
+     _J_U_S_T_I_F_Y
+
+          The justify command moves words from line to line so that the
+     last word in each line ends exactly at the right margin.  (The right
+     margin is the "width" specified in the last fill, justify, or center
+     command, or the default width of 75.) The justify command adds blanks
+     between the words to spread the words out evenly on a line.
+
+     A paragraph is justified by moving the cursor to the first line of the
+     paragraph and pressing <CMD> justify <RETURN> (where justify may be
+     abbreviated ju).  The full format of the justify command if you wish
+     to keep the default line width of 75 is:
+
+          <CMD> justify _n _a_r_e_a <RETURN>
+
+     If you wish to change the line width, the command is:
+
+          <CMD> justify width=_n _a_r_e_a <RETURN>
+
+     If the width=_n option is specified, that width stays in effect until
+     another width is specified in another fill, justify, or center com-
+     mand. (See also _A_R_E_A, _F_I_L_L, and _W_I_D_T_H.)
+
+     To restore justified text to its original unjustified state after
+     issuing a justify command, type <CMD> insert adjust <RETURN.  You can
+     only recover text from the last time the justify command was used.
+
+
+
+
+     _K_E_Y_S_T_R_O_K_E__F_I_L_E
+          The keystroke file is named .ek1 for a user who owns the direc-
+     tory and is the only user working in it.  The keystroke file is named
+     .ek1._u_s_e_r_n_a_m_e for a user who is working in someone else's directory.
+     The keystroke file is used to update the file being edited at the end
+     of the session when the user exits normally.  After exiting normally,
+     the keystroke file is deleted.
+
+     If the user exits with the abort option (exit abort) or if the Editor
+     crashes, the keystroke file is retained and the file being edited is
+     left unchanged.
+
+
+
+
+
+
+
+
+
+
+
+                                      -19-
+
+
+     An aborted session (exit abort) can be replayed if the user returns to
+     the same directory and types e.  The Editor then presents the user
+     with four options, one of which is a visible replay.  The user can
+     initiate the replay, watch it occur, and interrupt it before it ends
+     by pressing <INT>.
+
+     After an Editor crash, the user can return to the same directory and
+     type e, and the Editor will prompt the user with four recovery
+     options.  (See also _E_X_I_T, _R_E_C_O_V_E_R_Y, _R_E_P_L_A_Y, and _S_T_A_T_E _F_I_L_E.)
+
+
+
+
+     _<_L_E_F_T_>
+
+          This key is pressed to move the window 16 characters to the left.
+     The window cannot move to the left of column 1 of the text.  Pressing
+     <CMD> <LEFT> moves the window to the left so that it displays columns
+     1-78 of the file.  (See also <_A_R_R_O_W _K_E_Y_S>, and <_R_I_G_H_T>.)
+
+
+
+
+     _<_L_E_F_T__A_R_R_O_W_>
+
+          See <_A_R_R_O_W _K_E_Y_S>.
+
+
+
+
+     _<_+_L_I_N_E_>
+
+          This key moves the top fourth of what was on the window out of
+     sight and redraws the screen.  The cursor stays at the same line
+     number, or if that line number is moved off the screen, the cursor
+     stays at the top of the window.
+
+
+
+
+     _<_-_L_I_N_E_>
+
+          This key moves the bottom fourth of what was on the window out of
+     sight, brings into sight an equal number of lines at the top of the
+     window, and redraws the screen.  The cursor stays at the same line
+     number, or if that line number is moved off the screen, the cursor
+     stays at the bottom of the window.  Pressing <-LINE> has no effect if
+     the top of the window is at line number 1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -20-
+
+
+     _L_I_N_E__M_A_N_I_P_U_L_A_T_I_O_N
+
+          For breaking lines apart, see _S_P_L_I_T; combining lines, see _J_O_I_N;
+     deleting lines, see <_C_L_O_S_E> and <_E_R_A_S_E>; adding lines, see <_C_L_O_S_E> and
+     <_P_I_C_K>; moving lines, see <_C_L_O_S_E>.
+
+
+
+
+     _L_O_N_G__L_I_N_E_S
+
+          The window normally shows columns 1-78.  When the user attempts
+     to type beyond column 78, the Editor prints an error message and will
+     not print characters typed at that point.  The window can be moved to
+     the right 16 characters by pressing <RIGHT>.  Another 16 characters
+     can then be added to the line.
+
+     The window can be moved more than 16 characters to the right by moving
+     the cursor to the column that will become column 1 of the new window,
+     and then pressing <CMD> <RIGHT>.  The window will then move to the
+     right so that the cursor is at the left edge of the window.
+
+     The window can be moved from a position on the right back to the left-
+     most position (columns 1-78) by pressing <CMD> <LEFT>.
+
+     When the cursor is at the right most edge of the window, and the
+     <RIGHT ARROW> is pressed, the window will move two spaces to the
+     right.
+
+
+     Lines longer than 132 characters cannot be printed, so text lines
+     should be limited to 132 characters.  Lines of 132 characters may only
+     be printed sideways.  (See also <_A_R_R_O_W _K_E_Y_S> <_L_E_F_T>, and <_R_I_G_H_T>.)
+
+
+
+
+     _M_A_R_G_I_N__C_H_A_R_A_C_T_E_R_S
+
+          The character "-" is used to mark the top and bottom edges of the
+     window.  The character ":" is used to mark the right and left edges of
+     the window when all of the text is within the window.
+
+     The character "<" is used to mark the left edge of the window when the
+     window has been moved right.  The character ">" is used to mark the
+     right edge of the window when text extends beyond the right edge of
+     the window.
+
+     Bright blocks are sometimes used to target the column and line where
+     the cursor is located.
+
+     The character ";" is used to mark lines beyond the last line of text
+
+
+
+
+
+
+
+
+
+
+
+                                      -21-
+
+
+     in a file.
+
+     The character "." (period) is used to outline windows other than the
+     current window.
+
+
+
+
+     _M_A_R_G_I_N_S
+
+          The Editor sounds a warning beep when the user types a character
+     into column 67 of the screen regardless of where the actual right mar-
+     gin has been set.  The actual right margin for a fill, justify, or
+     center command is determined by the last "width=" issued in one of
+     these commands or by the default width of 75.
+
+     If a paragraph has already been typed beginning in column 1 and an
+     additional indention is desired, that indention can be achieved by
+     marking the indention (as a rectangle) and then pressing <OPEN>.
+
+     For documents and reports, text is normally typed beginning in column
+     1, interspersed with formatting macros, and then the format package
+     processes the file and creates the requested indentions.  (See also
+     _C_E_N_T_E_R, _F_I_L_L, _J_U_S_T_I_F_Y, <_M_A_R_K>, and <_O_P_E_N>.)
+
+
+
+
+     _<_M_A_R_K_>
+
+          This key is used to define an area and is labeled <MARK>.  This
+     key allows the user to mark lines and rectangles and then issue a com-
+     mand that affects only the marked area using a variety of commands and
+     key functions.  To mark several whole lines the user moves the cursor
+     to the first line to be marked and presses <MARK>.  The user then
+     moves the cursor to the last line to be marked (the number of lines
+     marked is indicated in the mark message below the window).  At this
+     point the user issues a command or presses a function key.  For exam-
+     ple, the user may press <PICK> to place the marked lines in the pick
+     buffer, or press <CLOSE> to place the lines in the close buffer, or
+     press <OPEN> to open a number of blank lines in the marked area, or
+     type in a variety of commands such as fill, justify, replace or erase.
+
+     The mark function is normally terminated when the <PICK>, <CLOSE>,
+     <ERASE>, or <OPEN> key is pressed, or when the user types in a com-
+     mand.
+
+     An incomplete or unwanted mark function can be terminated by pressing
+     <CMD> <MARK>.  (See also, _C_E_N_T_E_R, <_C_L_O_S_E>, <_E_R_A_S_E>, _F_I_L_L, _J_U_S_T_I_F_Y,
+     <_P_I_C_K>, <_O_P_E_N>.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -22-
+
+
+     _M_O_V_I_N_G__L_I_N_E_S
+
+          Moving lines is done by closing the lines and then placing them
+     elsewhere.  (See <_C_L_O_S_E>.)
+
+
+
+
+     _M_O_V_I_N_G__T_E_X_T__B_E_T_W_E_E_N__F_I_L_E_S
+
+          Sections of text from one file can be moved or copied to another
+     file by editing both files, copying the text with pick or moving it
+     with close, alternating files, and then placing the text in the second
+     file.
+
+     The user initiates the process by typing e _f_i_l_e_n_a_m_e <RETURN> to begin
+     editing a file from which sections of text will be copied or removed.
+     Once in that file, the cursor is moved to the first line of text to be
+     moved or copied and <MARK> is pressed to begin marking the area.  The
+     cursor is then moved to the last line of text to be moved or copied,
+     and <PICK> or <CLOSE> is pressed depending on whether the text is to
+     be copied or moved.
+
+     The second file is now brought up as the alternate file by pressing
+     <CMD> e _s_e_c_o_n_d_f_i_l_e_n_a_m_e <RETURN>.  The cursor is moved to the location
+     in this second file where the text is to be placed, and then <CMD>
+     <CLOSE> or <CMD> <PICK> is pressed depending on whether the text was
+     initially closed or picked.
+
+     The second file can now be edited normally.  Upon normal exit, both
+     files are updated to reflect the editing performed.  (See also _A_L_T_E_R_-
+     _N_A_T_E _F_I_L_E, <_C_L_O_S_E>, <_M_A_R_K>, _M_U_L_T_I_P_L_E _W_I_N_D_O_W_S,, and <_P_I_C_K>.)
+
+
+
+
+     _M_O_V_I_N_G__T_H_E__W_I_N_D_O_W
+
+          See <_A_R_R_O_W _K_E_Y_S>, <_L_E_F_T>, <+_L_I_N_E>, <-_L_I_N_E>, <+_P_A_G_E>, <-_P_A_G_E>, and
+     <_R_I_G_H_T>.
+
+
+
+
+     _N_A_M_E
+
+          The file being edited can be renamed, while in the Editor, by
+     pressing <CMD> name _n_e_w_f_i_l_e_n_a_m_e (where name can be abbreviated n).
+     The naming takes effect upon successful exit from the Editor.  To
+     negate the renaming, the editing session must be aborted with exit
+     abort.  (See also _F_I_L_E_N_A_M_E and _R_E_N_A_M_I_N_G _F_I_L_E_S.)
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -23-
+
+
+     _O_P_E_N
+
+          The open command may be used instead of <OPEN> to open space.  To
+     open an area, the user types <CMD> open _n <RETURN> (where open may be
+     abbreviated o).  The default area is one line.  (See also <_O_P_E_N>.)
+
+
+
+
+     _<_O_P_E_N_>
+
+          This key inserts blank space into the file.  If <OPEN> is pressed
+     by itself, it inserts a blank line at the line where the cursor is.
+     In doing this it moves all of the remaining lines in the file down one
+     line.  Several lines can be opened by pressing, <CMD> _n <OPEN>, where
+     _n is the number of blank lines to insert in the file.
+
+     The open key will also operate on an area that has been marked with
+     the <MARK> key.  For example, to indent several lines of text, the
+     cursor is moved to the first line of text and the <MARK> key is
+     pressed to begin the mark process.  The cursor is then moved to the
+     right the number of columns of indention required and then to the bot-
+     tom line of text.  This marked area is shown below the window as "MARK
+     nxn", where n refers to the number of lines and columns.  The <OPEN>
+     key is pressed at this point and the text is indented.  Note that the
+     dimensions of the marked area are not saved by the Editor, so a subse-
+     quent press of a <CLOSE> key does not return the area to its former
+     state. (See also <_C_L_O_S_E>, and <_M_A_R_K>.)
+
+
+
+
+     _<_+_P_A_G_E_>
+
+          This key moves the window toward the end of the file for one win-
+     dow full of lines.  The window can be moved more than one page by
+     pressing <CMD> _n <+PAGE>, where _n is the number of pages to move
+     toward the end of the file.
+
+     The key sequence <CMD> <+PAGE> moves the cursor to the last line of
+     the file and redraws the window if necessary. (See also <-PAGE>.)
+
+
+
+
+     _<_-_P_A_G_E_>
+
+          This key moves the window toward the front of the file by one
+     window full of lines.  The window can be moved more than one page by
+     pressing <CMD> _n <-PAGE>, where _n is the number of pages to move
+     toward the front of the file.
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -24-
+
+
+     The key sequence <CMD> <-PAGE>, moves the cursor to line 1 of the file
+     and redraws the window if necessary. (See also <+_P_A_G_E>.)
+
+
+
+
+     _P_A_G_I_N_A_T_I_O_N
+
+          Pagination of large documents is normally performed using a for-
+     matting package.  Pagination can be manually inserted by inserting
+     page eject (formfeed) characters at the beginning of each page of text
+     (assuming the formfeeds are closer together than the page size speci-
+     fied in the Unix print command, usually 60 lines).  A formfeed is
+     inserted in the text in column 1 by pressing <CNTL CHAR> |SHIFT+L|.
+     The first keystroke combination produces a bright block and the second
+     keystroke combination inserts a capital "L".
+
+
+
+
+     _P_A_R_A_G_R_A_P_H_S
+
+          Many Editor commands deal with paragraphs.  For example, the fill
+     command, if no area is specified, fills one paragraph.  In most com-
+     mands, "paragraph" is abbreviated p, for example, fill _6p.  To the
+     Editor a paragraph is a line or series of lines that ends with a blank
+     line or the end of the file.  That is, paragraphs are separated from
+     one another by a blank line.
+
+     Paragraphs are most easily dealt with by use of formatting macros.
+     (See also _F_I_L_L, _J_U_S_T_I_F_Y, and <_O_P_E_N>.)
+
+
+
+
+     _P_I_C_K
+
+          The pick command may be used instead of the pick key to pick text
+     and place it in the pick buffer.  The format of the command is <CMD>
+     pick _a_r_e_a <RETURN> (where pick may be abbreviated pi). If _a_r_e_a is not
+     specified, the default area is one line.
+
+     The information copied with the pick command or key may be placed back
+     in the file by entering the command <CMD> -pick <RETURN> (where -pick
+     may be abbreviated -p).  (See also <_P_I_C_K>.)
+
+
+
+
+     _-_P_I_C_K
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -25-
+
+
+          This command may be used to copy text from the pick buffer into
+     the file.  The format of the command is <CMD> -pick <RETURN> (where
+     -pick may be abbreviated -pi).
+
+     Text may also be copied from the pick buffer into the file by pressing
+     <CMD> <PICK>.  (See also <_P_I_C_K>.)
+
+
+
+
+     _<_P_I_C_K_>
+
+          The pick key copies characters, lines, and areas into a buffer
+     from which copies may be placed anywhere in the file.  The picked
+     material remains in the buffer until <PICK> is pressed again, or until
+     the user exits the file.  One line may be copied by moving the cursor
+     to that line and pressing <PICK>.  Several lines may be copied by
+     pressing <CMD> _n <PICK>, where _n is the number of consecutive lines to
+     be copied.  These lines are copied beginning with the line where the
+     cursor is.
+
+     A copy of the picked lines can be inserted into the file by moving the
+     cursor to where the lines are to be placed and pressing <CMD> <PICK>.
+     The picked lines are inserted starting on the line where the cursor
+     is.  Copies of the picked lines may be inserted in an unlimited number
+     of places in the file.
+
+     The pick function also works with marked lines and marked rectangles.
+     To mark a rectangular area and then place a copy of it into the pick
+     buffer, the following keystrokes are necessary:  move the cursor to
+     the upper left hand corner of the rectangular area and press <MARK>;
+     move the cursor to the lower right hand corner of the rectangular area
+     and press <PICK>.  The text will be copied into the pick buffer, and
+     the cursor will return to where it was when <MARK> was pressed.
+
+     Text copied form the pick buffer is placed in the change file. (See
+     also _C_H_A_N_G_E _F_I_L_E, <_C_L_O_S_E>, _M_O_V_I_N_G _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S, and PICK.)
+
+
+
+
+     _P_I_C_K__B_U_F_F_E_R
+
+          The pick buffer is a special area in the Editor that contains
+     text that is copied with the <PICK> key.  Picked text remains in this
+     buffer until the <PICK> key is pressed again when it is replaced by
+     new text or until the file is exited.  (See also _P_I_C_K and <_P_I_C_K>.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -26-
+
+
+     _P_L_A_C_I_N_G__T_E_X_T
+
+          Text that has been removed with the <CLOSE> key may be copied
+     back into the file in the same place or elsewhere by pressing <CMD>
+     <CLOSE>.  Text that has been picked with the <PICK> key may be copied
+     back into the file by pressing <CMD> <PICK>.
+
+     Text can also be placed in the file by the use of commands.  Text in
+     the pick buffer can be copied to the file by pressing <CMD> -pick
+     <RETURN> (where -pick may be abbreviated -pi).  Text in the close
+     buffer may be copied to the file by pressing <CMD> -close <RETURN>
+     (where -close may be abbreviated -c).  (See also <_C_L_O_S_E>, _P_I_C_K and
+     <_P_I_C_K>.)
+
+
+
+
+     _Q_U_I_T_T_I_N_G
+
+          See _e_x_i_t.
+
+
+
+
+     _R_E_C_O_V_E_R_Y
+
+          There are several situations from which a user would want to
+     recover.  First, there is the situation in which the Editor, E, fails
+     and prints a "crash" message.  Recovery from this situation is per-
+     formed by entering the same directory and typing e.  The Editor will
+     prompt the user with four options, one of which is a non-visible,
+     automatic recovery (option 1).
+
+     Another type of recovery involves material inadvertently closed out
+     via the <CLOSE> key.  Frequently a user wants to recover text that was
+     inadvertently closed.  That text may be found in the change file.  The
+     change file may be edited as an alternate file, the material picked
+     from it, and then placed in the original file. (See _C_H_A_N_G_E _F_I_L_E and
+     _M_O_V_I_N_G _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S.)
+
+     When a user makes a serious editing mistake and ruins a file, he can
+     negate the error and the editing session by typing exit abort.  He can
+     then recover the editing session by typing e.  The Editor will prompt
+     him with four options, one of which is a visible replay (option 2).
+     The user can initiate the replay, watch it occur, and just before the
+     serious mistake is replicated, interrupt the replay by pressing <INT>.
+     The replay is performed quickly, and some skill is required to inter-
+     rupt it at the desired point.
+
+     The Editor prints the following prompt when it is entered again in the
+     same directory after a crash or an aborted session:
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -27-
+
+
+          The last time you used the Editor in this directory, you crashed or
+          aborted.  You have these choices:
+           1.  E will silently recover the last session and then update the screen;
+               exit before you continue editing.
+                 (Normally, select this option.)
+           2.  E will replay the last session on the screen; exit before you
+               continue editing.
+                 (Select this option if E continues to crash in response to
+                 Option 1; press the interrupt key just before E completes the
+                 replay.  The interrupt key is <INT> for Ambassadors, and |CTRL+C|
+                 for the other Ann Arbor terminals.
+           3.  E will give you the version you had BEFORE you began the last session.
+                 (Select this option only if you do NOT wish to recover the last
+                 session's work.)
+           4.  E will not do anything.
+                (Select this option if you do not know what to do; call X678 for
+                assistance.)
+           Type the number of the option you want then hit <RETURN>:
+
+     Choices 1 and 2 are normally requested; choices 3 and 4 are presented
+     to allow for all possible alternatives (they do not recover).
+
+     To circumvent this message after an aborted session, call the Editor
+     by typing e -norecover, or you may choose option 3.  This will com-
+     pletely eliminate an aborted session and destroy any chance for a
+     recovery of that session.
+
+
+
+
+     _R_E_C_T_A_N_G_U_L_A_R__A_R_E_A_S
+          Rectangular areas are defined by using the mark function.  (See
+     <_M_A_R_K>.)
+
+
+
+
+     _R_E_D_R_A_W
+
+          To redraw the screen and eliminate extraneous characters (such as
+     system messages, noise characters, and garbage characters), the user
+     presses <CMD> redraw <RETURN> (where redraw may be abbreviated red).
+
+
+
+
+     _R_E_N_A_M_I_N_G__F_I_L_E_S
+
+          A file can be renamed using the Unix command mv in response to
+     the Unix "%" prompt.
+
+     The file being edited can be renamed while in the Editor by pressing,
+
+
+
+
+
+
+
+
+
+
+
+                                      -28-
+
+
+     <CMD> name _n_e_w_f_i_l_e_n_a_m_e <RETURN> (where name can be abbreviated n).
+     The renaming takes place upon normal exit from the Editor.  To negate
+     the renaming, the session must be aborted by typing exit abort.
+
+
+
+
+     _R_E_P_L_A_C_E
+
+          The replace command is used to replace characters or words with
+     other characters or words.  The simplest form of the command is
+     replace (where replace can be abbreviated rep), which directs the Edi-
+     tor to search for occurrences of _t_e_x_t_a beginning where the cursor is
+     and proceeding toward the end of the file.
+
+          <CMD> replace /_t_e_x_t_a/_t_e_x_t_b/ <RETURN>
+          <CMD> -replace /_t_e_x_t_a/_t_e_x_t_b/ <RETURN>
+
+     This would replace every occurrence of _t_e_x_t_a with _t_e_x_t_b, starting
+     where the cursor is and proceeding to the end of the file.  If the
+     command is prefaced with a minus sign, -replace or -rep, the Editor
+     searches for occurrences of _t_e_x_t_a beginning where the cursor is and
+     proceeding toward the beginning of the file.
+
+     Two options are show and interactive.  The show option allows the user
+     to see the replacements as they occur.  The interactive option allows
+     the user to not only see the replacements, but also to control whether
+     each replacement will occur.  Since interactive includes show, only
+     one of these options can be typed with the command at any one time.
+
+     The show option displays the replacements on the screen as they occur.
+     That is, each occurrence of _t_e_x_t_a is located, the screen is redrawn to
+     show that occurrence, and then the replacement is performed.  The com-
+     mand can be interrupted at any time by pressing <INT>.
+
+     The interactive option, (which can be abbreviated int) allows the user
+     to replace only selected occurrences of _t_e_x_t_a with _t_e_x_t_b.  When the
+     first occurrence of _t_e_x_t_a is found, the cursor is moved to it.  At
+     this point, pressing <REPLC> triggers replacement of that occurrence
+     of _t_e_x_t_a with _t_e_x_t_b.  The user then presses <+SCH> to search for the
+     next occurrence of _t_e_x_t_a.  If the user does not want an occurrence of
+     _t_e_x_t_a to be replaced, the user presses <+SCH>, and the Editor skips
+     that replacement and proceeds to the next occurrence of _t_e_x_t_a.  In
+     this fashion the user can replace just those occurrences of _t_e_x_t_a that
+     he wants to.
+
+     The text searched for and the replacement text can be separated in the
+     command by a variety of characters including: /, *, ', ", $, +.  These
+     characters should only be used if they are not part of your text to be
+     replaced.
+
+     Replacements may be limited to a specified number of paragraphs.
+
+
+
+
+
+
+
+
+
+
+
+                                      -29-
+
+
+     The following examples illustrate variations of the command:
+
+          <CMD> rep /_S_m_y_t_h_e/_S_m_i_t_h/ <RETURN>          Simple replacement
+                                                     to end of file.
+
+          <CMD> rep _4_p /_S_m_y_t_h_e/_S_m_i_t_h/ <RETURN>       Simple replacement
+                                                     for 4 paragraphs.
+
+          <CMD> rep _4  /_S_m_y_t_h_e/_S_m_i_t_h/ <RETURN>       Simple replacement
+                                                     for 4 lines.
+
+          <CMD> rep _4_p _i_n_t */____/*/..../* <RETURN>  Replace "/____/" with
+                                                     "/..../" in 4 paragraphs
+                                                     interactively.
+
+          <MARK> <cursor movements> <CMD> rep int /_A_A/_B_B/ <RETURN>
+
+     This last example illustrates that a marked area can be used to limit
+     the area where replacement takes effect.  In this example, _A_A is to be
+     replaced by _B_B in the interactive mode in the area marked by the cur-
+     sor movements.  (See also <_M_A_R_K>, <+_S_C_H>,and <-_S_C_H>,.)
+
+
+
+
+     _R_E_P_L_A_Y_I_N_G__A__S_E_S_S_I_O_N
+          A session may be replayed if the session ended in a crash, or if
+     the session was ended by the user typing exit abort.  In all of these
+     cases the keystroke file, normally named ".ek1", is preserved and can
+     be used by the system for a replay.
+
+     After a crash the user returns to the same directory and types e, and
+     the Editor prompts him with four options, one of which is a nonvisible
+     automatic replay (option 1).
+
+     In the event of an aborted session (exit abort), the user also returns
+     to the same directory and types e, and the Editor prompts him with
+     four options, one of which is a visible replay (option 2).  The user
+     initiates the replay, watches it occur, and then interrupts it at a
+     desired point by pressing <INT>.  (See also _K_E_Y_S_T_R_O_K_E _F_I_L_E and
+     _R_E_C_O_V_E_R_Y.)
+
+
+
+
+     _<_R_E_T_U_R_N_>
+
+          Within the window, this key is pressed to move the cursor to
+     column 1 of the next line.
+
+     On the command line this key is pressed at the end of a command to
+     signal the Editor that a command had been entered, e.g., an "execute"
+
+
+
+
+
+
+
+
+
+
+
+                                      -30-
+
+
+     key.
+
+
+
+
+     _<_R_I_G_H_T_>
+
+          This key is pressed to move the window 16 characters to the
+     right.  Pressing <CMD> <RIGHT> moves the window to the right so that
+     the cursor is displayed in column 1 of the new window.  (See also
+     <_A_R_R_O_W _K_E_Y_S> and <_L_E_F_T>.)
+
+
+
+
+     _<_R_I_G_H_T__A_R_R_O_W_>
+
+          See <_A_R_R_O_W _K_E_Y_S>.
+
+
+
+
+     _R_U_N
+
+          A UNIX command can be executed in the Editor by pressing:
+
+          <CMD> run _a_r_e_a _c_o_m_m_a_n_d <RETURN>
+
+
+     For example, to run the Unix command "ls" and have the output included
+     in the file being edited, press <CMD> run _l_s <RETURN>.
+
+     Note that the output from a command can vary depending on when it is
+     run, and consequently a replay of the editing session that includes a
+     command may produce disastrous results.
+
+     For knowledgeable Unix users only: area is passed to the standard
+     input of the command and is replaced by the output of the command.
+
+
+
+
+     _S_A_V_E
+          A copy of the file being edited can be saved with the current
+     changes by pressing, <CMD> save _n_e_w_f_i_l_e_n_a_m_e <RETURN> (where save may
+     be abbreviated sa).  The file is saved immediately, and does not wait
+     for you to exit from the Editor.  The _n_e_w_f_i_l_e_n_a_m_e must be specified
+     and cannot be the name of the file being edited.  This command is a
+     convenient way of backing up a modified file before attempting some
+     new, dramatic editing.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -31-
+
+
+     _S_A_V_I_N_G__F_I_L_E_S
+
+          A file is saved with the edited changes when the user exits nor-
+     mally with exit.  A file can also be saved with the edited changes by
+     means of the save command.  (See also _C_R_E_A_T_I_N_G _F_I_L_E_S, _E_X_I_T,  and
+     _S_A_V_E.)
+
+
+
+
+     _<_+_S_C_H_>
+
+          This key is used to search for characters, or words.  The search
+     begins where the cursor is and proceeds toward the end of the file.
+     To search specific words or characters, the user presses <CMD> _w_o_r_d_s
+     <+SCH>.  If the Editor finds an occurrence of _w_o_r_d_s, the Editor moves
+     the cursor to that text and redraws the window if necessary.  To con-
+     tinue searching the user presses <+SCH> again.  The text string
+     searched for is placed in a search buffer, and consequently is avail-
+     able to be searched again by pressing <+SCH> or <-SCH>.
+
+     There is another method of placing text in the search buffer.  This
+     method is limited to text that does not contain blanks.  To use this
+     method, the user positions the cursor at the first character of the
+     text and presses <CMD> <+SCH>.  The Editor then copies the characters
+     up to but not including the next blank space (one word only) into the
+     search buffer.  The search for the text then proceeds normally. (See
+     also _R_E_P_L_A_C_E and <-_S_C_H>.)
+
+
+
+
+     _<_-_S_C_H_>
+
+          This key is used to search for characters or words.  The search
+     begins where the cursor is and proceeds toward the beginning of the
+     file.  The method is the same as in <+SCH>. (See also _R_E_P_L_A_C_E and
+     <+_S_C_H>.)
+
+
+
+
+     _S_C_R_A_T_C_H__F_I_L_E
+
+          Occasionally the Editor finds itself with no file to work in when
+     the user expects to be working in a file.  The Editor solves this
+     dilemma by creating a file named "scratch".  If the user does not want
+     to keep "scratch", he should exit.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -32-
+
+
+     _S_E_A_R_C_H_I_N_G
+
+          See <+_S_C_H> and <-_S_C_H>.
+
+
+
+
+     _S_E_T_T_I_N_G__T_A_B_S
+
+          See _t_a_b and _t_a_b_s.
+
+
+
+
+     _S_P_L_I_T
+
+          This command splits one line into two lines at the point where
+     the cursor is.  The righthand side of the line, including the charac-
+     ter at the cursor, is inserted as a new line on the line below, and
+     then the window is redrawn.  To use this command, a user types <CMD>
+     split <RETURN> (where split may be abbreviated sp).  (See also _J_O_I_N.)
+
+
+
+
+     _<_S_/_R__T_A_B_>
+
+          This key sets and unsets tabs.  It is labeled <[> on some termi-
+     nals.  To set a tab using this key, the user moves the cursor to the
+     column where a tab is desired and presses <S/R TAB>.  To clear a tab
+     using this key, the user moves the cursor to position where a tab is
+     to be removed and presses <CMD> <S/R TAB>. (See also _T_A_B, -_T_A_B, _T_A_B_S,
+     -_T_A_B_S, <+_T_A_B>, and <-_T_A_B_S>.
+
+
+
+
+     _S_T_A_T_E__F_I_L_E
+
+          The state file contains information about the last file edited in
+     the directory, including the filename, the place in the file where the
+     cursor was when the user exited, the line length established in the
+     last fill, justify, or center command, the state of Insert Mode, the
+     tabs, and the last search string.  The name of this file, assuming the
+     user owns the directory and is the only user working in the directory,
+     is ".es1". (See also _C_H_A_N_G_E _F_I_L_E, _K_E_Y_S_T_R_O_K_E _F_I_L_E,, and _R_E_C_O_V_E_R_Y.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -33-
+
+
+     _T_A_B
+
+          To set a tab using this command, a user types <CMD> tab _c_o_l_u_m_n
+     <RETURN>, where _c_o_l_u_m_n is an optionally specified column number or
+     several column numbers separated by blanks.  If _c_o_l_u_m_n is not speci-
+     fied, the tab is set where the cursor is.
+
+     Note that this command does not clear tabs; it sets the tabs where
+     indicated.  (See also -_T_A_B, _T_A_B_S, -_T_A_B_S, <+_T_A_B>, <_S/_R _T_A_B>, and <-
+     _T_A_B_S>.
+
+
+
+
+     _-_T_A_B
+
+          To clear a tab using this command, a user types <CMD> -tab _c_o_l_u_m_n
+     <RETURN>, where _c_o_l_u_m_n is an optionally specified column number or
+     several column numbers separated by blanks.  If _c_o_l_u_m_n is not speci-
+     fied, the tab is cleared where the cursor is).  (See also _T_A_B, _T_A_B_S,
+     -_T_A_B_S, <+_T_A_B>, <_S/_R _T_A_B>, and <-_T_A_B_S>.
+
+
+
+
+     _<_+_T_A_B_>__o_r__<_T_A_B_>
+
+          This key moves the cursor to the next tab going toward the right
+     margin.  Default tabs are set every 8 columns beginning in column 1
+     and ending in column 73.  When the cursor is at the rightmost tab or
+     beyond, pressing <+TAB> or <TAB> has no effect.  (See also -_T_A_B, _T_A_B_S,
+     -_T_A_B_S, <_S/_R _T_A_B>, and <-_T_A_B_S>.)
+
+
+
+
+     _<_-_T_A_B_>__o_r__|_S_H_I_F_T_+_T_A_B_|
+
+          This key moves the cursor to the next tab going toward the left
+     margin.  The default tabs are set every 8 columns beginning in column
+     1 and ending in column 73.  When the cursor is at or before the left-
+     most tab, pressing <-TAB> or |SHIFT+TAB| has no effect.  (See also
+     -_T_A_B, _T_A_B_S, -_T_A_B_S, <_S/_R _T_A_B>, and <-_T_A_B_S>.
+
+
+
+
+     _T_A_B_F_I_L_E
+
+          This command sets tabs according to a file containing a list of
+     column numbers separated by blanks.  To set tabs using this command,
+     the user presses <CMD> tabfile _f_i_l_e_n_a_m_e <RETURN>, where filename is
+
+
+
+
+
+
+
+
+
+
+
+                                      -34-
+
+
+     the name of a file containing the column numbers where the tabs are to
+     be placed.  The file with the tabs must be created and saved before
+     editing a file where the tabfile is to be used.  Note that this com-
+     mand does not erase any existing tabs; it adds tabs as specified.
+     (See also -_T_A_B, _T_A_B_S, -_T_A_B_S, <_S/_R _T_A_B>, <+_T_A_B_S> and <-_T_A_B_S>.)
+
+
+
+
+     _T_A_B_S_,__T_H_E__T_O_P_I_C
+
+          The Editor sets default tabs in column 1 and every 8th column
+     after that to column 73.  Additional tabs can be set using tabfile,
+     tab, and
+     <S/R TAB>.  Tabs can be removed using -tab and <CMD> <S/R TAB>.  (See
+     also -_T_A_B, _T_A_B_S, -_T_A_B_S, <_S/_R _T_A_B>, <+_T_A_B_S> and <-_T_A_B_S>.)
+
+
+
+
+     _T_A_B_S
+
+          This command sets tabs every nth column, for example, tabs sets
+     every 5 columns.  To set tabs in this fashion, the user presses <CMD>
+     tabs _n <RETURN>, where n is every nth column beginning with column 1.
+     (See also -_T_A_B, -_T_A_B_S, <_S/_R _T_A_B>, <+_T_A_B_S> and <-_T_A_B_S>.)
+
+
+
+
+     _-_T_A_B_S
+
+          This command clears all tabs.  To clear all tabs, the user
+     presses <CMD> -tabs <RETURN>.  This command can also be used to clear
+     tabs in every nth column by pressing, <CMD> -tabs _n <RETURN>, where n
+     is the distance between the columns.  Tabs can be cleared in every nth
+     column in an area if the area is first marked and then the -tabs com-
+     mand issued.  (See also _T_A_B, _T_A_B_S, <+_T_A_B>, <-_T_A_B>, and <_S/_R _T_A_B>.)
+
+
+
+
+     _T_R_A_C_K
+
+          Track causes the current file and the alternate file to track
+     each other.  That is, if you move the window in any direction, the
+     alternate file window is moved the same amount.  This is useful for
+     comparing two files.  If you move the window in any direction, the
+     cursor for the alternate file will be in the same position relative to
+     the window as the current file's cursor.  In no case will the alter-
+     nate file's window be moved backwards past the beginning of the file
+     or to the left beyond the left edge of the file.  A "TRACK" indicator
+
+
+
+
+
+
+
+
+
+
+
+                                      -35-
+
+
+     will appear on the info line if tracking is set in the window you are
+     in.  Use "-track" to turn off tracking.  (See _A_L_T_E_R_N_A_T_E _F_I_L_E and
+     -_T_R_A_C_K.)
+
+
+
+
+     _-_T_R_A_C_K
+
+          Track causes the current file and the alternate file to track
+     each other.  -Track turns off the tracking in the current window.
+     (See _A_L_T_E_R_N_A_T_E _F_I_L_E and _T_R_A_C_K.)
+
+
+
+
+     _U_N_D_E_R_L_I_N_I_N_G
+
+          Printing text on the terminal screen with underline characters is
+     not possible on Ann Arbor terminals.  Underlining is possible on text
+     printed on hardcopy terminals and on text printed on printers in the
+     Computation Center.  Underlining is accomplished most easily by use of
+     the format package.  Underlining can be accomplished on a character-
+     by-character basis by adding a control character, a backspace charac-
+     ter, and an underline character to the text.
+
+     To underline one character manually, the underline character must be
+     typed, and then a control character equal to a backspace character
+     must be entered in the text, and then the character itself must be
+     typed.  The keystrokes required to underline the letter "t" are as
+     follows:
+
+          <_> <CNTL CHAR> |SHIFT+H| t
+
+     The first keystroke generates the underline character; the second
+     keystroke generates a small, bright block on the screen.  The next
+     keystroke, generates the code for a control backspace character that
+     is to be entered into the text (not a backspace character used while
+     editing); and finally the last keystroke generates the letter _t.
+
+
+
+
+     _U_N_M_A_R_K
+          To negate marking, the user presses <CMD> <MARK>.  (Also see
+     <_M_A_R_K>.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -36-
+
+
+     _U_P__A_R_R_O_W
+
+          (See <_A_R_R_O_W _K_E_Y_S>.)
+
+
+
+
+     _U_S_I_N_G__A__F_I_L_E
+
+          A file is edited by typing e _f_i_l_e_n_a_m_e.  If the file to be edited
+     is the same file worked on in the last editing session, then the user
+     can return to the same file in the same place by typing e.  While
+     editing one file, another file can be edited as an alternate file.
+     (See also _A_L_T_E_R_N_A_T_E _F_I_L_E and _M_O_V_I_N_G _T_E_X_T _B_E_T_W_E_E_N _F_I_L_E_S.)
+
+
+
+
+     _W_I_D_E__F_I_L_E_S
+
+          Files with wide lines can be viewed by using <RIGHT> and <LEFT>
+     to shift the window.  (See also _L_O_N_G _L_I_N_E_S.)
+
+
+
+
+     _W_I_D_T_H
+
+          The fill, justify, and center commands allow the user to specify
+     a width.  The width=_n specified as part of the command may be abbrevi-
+     ated w=_n.  This width remains in effect until another fill, justify,
+     or center command is entered with a different width specification, or
+     until you exit from the file.  This width is maintained as part of the
+     information kept in the state file.
+
+     When a file is created, the default width is 75.
+
+
+
+
+     _W_I_N_D_O_W
+
+          The Editor uses the window concept to display a file.  The termi-
+     nal screen is viewed as a window that opens on part of the file.  The
+     window can be moved forward and backward through the file (and right
+     and left) to view different portions of the file.  When the user
+     presses keys that require the cursor to be moved out of the window,
+     then the window is moved so that the cursor remains in the window.
+     (See also _C_R_E_A_T_I_N_G _W_I_N_D_O_W_S, _D_E_L_E_T_I_N_G _W_I_N_D_O_W_S, and WINDOWS.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -37-
+
+
+     _W_I_N_D_O_W_S
+
+          Multiple windows are useful for moving text between files, com-
+     paring files, and merging files.  A new window is created by position-
+     ing the cursor on either the left or top edge of the window but not in
+     the top left hand corner.  Press <CMD> window _n_e_w_f_i_l_e_n_a_m_e <RETURN>
+     (where window may be abbreviated w).  The file _n_e_w_f_i_l_e_n_a_m_e becomes the
+     current file, and the new window becomes the current window.  If a
+     filename is not specified, <CMD> window <RETURN>, the current file
+     also becomes the current file in the new window.
+
+     The windows are numbered in the order in which they were created.  To
+     move the Editor from window to window, the user presses <CHG WIN>.  To
+     move to a particular window, the user types <CMD> _n <CHG WIN>, where _n
+     is the number of the window.
+
+     To remove the last window created, the user types <CMD> -window
+     <RETURN> (where -window may be abbreviated -w).  (See also _A_L_T_E_R_N_A_T_E
+     _F_I_L_E.)
+
+
+
+
+     _#_o
+
+          This is the name of a pseudo file created by the Editor to access
+     the text that has been closed using <CLOSE> or the close command, or
+     deleted using the erase command.  It also gives access to text that
+     has been filled or justified.  (See _C_H_A_N_G_E _F_I_L_E.)
+
+
+
+
+     _#_p
+
+          This is the name of a pseudo file created by the Editor to access
+     text in the change file that has been picked.  (See _C_H_A_N_G_E _F_I_L_E.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -38-
+
+
+                          _I_I_I_.___T_H_E__S_T_A_N_D_A_R_D__K_E_Y_B_O_A_R_D
+
+
+
+          There is now a "standard" E keyboard, that is designed to be
+     usable on all video display terminals.  Either say "e
+     -keyboard=standard" or "setenv EKBD standard" before running E to
+     select this keyboard.  This is also the keyboard that E will use if
+     there is no specific knowledge of your type of terminal compiled into
+     the editor.
+
+          This keyboard layout is designed to be used on terminals with no
+     function keys. "^H" means control-H, and "^X-^U" means control-X fol-
+     lowed by control-U.  The ALT entry gives you a choice of "^/" or "^_"
+     because one or the other or both will not work on some terminals. ("_"
+     is correct ASCII.)
+
+          Note that +WORD and -WORD are not implemented yet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      -39-
+
+
+                            E STANDARD KEYBOARD
+
+     (extend)        ^X                       |    ^@        CMD
+     +LINE           ^F                       |    ^A        CMD
+     +PAGE           ^R                       |    ^B        -WORD
+     +SRCH           ^Y                       |    ^C        BSP
+     +TAB            ^I                       |    ^D        -LINE
+     +WORD           ^N                       |    ^E        -PAGE
+     -LINE           ^D                       |    ^F        +LINE
+     -PAGE           ^E                       |    ^G        HOME
+     -SRCH           ^T                       |    ^H        LEFT
+     -TAB            ^X-^U                    |    ^I        +TAB
+     -WORD           ^B                       |    ^J        DOWN
+     ALT             ^X-^A or ^_ or ^/        |    ^K        UP
+     BSP             ^C                       |    ^L        RIGHT
+     CHG WIN         ^X-^W                    |    ^M        RETURN
+     CLOSE           ^V                       |    ^N        +WORD
+     CMD             ^A or NULL or ^@         |    ^O        OPEN
+     CTRLCHAR        ^X-^C                    |    ^P        PICK
+     DELCHAR         ^W                       |    ^Q        (not used)
+     DOWN            ^J                       |    ^R        +PAGE
+     ERASE           ^X-^E or ^^              |    ^S        (not used)
+     HOME            ^G                       |    ^T        -SRCH
+     INSERT          ^Z or ESC or ^[          |    ^U        MARK
+     INT             ^\                       |    ^V        CLOSE
+     JOIN            ^X-^J                    |    ^W        DELCHAR
+     LEFT            ^H                       |    ^X        (extend)
+     MARK            ^U                       |    ^Y        +SRCH
+     OPEN            ^O                       |    ^Z        INSMODE
+     PICK            ^P                       |    ^[        INSERT
+     REPL            ^X-^R or ^]              |    ^\        INT
+     RETURN          ^M                       |    ^]        REPL
+     RIGHT           ^L                       |    ^^        ERASE
+     SPLIT           ^X-^B                    |    ^_        ALT
+     TABS            ^X-^T                    |    ^/        ALT
+     UP              ^K                       |    ^X-^A     ALT
+     WIN LEFT        ^X-^H                    |    ^X-^C     CTRLCHAR
+     WIN RIGHT       ^X-^L                    |    ^X-^E     ERASE
+                                              |    ^X-^H     WIN LEFT
+                                              |    ^X-^J     JOIN
+                                              |    ^X-^L     WIN RIGHT
+                                              |    ^X-^R     REPL
+                                              |    ^X-^B     SPLIT
+                                              |    ^X-^T     TABS
+                                              |    ^X-^U     -TAB
+                                              |    ^X-^W     CHG WIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                     -iii-
+
+
+                                    _C_O_N_T_E_N_T_S
+
+
+
+
+
+     Section
+
+     TEXT PROCESSING .................................................    1
+
+        I.  INTRODUCTION .............................................    1
+     KEYSTROKE SYNTAX ................................................    1
+
+       II.  THE RAND EDITOR E ........................................    2
+     ABORTING A COMMAND ..............................................    2
+     ABORTING A SESSION ..............................................    2
+     ALTERNATE FILE ..................................................    2
+     AREA ............................................................    3
+     <ARROW KEYS> ....................................................    3
+     BACKSPACE .......................................................    4
+     BACKUP FILE .....................................................    4
+     BACKWARD SEARCH .................................................    4
+     BOX .............................................................    5
+     <BSP> ...........................................................    5
+     CENTER ..........................................................    5
+     CHANGES FILES ...................................................    6
+     CHANGING FILES ..................................................    6
+     CHANGING WINDOWS ................................................    6
+     <CLOSE> .........................................................    6
+     CLOSE ...........................................................    7
+     CLOSE BUFFER ....................................................    7
+     <CMD> ...........................................................    7
+     COMBINING FILES .................................................    8
+     COMBINING LINES .................................................    8
+     COMMA FILES .....................................................    8
+     COMMAND MODE ....................................................    8
+     COPYING FILES ...................................................    8
+     COPYING TEXT ....................................................    9
+     CRASHES, RECOVERY FROM ..........................................    9
+     CREATING FILES ..................................................    9
+     CREATING WINDOWS ................................................    9
+     <CTRL> ..........................................................   10
+     CURRENT WINDOW ..................................................   10
+     CURSOR ..........................................................   10
+     CURSOR MOVEMENT </->>, </<->, </|^>, </> .........................   10
+     <DEL CHAR> ......................................................   10
+     DELETE ..........................................................   11
+     DELETING TEXT ...................................................   11
+     DELETING WINDOWS ................................................   11
+     <DOWN ARROW> ....................................................   12
+     .ec1 ............................................................   12
+     .ek1 ............................................................   12
+
+
+
+
+
+
+
+
+
+
+
+                                      -iv-
+
+
+     .ek1b ...........................................................   12
+     .es1 ............................................................   12
+     E ...............................................................   13
+     EDIT MODE .......................................................   13
+     EFFICIENCY ......................................................   13
+     ERASE ...........................................................   13
+     <ERASE> .........................................................   13
+     -ERASE ..........................................................   14
+     ERASING EXTRANEOUS CHARACTERS ...................................   14
+     ERASING TEXT ....................................................   14
+     EXECUTE A FUNCTION ..............................................   14
+     EXIT ............................................................   15
+     FILENAME ........................................................   15
+     FILES ...........................................................   16
+     FILL ............................................................   16
+     FUNCTION KEYS ...................................................   16
+     GOTO ............................................................   17
+     <HOME> ..........................................................   17
+     <INSERT> ........................................................   17
+     INTERACTIVE REPLACE .............................................   17
+     JOIN ............................................................   17
+     JUSTIFY .........................................................   18
+     KEYSTROKE FILE ..................................................   18
+     <LEFT> ..........................................................   19
+     <LEFT ARROW> ....................................................   19
+     <+LINE> .........................................................   19
+     <-LINE> .........................................................   19
+     LINE MANIPULATION ...............................................   20
+     LONG LINES ......................................................   20
+     MARGIN CHARACTERS ...............................................   20
+     MARGINS .........................................................   21
+     <MARK> ..........................................................   21
+     MOVING LINES ....................................................   22
+     MOVING TEXT BETWEEN FILES .......................................   22
+     MOVING THE WINDOW ...............................................   22
+     NAME ............................................................   22
+     OPEN ............................................................   23
+     <OPEN> ..........................................................   23
+     <+PAGE> .........................................................   23
+     <-PAGE> .........................................................   23
+     PAGINATION ......................................................   24
+     PARAGRAPHS ......................................................   24
+     PICK ............................................................   24
+     -PICK ...........................................................   24
+     <PICK> ..........................................................   25
+     PICK BUFFER .....................................................   25
+     PLACING TEXT ....................................................   26
+     QUITTING ........................................................   26
+     RECOVERY ........................................................   26
+     RECTANGULAR AREAS ...............................................   27
+     REDRAW ..........................................................   27
+     RENAMING FILES ..................................................   27
+
+
+
+
+
+
+
+
+
+
+
+                                      -v-
+
+
+     REPLACE .........................................................   28
+     REPLAYING A SESSION .............................................   29
+     <RETURN> ........................................................   29
+     <RIGHT> .........................................................   30
+     <RIGHT ARROW> ...................................................   30
+     RUN .............................................................   30
+     SAVE ............................................................   30
+     SAVING FILES ....................................................   31
+     <+SCH> ..........................................................   31
+     <-SCH> ..........................................................   31
+     SCRATCH FILE ....................................................   31
+     SEARCHING .......................................................   32
+     SETTING TABS ....................................................   32
+     SPLIT ...........................................................   32
+     <S/R TAB> .......................................................   32
+     STATE FILE ......................................................   32
+     TAB .............................................................   33
+     -TAB ............................................................   33
+     <+TAB> or <TAB> .................................................   33
+     <-TAB> or |SHIFT+TAB| ...........................................   33
+     TABFILE .........................................................   33
+     TABS, THE TOPIC .................................................   34
+     TABS ............................................................   34
+     -TABS ...........................................................   34
+     TRACK ...........................................................   34
+     -TRACK ..........................................................   35
+     UNDERLINING .....................................................   35
+     UNMARK ..........................................................   35
+     UP ARROW ........................................................   36
+     USING A FILE ....................................................   36
+     WIDE FILES ......................................................   36
+     WIDTH ...........................................................   36
+     WINDOW ..........................................................   36
+     WINDOWS .........................................................   37
+     #o ..............................................................   37
+     #p ..............................................................   37
+
+      III.  THE STANDARD KEYBOARD ....................................   38
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

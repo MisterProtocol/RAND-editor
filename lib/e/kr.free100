@@ -1,0 +1,20 @@
+     KNKKKKKNKKKKKNKKKKKNKKKKKNKKKKKG         FKKKKKNKKKKKNKKKKKNKKKKKG
+      J UPA J DNA J LTA J RTA J CMD J<KKKsKKK>J     J-SRCHJREPL J+SRCHJ
+      J  ^  J  J  J     J     J CMD J    h    JSPLITJINSMDJDELCHJHELP J
+      J  J  J  V  J <KK J KK> Jhome J    i    J clr Jline J charJprintJ
+     KIKKKKKIKKKKKIKKKKKIKKKKKIKKKKKL    f    MKKKKKIKKKKKIKKKKKIKKKKKL
+      J     J     J     J BSP J     J    t    J     J     J     J     J
+      J  -  J  =  J  `  J bsp JbreakJ    e    J  7  J  8  J  9  J  -  J
+     KIKKNKKOKKNKKOKKNKKOKKNKKOKKNKKH    d    MKKKKKIKKKKKIKKKKKIKKKKKL
+         J     J     J     J DEL J            J     J     J     J     J
+         J  [  J  ]  J     JrubotJ            J  4  J  5  J  6  J  ,  J
+     KNKKOKKNKKOKKNKKH     MKKKKKL            MKKKKKIKKKKKIKKKKKIKKKKKL
+      J     J     J   CR   J     J            J     J     J     J     J
+      J  ;  J  '  J return J  \  J            J  1  J  2  J  3  J     J
+     KOKKNKKOKKNKKOKKKKKNKKOKKNKKH            MKKKKKOKKKKKIKKKKKL     J
+         J     J        J CR  J               J           J     J     J
+         J  /  J  shift J lf  J               J     0     J  .  JenterJ
+        KOKKKKKOKKKKKKKKOKKKKKH               EKKKKKKKKKKKOKKKKKOKKKKKH
+ Commands of the form cXXXX perform XXXX when used with ctrl key.
+ Commands of the form eXXXX perform XXXX when used following the ESC key.
+ Commands on function keys have shifted and normal forms.

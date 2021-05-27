@@ -1,0 +1,12 @@
+.SH MACROS
+The editor has elementary support for macros.
+This support is in the form of a "record/play" capability.
+As documented in the section "COMMANDS", the editor supports "record",
+"play", and "store" commands.  The command \fI<cmd>record\fR begins
+recording editor commands and typed text, until a second \fI<cmd>record\fR
+command is given.  The macro that has been recorded may then be replayed
+by the command \fI<cmd>play [N]\fR. The optional count \fIN\fR gives the
+number of times the macro should be replayed; once is the default.
+The macro thus recorded may be assigned
+a name by executing \fI<cmd>store [name]\fR. The named macros may
+be replayed by the command \fI<cmd>play $name [N]\fR. 

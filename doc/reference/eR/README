@@ -1,0 +1,4 @@
+these files expect to be in /usr/lib/tmac/*.
+
+if you move them somewhere else, check and change
+the .so entries.

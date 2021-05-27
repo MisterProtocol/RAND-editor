@@ -1,0 +1,428 @@
+==========================================================================
+
+E version 18
+
+October, 1984
+
+==========================================================================
+
+--------
+The +WORD and -WORD functions have been implemented.  The two
+associated modes are:
+
+	whitespace - words are delimited by blanks/newlines (default)
+
+	alphanum   - words are delimited by all special characters
+		     and blanks, but the cursor advances to the first
+		     alphanumeric character following the delimiter.
+		     (NOTE: in the following string, the cursor
+		     will be positioned at 'x' after repeated +WORDs
+		     from the left: "xaa xaaa x $x x.x x_x x->x $$ . x").
+
+See the new "set" command below to change the mode.
+
+--------
+Regular expression pattern matching has been implemented for searching
+and replacing.  This mode is enabled by the "re[gexp]" command (or by
+the command line argument "-regexp").  In regular expression mode, "RE"
+is displayed at the bottom of the screen.  The command "-re[gexp]"
+returns returns to non-regular expression mode.
+
+The regular expressions recognized are described below. This description
+is essentially the same as that for ed.
+
+	A regular expression specifies a set of strings of characters.
+	A member of this set of strings is said to be matched by
+	the regular expression.  In the following specification for
+	regular expressions the word `character' means any character but NUL.
+
+	1.  Any character except a special character matches itself.
+	    Special characters are the regular expression delimiter plus
+	    \ [ . and sometimes ^ * $.
+	2.  A . matches any character.
+	3.  A \ followed by any character except a digit or ( )
+	    matches that character.
+	4.  A nonempty string s bracketed [s] (or [^s]) matches any
+	    character in (or not in) s. In s, \ has no special meaning,
+	    and ] may only appear as the first letter. A substring
+	    a-b, with a and b in ascending ASCII order, stands for
+	    the inclusive range of ASCII characters.
+	5.  A regular expression of form 1-4 followed by * matches a
+	    sequence of 0 or more matches of the regular expression.
+	6.  A regular expression, x, of form 1-8, bracketed \(x\)
+	    matches what x matches.
+	7.  A \ followed by a digit n matches a copy of the string that the
+	    bracketed regular expression beginning with the nth \( matched.
+	8.  A regular expression of form 1-8, x, followed by a regular
+	    expression of form 1-7, y matches a match for x followed by
+	    a match for y, with the x match being as long as possible
+	    while still permitting a y match.
+	9.  A regular expression of form 1-8 preceded by ^ (or followed
+	    by $), is constrained to matches that begin at the left
+	    (or end at the right) end of a line.
+	10. A regular expression of form 1-9 picks out the longest among
+	    the leftmost matches in a line.
+	11. An empty regular expression stands for a copy of the last
+	    regular expression encountered.
+
+------------
+set command - allows various options to be set
+
+       Syntax:   CMD: set option value
+
+       Example:  CMD: set +line 10
+
+   Options:
+       +line n  - sets the +line key to 'n' lines
+       -line n  - sets the -line key to 'n' lines
+       line n   - sets the +line and -line keys to 'n' lines
+       +page n  - sets the +page key to 'n' screens
+       -page n  - sets the -page key to 'n' screens
+       page n   - sets the -page and +page keys to 'n' screens
+       ?        - displays the values of several options
+		  (same as the "?set" command)
+       bell     - enable the bell
+       nobell   - disable the bell
+       left n   - sets the <window left> key to 'n' cols
+       right n  - sets the <window right> key to 'n' cols
+       window n - sets the <window left> and <window right> keys to 'n' cols
+       width n  - sets the linewidth to 'n' cols (for fill, etc.)
+       wordelim 'mode' - sets the action of the +word and -word functions
+			to 'mode' (see +word and -word above).
+
+The "line", "page", and "window" options may be individually set in
+different windows.
+
+------------
+
+To compile for System III or V, include -DSYSIII in the DEFS line of
+the Makefile, or better yet, define SYSIII in ../../include/localenv.h.
+
+------------
+
+Changed to deal with symbolic links.  The link is read, and the
+referenced file (and name) is used rather than the link itself.
+Renaming is disallowed for files referenced from a symbolic link.
+
+-----------
+
+The Ann Arbor Ambassador compiled in code (../term/ambas.c) now downloads
+the Standard Keyboard into the function keys.  This is the default
+outside of Rand.  Within Rand, this happens if the environment variable
+EKBD is set to "aaastandard".  The only side effect of this change is that
+the <BACKSPACE> key is non-destructive (same as the standard
+keyboard), and <DEL> must be used for a destructive backspace.)
+
+-----------
+
+In commands that specify filenames (e.g., "CMD: e file"), a leading
+"~/" or "~user" is expanded to the appropriate home directory.
+
+----------
+
+Several minor bugs were fixed.
+
+==========================================================================
+
+E Changes: E version 15 & 17
+
+Saturday, Dec 17, 1983
+
+==========================================================================
+
+--------
+
+No more "#" file.  Instead, "#p" (pick) and "#o" (old lines).  Both are
+writable.  Thus you can cut down on the size of the "#" files, thus
+freeing up memory.  Picking lines from the "#p" file won't append anything
+to the "#p" file.
+
+Every time a line is changed, the previous version goes into the "#o" file.
+
+--------
+
+The new "box" command draws a box just inside the marked or specified area.
+  The `|' and `-' characters are used for the vertical and horizontal
+  members.  Corners and crossings are displayed as `+'.  If a `box' command
+  tries to put a `|' where there is already a `-' or vice versa, then
+  it is considered a crossing, and a `+' character is placed there instead.
+  Simple horizontal and vertical lines can be drawn with
+  the `box' command simply by making a box with single-character height or
+  width respectively.
+
+--------
+
+New commands for `putting' buffers:
+	cover <buffer>
+	overlay <buffer>
+	underlay <buffer>
+	blot <buffer>
+	-blot <buffer>
+	insert <buffer>
+where <buffer> is one of:
+	adjust close erase pick run box
+The close, erase, and pick buffers are the buffers filled by the commands
+of the same names.  The adjust buffer holds the text deleted by the last
+fill, justify, or center command.  The run buffer holds the text deleted by
+the last run command.  The box buffer is a pseudo buffer that has a box
+in it of the size of the currently specified rectangular area.  Note that
+the close buffer is no longer the repository for text deleted by fill,
+justify, center, or run.
+  insert does what used to be called a "put", e.g. <CMD><CLOSE>, etc.  What
+      is new is that some of the new other "Q-Buffers" can now be inserted.
+  cover places the named buffer over top of the text without moving anything.
+  overlay is like cover, except that only the printing characters in the
+      buffer clobber the original text.
+  underlay is the reverse of overlay, i.e. the buffer covers only the non-
+      printing characters of the original text.
+  blot is like overlay except that positions in the file corresponding to
+      printing characters in the buffer are erased.
+  -blot is like blot except that positions in the file corresponding to
+      blanks in the buffer are erased.
+
+--------
+
+Join command is different.
+    In the new version of E, the `join' command works differently.  In
+    older versions it joined at the current cursor position the current
+    line with the next line.  If there happened to be text on the current
+    line beyond the cursor, too bad; it was lost.  Also, if there was
+    leading whitespace at the beginning of the next line, it was preserved.
+    Both of the preceding situations are almost never wanted.
+
+    In the new version, the join command looks forward starting at the
+    beginning of the next line for the first non-blank character in the
+    file and joins that and the rest of its line to the end of the current
+    line.
+
+    If the cursor position is beyond the end of the current line the join
+    point is the cursor position, else it is one space beyond the end of
+    the current line.  In no case is any printing text deleted.
+
+    Note that it is easy to delete text from cursor to end of line with
+    <CMD><DELCHAR>, and if that is desired it can be done explicitly prior
+    to the join.
+
+    As a new feature, you can mark the two points you want joined with the
+    <MARK> key.  All text deleted by the operation is saved in the close
+    buffer.
+
+    This new way handles the most-used case best and avoids the mistaken
+    closing of text.
+
+--------
+
+New `track' and `-track' commands.  `Track' causes the current file and the
+  alternate file to track each other.  That is, if you move the window in any
+  direction, the alternate file window is moved the same amount.
+  This is useful for comparing two files.
+
+If the you move the window in any direction, the cursor for the alternate
+  file will be in the same position relative to the window as the current
+  file's cursor.  In no case will the alternate file's window be moved
+  backwards past the beginning of the file or to the left beyond the left
+  edge of the file.  A `TRACK' indicator will appear on the info line if
+  tracking is set in the window you are you are in.  The `-track' command
+  turns off tracking in the current window.
+
+--------
+
+New `range' and `-range' commands.
+
+The range of searches and replaces can be limited to a selected
+number of lines with the range command.  This can be very helpful
+if you are only doing searches and replaces in a specific section
+of a file, like a program subroutine or a document section.
+
+You either mark some lines and do
+    CMD: range
+or say explicitly how many lines or paragraphs, as in
+    CMD: range 45
+and an indicator `=RANGE' will show up on the bottom line of the screen,
+indicating that a range is set, and you are inside the range.  If you see
+`<RANGE' or `>RANGE' you are before or after the set range, respectively.
+To turn off the set range, say
+    CMD: -range
+and the `RANGE' indicator will go away.  If you want to set the same range
+again, just say
+    CMD: range
+and the previous range will be in effect again.  To find out the extent
+of the range, whether it is in effect or not, use
+    CMD: ?range
+
+If you insert or delete lines in the file, the ends of the range will
+adjust to keep pointing to the same text.  Separate ranges can be
+set for the current and alternate file in each window.
+
+You can go to the beginning or end of a range with commands like:
+    CMD: goto rbeginning
+    CMD: goto rend
+and `rb' and `re' are guaranteed abbreviations for these.
+Once a range has been set, you can use these goto commands even if
+the range is not currently in effect.
+
+-------
+
+New "stop" command.
+
+Stops the editor.  Only works on systems with job control,
+i.e. presently only 4.1bsd and up.
+
+--------
+
+Two new ways to exit:
+    CMD: exit nosave
+     This is like normal exit except that no saves happen.
+    CMD: exit quit
+     This is like exit abort, but deletes the keystroke file.
+
+		  saves files   update state   rmv keys   rmv chg file
+		  -----------   ------------   --------   ------------
+    exit               X             X             X          X
+  * exit nosave        -             X             X          X
+  * exit quit          -             -             X          X
+    exit abort         -             -             -          X
+    exit dump          -             -             -          -
+
+    CMD: b
+is forever a guaranteed acceptable abbreviation for the "bye" command,
+which is a synonym for exit.
+
+The "exit load" option has been withdrawn as obsolete.
+
+As part of the exit sequence each SAVE, DELETE, and RENAME message
+is shown separately at the bottom of the screen, scrolling up everything
+above it.
+
+--------
+
+If you edit a file which does not exist yet,
+the file will not actually be created unless something is written into it.
+
+--------
+
+If there is an `editalt' environment variable, it becomes the alt file,
+else if there is a second filename it becomes the alt file.
+
+Removed secret feature that would position the window to lin and col
+if those numeric arguments followed the filename.
+
+-------
+
+New command line options:
+
+  % e -bullets
+  % e -nobullets
+  Forces border bullets on or off regardless of the line speed
+
+  % e -terminal=aa
+  Sets the terminal type to `aa', for example.
+  Overrides TERM environment variable, if any.
+  If no compiled-in code for the terminal, termcap will be used
+  and keyboard will be `standard'.
+
+  % e -keyboard=standard
+  Sets the keyboard type to `standard', for example.
+  Overrides `-terminal=' argument if any.
+  Overrides EKBD environment variable, if any
+
+  % e -dtermcap
+  Forces E to use termcap instead of compiled-in code.
+
+--------
+
+E no longer turns off messages.
+
+-------
+
+Inplace update now sets modify time of backup file to same as
+original file.
+
+Inplace can be set explicitly for a file even if it has only one link.
+If e -inplace invoked, it will not automatically set INPLACE on singly-linked
+files, however.
+
+--------
+
+There is now a "standard" E keyboard, that is designed to be usable
+on even the most limited keyboards.  Say "e -keyboard=standard" or
+"setenv EKBD standard" to select this keyboard.  Sorry to say, even
+I use this exclusively now, because I have to use E on several different
+terminals, and it is too much trouble to keep re-adjusting to different
+function key layouts.  Here is the "standard" layout:
+
+
+Rand Editor `standard' keyboard           12/17/83
+
+This keyboard layout is designed to be used on
+terminals with no function keys.  "^H" means control-H,
+and "^X-^U" means control-X followed by control-U.
+The ALT entry gives you a choice of `^/' or `^_' because
+one or the other or both will not work on some terminals.
+(`_' is correct ASCII.)
+
+Note that JOIN, SPLIT, and ERASE are now available as function keys.
++WORD and -WORD are not implemented yet.
+
++-------------------------------------+----------------------+
+|                                     |                      |
+| (ext)         ^X                    |    ^@     CMD        |
+| +LINE         ^D                    |    ^A     CMD        |
+| +PAGE         ^R                    |    ^B     -WORD      |
+| +SRCH         ^Y                    |    ^C     BSP        |
+| +TAB          ^I                    |    ^D     +LINE      |
+| +WORD         ^N                    |    ^E     -PAGE      |
+| -LINE         ^F                    |    ^F     -LINE      |
+| -PAGE         ^E                    |    ^G     HOME       |
+| -SRCH         ^T                    |    ^H     LEFT       |
+| -TAB          ^X-^U                 |    ^I     +TAB       |
+| -WORD         ^B                    |    ^J     DOWN       |
+| ALT           ^X-^A or ^_ or ^/     |    ^K     UP         |
+| BSP           ^C                    |    ^L     RIGHT      |
+| CHG WIN       ^X-^W                 |    ^M     RETURN     |
+| CLOSE         ^V                    |    ^N     +WORD      |
+| CMD           ^A or NULL or ^@      |    ^O     OPEN       |
+| CTRLCHAR      ^X-^C                 |    ^P     PICK       |
+| DELCHAR       ^W                    |    ^Q     (not used) |
+| DOWN          ^J                    |    ^R     +PAGE      |
+| ERASE         ^X-^E or ^^           |    ^S     (not used) |
+| HOME          ^G                    |    ^T     -SRCH      |
+| INSERT        ^Z or ESC or ^[       |    ^U     MARK       |
+| INT           ^\                    |    ^V     CLOSE      |
+| JOIN          ^X-^J                 |    ^W     DELCHAR    |
+| LEFT          ^H                    |    ^X     (ext)      |
+| MARK          ^U                    |    ^Y     +SRCH      |
+| OPEN          ^O                    |    ^Z     INSMODE    |
+| PICK          ^P                    |    ^[     INSERT     |
+| REPL          ^X-^R or ^]           |    ^\     INT        |
+| RETURN        ^M                    |    ^]     REPL       |
+| RIGHT         ^L                    |    ^^     ERASE      |
+| SPLIT         ^X-^B                 |    ^_     ALT        |
+| TABS          ^X-^T                 |    ^/     ALT        |
+| UP            ^K                    |    ^X-^A  ALT        |
+| WIN LEFT      ^X-^H                 |    ^X-^C  CTRLCHAR   |
+| WIN RIGHT     ^X-^L                 |    ^X-^E  ERASE      |
+|                                     |    ^X-^H  WIN LEFT   |
+|                                     |    ^X-^J  JOIN       |
+|                                     |    ^X-^L  WIN RIGHT  |
+|                                     |    ^X-^R  REPL       |
+|                                     |    ^X-^B  SPLIT      |
+|                                     |    ^X-^T  TABS       |
+|                                     |    ^X-^U  -TAB       |
+|                                     |    ^X-^W  CHG WIN    |
+|                                     |                      |
++-------------------------------------+----------------------+
+
+===============
+1983
+
+Now uses CBREAK mode.  ^X^S changed to ^X^B to avoid ^S.
+
+Now uses erase to end of line, insert line, delete line,
+and on vt100, region scroll.
+
+File and directory access checking now uses access() system
+call rather than mucking with permission bits.  This solves
+bug where E thought it could modify files on a readonly
+file system.  Also handle 4.2 group permissions portably.
+

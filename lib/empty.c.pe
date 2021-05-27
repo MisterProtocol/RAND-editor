@@ -1,0 +1,10 @@
+/* Perkin Elmer version 12/81 */
+
+#include <sgtty.h>
+
+empty (fd)
+{
+    long count;
+
+    return ioctl (fd, TIOCEMPTY, &count) < 0;
+}

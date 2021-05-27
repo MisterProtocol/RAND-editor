@@ -1,0 +1,33 @@
+if test -f ,includes
+then    rm ,includes
+fi
+for i
+do
+	unifdef `cat Ifdefs` $i \
+	| sed -n "/^#[ 	]*include/s/.*/$i: &/p"  \
+	>> ,includes
+done
+sed '
+	s#:.*SIG_INCL.*#: $(STD)$(SIG_INCL)#
+	s#:.*SGTT_INCL#: $(STD)$(SGTT_INCL)#
+	s#:[^"<]*\(["<][^">]*\).*#: \1#
+	s#\([^ ]*\)\.c#$(O)\1.o#
+	s#"##
+	s#<c_env#$(LOCALINCL)c_env#
+	s#<localenv#$(LOCALINCL)localenv#
+	s#<#$(STD)#
+	/^e.h:.*la.h/s#STD#LA#
+	/^e.h:.*ff.h/s#STD#FF#
+' ,includes >,makedep
+echo '/^# DO NOT DELETE THIS LINE/+2,$d' >,eddep
+echo 'r ,makedep' >>,eddep
+echo 'w' >>,eddep
+echo 'q' >>,eddep
+rm ,Makefile
+cp Makefile ,Makefile
+ed - Makefile < ,eddep
+echo '' >> Makefile
+echo '# DEPENDENCIES MUST END AT END OF FILE' >> Makefile
+echo '# IF YOU PUT STUFF HERE IT WILL GO AWAY' >> Makefile
+echo '# see make depend above' >> Makefile
+rm ,eddep ,makedep ,includes

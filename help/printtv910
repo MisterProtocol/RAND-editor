@@ -1,0 +1,33 @@
+
+
+
+                                        Televideo 910 Keyboard Layout for the Rand Editor
+
+ +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+ |  esc  |   1   |   2   |   3   |   4   |   5   |   6   |   7   |   8   |   9   |   0   |   -   |   =   |   `   |   \   | back  |
+ |       |       |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+ | INSMOD|       |       |       |       |       |       |       |       |       |       |       |       |       |  INT  | LEFT  |
+ +-------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+-------+---+---+-------+
+ |    tab    |   q   |   w   |   e   |   r   |   t   |   y   |   u   |   i   |   o   |   p   |   [   |  linefeed |   |clear space|
+ |           |       |xCHGWDW|xERASE | xREPL | xTABS |       | x-TAB |       |       |       |       |           |   |           |
+ |    TAB    |       | DELCH | -PAGE | +PAGE | -SRCH | +SRCH |  MARK |  TAB  |  OPEN |  PICK | INSMOD|    DOWN   |   |   OPEN        |
+++------+----+--+----+--+----+--+----+--+----+--+----+--+----+--+----+--+----+--+----+--+----+--+----+--+--------+   +---------+-+
+|  ctl  | alplk |   a   |   s   |   d   |   f   |   g   |   h   |   j   |   k   |   l   |   ;   |   '   |  return    |  break  |
+|       |       | xALT  |       |       |       |       | xWLEFT| xJOIN |       | xWRITE|       |       |            |         |
+|       |       |  CMD  | xSPLIT| -LINES| +LINES| HOME  |  LEFT |  DOWN |  UP   | RIGHT |       |       |     CR     |   CMD   |
++-------+-------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+-------+---------+
+| bktab |   shift   |   z   |   x   |   c   |   v   |   b   |   n   |   m   |   ,   |   .   |   /   |  shift |   {   |   del   |
+|       |           |       |       |  BSP  |       |       |       |       |       |       |       |        |       |         |
+| -TAB  |           | INSMOD|       |xCTRLQ | CLOSE | -WORD | +WORD |  CR   |       |       |       |        |       |   BSP      |
++-------+--+-------++------++-------+-------+-------+-------+-------+-------+-------+-------+-------+--------+-------+---------++
+	   | print | funct |                             space                          |  home | down  |  up   | left  | right |
+	   |       |       |                                                            |       |       |       |       |       |
+	   |       |       |                                                            | DELCH | DOWN  |  UP   | LEFT  | RIGHT |
+	   +-------+-------+------------------------------------------------------------+-------+-------+-------+-------+-------+
+
+
+                        All commands of the form "xXXXXX" are accessed by the combination <CTRL+x><CTRL+*>
+                                               All others are <CTRL+*> except for:
+                           backtab, esc, return, backspace, clearspace, break, del, home, and arrowkeys
+
+                                          The keypad is not used for control functions.

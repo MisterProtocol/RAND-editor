@@ -1,0 +1,4 @@
+editor.eR is the source to the draft E reference manual.  it
+needs to be compiled with nroff and troff using the eR macro
+package (included here under eR).
+

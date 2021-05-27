@@ -1,0 +1,22 @@
+#0  0x00000033f4c32925 in raise () from /lib64/libc.so.6
+#1  0x00000033f4c34105 in abort () from /lib64/libc.so.6
+#2  0x00000033f4c70837 in __libc_message () from /lib64/libc.so.6
+#3  0x00000033f4c76166 in malloc_printerr () from /lib64/libc.so.6
+#4  0x00000033f4c78c93 in _int_free () from /lib64/libc.so.6
+#5  0x00000033f4c667cd in fclose@@GLIBC_2.2.5 () from /lib64/libc.so.6
+#6  0x0000000000420dcf in cleanup (filclean=-185014400, rmkeysflg=0) at e.sb.c:260
+#7  0x00000000004213e8 in dofatal (type=0, msg=0x42b330 "", a1=4096, a2=-1157599232, a3=-1, a4=0, a5=659919730, a6=-1157604008, a7=-9264, a8=-1157604009,
+    a9=-9264) at e.sb.c:501
+#8  0x0000000000420f43 in fatal (type=0, msg=0x42b330 "", a1=4096, a2=-1157599232, a3=-1, a4=0, a5=659919730, a6=-1157604008, a7=-9264, a8=-1157604009,
+     a9=-9264) at e.sb.c:390
+#9  0x00000000004214d5 in salloc (n=7432330584, fatalflg=1) at e.sb.c:593
+#10 0x000000000041dad2 in excline (length=0) at e.la.c:447
+#11 0x000000000041d37d in GetLine (ln=0) at e.la.c:114
+#12 0x0000000000413d00 in putup (ls=0, lf=38, strtcol=0, ncols=223) at e.t.c:208
+#13 0x0000000000413b47 in putupwin () at e.t.c:113
+#14 0x000000000040b50e in editfile (file=0x7fffffffe475 "long33k", col=0, line=0, mkopt=1, puflg=1) at e.u.c:352
+#15 0x0000000000402954 in main1 (argc=0, argv=0x7fffffffe108) at e.c:470
+#16 0x0000000000402359 in main (argc=2, argv=0x7fffffffe108) at e.main.c:37
+(gdb)
+
+
