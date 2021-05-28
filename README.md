@@ -109,3 +109,27 @@ in an idiosyncratic way, as it dates from a "do-it-yourself" era when
 third-party libraries were nonexistent.  The second branch handles mouse
 support by means of a completely rewritten input section, which uses
 `ncurses` to multiplex terminal and mouse input.
+
+### Extra files
+
+There are a number of extra files and directories included in the repository
+that are not directly involved in building the editor or its helper
+executables.  These are present for historical interest, and because
+they have been useful in the past in debugging problems with the editor.
+"pres.c", for example, will print the editor "state files" in a
+human-readable form.  If you're not interested in them they may simply
+be removed.
+
+### What to Do First
+
+Read the `README` file.  Read the top level `Makefile`, and `e19/Makefile`.
+Do what those Makefiles say.  The most common way to build the editor,
+after everything has been set up, is to say `make clean bsd` or
+`make clean s5` at the top level. 
+Before installing, you should test the editor.  The editor executable
+is left in `e19/le`.  The origin of the name `le` as opposed to `e`
+is lost to history.
+Note that this will not build the
+filter executables or the `man` files.  Look in the subdirectories
+such as `fill` and `man` for those.  Finally, `make bsd.install` or
+`make s5.install` will install the editor on your system.
