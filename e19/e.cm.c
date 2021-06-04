@@ -806,7 +806,7 @@ Flag on;
 		if (fileflags[curfile] & CANMODIFY)
 		    break;
 		if (fileflags[curfile] & FWRITEABLE ||
-			userid == fgetowner (curfile))
+			userid == (unsigned int)fgetowner (curfile))
 		    fileflags[curfile] |= CANMODIFY;
 		break;
 

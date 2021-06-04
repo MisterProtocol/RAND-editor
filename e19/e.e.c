@@ -138,7 +138,8 @@ Flag    puflg;
 	nsave = ncline;
 	ncline = col + 1;
 	fcline = YES;
-	putline (NO);
+     /* putline (NO); */
+	putline ();
 	/* make the second line */
 	cline[col] = csave;
 	ncline = nsave - col;
@@ -1163,7 +1164,7 @@ void
 clean (tmpfile)
 Small tmpfile;
 {
-#ifdef lint
+#ifdef YES  /* was lint to quiet warnings */  /* todo: why is this routine called? */
     if (tmpfile)
 	{}
 #endif

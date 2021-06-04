@@ -127,15 +127,17 @@ void
 releasewk (wk)
 register S_wksp *wk;
 {
-    if (wk->wfile != NULLFILE) {
-	(void) la_close (&wk->las);
-	wk->wfile = NULLFILE;
-    }
-    wk->wkflags &= ~RANGESET;
-    if (wk->brnglas) {
-	(void) la_close (wk->brnglas);
-	wk->brnglas = (La_stream *) 0;
-	(void) la_close (wk->ernglas);
+    if (wk != NULL) {
+	if (wk->wfile != NULLFILE) {
+	    (void) la_close (&wk->las);
+	    wk->wfile = NULLFILE;
+	}
+	wk->wkflags &= ~RANGESET;
+	if (wk->brnglas) {
+	    (void) la_close (wk->brnglas);
+	    wk->brnglas = (La_stream *) 0;
+	    (void) la_close (wk->ernglas);
+	}
     }
     return;
 }
@@ -155,7 +157,8 @@ Reg1 Flag onoff;
 {
     static Flag wason;
 
-    if ((onoff = (onoff ? YES : NO) ^ wason)) {
+/*  if ((onoff = (onoff ? YES : NO) ^ wason)) { */
+    if ((onoff = onoff ? YES : NO) ^ wason) {
 	if ((wason = onoff))
 	    info (inf_range + 1, 5, "RANGE");
 	else {

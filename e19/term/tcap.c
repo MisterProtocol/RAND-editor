@@ -137,10 +137,12 @@ register int num;
 /*dl_tcap (num) { tputs(DL, 1, pch); return 1; }*/
 /* ARGSUSED */
 int
-ic_tcap (int num) { tputs(IC, 1, pch); return 1; }
+/*ic_tcap (int num) { tputs(IC, 1, pch); return 1; }*/
+ic_tcap () { tputs(IC, 1, pch); return 1; }
 /* ARGSUSED */
 int
-dc_tcap (int num) { tputs(DC, 1, pch); return 1; }
+/*dc_tcap (int num) { tputs(DC, 1, pch); return 1; }*/
+dc_tcap () { tputs(DC, 1, pch); return 1; }
 int
 cle_tcap () { tputs(CE, 1, pch); return 1; }
 #ifdef LMCHELP

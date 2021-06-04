@@ -393,6 +393,12 @@ Ncols   col;
     register S_wksp *lwksp;
     register S_wksp *cwksp;
 
+    /* Some replays result in this error condition (5/2021) */
+    if (curwin == &enterwin) {
+	chgwindow(-1);
+	mesg (ERRALL + 1, "An error has been detected, please exit and restart your session.");
+    }
+
     if (curfile == deffn) {
 	/* insure that the new altwksp will be null */
 	releasewk (curwin->wksp);

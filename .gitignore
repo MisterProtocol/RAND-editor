@@ -5,6 +5,9 @@
 ,*
 *~
 
+# RAND editor files
+.es1*
+
 # Object files
 *.o
 *.ko

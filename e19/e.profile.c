@@ -131,7 +131,7 @@ chk_profile( profilename )
 int
 SafeCurDirProfile()
 {
-	int euid;
+	unsigned int euid;
 	struct stat sb;
 
 	if( userid == 0 || (euid = geteuid()) == 0 )

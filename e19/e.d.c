@@ -776,6 +776,7 @@ Short count;
 }
 
 
+#ifdef UNUSED /* commented out in e.t.c */
 #ifdef  COMMENT
   move characters horizontally within a line at the current position.
   If "delta" > 0, then insert characters, else delete them.
@@ -788,7 +789,7 @@ Scols num;
 char *buf;
 {
     if (term.tt_inschar && term.tt_delchar)
-	; /* how nice */
+    {   ;} /* how nice */
     Block {
 	Reg2 Uchar *rto;
 	rto = &image[icursor];
@@ -805,7 +806,7 @@ char *buf;
     }
     return;
 }
-
+#endif /* UNUSED */
 
 #ifdef  COMMENT
   move a rectangle of text vertically

@@ -319,7 +319,7 @@ Reg2 char *argv[];
 	getout (NO, "");
     }
 
-    if (dbgflg && (dbgfile = fopen (dbgname, "w")) == NULL) {
+    if (dbgflg && (dbgfile = fopen (dbgname, "a")) == NULL) {
 	/*getout (NO, "Can't open debug file: %s", dbgname);*/
 	fprintf(stdout, "Can't open debug file: %s\n", dbgname);
 	fflush(stdout);
@@ -1064,7 +1064,9 @@ startup ()
 
     Block {
 	    Reg1 int indv;
+#ifndef HOSTTMPNAMES
 	    Reg2 int len;
+#endif
 	    DIR *dirp;
 	    Reg4 int i;
 #if SYSV || SOLARIS
@@ -1072,14 +1074,15 @@ startup ()
 #else
 	    struct direct *dp;
 #endif
-	    char tdir[200];
+	    char tdir[4096];
 #ifdef HOSTTMPNAMES
-	    char tname[200];
+	    char tname[4096]; /* Guaranteed larger than deftmpdir, below */
 
 	sprintf(tname, ".%s%s", myname, hostname);
+#else
+	len = strlen (keytmp);
 #endif
 	indv = strlen (tmppath) + VRSCHAR;
-	len = strlen (keytmp);
 
 	if (*tmppath == '/')
 	    strcpy(tdir, deftmpdir);

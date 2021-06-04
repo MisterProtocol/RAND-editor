@@ -269,12 +269,12 @@ Scols   ncols;      /* number of columns for partial line redraw */
 	 **/
 
 	/*dbg*/
-	int fc_rval;
+	/*int fc_rval;*/
 
 	if (   offendflg
 	    || (fc = fnbcol (cline, lcol, min (ncline, lcol + rlimit))) < lcol
 	   ) {
-	    fc_rval = fc;
+	    /*fc_rval = fc;*/
 	    fc = rlimit;
 	}
 	else
@@ -495,12 +495,10 @@ offbullets ()
 void
 offbullets ()
 {
-    Reg1   Scols  occ;
     Reg2   Slines ocl;
 
     if (!borderbullets)
 	return;
-    occ = oldccol;
     oldccol = cursorcol;
     ocl = oldcline;
     oldcline = cursorline;
@@ -539,7 +537,8 @@ Flag newbullets;
 	/* do top */
 #ifdef LMCMARG
 	if (occ < oldccol)
-	    tm_unbullet (allbullets, occ, -1, TMCH, BTMCH, NO);
+	    /*tm_unbullet (allbullets, occ, -1, TMCH, BTMCH, NO);*/
+	    tm_unbullet (allbullets, occ, -1, TMCH, NO);
 #else /* LMCMARG */
 	if (!allbullets && occ < oldccol) {
 	    poscursor (occ, -1);
@@ -550,7 +549,8 @@ Flag newbullets;
 	putch (BULCHAR, NO);
 #ifdef LMCMARG
 	if (occ > oldccol)
-	    tm_unbullet (allbullets, occ, -1, TMCH, BTMCH, NO);
+	    /*tm_unbullet (allbullets, occ, -1, TMCH, BTMCH, NO);*/
+	    tm_unbullet (allbullets, occ, -1, TMCH, NO);
 #else /* LMCMARG */
 	if (!allbullets && occ > oldccol) {
 	    poscursor (occ, -1);
@@ -560,7 +560,8 @@ Flag newbullets;
 	/* do bottom */
 #ifdef LMCMARG
 	if (occ < oldccol)
-	    bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH, NO);
+	    /*bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH, NO);*/
+	    bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH);
 #else /* LMCMARG */
 	if (!allbullets && occ < oldccol) {
 	    poscursor (occ, curwin->btext + 1);
@@ -571,7 +572,8 @@ Flag newbullets;
 	putch (BULCHAR, NO);
 #ifdef LMCMARG
 	if (occ > oldccol)
-	    bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH, NO);
+	    /*bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH, NO);*/
+	    bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH);
 #else /* LMCMARG */
 	if (!allbullets && occ > oldccol) {
 	    poscursor (occ, curwin->btext + 1);
@@ -616,12 +618,12 @@ tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
     rewrites the margin character, based on the current tab data.
     If igntab is true, any tab at the character is ignored.
 #endif
+/*tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)*/
 void
-tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
+tm_unbullet (allbullets, occ, tb, ordch, igntab)
     Flag allbullets, igntab;
     Ncols occ, tb;
-    char ordch, xordch;
-
+    char ordch;
 {
     Ncols i;
 
@@ -643,7 +645,8 @@ tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
 #ifdef COMMENT
 void
 bm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
-    Flag allbullets, igntab;
+    Flag allbullets;
+    Flag igntab;  /* not used */
     Ncols occ, tb;
     char ordch, xordch;
 .
@@ -651,9 +654,10 @@ bm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
     rewrites the margin character, based on current margin data.
     If igntab is true, any tab at the character is ignored.
 #endif
+/*bm_unbullet (allbullets, occ, tb, ordch, xordch, Flag igntab)*/
 void
-bm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
-    Flag allbullets, igntab;
+bm_unbullet (allbullets, occ, tb, ordch, xordch)
+    Flag allbullets;
     Ncols occ, tb;
     char ordch, xordch;
 
@@ -714,10 +718,11 @@ stmarg0 (pos, igntab, marflag)
     if (pos >= 0 && pos <= curwin->rtext)
     {
 	if (marflag & TOPMAR)
-	    tm_unbullet (NO, pos, -1, TMCH, TTMCH, igntab);
+	    /*tm_unbullet (NO, pos, -1, TMCH, TTMCH, igntab);*/
+	    tm_unbullet (NO, pos, -1, TMCH, igntab);
 	if (marflag & BOTMAR)
-	    bm_unbullet (NO, pos, curwin->bmarg - 1,
-		    BMCH, BTMCH, igntab);
+	    /*bm_unbullet (NO, pos, curwin->bmarg - 1, BMCH, BTMCH, igntab);*/
+	    bm_unbullet (NO, pos, curwin->bmarg - 1, BMCH, BTMCH);
     }
     return;
 }
@@ -1901,6 +1906,7 @@ sintrup ()                        /* Whether to intrup search/exec      */
     }
 #endif /* SYSSELECT */
 
+/*dbgpr("sintrup(), returning NO\n");*/
     return NO;
 }
 
@@ -2904,19 +2910,19 @@ Flag    cwkspflg;
     Reg6 Slines first;      /* first line of area in window to be changed */
     Reg2 Slines endwin;     /* height of window -1 */
 
-/**
+/**/
 dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
   fn,from,num,delta,cwkspflg);
- **/
+/**/
     for (win = Z; win < nwinlist; win++) {
 	if ((tw = winlist[win]->altwksp)->wfile == fn)
-	    tw->wlin += readjtop (tw->wlin, from, num, delta,
-				  winlist[win]->btext + 1);
+	    /*tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1);*/
+	    tw->wlin += readjtop (tw->wlin, from, num, delta);
 	if ((tw = winlist[win]->wksp)->wfile == fn) {
 	    Nlines wmove;
 	    Reg7 S_window *oldwin;
-	    wmove = readjtop (tw->wlin, from, num, delta,
-			      winlist[win]->btext + 1);
+	    /*wmove = readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1);*/
+	    wmove = readjtop (tw->wlin, from, num, delta);
 	    winfirst = from - (tw->wlin += wmove);
 	    if (tw == curwksp && !cwkspflg)
 		continue;
@@ -2990,13 +2996,13 @@ readjtop (wlin, from, num, delta)
     The logic in redisplay () and the algorithm
     implemented here are closely interdependent.
 #endif
+/*readjtop (wlin, from, num, delta, Slines height)*/
 Nlines
-readjtop (wlin, from, num, delta, height)
+readjtop (wlin, from, num, delta)
 Reg1 Nlines wlin;
 Reg3 Nlines from;
 Reg4 Nlines num;
 Reg2 Nlines delta;
-Slines height;
 {
     /* adjust line num of top of wksp, if necessary  */
 

@@ -104,7 +104,8 @@ Flag rmbak;
     Flag hasmultlinks;
 
 
-    putline (YES);
+ /* putline (YES); */
+    putline ();
     bakfile = NULL;
     if (filename == NULL)
 	origfile = names[fn];

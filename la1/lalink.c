@@ -4,7 +4,7 @@
   Link the fsd chain into plas at the current position.  It is assumed
   that the current position points to the beginning of an fsd.
   Also, the caller should verify that the number of lines to be linked
-  in will not grow the file large enough that its size can\'t be represented
+  in will not grow the file large enough that its size cannot be represented
   within an object of type La_linepos.
 #endif
 void

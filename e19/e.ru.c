@@ -179,12 +179,12 @@ fillopts (cp, str, tmp, equals)
     For now the only option is "width=".
 #endif
 /* ARGSUSED */
+/* fillopts (cp, str, tmp, Flag equals) */
 Cmdret
-fillopts (cp, str, tmp, equals)
+fillopts (cp, str, tmp)
 char *cp;
 char **str;
 Small tmp;
-Flag equals;
 {
     if (tmp == 0) { /* "width" table entry */
 	if ((tmp = doeq (&cp, &tmplinewidth)) < 0)

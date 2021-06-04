@@ -46,14 +46,16 @@ Nlines  ln;
 /*  if (ln < 0) { */
     if (ln < 0 || curlas->la_file == NULL) {
 	if (fcline)
-	    putline (NO);
+	 /* putline (NO); */
+	    putline ();
 	clinelas = (La_stream *) 0;
 	return;
     }
 
     if (ln >= la_lsize (curlas)) {
 	if (fcline)
-	    putline (NO);
+	 /* putline (NO); */
+	    putline ();
 	xcline = YES;         /* past end of file */
 	/* make up a blank line */
 	clinelas = curlas;
@@ -74,7 +76,8 @@ Nlines  ln;
     }
 
     if (fcline)
-	putline (NO);
+	 /* putline (NO); */
+	    putline ();
 
     clinefn = curfile;
     clinelas = rlas = curlas;
@@ -99,15 +102,16 @@ Nlines  ln;
 	Uchar *bufp;
      /* elasdump (rlas, "before getlin");       */
 	if ((nleft = la_lpnt (rlas, &bufp)) <= 0)
-	    /*fatal (FATALIO, "GetLine read err #%d %d",*/
-	    fatal (FATALIO, "GetLine read err #%d %ld",
+	  /*fatal (FATALIO, "GetLine read err #%d %d",*/
+	    fatal (FATALIO, "GetLine read err #%d nleft=%ld",
 		   la_error (), nleft);
     /*  dbgpr("GetLine: nleft=%ld\n", nleft);*/
 	cp = bufp;
 	while (--nleft >= 0) Block {
 	    Reg2 Char ch;
-	    Ncols endcl_clp = (Ncols)(endcl-clp);
-    /*dbgpr("GetLine, --nleft bef excline, ncline=(%ld) nleft=(%ld) endcl_clp=(%d)\n", ncline,nleft,endcl_clp);*/
+	    /* dbg */
+	    /*Ncols endcl_clp = (Ncols)(endcl-clp);*/
+	    /*dbgpr("GetLine, --nleft bef excline, ncline=(%ld) nleft=(%ld) endcl_clp=(%d)\n", ncline,nleft,endcl_clp);*/
 	    if (clp > endcl) Block {    /* check if room in cline */
 		Reg1 Ncols i1;
 		/*ncline = (i1 = clp - cline) + 1;*/
@@ -116,8 +120,9 @@ Nlines  ln;
 		clp = &cline[i1];
 		endcl = &cline[lcline - 9];
 		/*dbg*/
-		endcl_clp = (Ncols)(endcl-clp);
-		/**/dbgpr("GetLine, clp > endcl--nleft bef excline, ncline=(%ld) nleft=(%ld) endcl_clp=(%d)\n", ncline,nleft,endcl_clp);
+		/*endcl_clp = (Ncols)(endcl-clp);*/
+		/*dbgpr("GetLine, clp > endcl--nleft bef excline, ncline=(%ld) nleft=(%ld) endcl_clp=(%d)\n", ncline,nleft,endcl_clp);*/
+
 	    }
     /** dbgpr("GetLine, --nleft aft excline, ncline=(%ld) nleft=(%ld)\n", ncline,nleft); **/
 	    //if(ncline>200000L) {
@@ -174,8 +179,8 @@ putline (allflg)
     will flush them all out.
 #endif
 Flag
-putline (allflg)
-Flag allflg;
+/*putline (Flag allflg)  */
+putline ()
 {
     La_stream tlas;
     int nr;
@@ -449,8 +454,8 @@ Ncols length;
 	j = length;
 
     /*tmp = salloc ((int) (j + 1), YES);*/
-/**/dbgpr("xcline: calling salloc, n=(%ld) ncline=(%ld) lcline=(%ld) icline=(%ld)\n",
-      j, ncline, lcline, icline); /**/
+/**   dbgpr("xcline: calling salloc, n=(%ld) ncline=(%ld) lcline=(%ld) icline=(%ld)\n",
+      j, ncline, lcline, icline);  **/
     tmp = salloc ((Ncols) (j + 1), YES);
     if (ncline > 0)
 	/*move (cline, tmp, (Uint) ncline);*/
@@ -500,7 +505,8 @@ Nlines  stline;
 Nlines  num;
 Flag    type;
 {
-    putline (YES);
+  /*putline (YES);*/
+    putline ();
     return la_lcount (curlas, stline, num, type);
 }
 

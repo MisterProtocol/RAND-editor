@@ -614,6 +614,10 @@ Flag    puflg;
 	    if (delay)
 		setbul (YES);
 	}
+/*
+dbgpr("dplsearch: found, srchline=%d srchcol=%d winlin=%d wincol=%d cursorline=%d cursorcol=%d\n",
+ srchline, srchcol, winlin, wincol, cursorline, cursorcol);
+*/
 	break;
 
     case NOTFOUND_SRCH:
@@ -863,9 +867,9 @@ Nlines line;
 {
     char lstr[16];
 #ifdef LA_LONGFILES
-    sprintf (lstr, "%ld", srchline + 1);
+    sprintf (lstr, "%ld", line + 1);  /* was srchline, which is the arg */
 #else /* LA_LONGFILES */
-    sprintf (lstr, "%d", srchline + 1);
+    sprintf (lstr, "%d", line + 1);
 #endif /* LA_LONGFILES */
     mesg (ERRALL + 2, "Search aborted at line ", lstr);
     d_put (0);

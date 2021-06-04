@@ -109,7 +109,7 @@ typedef struct lastream {
 #define la_lpos   la_spos.xla_lpos
 #define la_cfsd   la_spos.xla_cfsd
 
-#define la_active(plas)	    ((plas) && (plas)->la_file)
+#define la_active(plas)     ((plas) && (plas)->la_file)
 #define la_modified(plas)   (((plas)->la_file->la_mode & LA_MODIFIED)? YES : NO)
 #define la_domodify(plas)   ((plas)->la_file->la_mode |= LA_MODIFIED)
 #define la_unmodify(plas)   ((plas)->la_file->la_mode &= ~LA_MODIFIED)
@@ -145,14 +145,14 @@ extern La_linesize  la_clseek (), la_lget (), la_lpnt ();
 extern La_linesize  la_lrsize (), la_lwsize ();
 extern La_stream   *la_clone (), *la_open (), *la_other ();
 extern int          la_tcollect (), la_verify ();
-extern void	    la_freefsd (), la_link ();
+extern void         la_freefsd (), la_link ();
 
 #define LA_NEWLINE ('\n')
 
 /*  If any of these is not supplied by the user,
  *  a default one will be loaded from the library.
  **/
-extern _Noreturn void   la_abort(char *, ...);       /* called in some bug situations */
+extern _Noreturn void   la_abort(char *);       /* called in some bug situations */
 extern int    la_int();         /* is called periodically during some long  */
 				/* operations, and if it returns non-0, the */
 				/* operation is aborted */
@@ -172,12 +172,12 @@ extern int        la_nbufs;     /* how many cache buffers to use */
 extern La_stream *la_firststream;/* first in chain of open La_streams */
 extern La_stream *la_laststream;/* last in chain of open La_streams */
 extern int        la_errno;     /* last non-La_stream error that occurred */
-extern int	  ff_close ();
-extern char	  ff_fd ();
-extern char	 *my_move ();	/* This is in ff3 */
-extern char	 *fill ();	/* This is in ff3 */
-extern int	  ff_point ();
-extern int	  ff_close (), ff_read (), ff_point (), ff_write ();
+extern int        ff_close ();
+extern char       ff_fd ();
+extern char      *my_move ();   /* This is in ff3 */
+extern char      *fill ();      /* This is in ff3 */
+extern int        ff_point ();
+extern int        ff_close (), ff_read (), ff_point (), ff_write ();
 /* la_errno values: */
 #define LA_BADBAD     2 /* bad stream ptr to la_error call */
 #define LA_INT        3 /* operation was interrupted */

@@ -339,7 +339,8 @@ saveall ()
 	}
 	if (j-- == 0)
 	    break;
-	putline (YES);
+	/*putline (YES);*/
+	putline ();
 	la_sync (NO);   /* flush all cached buffers out */
     }
 

@@ -1,7 +1,7 @@
 #include "lalocal.h"
 
 #ifdef GCC
-extern void *malloc ();
+extern void *malloc (size_t size);
 #else
 extern char *malloc ();
 #endif /*GCC*/
@@ -83,7 +83,7 @@ La_linepos nlines;
 		fsdsize = LA_FSDSIZE + cp - cfsd->fsdbytes;
 	    } else
 		fsdsize = LA_FSDSIZE + 6;
-	    if ((t2fsd = (La_fsd *) malloc (fsdsize)) == NULL) {
+	    if ((t2fsd = (La_fsd *) malloc ((size_t) fsdsize)) == NULL) {
 		la_errno = LA_NOMEM;
 		la_freefsd (nffsd);
 		la_freefsd (nlfsd);

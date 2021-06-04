@@ -25,7 +25,7 @@
 # Workaround: compile with -m32
 #
 #CC = gcc -m32
-CC = gcc
+CC = gcc -std=c99
 #ORG = /usr/rand
 #ORG = /usr/rand
 ORG = /usr/local
@@ -57,7 +57,8 @@ GROUP = wheel
 
 # not on RH enterprise
 #LINUX=-DFLOCK
-LINUX=-DLINUX -D_BSD_SOURCE -DTERMSIM -DGCC
+#LINUX=-DLINUX -D_BSD_SOURCE -DTERMSIM -DGCC
+LINUX=-DLINUX -D_BSD_SOURCE -D_DEFAULT_SOURCE -DTERMSIM -DGCC
 
 
 # Use following for SysV
@@ -88,7 +89,7 @@ BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO -DFSYNCKEYS \
 
 
 #trw:11.19.06
-S5CFLAGS    = -g -Wall -std=c99 # -O
+S5CFLAGS    = -g -Wall -Wextra -Wno-implicit-fallthrough # -O
 #S5CFLAGS   = -g # -O
 #S5CFLAGS   = -g -traditional -traditional-cpp # -O
 #S5CFLAGS   = -g # -O
@@ -96,7 +97,8 @@ S5CFLAGS    = -g -Wall -std=c99 # -O
 
 #mob:3.8.2021
 target bsd: E_TCLIB = -lncurses
-target sys5: E_TCLIB = -ltinfo
+#target sys5: E_TCLIB = -ltinfo
+target sys5: E_TCLIB = -lncurses
 BSDCFLAGS  = -g # -O
 S5LDFLAGS  = -g
 BSDLDFLAGS = -g
@@ -190,7 +192,8 @@ sys5.install:   sys5 s5.help s5.man s5.tmp
 	touch $(BIN)/$(NAME)
 	mv $(BIN)/$(NAME) $(BIN)/$(NAME).old
 	ln e19/le $(NAME)
-	install -u $(OWNER) -g $(GROUP) -f $(BIN) $(NAME)
+#       install -u $(OWNER) -g $(GROUP) -f $(BIN) $(NAME)
+	install -s -o $(OWNER) -g $(GROUP) -m 755 $(NAME) $(BIN)
 	strip $(BIN)/$(NAME)
 	chmod 755 $(BIN)/$(NAME)
 	rm -f $(NAME)
@@ -222,6 +225,7 @@ etc:
 		"DFS=$(LIBDFS)" \
 		"CCF=$(LIBCCF)"
 	cp fill/fill $(LIB)
+	-rm $(LIB)/just
 	ln $(LIB)/fill $(LIB)/just
 	cp fill/center $(LIB)
 	cp fill/run $(LIB)

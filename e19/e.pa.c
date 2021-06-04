@@ -46,7 +46,7 @@ Nlines  parline;
 {
     register char *cp,
 		  *cp1;
-    long tmp;    /* must be int for s2i */ /* Can't be int if MAXNLINES is too large */
+    long tmp;    /* must be long for s2i */
     Nlines plines;
 
     cp = *str;

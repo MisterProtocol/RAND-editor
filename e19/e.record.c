@@ -366,7 +366,7 @@ ReadMacroFile()
 	strcpy( mp->name, name );
 
 	mp->text = (Uchar *)salloc(mp->len);
-	if( fread( mp->text, sizeof(Uchar), mp->len, fp ) != mp->len ) {
+	if( fread( mp->text, sizeof(Uchar), mp->len, fp ) != (size_t) mp->len ) {
 	    mesg( ERRALL+1, "Bad return reading ~/.e_macros" );
 	    sleep(3);
 	}

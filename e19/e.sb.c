@@ -37,7 +37,7 @@ Flag HaveBkeytmp = 0;
 extern void getpath ();
 extern void fixtty ();
 extern void cleanup ();
-_Noreturn void la_abort (char *, ...);
+_Noreturn void la_abort (char *);
 _Noreturn void fatal (Flag, char*, ...);
 _Noreturn void dofatal ();
 void fatalpr (char*, ...);
@@ -140,11 +140,11 @@ getmypath ()
 char *getmypath ()
 
 {
-    struct passwd	*pw;
+    struct passwd       *pw;
     char junk[128];
 
     if (mypath)
-        return mypath;
+	return mypath;
     if ((pw = getpwuid (userid)) == NULL)
     {
 	sprintf(junk, "getpwuid failed for uid %d!\n", userid);
@@ -354,21 +354,18 @@ sig ()
 
 #ifdef COMMENT
 void
-la_abort (char *msg, ...)
+la_abort (char *msg)
 .
     Called by the LA Package on fatal trouble.
     Pass the information on to a call to fatal().
 #endif
 /* VARARGS1 */
-_Noreturn void la_abort (char *msg, ...)
+_Noreturn void la_abort (char *msg)
 {
-    va_list ap;
-    va_start (ap, msg);
-
-    dofatal (LAFATALBUG, msg, ap);
+    fatal (LAFATALBUG, msg);
     /* never returns */
     /* NOTREACHED */
-    exit (-1);	/* Keep compiler happy */
+    exit (-1);  /* Keep compiler happy */
 }
 
 char *bugwas;
@@ -393,7 +390,7 @@ fatal (Flag type, char *msg, ...)
 
      dofatal (type, msg, ap);
      /* NOTREACHED */
-    exit (-1);	/* Keep compiler happy */
+    exit (-1);  /* Keep compiler happy */
 }
 
 #ifdef COMMENT
@@ -500,11 +497,9 @@ that the editor couldn't read file \"%s\".\n", crashdoc);
 (The following message comes to you from the shell:)\n\n");
 	fflush (stdout);
 
-         cleanup (0, 0); /* don't remove changes or keystroke files */
-#ifdef SIGNALS
-	signal (ABORT_SIG, SIG_DFL); /* set IOT sig back to deflt for abort() */
-#endif /* SIGNALS */
-	/* abort(); */ /* This causes an IOT trap loop on MacOS */
+	cleanup (0, 0); /* don't remove changes or keystroke files */
+	signal (SIGABRT, SIG_DFL); /* set IOT sig back to deflt for abort() */
+	abort();
 	exit (-1);
 
     case FATALIO:
@@ -628,8 +623,8 @@ char   *ext;
 {
     int lname;
     register char  *c,
-                   *d,
-                   *newname;
+		   *d,
+		   *newname;
 
     for (lname = 0, c = name; *c++; ++lname)
 	continue;
@@ -746,8 +741,8 @@ void fatalpr (char *fmt, ...)
     va_list ap, ap1;
     va_start (ap, fmt);
     va_start (ap1, fmt);
-    
-    dbgpr1 (fmt, ap);
+
+/*  dbgpr1 (fmt, ap); */
     vfprintf(stdout, fmt, ap1);
     return;
 }

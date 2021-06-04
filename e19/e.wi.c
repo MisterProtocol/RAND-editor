@@ -372,7 +372,8 @@ Small how;
     register Short i;
     register Short j;
 #ifdef LMCMARG
-    Ncols k, k1;
+/*  Ncols k, k1; */
+    Ncols k;
 #endif /* LMCMARG */
 
     oldwin = curwin;
@@ -383,7 +384,7 @@ Small how;
 #ifdef LMCMARG
     for (k=Z; k < ntabs && tabs[k] < window->wksp->wcol; k++)
 	{}
-    k1 = k;
+ /*  k1 = k; */
 #endif /* LMCMARG */
     if (!(how & WIN_ACTIVE))
 	for (; i <= j; i++)

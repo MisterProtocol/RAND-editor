@@ -27,7 +27,7 @@ register int ms;
      */
     if (ms == 0)
 	    return;
-    if (ospeed <= 0 || ospeed >= (sizeof tmspc10 / sizeof tmspc10[0]))
+    if (ospeed <= 0 || ospeed >= (int) (sizeof tmspc10 / sizeof tmspc10[0]))
 	    return;
 
     /*
