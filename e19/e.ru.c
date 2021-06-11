@@ -248,6 +248,7 @@ Flag    closeflg;
     char *args[5];              /* watch this size! */
     register Small ix;
     char filterpath[200];
+    char buf[10];
 
     ix = Z;
     args[ix] = filters[whichfilter];
@@ -255,7 +256,6 @@ Flag    closeflg;
     case FILLNAMEINDEX:
     case JUSTNAMEINDEX:
     case CENTERNAMEINDEX: Block {
-	    char buf[10];
 	    sprintf (buf, "-l%d", linewidth);
 	    args[++ix] = buf;
 	    if (whichfilter != CENTERNAMEINDEX && fill_hyphenate == YES)

@@ -398,7 +398,7 @@ filter()
 void
 doit()
 {
-    register int c;
+    register int c = 1;
     register unsigned int n;
 
     for (n=1; n<start; ) {
