@@ -27,17 +27,59 @@
 
 /******************* standard filter declarations ************************/
 #include "e.h"
+#include <sys/stat.h>
+#include <time.h>
 /*  #include <stdio.h>  is already included by e.h above */
-#ifdef sun
+/* _sobuf isn't used by stdio in modern times so this hack
+ * doesn't work any more.
+  #ifdef sun
+  char _sobuf[BUFSIZ];
+  #else
+  extern unsigned char _sobuf[];
+  #endif  / * sun * /
+ */
+
 char _sobuf[BUFSIZ];
-#else
-extern unsigned char _sobuf[];
-#endif /* sun */
+
 FILE *tfopen ();
+
+void getoptions();
+void filterfiles();
+void my_local_filter();
+void my_getout();
+void my_getprogname();
+void getoptions();
+void stop();
+void setraw();
+void badstart();
+void doit();
+int  intss();
+void badstart();
+void doscrsize();
+void dotime();
+void dofill();
+void dosrch();
+void doinmode();
+void dooldmark();
+char dowindow();
+void sepwindows();
+void domargins();
+void dooldalt();
+void dooldfile();
+void dotermtype();
+void dorexp();
+void domodes();
+void domark();
+void doauto();
+void dotrack();
+void dosets();
+void doalt();
+void dofile();
+void my_dotabs();
 
 #define STATSIZE 100     /* max num of characters returned by stat call */
 #define BELL 07
-/* #define RAWMODE      /* define this if raw mode is needed               */
+/* #define RAWMODE      / * define this if raw mode is needed               */
 			/* NOT FIXED FOR UNIXV7 yet */
 #ifdef UNIXV7
 #include <sgtty.h>
@@ -77,6 +119,7 @@ FILE *input;
 
 
 /**/
+int
 main(argc, argv)
 int argc;
 char **argv;
@@ -87,7 +130,7 @@ char **argv;
     curargchar = argarray[curarg];
 
     input = stdin;
-    getprogname();
+    my_getprogname();
 
     opterrflg = badfileflg = 0;
     show_errs_flg = 0;
@@ -106,7 +149,7 @@ char **argv;
 	} while (curarg < numargs);
 	if ( (opterrflg && opt_abort_flg) || (badfileflg && fil_abort_flg) ) {
 	    fprintf(stderr,"%s: not performed.\n",progname);
-	    getout (-2);
+	    my_getout (-2);
 	}
     }
 
@@ -114,7 +157,7 @@ char **argv;
     opterrflg = badfileflg = 0;
 
     if (!intss())
-	setbuf(stdout, _sobuf);
+	setbuf(stdout, (char *)_sobuf);
     do {
 	opterrflg = 0;
 	show_errs_flg = opt_stop_flg;
@@ -127,11 +170,12 @@ char **argv;
 	if (badfileflg && fil_stop_flg)
 	    stop ();
     } while (curarg < numargs);
-    getout (0);
+    my_getout (0);
 }
 
 
-getprogname()
+void
+my_getprogname()
 {
     register char *cp;
     register char lastc = '\0';
@@ -152,9 +196,10 @@ getprogname()
 }
 
 
+void
 getoptions(check_only)
 {
-    register char *p, *c;
+    register char *p;
 
     for (; curarg<numargs; curarg++) {
 	curargchar = argarray[curarg];
@@ -197,7 +242,6 @@ getoptions(check_only)
 		break;
 
 	    default:                      /* unknown option or other errors */
-	    error:
 		opterrflg = 1;
 		if (show_errs_flg) {
 		    fprintf(stderr,"%s: option error: -%s\n",
@@ -210,13 +254,14 @@ getoptions(check_only)
     }
 }
 
+void
 filterfiles(check_only)
 {
-    register FILE *f;
+    register FILE *f = NULL;
 
     if (curarg >= numargs && !check_only) {
 	input = stdin;
-	my_filter();
+	my_local_filter();
 	return;
     }
 
@@ -229,14 +274,11 @@ filterfiles(check_only)
 		return;
 	}
 	else {
-	    if (check_only)
-		f = tfopen(curargchar,"r");
-	    else
-		f = fopen(curargchar,"r");
+	    f = fopen(curargchar,"r");
 	    if (f == NULL) {
-		char scratch[STATSIZE];
+		struct stat scratch;
 
-		if (stat(curargchar,scratch) == -1) {
+		if (stat(curargchar,&scratch) == -1) {
 		    if (show_errs_flg) {
 			fprintf(stderr,"%s: can't find %s\n",
 			    progname,curargchar);
@@ -255,12 +297,15 @@ filterfiles(check_only)
 	}
 	if (!check_only && f != NULL) {
 	    input = f;
-	    my_filter();
+	    my_local_filter();
+	} else if (check_only && f != NULL) {
+	    fclose (f);
 	}
     }
 }
 
-my_filter ()
+void
+my_local_filter ()
 {
     if ( input == stdin && intss() )
 	fprintf(stderr,"%c%s: start typing.\n",BELL,progname);
@@ -280,6 +325,7 @@ my_filter ()
 }
 
 
+void
 doit()
 {
     int n, revision, nwinlist;
@@ -307,7 +353,7 @@ doit()
 	doscrsize();
 contcase:
 	dotime();
-	dotabs();
+	my_dotabs();
 	dofill();
 	dosrch();
 	doinmode();
@@ -329,7 +375,7 @@ contcase:
 	dotermtype();
 	doscrsize();
 	dotime();
-	dotabs();
+	my_dotabs();
 	dofill();
 	dosrch();
 	doinmode();
@@ -362,11 +408,12 @@ contcase:
     return;
 }
 
+void
 badstart()
 {
     int nerr;
 
-    if (nerr = ferror (input))
+    if ((nerr = ferror (input)))
 	printf ("\nBad startup file.  Read error %d.\n", nerr);
     else if (feof (input))
 	fputs ("\nBad startup file.  Premature EOF.\n", stdout);
@@ -375,12 +422,12 @@ badstart()
 }
 
 
+void
 setraw ()
 {
-    register regi;
-
 #ifdef RAWMODE
     if (gtty (INSTREAM, &instty) != -1) {
+	int regi;
 	regi = instty.sg_flags;
 	instty.sg_flags = RAW | (instty.sg_flags & ~(ECHO | CRMOD));
 	stty (INSTREAM, &instty);        /* set tty raw mode */
@@ -391,13 +438,15 @@ setraw ()
     flushflg = 1;
 }
 
+void
 stop ()
 {
     fprintf(stderr,"%s: stopped.\n",progname);
-    getout(-1 - output_done);
+    my_getout(-1 - output_done);
 }
 
-getout (status)
+void
+my_getout (status)
 {
     fixtty ();
     exit (status);
@@ -424,12 +473,13 @@ xintss()
 }
 */
 
+void
 dotermtype ()
 {
 	short nletters;
 
 	printf ("Terminal type: \"");
-	if (nletters = getshort (input)) {
+	if ((nletters = getshort (input))) {
 	    while (--nletters > 0)
 		fputc (getc (input), stdout);
 	    if (getc (input))
@@ -438,6 +488,7 @@ dotermtype ()
 	printf ("\"\n");
 }
 
+void
 doscrsize()
 {
 	char nlin, ncol;
@@ -447,6 +498,7 @@ doscrsize()
 	printf ("Screen size: %d x %d\n", nlin, ncol);
 }
 
+void
 dotime()
 {
 	long tmpl;
@@ -455,7 +507,8 @@ dotime()
 	printf ("Time of start of session: %s", ctime (&tmpl) );
 }
 
-dotabs()
+void
+my_dotabs()
 {
 	short n;
 
@@ -472,16 +525,18 @@ dotabs()
 	fputc ('\n',stdout);
 }
 
+void
 dofill()
 {
 	printf ("Width for fill, etc. = %d\n", getshort (input));
 }
 
+void
 dosrch()
 {
 	short nletters;
 
-	if (nletters = getshort (input)) {
+	if ((nletters = getshort (input))) {
 	    printf ("Search string is \"");
 	    while (--nletters > 0)
 		fputc (getc (input), stdout);
@@ -493,6 +548,7 @@ dosrch()
 	    printf ("No search string.\n");
 }
 
+void
 doinmode()
 {
 	printf ("INSERT mode ");
@@ -502,6 +558,7 @@ doinmode()
 	    printf ("off\n");
 }
 
+void
 dorexp ()
 {
 	printf ("RE mode ");
@@ -511,6 +568,7 @@ dorexp ()
 	    printf ("off\n");
 }
 
+void
 domark()
 {
 	long winlin;
@@ -530,6 +588,7 @@ domark()
 	    printf ("MARK not in effect\n");
 }
 
+void
 dooldmark()
 {
 	short col, wincol, winlin;
@@ -548,6 +607,7 @@ dooldmark()
 	    printf ("MARK not in effect\n");
 }
 
+void
 doauto()
 {
 	if (getc (input))
@@ -557,6 +617,7 @@ doauto()
 	printf ("Left margin set on column %d.\n", getshort (input));
 }
 
+char
 dowindow()
 {
 	char nwinlist, winnum;
@@ -570,6 +631,7 @@ dowindow()
 	return nwinlist;
 }
 
+void
 domargins(n)
 	int n;
 {
@@ -586,6 +648,7 @@ domargins(n)
 	    tmarg, lmarg, bmarg, rmarg);
 }
 
+void
 dotrack ()
 {
 	if (getc (input))
@@ -594,6 +657,7 @@ dotrack ()
 	    printf ("  TRACK not set.\n");
 }
 
+void
 dosets ()
 {
 	short plline, miline, plpage;
@@ -609,12 +673,13 @@ dosets ()
 		     plline, miline, plpage, mipage, lwin, rwin);
 }
 
+void
 doalt()
 {
 	short nletters, wincol;
 	long winlin;
 
-	if (nletters = getshort (input)) {
+	if ((nletters = getshort (input))) {
 	    if (feoferr (input))
 		badstart();
 	    fputs ("  Alternate file: ", stdout);
@@ -635,11 +700,12 @@ doalt()
 		badstart();
 }
 
+void
 dooldalt()
 {
 	short nletters, wincol, winlin;
 
-	if (nletters = getshort (input)) {
+	if ((nletters = getshort (input))) {
 	    if (feoferr (input))
 		badstart();
 	    fputs ("  Alternate file: ", stdout);
@@ -661,6 +727,7 @@ dooldalt()
 	    badstart();
 }
 
+void
 dofile()
 {
 	short nletters, wincol;
@@ -681,6 +748,7 @@ dofile()
 	printf ("%d) = (lin, col) cursor position\n", getshort (input));
 }
 
+void
 dooldfile()
 {
 	short nletters, wincol, winlin;
@@ -700,13 +768,14 @@ dooldfile()
 	    printf ("%d) = (lin, col) cursor position\n", getshort (input));
 }
 
+void
 sepwindows ()
 {
 	fputs ("============================================\n", stdout);
 }
 
 
-
+void
 domodes ()
 {
 	printf ("LITMODE %s.\n",  getc(input) ? "on" : "off" );
