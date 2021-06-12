@@ -211,7 +211,7 @@ my_getprogname()
 
 
 void
-getoptions(check_only)
+getoptions(int check_only)
 {
     register char *p;
 
@@ -324,7 +324,7 @@ getoptions(check_only)
 
 
 void
-filterfiles(check_only)
+filterfiles(int check_only)
 {
     register FILE *f = (FILE *)-1;
 
