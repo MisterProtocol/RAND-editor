@@ -61,6 +61,13 @@ If the TERM environment variable is set to a terminal type for which "e"
 has a built-in terminal description file, "e" will use the internal
 information.  Otherwise, "e" will use either `terminfo` or `termcap`
 terminal descriptions, depending on how it is compiled (see below).
+#### "ncurses"
+The original version of the editor does its own input and terminal
+handling, without reference to external libraries, although it can
+make use of curses to write to terminals that do not have built-in
+support.
+However, the newer version, with mouse support, uses the `ncurses`
+library to multiplex input from the mouse.
 
 ### Filter Programs
 
@@ -98,8 +105,9 @@ compiled by a shell script.
 
 It is intended that there be two branches in this repository, which will
 not be merged.  One branch contains the code for the RAND editor as
-forward-ported to Linux and MacOS, but with no further changes or additions
-made.  The second branch contains code developed from the first branch,
+forward-ported to Linux and MacOS, but with no further additions
+made, except for bug fixes.  The second branch contains code developed
+from the first branch,
 which supports use of the mouse, and colored text highlighting on terminal
 emulators that support it.  It is expected that most people will be interested
 in the second branch.  The first branch exists for historical interest, and
