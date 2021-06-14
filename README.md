@@ -14,6 +14,33 @@ code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed below.
 
+### Branches
+
+It is intended that there be two branches in this repository, which will
+not be merged.  One branch (`original`)contains the code for the RAND editor as
+forward-ported to Linux and MacOS, but with no further additions
+made, except for bug fixes.  The second branch (`main`) contains code developed
+from the first branch,
+which supports use of the mouse, and colored text highlighting on terminal
+emulators that support it.  It is expected that most people will be interested
+in the second branch.  The first branch exists for historical interest, and
+for people who have problems getting the second branch to compile on their
+systems.  The first branch, with the original code, reads terminal input
+in an idiosyncratic way, as it dates from a "do-it-yourself" era when
+third-party libraries were nonexistent.  The second branch handles mouse
+support by means of a completely rewritten input section, which uses
+`ncurses` to multiplex terminal and mouse input.
+
+### Extra files
+
+There are a number of extra files and directories included in the repository
+that are not directly involved in building the editor or its helper
+executables.  These are present for historical interest, and because
+they have been useful in the past in debugging problems with the editor.
+"pres.c", for example, will print the editor "state files" in a
+human-readable form.  If you're not interested in them they may simply
+be removed.
+
 ### History
 
 The code in "e" is very old, and much of the reason for the creation
@@ -64,7 +91,7 @@ terminal descriptions, depending on how it is compiled (see below).
 #### "ncurses"
 The original version of the editor does its own input and terminal
 handling, without reference to external libraries, although it can
-make use of curses to write to terminals that do not have built-in
+make use of `curses` to write to terminals that do not have built-in
 support.
 However, the newer version, with mouse support, uses the `ncurses`
 library to multiplex input from the mouse.
@@ -100,33 +127,6 @@ carefully and changed as necessary for the local environment.  "e" missed
 out on the whole `config` thing by quite a few decades.  Frankly, I'm
 surprised it even uses `make`.  It didn't used to.  In the old days it was
 compiled by a shell script.
-
-### Branches
-
-It is intended that there be two branches in this repository, which will
-not be merged.  One branch contains the code for the RAND editor as
-forward-ported to Linux and MacOS, but with no further additions
-made, except for bug fixes.  The second branch contains code developed
-from the first branch,
-which supports use of the mouse, and colored text highlighting on terminal
-emulators that support it.  It is expected that most people will be interested
-in the second branch.  The first branch exists for historical interest, and
-for people who have problems getting the second branch to compile on their
-systems.  The first branch, with the original code, reads terminal input
-in an idiosyncratic way, as it dates from a "do-it-yourself" era when
-third-party libraries were nonexistent.  The second branch handles mouse
-support by means of a completely rewritten input section, which uses
-`ncurses` to multiplex terminal and mouse input.
-
-### Extra files
-
-There are a number of extra files and directories included in the repository
-that are not directly involved in building the editor or its helper
-executables.  These are present for historical interest, and because
-they have been useful in the past in debugging problems with the editor.
-"pres.c", for example, will print the editor "state files" in a
-human-readable form.  If you're not interested in them they may simply
-be removed.
 
 ### What to Do First
 
