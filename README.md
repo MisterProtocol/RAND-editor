@@ -128,6 +128,18 @@ out on the whole `config` thing by quite a few decades.  Frankly, I'm
 surprised it even uses `make`.  It didn't used to.  In the old days it was
 compiled by a shell script.
 
+### Highlighting
+
+This version of the editor supports highlighting of text using colors,
+on terminals which support colored text.  The default highlighting
+uses dark text on a light gray background.  Arbitrary colors may be chosen
+instead using command-line arguments; see the man page for details.
+
+To assist in choosing pleasing colors, a directory `t_xcolor` is included
+with programs to display possible color combinations.  N.B.: These programs
+have not been extensively tested on a variety of systems; some work
+may be needed to compile them.
+
 ### What to Do First
 
 Read the `README` file.  Read the top level `Makefile`, and `e19/Makefile`.
