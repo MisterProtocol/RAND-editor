@@ -25,6 +25,7 @@
 # Workaround: compile with -m32
 #
 #CC = gcc -m32
+#CC = gcc -Wcomment
 CC = gcc -std=c99
 #ORG = /usr/rand
 #ORG = /usr/rand

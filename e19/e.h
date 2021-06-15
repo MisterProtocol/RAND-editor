@@ -47,13 +47,11 @@
 /** ine LMCSRMFIX       / * Replace "stuck at rt margin" with reasonable sub */
 /** #define VBSTDIO		/ * Can't cheat by using _sobuf -- it doesn't exist */
 
+#include <ncurses.h>
+#include <term.h>
+
 #include <c_env.h>
 #include <localenv.h>
-
-#ifdef NCURSES
-#include <curses.h>
-#include <term.h>
-#endif /* NCURSES */
 
 #ifdef UNIXV7
 #include <sys/types.h>
@@ -126,7 +124,7 @@ typedef La_linesize ANcols;     /* number of columns in a line */
 typedef Char  Fd;               /* unix file descriptor */
 typedef char  AFd;              /* unix file descriptor */
 typedef Char  Fn;               /* index into files we are editing */
-typedef Uchar  AFn;             /* index into files we are editing */
+typedef Uchar AFn;              /* index into files we are editing */
 typedef Small Cmdret;           /* comand completion status */
 
 #ifdef NOSIGNEDCHAR
@@ -525,7 +523,12 @@ typedef struct savebuf {
 #define CCRECORD       0234
 #define CCPLAY         0235
 #endif
-#define CCHIGHEST      0235
+
+#ifdef NCURSES
+#define CCMOUSE        0236
+#define CCMOUSEONOFF   0237
+#endif
+#define CCHIGHEST      0237
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */
@@ -671,6 +674,8 @@ extern Flag windowsup;   /* screen is in use for windows */
 
 extern
 FILE   *dbgfile;
+extern
+FILE   *replay_fp;
 
 extern short revision;  /* revision number of this e */
 extern short subrev;    /* sub-revision number of this e */
@@ -692,6 +697,12 @@ extern char *keycaps[CCHIGHEST+1-127+32];
 extern char *cmdkeycaps[CCHIGHEST+1-127+32];
 
 /*********/
+/* e.mouse.c */
+
+extern Flag initMouseDone;
+extern Flag initCursesDone;
+extern Flag bs_flag;
+
 /* e.d.c */
 
 #ifdef LMCVBELL
@@ -895,7 +906,8 @@ extern void infotrack ();
 extern void limitcursor ();
 extern void mainloop ();
 extern void mark ();
-extern void mesg ();
+/*extern void mesg ();*/
+extern void mesg (int, ...);
 extern void movecursor ();
 extern void param ();
 extern void poscursor ();
@@ -930,10 +942,13 @@ extern FILE *fp_profile;
 #endif /* STARTUPFILE */
 
 #ifdef RECORDING
+/* e.record.c */
 extern Flag recording, playing;
 extern Uchar *rec_p, *rec_text;
 extern int rec_size, rec_count, rec_len, play_count;
+extern Flag play_silent;
 #endif
 
 extern char *etcdir;
 extern char *keytmp;
+

@@ -1,0 +1,14 @@
+1. cmd: record  (start recording keystrokes)
+   <type keystrokes, etc.; can include <ret> chars, other <cmd> line functions
+   cmd: -record (stop recording; saves the keystrokes in an unnamed 'current macro'
+
+2.  cmd: play [N] plays the currently defined macro once [or N times]
+
+3.  store X (save the recording in macro named X)
+
+4.  cmd: $X [N] plays macro X once [or N times]
+
+
+
+
+

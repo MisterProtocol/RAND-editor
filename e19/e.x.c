@@ -195,6 +195,7 @@ Uchar    putscbuf[10];
 Flag windowsup = NO;
 
 FILE   *dbgfile = NULL;
+FILE   *replay_fp = NULL;
 
 Char evrsn;   /* the character used in the chng, strt, & keys filename   */
 		/* '0', '1', ...	*/
@@ -437,3 +438,4 @@ char *keycaps[] = {
 #endif /* RECORDING */
 
 char *etcdir;
+

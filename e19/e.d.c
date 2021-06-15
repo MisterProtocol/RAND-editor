@@ -97,6 +97,56 @@ extern Flag VBell;
 #endif /* LMCVBELL */
 extern int kill();
 
+/* debug */
+#include <ncurses.h>
+#include <term.h>
+
+/* test vid modes */
+int
+PCH(int ch) { putchar(ch); return (0); }
+extern char *smso, *rmso, *bold, *setab, *setaf, *sgr0;
+
+char *
+getVCCname(int c);
+
+typedef struct VCCName {
+  int val;
+  char *name;
+} VCCName;
+
+VCCName  VCC_CMDS[] = {
+{000,   "VCCNUL"},
+{001,   "VCCINI"},
+{002,   "VCCRES"},
+{003,   "VCCEND"},
+{004,   "VCCICL"},
+
+#ifdef OUT
+{005,   "VCCMK1"},
+{006,   "VCCMK0"},
+#endif
+
+{007,   "VCCBEL"},
+{010,   "VCCLEF"},
+{013,   "VCCHOM"},
+{014,   "VCCCLR"},
+{015,   "VCCRET"},
+{016,   "VCCUP"},
+{021,   "VCCARG"},
+{022,   "VCCDWN"},
+{024,   "VCCAAD"},
+{036,   "VCCBKS"},
+{037,   "VCCRIT"},
+{025,   "VCCWIN"},
+{026,   "VCCINL"},
+{027,   "VCCDLL"},
+{-1,    ""}
+};
+/* end debug */
+
+/* enables debugging, selectively */
+Flag debug_d_write = 0;
+
 #ifdef COMMENT
 void
 d_init (clearmem, clearscr)
@@ -113,6 +163,10 @@ Flag clearscr;
 {
     register Short i;
 
+/*
+   dbgpr("d_init:  clearmem=%d clearscr=%d, image is %s null, redraw=%d\n",
+    clearmem, clearscr, image == NULL ? "" : "not", redraw);
+*/
     if (image == NULL) {
 	screensize = term.tt_width * term.tt_height;
 	image = (Uchar *) salloc (screensize, YES);
@@ -176,10 +230,31 @@ Short count;
     register Short j;
     register int chr;
 
-/*trw, dbg*/
-/*  dbgpr("d_write, chr=(%c) count=(%d), icursor=(%d) ocursor=(%d) lincurs=(%d) term.tt_width=(%d) term.tt_wl=(%d)\n",
-    *chp, count, icursor, ocursor, lincurs, term.tt_width, term.tt_wl);
- **/
+/*debug*/
+#ifdef DBGPR
+char *vccname;
+int vcc_arg1 = -1;
+int vcc_arg2 = -1;
+
+if( 0 || debug_d_write ) {
+  if( *chp < ' ' ) {
+    vccname = getVCCname(*chp);
+    if( count == 3 ) {
+      vcc_arg1 = (int) (chp[1] - 041);  /* see poscursor() in e.t.c, VCCAAD */
+      vcc_arg2 = (int) (chp[2] - 041);
+    }
+  }
+  else {
+    vccname = "n/a";
+  }
+
+  if( count >= 1 ) {
+   dbgpr("d_write, chr=(chr[0]=(%o)(%c) count=(%d), [vccname=(%s)(%d)(%d)] icursor=(%d) ocursor=(%d) lincurs=(%d) term.tt_width=(%d) term.tt_wl=(%d)\n",
+    *chp, *chp, count, vccname, vcc_arg1, vcc_arg2, icursor, ocursor, lincurs, term.tt_width, term.tt_wl);
+  }
+}
+/**/
+#endif /* DBGPR */
 
     for (; count > 0; chp++, count--) {
 #ifdef UNSCHAR
@@ -237,6 +312,21 @@ Short count;
 		case VCCAAD:
 		    state = 3;
 		    break;
+
+#ifdef OUT
+		/* next two are *tests* of start/end of standout mode */
+		case VCCMK1:
+		    /*tputs(smso,1,PCH);*/
+		    tputs(tparm(setab,7),1,PCH);
+		    /*fflush(stdout);*/
+		    goto nextchar;
+
+		case VCCMK0:
+		  /*tputs(rmso,1,PCH);*/
+		    tputs(sgr0,1,PCH);
+		    /*flush(stdout);*/
+		    goto nextchar;
+#endif /* OUT */
 
 		case VCCINI:
 		    MINI0 ();
@@ -485,7 +575,8 @@ Short count;
 #endif /* DUMB */
 
 		default:
-		    /*  dbgpr ("Illegal command to terminal simulator, chr=(%d)", chr);  */
+		    /*  dbgpr ("Illegal command to terminal simulator, chr=(%03o)(%d)", chr,chr); **/
+		  return;
 		    fatal (FATALBUG, "Illegal command to terminal simulator");
 		}
 
@@ -591,7 +682,7 @@ Short count;
  *                      putmult (c);
  *              }
  *              else
- **/
+ */
 		switch (chr) {
 		case VECSWR:
 		    wrapmode = 1;
@@ -627,7 +718,7 @@ Short count;
  *                  if (state == 13)
  *                      goto nextchar;
  *              }
- **/            break;
+ */             break;
 
 	    case 8:                         /* insert mode in effect */
 		if (chr >= 040) {         /*! no multichar inserts as yet */
@@ -677,7 +768,7 @@ Short count;
  *                      icursor++;
  *                  goto nextchar;
  *              }
- **/            state = 6;
+ */             state = 6;
 		break;
 
 	    case 10:                        /* throwing away characters */
@@ -1290,8 +1381,8 @@ Flag displflg;
 Flag wrtflg;
 {
 
-/*  dbgpr("dbmove: from=(%d) to=(%d) nchars=(%d)",
-		   from,     to,     nchars);   */
+/*  dbgpr("dbmove: from=(%d) to=(%d) nchars=(%d) displflg=%d",
+		   from,     to,     nchars, displflg); */
 
 
     if (nchars <= 0 || from == to)
@@ -1325,7 +1416,7 @@ Flag wrtflg;
 	icol = savicol;
     }
     if (wrtflg) {
-    /*  dbgpr("dbmove: calling move: nchars=(%ld)\n", nchars);   */
+    /*  dbgpr("dbmove: calling move: nchars=(%ld)\n", nchars); */
 	my_move ((char *) &image[from], (char *) &image[to],
 	      (long) nchars);
     }
@@ -1345,13 +1436,16 @@ putscr (chr)
     the cursor to be where it is supposed to be.
     This routine would be better structured if it called two routines:
     one to get us in the right position, and one to put out the character.
-    However, since it is called once per output character, that would
+    since it is called once per output character, that would
     cost a bit in performance.
 #endif /* COMMENT */
 void
 putscr (chr)
 int chr;
 {
+
+/*dbgpr("putscr chr=(%o, %c), icol=%d ilin=%d\n", chr, chr, icol, ilin);*/
+
     static Flag wrapflg;
     register Slines lin;
     register Scols col;
@@ -1537,7 +1631,7 @@ int chr;
 	    }
 	}
 	ocursor = icursor;
-/*  dbgpr("putscr: ocursor is now=(%d) screensize=(%d)\n", ocursor, screensize); */
+/* dbgpr("putscr, end: ocursor is now=(%d) screensize=(%d)\n", ocursor, screensize);*/
 	olin = lin;
 	ocol = col;
     }
@@ -1654,3 +1748,22 @@ fresh ()
     return;
 }
 
+/* debug */
+
+#ifdef DBGPR
+/*
+ *   Lookup the name of a VCC command
+ *   eg, for 0402 return "KEY_DOWN"
+ */
+char *
+getVCCname (int c) {
+    unsigned int i;
+
+    for(i=0; i < sizeof(VCC_CMDS) / sizeof(VCC_CMDS[0]); i++) {
+       if( VCC_CMDS[i].val == c )
+	 return VCC_CMDS[i].name;
+    }
+    return "N/A";
+}
+/* end debug */
+#endif /* DBGPR */

@@ -15,6 +15,7 @@ file e.m.c
 #include "e.tt.h"
 #include "e.e.h"
 
+
 extern char *re_comp();         /* Added 10/18/82 MAB */
 Cmdret edkey ();
 Cmdret split ();
@@ -31,6 +32,23 @@ extern void infoauto ();
 extern void GetLine ();
 
 extern Small mword ();
+
+#ifdef NCURSES
+#include "ncurses.h"
+extern void debug_inputkey ();
+extern void initCurses ();
+extern void testart();
+extern unsigned Short mGetkey ();
+extern Flag debug_d_write;
+extern Flag optskipmouse;
+extern Flag finished_replay;
+extern char *getEkeyname(int i);
+extern int toggle_mouse(char *);
+extern Flag redrawflg;
+extern void doMouseReplay();
+extern void doMouseEvent();
+extern void highlightarea(Flag setmode, Flag redrawflg);
+#endif /* NCURSES */
 
 #ifdef COMMENT
 void
@@ -121,6 +139,9 @@ contin:
 		    else
 			mkcolstr[0] = '\0';
 		    markcols = ncols;
+/**
+dbgpr("mainloop:  curmark, nlines=%d ncols=%d\n", marklines, markcols);
+ **/
 		}
 	    }
 	    Block {
@@ -132,7 +153,11 @@ contin:
 		infoarealen = len;
 		sfree (cp);
 	    }
+
+	    /* display marked area */
+	    highlightarea(YES,redrawflg);
 	}
+	redrawflg = 0;  /* set in e.cm.c, case CMDREDRAW */
 
 	if (borderbullets) {
 	    dobullets (loopflags.bullet, loopflags.clear);
@@ -147,24 +172,94 @@ contin:
 #ifdef LMCLDC
 	(*term.tt_xlate) (0);   /* reset the graphics if needed */
 #endif /* LMCLDC */
-	getkey (WAIT_KEY);
+
+
+/**
+dbgpr("e.m.c, mainloop(), waiting for getkey\n");
+ **/
+
+#ifdef NCURSES
+
+
+	/*  mGetkey uses the curses getch() for input.
+	 */
+	if( initCursesDone ) {
+	    mGetkey (WAIT_KEY);   /* returns value in global 'key' */
+	}
+	else {
+	    getkey (WAIT_KEY);   /* returns value in global 'key' */
+	}
+	/* /
+	if( key < ' ' || key >= 0177 ) {
+	  dbgpr("e.m.c: mGetkey returned key=(%d)(%04o)(%s)\n\n", key, key, getEkeyname(key));
+	}
+	else {
+	  dbgpr("e.m.c, mGetkey returned key=(%d)(%04o)('%c') line=%d col=%d\n\n",
+	    key, key, (char)key, cursorline, cursorcol);
+	}
+	/ */
+
+/*  /
+dbgpr("mainloop:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
+    curwin, &wholescreen, &enterwin, &infowin);
+dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.wksp=(%o)\n",
+    curwksp, wholescreen.wksp, enterwin.wksp, infowin.wksp);
+/  */
+
+#else
+	getkey (WAIT_KEY);   /* returns value in global 'key' */
+#endif /* NCURSES */
+
+
+/* begin curses changes */
+	/*if( key == KEY_MOUSE ) { */
+	if( key == CCMOUSE ) {
+	    /*debug_inputkey(KEY_MOUSE, "e.m.c mainloop(), mGetkey()"); */
+	    /* handle mouse event */
+	    doMouseEvent();
+	    continue;
+	}
+#ifdef OUT
+	/* use F2 as an emergency exit while debugging,
+	 * beats having to kill the pid...
+	 */
+	if( key == KEY_F(2)) {
+	    dbgpr("mainloop, got F2, exiting...\n");
+	    /*opstr[0] = '\0';*/
+	    opstr = "quit";
+	    nxtop = NULL;
+	    eexit();
+	}
+#endif /* OUT */
+	/* use F6 to enable/disable the mouse so one can use copy/paste
+	 * to insert text into E
+	 */
+	if( key == CCMOUSEONOFF ) {
+	/*  dbgpr("mainloop, got key CCMOUSEONOFF, toggle mouse\n");*/
+	    toggle_mouse("");
+	    continue;
+	}
+/* end curses changes */
 
 	if (loopflags.hold) {
 	    loopflags.hold = NO;
-	    mesg (TELALL);
+	    /*mesg (TELALL);*/
+	    mesg (TELALL+1, "");
 	}
 
 	Block {
 	    Reg1 Small donetype;
-	    if (   !CTRLCHAR
+	    if (   !CTRLCHAR                /*  (key < 040 || 0177 <= key) */
 		|| key == CCCTRLQUOTE
 		|| key == CCBACKSPACE
 		|| key == CCDELCH
 	       ) {
+		/*dbgpr("e.m.c: before printchar() key=%d (%c)\n", key, (char)key);*/
 		donetype = printchar ();
 		goto doneswitch;
 	    }
 	    Block {
+		/*dbgpr("e.m.c: skipping printchar() key=%d (%c)\n", key, (char)key);*/
 		Reg2 Small cm;
 		if (key < MAXMOTIONS && (cm = cntlmotions[key])) {
 		    /* in the next several lines, a redisplay is always done,
@@ -192,9 +287,10 @@ contin:
 			      movewin(curwksp->wlin + nl, curwksp->wcol - df,
 				cursorline, cursorcol, YES);
 			}
-			else if (cursorline == curwin->btext)
+			else if (cursorline == curwin->btext) {
 			    /* Return on bottom line => +lines    */
 			    vertmvwin (defplline);
+			}
 		    }
 		    /*
 		     *  e18 mod:  An RT (right arrow) at the right window
@@ -453,7 +549,9 @@ contin:
 	    }
 gotcmd:
 	    param ();
-
+/**
+dbgpr("after param(): key=%o cmdmode=%d, paramv=(%s)\n", key, cmdmode, paramv);
+ **/
 	    if (cmdmode && key != CCRETURN)
 		goto notcmderr;
 	    switch (key) {
@@ -829,6 +927,7 @@ gotcmd:
 		case CCREPLACE:
 		case CCDEL:
 		default:
+		    dbgpr("key=(%d) not implemented\n", key);
 		    goto notimperr;
 	    }
 
@@ -1012,3 +1111,5 @@ Flag cmdflg;
 	}
     }
 }
+
+

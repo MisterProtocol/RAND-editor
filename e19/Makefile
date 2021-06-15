@@ -40,7 +40,7 @@ STD     = /usr/include/
 # --begin 2/21/2020 comments, amended MOB 3/8/2021
 # if libtinfo is available (provided by ncurses package)
 # use next two
-TINFO = -DLIBTINFO
+#TINFO = -DLIBTINFO
 TERMCAP = $(E_TCLIB)
 
 # Otherwise, use some form of the old termcap library,
@@ -53,14 +53,6 @@ TERMCAP = $(E_TCLIB)
 # If switching back and forth to load le with the other library (ie, testing)
 # remove o/e.tt.o
 # ---end 2/21/2020 comments
-
-# -- comment by MOB 5/25/21
-# If the Make of e19 fails because of a syntax error in the automatically generated file e.r.c,
-# chances are that your shell and/or your C compiler follow different rules than the ones that
-# went into generating the flavor of "vers.sh" for your system.  Right now there are two versions,
-# "vers.bsd.sh" (for BSD-derived systems like the Mac) and "vers.s5.sh" (for Linux).  If e.r.c blows
-# up, try using the other "vers.sh" file.  The only difference is in the number of backslashes (ugh).
-# -- end comment by MOB 5/25/21
 
 CC      = cc
 RM      = rm -f
@@ -78,6 +70,7 @@ OFILES  = \
 	$(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.ru.o $(O)e.sb.o \
 	$(O)e.se.o $(O)e.sv.o $(O)e.t.o $(O)e.tb.o $(O)e.tt.o \
 	$(O)e.u.o $(O)e.wi.o $(O)e.wk.o $(O)e.x.o \
+	$(O)e.mouse.o \
 	$(CHKMALLOC)
 
 CFILES  = \
@@ -93,6 +86,7 @@ CFILES  = \
 	e.it.c \
 	e.la.c \
 	e.m.c \
+	e.mouse.c \
 	e.main.c \
 	e.mk.c \
 	e.nm.c \
@@ -124,7 +118,7 @@ all:
 	cd ..; make linux
 
 
-$(E):   $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
+$(E):   newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 #       $(LD) $(LDFLAGS) /lib/crt0.o
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 	   $(O)e.main.o $(O)e.o $(O)e.pa.o $(O)e.iit.o $(O)e.q.o \
@@ -135,7 +129,7 @@ $(E):   $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
 	   $(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.t.o \
 	   $(O)e.ru.o $(O)e.cm.o $(O)e.d.o $(O)e.it.o \
 	   $(O)e.la.o $(O)e.m.o $(O)e.p.o $(O)e.r.o $(O)e.sb.o \
-	   $(O)e.tt.o $(O)e.x.o $(O)e.profile.o \
+	   $(O)e.tt.o $(O)e.x.o $(O)e.profile.o $(O)e.mouse.o \
 	$(LALIB) \
 	$(FFLIB) \
 	$(MISCLIB) \
@@ -234,6 +228,10 @@ $(O)e.m.o: e.m.c
 	$(CC) $(CFLAGS) $(INCL) -c e.m.c
 	mv e.m.o $(O)e.m.o
 
+$(O)e.mouse.o: e.mouse.c
+	$(CC) $(CFLAGS) $(INCL) -c e.mouse.c
+	mv e.mouse.o $(O)e.mouse.o
+
 $(O)e.main.o: e.main.c
 	$(CC) $(CFLAGS) $(INCL) -c e.main.c
 	mv e.main.o $(O)e.main.o
@@ -297,6 +295,10 @@ $(O)e.sb.o: e.sb.c
 $(O)e.se.o: e.se.c
 	$(CC) $(CFLAGS) $(INCL) -c e.se.c
 	mv e.se.o $(O)e.se.o
+
+#$(O)e.showkeys.o: e.showkeys.c
+#        $(CC) $(CFLAGS) $(INCL) -c e.showkeys.c
+#        mv e.showkeys.o $(O)e.showkeys.o
 
 $(O)e.sv.o: e.sv.c
 	$(CC) $(CFLAGS) $(INCL) -c e.sv.c

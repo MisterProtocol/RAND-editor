@@ -17,6 +17,7 @@ file e.record.c
 
 #ifdef RECORDING
 
+extern unsigned Short mGetkey ();
 extern int fileno();
 extern char *optmacrofile;      /* TODO:  move to e.h */
 
@@ -91,6 +92,14 @@ unsigned Short c;
 
     if (c == CCCMD)             /* So "CMD: record" can be stripped off */
 	lastcmd_len = rec_len;  /* when recording is cancelled this way */
+
+#ifdef NCURSES
+    if (c == CCMOUSE) {
+	mesg (ERRALL+1, "Mouse clicks not allowed while recording.");
+	return;
+    }
+/*dbgpr("RecordChar: add c=(%o)(%c)\n", c, c);*/
+#endif
 
     *rec_p++ = c;
     rec_len++;
@@ -481,7 +490,11 @@ char *opt;
 	    printf ("\n\r\n\rMacro \"%s\" is not defined.\r\n", opt);
 
 	keyused = YES;
+#ifdef NCURSES
+	rc = mGetkey (WAIT_KEY);
+#else
 	rc = getkey (WAIT_KEY);
+#endif
 	if (rc == CCRETURN ) break;
     }
 

@@ -1,0 +1,13 @@
+Mon May 2 12:00:27 PDT 1988 begin
+make test
+ccxx -DNEWARGS -V  o/test.o libla.a ../ff3/libff.a
+ld: -V: bad flag
+	designer C++ Programming System, release 1.2 Sun-Wk.1
+	Copyright 1987, Glockenspiel Ltd., Dublin. Ireland
+Error executing command "cc -V -o o/test o/test.o ./libla.a ../ff3/libff.a /lib/libcxx.a".
+C++ Driver terminating.
+*** Error code 4
+
+Stop.
+Done
+Mon May 2 12:00:31 PDT 1988 end

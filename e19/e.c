@@ -108,10 +108,24 @@ extern char *ttyname ();
 
 #define OPTNEWFILEMODE 34
 
+#ifdef NCURSES_MOUSE
+#define OPTSKIPMOUSE   35   /* don't enable mouse support */
+#endif
+
+#ifdef NCURSES
+#define OPTBGRGB       36   /* highlight background rgb values, -bg=r,g,b */
+#define OPTFGRGB       37   /* highlight foreground rgb values, -fg=r,g,b */
+#define OPTSETAB       38   /* alt method to set bg color,      -setab=N */
+#define OPTSETAF       39   /* alt method to set fg color,      -setaf=N */
+#endif
+
+
 
 /* Entries must be alphabetized. */
 /* Entries of which there are two in this table must be spelled out. */
 S_looktbl opttable[] = {
+   {"bg"       , OPTBGRGB    },  /* -bg=r,g,b */
+   {"bgcolor"  , OPTBGRGB    },  /* -bg=r,g,b */
    {"blanks"   , OPTBLANKS   },  /* expand tabs to blanks */
    {"bullets"  , OPTBULLETS  },
    {"create"   , OPTCREATE   },
@@ -120,9 +134,11 @@ S_looktbl opttable[] = {
 #ifdef TERMCAP
    {"dtermcap" , OPTDTERMCAP },
 #endif /* TERMCAP */
+   {"fg"       , OPTFGRGB    },  /* -fg=r,g,b */
+   {"fgcolor"  , OPTFGRGB    },  /* -fg=r,g,b */
    {"help"     , OPTHELP     },
    {"inplace"  , OPTINPLACE  },
-#ifdef KBFILE
+#ifdef  KBFILE
    {"kbfile"   , OPTKBFILE   },
 #endif /* KBFILE */
    {"keyboard" , OPTKEYBOARD },
@@ -156,13 +172,37 @@ S_looktbl opttable[] = {
    {"regexp"   , OPTPATTERN  },  /* Added Purdue CS 2/8/83 */
    {"replay"   , OPTREPLAY   },
    {"search"   , OPTSEARCH   },
+   {"setab"    , OPTSETAB    },
+   {"setaf"    , OPTSETAF    },
    {"silent"   , OPTSILENT   },
+#ifdef NCURSES_MOUSE
+   {"skipmouse", OPTSKIPMOUSE},  /* 3/19/21: added to skip ncurses mouse initialization */
+#endif
    {"state"    , OPTSTATE    },
    {"stick"    , OPTSTICK    },
    {"tabs"     , OPTTABS     },  /* don't convert tabs to spaces */
    {"terminal" , OPTTERMINAL },
    {0          , 0}
 };
+
+#ifdef NCURSES
+Flag optskipmouse = NO;  /* YES 3/19/21: added to skip ncurses mouse initialization */
+extern void initCurses();
+/* variables for user to set custom rgb values for highlighting */
+extern int opt_bg_r;
+extern int opt_bg_g;
+extern int opt_bg_b;
+extern Flag bg_rgb_options;
+extern int opt_fg_r;
+extern int opt_fg_g;
+extern int opt_fg_b;
+extern Flag fg_rgb_options;
+/* alternate method for setting fg/bg color, using termio capabilities */
+extern int opt_setaf;
+extern int opt_setab;
+/* testing */
+void resize_handler (int sig);
+#endif
 
 #ifdef  NOCMDCMD
 Flag optnocmd;          /* YES = -nocmdcmd; <cmd><cmd> functions disabled */
@@ -213,7 +253,7 @@ extern Flag HaveBkeytmp;
 #ifdef  RECORDING
 Flag    optnomacros;    /* YES = don't read .e_macros */
 char    *optmacrofile;  /* -macrofile=filename option specified */
-void	ReadMacroFile (void);
+void    ReadMacroFile (void);
 #endif /* RECORDING */
 
 extern void main1 ();
@@ -243,6 +283,8 @@ extern void chk_profile();
 extern void initwindows();
 _Noreturn void getout (Flag, char *, ...);
 extern int fileno();
+off_t replay_filesize;
+int replay_stopcount = 0; /* set by user when picking replay option */
 
 #ifdef COMMENT
 void
@@ -260,6 +302,12 @@ Reg2 char *argv[];
 {
     char    ichar;      /* must be a char and can't be a register */
     char    *cp;
+
+/* works! here */
+#ifdef xNCURSES
+    dbgpr("e.c, near the start of main1(), calling initCurses()\n");
+    initCurses();
+#endif
 
 #ifdef BSD
 #ifndef VBSTDIO
@@ -311,7 +359,7 @@ Reg2 char *argv[];
 
 #ifdef  RECORDING
     if( !optnomacros )
-	ReadMacroFile();        /* TODO: add option to prevent this */
+	ReadMacroFile();        /* TODO: add option to skip this */
 #endif
 
     if (helpflg) {
@@ -319,12 +367,13 @@ Reg2 char *argv[];
 	getout (NO, "");
     }
 
-    if (dbgflg && (dbgfile = fopen (dbgname, "a")) == NULL) {
+    if (dbgflg && (dbgfile = fopen (dbgname, "a")) == NULL) {   /* 3/21: was "w" */
 	/*getout (NO, "Can't open debug file: %s", dbgname);*/
 	fprintf(stdout, "Can't open debug file: %s\n", dbgname);
 	fflush(stdout);
 	exit(-1);
     }
+
 
 #ifdef NOPE
 /* #ifdef TERMCAP */
@@ -341,45 +390,60 @@ Reg2 char *argv[];
 	}
     }
     else if (stat(TERMCAPFILE, &xx_statbuf) == -1) {
-	getout (NO, "Both the environment variable TERMCAP and /etc/termcap are not found", "");
+	fprintf(stdout, "Can't find the default file \"%s\" TERMCAPFILE variable, (localenv.h)\n", TERMCAPFILE);
+	getout (NO, "Both the environment variable TERMCAP and TERMCAPFILE are not found", "");
     }
 #endif
 
 #ifdef LMCAUTO
     infoint0 ();
 #endif /* LMCAUTO */
+
     startup ();
 
     if (replaying) Block {
-#ifndef ASCIIKEYINFO
-	short tmp;      /* must be a short, can't be a register */
-	short replterm; /* must be a short, can't be a register */
-	struct stat statbuf;
-	short ht, wid;
-#endif /* ASCIIKEYINFO */
+
+	/* any key can interrupt a replay */
+	/* intok = NO; hmm... */
+
+#ifdef OUT
 	if ((inputfile = open (inpfname, 0)) < 0)
 	    getout (YES, "Can't open replay file %s.", inpfname);
-#ifdef ASCIIKEYINFO
-	{   char buf[256], *s;
+#endif
+
+	inputfile = STDIN;  /* fd 0 */
+	/*
+	 *   Reading replay file with stream routines makes e.t.c much cleaner
+	 */
+/*dbgpr("inpfname=(%s)\n", inpfname);*/
+	if ((replay_fp = fopen (inpfname, "r")) == NULL) {
+	    getout (YES, "Can't open replay file: %s", inpfname);
+	    fflush(stdout);
+	    exit(-1);
+	}
+	Block {
+	    struct stat rbuf;
+	    if (fstat(fileno(replay_fp), &rbuf) == -1) {
+		dbgpr("stat failed on replay_fp\n");
+	    }
+	    replay_filesize = rbuf.st_size;
+	    /*dbgpr("replay_filesize=(%d)\n", replay_filesize);*/
+	}
+
+	Block {
+	    char buf[256];
 	    int a_ver, a_h, a_w;
 	    char a_ichar;
 	    char a_term[50];
 
-	    for (s = buf;  read(inputfile, s, 1) > 0 && *s != '\n'; s++)
-		continue;
-	    if (*s != '\n')
-		getout (YES, "Replay file is %s.",
-		    (s == buf) ? "empty" : "too short");
-
-	    *++s = '\0';
+	    fgets(buf, sizeof(buf), replay_fp);
 	    sscanf (buf, "version=%d ichar=%c term=%s h=%d w=%d",
 		&a_ver, &a_ichar, a_term, &a_h, &a_w);
-/****
+/****/
 fprintf(stdout, "replayinfo: ver=%d ichar=%o term=%s h=%d w=%d\n",
     a_ver, a_ichar, a_term, a_h, a_w);
 fflush(stdout);
-sleep(8);
-*****/
+/*****/
 	    if (-a_ver != revision)
 		getout (YES, "Replay file \"%s\" was made by revision %d of %s.",
 		     inpfname, a_ver, progname);
@@ -400,41 +464,12 @@ Your current screensize is %d w X %d h.\n",
 	    term.tt_height = a_h;
 	    initwindows (YES);
 	}
-#else /* ASCIIKEYINFO */
-	if (read (inputfile, (char *) &tmp, 2) == 0)
-	    getout (YES, "Replay file is empty.");
-	if (tmp != revision)
-	    getout (YES, "Replay file \"%s\" was made by revision %d of %s.",
-		 inpfname, -tmp, progname);
-	if (read (inputfile, (char *) &ichar, 1) == 0 ||
-	    read (inputfile, (char *) &replterm, sizeof (short)) == 0)
-	    getout (YES, "Replay file is too short.");
-	if (replterm != termtype)
-	    getout (YES, "\
-Replay file \"%s\" was made by a different type of terminal.", inpfname);
-	/*
-	 *  Replays made with different screen sizes can be handled
-	 *  if our current dimensions are >= the replay dimensions.
-	 */
-	if (read (inputfile, (char *) &ht, 2) == 0
-	    || read (inputfile, (char *) &wid, sizeof (short)) == 0)
-		getout (YES, "Replay file is too short.");
-	if (term.tt_width != wid || term.tt_height != ht ) {
-	    if (wid > term.tt_width || ht > term.tt_height)
-		getout (YES, "\
-To replay file %s, you need a screensize at least %d w X %d h.\n\
-Your current screensize is %d w X %d h.\n",
-		    inpfname, wid, ht, term.tt_width, term.tt_height );
-	    term.tt_width = wid;
-	    term.tt_height = ht;
-	    initwindows (YES);
-	}
-#endif /* ASCIIKEYINFO */
     }
     else if (curarg < argc)
 	ichar = NO_WINDOWS;         /* file args follow */
     else
 	ichar = ALL_WINDOWS;        /* put up all old windows and files */
+
 
     if (recovering)
 	printf ("\r\n\r\rRecovering from crash...");
@@ -446,6 +481,8 @@ Your current screensize is %d w X %d h.\n",
 	(*term.tt_home) ();
 	(*term.tt_clear) ();
     }
+
+
 #ifdef ENVIRON
 #ifdef LMCVBELL
     if (getenv ("VBELL"))
@@ -474,6 +511,11 @@ Your current screensize is %d w X %d h.\n",
 
     infoinit ();
 
+/*
+dbgpr("main1, after infoinit, replaying=%d, recovering=%d\n",
+    replaying, recovering);
+*/
+
     if (!replaying && curarg < argc && *argv[curarg] != '\0') Block {
     /*  extern void keyedit ();  */
     /*  static void keyedit ();  */
@@ -499,8 +541,15 @@ Your current screensize is %d w X %d h.\n",
 	    eddeffile (YES);
 	keyedit (argv[curarg]);
     }
-    else if (!replaying || ichar != NO_WINDOWS)
+    else if (!replaying || ichar != NO_WINDOWS) {
 	putupwin ();
+    }
+
+#ifdef NCURSES
+/*  dbgpr("e.c, end of main1(), calling initCurses()\n"); */
+    initCurses();
+#endif
+
     return;
 }
 
@@ -757,6 +806,44 @@ checkargs ()
 	    upnostrip = YES;
 	    break;
 
+#ifdef NCURSES_MOUSE
+	case OPTSKIPMOUSE:
+	    optskipmouse = YES;
+	    break;
+#endif
+
+#ifdef NCURSES
+	case OPTBGRGB:
+	    if (!opteqflg || *cp == 0)
+		getout (YES, "Usage:  -bg=r,g,b");
+	    if (sscanf(cp, "%4d,%4d,%4d", &opt_bg_r, &opt_bg_g, &opt_bg_b) != 3)
+		getout (YES, "Usage:  -bg=r,g,b");
+	    bg_rgb_options = YES;
+	    break;
+
+	case OPTFGRGB:
+	    if (!opteqflg || *cp == 0)
+		getout (YES, "Usage:  -fg=r,g,b");
+	    if (sscanf(cp, "%d,%d,%d", &opt_fg_r, &opt_fg_g, &opt_fg_b) != 3)
+		getout (YES, "Usage:  -fg=r,g,b");
+	    fg_rgb_options = YES;
+	    break;
+
+	case OPTSETAB:
+	    if (!opteqflg || *cp == 0 || (sscanf(cp, "%d", &opt_setab) != 1))
+		getout (YES, "Usage:  -setab=N");
+	    if (opt_setab < 0 || opt_setab > 255)
+		getout (YES, "setab value must be 0-255");
+	    break;
+
+	case OPTSETAF:
+	    if (!opteqflg || *cp == 0 || (sscanf(cp, "%d", &opt_setaf) != 1))
+		getout (YES, "Usage:  -setaf=N");
+	    if (opt_setaf < 0 || opt_setaf > 255)
+		getout (YES, "setaf value must be 0-255");
+	    break;
+#endif
+
 	case OPTTABS:
 	    if (upblanks || litmode){
 		opterr = "option cannot be used with -blanks or -literal";
@@ -847,6 +934,10 @@ startup ()
 #endif
 #ifdef SIGWINCH
 	    case SIGWINCH:
+/* begin reszie test */
+		signal(i, resize_handler);
+		break;
+/* end resize test */
 #endif /* SIGWINCH */
 #define XWINDOWS    /*fornow*/
 #ifdef XWINDOWS
@@ -1074,9 +1165,9 @@ startup ()
 #else
 	    struct direct *dp;
 #endif
-	    char tdir[4096];
+	    char tdir[4096]; /* Guaranteed larger than deftmpdir, below */
 #ifdef HOSTTMPNAMES
-	    char tname[4096]; /* Guaranteed larger than deftmpdir, below */
+	    char tname[4096];
 
 	sprintf(tname, ".%s%s", myname, hostname);
 #else
@@ -1101,6 +1192,9 @@ startup ()
 		/*  && (i = open (dp->d_name, 0)) >= 0 ) {  */
 		/* lockf() requires write permission */
 		    && (i = open (dp->d_name, O_RDWR)) >= 0 ) {
+/**
+dbgpr("main1:  dp->d_name=(%s)\n", dp->d_name);
+**/
 #else
 	    if (dp->d_namlen == len
 		    && !strncmp (dp->d_name, keytmp, 3)
@@ -1242,6 +1336,11 @@ options are:\n", progname);
     printf ("\
 %c -readonly\n", readonly ? '*' : ' ');
 
+#ifdef NCURSES_MOUSE
+    printf ("\
+%c -skipmouse\n", optskipmouse ? '*' : ' ');
+#endif
+
     printf ("\
 %c -regexp\n", patmode ? '*' : ' ');
 
@@ -1263,10 +1362,27 @@ options are:\n", progname);
 %c -tabs\n", uptabs == YES ? '*' : ' ');
 
     printf ("\
-%c -terminal=%s (terminal type)\n", opttname ? '*' : ' ', tname);
+%c -terminal=%s (terminal type)\n\n", opttname ? '*' : ' ', tname);
+
+    printf ("Color options for highlighting marked areas:\n");
+    printf ("\
+  -setab=N [0-255] set background color number (black=0, white=255)\n");
 
     printf ("\
-\"*\" means option was in effect.");
+  -setaf=N [0-255] set foreground color number\n");
+
+    printf ("\
+   or:\n");
+    printf ("\
+%c -bgcolor=r,g,b (background color)\n", ' ');
+
+    printf ("\
+%c -fgcolor=r,g,b (foreground color)\n\n", ' ');
+
+
+
+    printf ("\
+*  means option was in effect.");
     return;
 }
 
@@ -1308,12 +1424,25 @@ Type the number of the option you want then hit <RETURN>: ");
 	fflush (stdout);
 	/*gets (line);*/
 	fgets (line, sizeof line, stdin);
+	char ch;
+	    /* if a replay option is followed by a number (eg: 2 5),
+	     * the 2nd number is used as the number of chars to halt replay
+	     * before the end of the keystroke file.
+	     */
+	if (sscanf(line, "%c %d", &ch, &replay_stopcount) == 2) {
+	    /* eg, 2 5 for option 2, stop 5 chars from end of keyfile */
+	    if (replay_stopcount < 0) {
+	       replay_stopcount = 0;
+	    }
+	  /*dbgpr("replay_stopcount set to %d\n", replay_stopcount);*/
+	}
+
 	if (feof (stdin))
 	    getout (type, "");
 	switch (*line) {
 	case '1':
 	    recovering = YES;
-	    silent = YES;
+	    /*silent = YES;*/
 	    if (0) {
 	case '2':
 		recovering = NO;
@@ -1335,6 +1464,7 @@ Type the number of the option you want then hit <RETURN>: ");
     }
     setitty ();
     setotty ();
+fflush(stdout);
     return;
 }
 
@@ -1784,11 +1914,11 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 
     insmode = getc (gbuf);
 
-    if (getc(gbuf) || patmode)	patmode	= YES;	/* Added Purdue	CS 10/8/82 MAB */
-    if (getc(gbuf) || litmode)	litmode	= YES;	/* Added Purdue	CS 2/8/83 MAB */
-    if (getc(gbuf) || uptabs)	uptabs = YES;	/* Added Purdue	CS 2/8/83 MAB */
-    if (getc(gbuf) || upblanks)	upblanks = YES;	/* Added Purdue	CS 2/8/83 MAB */
-    if (getc(gbuf) || upnostrip)upnostrip = YES;/* Added Purdue	CS 2/8/83 MAB */
+    if (getc(gbuf) || patmode)  patmode = YES;  /* Added Purdue CS 10/8/82 MAB */
+    if (getc(gbuf) || litmode)  litmode = YES;  /* Added Purdue CS 2/8/83 MAB */
+    if (getc(gbuf) || uptabs)   uptabs = YES;   /* Added Purdue CS 2/8/83 MAB */
+    if (getc(gbuf) || upblanks) upblanks = YES; /* Added Purdue CS 2/8/83 MAB */
+    if (getc(gbuf) || upnostrip)upnostrip = YES;/* Added Purdue CS 2/8/83 MAB */
 
     if (getc (gbuf)) {  /* curmark */
 	getskip (sizeof (long)
@@ -2220,7 +2350,7 @@ _Noreturn void getout (Flag filclean, char *str, ...)
 #else
     exit (-1);
 #endif
-    va_end (ap);	/* For form's sake */
+    va_end (ap);        /* For form's sake */
     /* NOTREACHED */
 }
 
@@ -2277,5 +2407,37 @@ initwindows (resizing)
 
     curwin = &wholescreen;
     return;
+}
+
+
+/*
+ * catch a resize window signal, let user
+ * know resizing is not supported (yet)
+ */
+void
+resize_handler (int sig) {
+
+    signal(SIGWINCH, SIG_IGN);
+
+    struct winsize winsize;
+    int h, w;
+    if (ioctl(0, TIOCGWINSZ, (char *) &winsize) == 0) {
+	h = winsize.ws_row;
+	w = winsize.ws_col;
+     /**/ dbgpr("got SIGWINCH sig=%d, h=%d w=%d LINES=%d, COLS=%d\n", sig, h, w, LINES, COLS); /**/
+    }
+
+    /* if the window is smaller, advice how best to recover */
+    char buf[128] = "";
+    if (h < term.tt_height || w < term.tt_width) {
+	snprintf(buf, 80, "Enlarge to at least %d x %d, then <cmd>redraw to recover.",
+	   term.tt_height, term.tt_width);
+    }
+    if (h != term.tt_height || w != term.tt_width) {
+	mesg(ERRALL + 2, "Window size changes are not supported. ",  buf);
+	fflush(stdout);
+    }
+
+    signal(SIGWINCH, resize_handler);
 }
 

@@ -4,9 +4,12 @@
 
 
 
+#ifdef OUT
 #ifndef LIBTINFO  /* using old copy of termcap library */
 #define tparm tparam
 #endif
+#endif /* OUT */
+
 
 /****************************************/
 /**** 0 = terminal from termcap ****/

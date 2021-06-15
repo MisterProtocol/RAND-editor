@@ -62,7 +62,26 @@ Flag    freshputup;             /* ignore previous stuff on these lines */
 Flag    nodintrup;              /* disallow display interruption */
 Scols putupdelta;               /* nchars to insert (delete) in putup() */
 
+Flag entering = NO;     /* set if e is in the param () routine. */
+
 int fnbcol ();
+
+#ifdef NCURSES
+extern void debug_inputkey ();
+extern void dbg_showMarkInfo();
+/* these are tmp copies of getkey and getkey1 for debugging... */
+unsigned Short mGetkey (Flag peekflg, struct timeval *timeout);
+unsigned Short mGetkey1(Flag peekflg, struct timeval *timeout);
+Char MapCursesKey(Char rchar);
+#include "e.keys.h"
+char *getEkeyname(int i);
+char *getCursesKeyname(int i);
+char *dbg_KeyName(int c);
+#endif
+
+Flag finished_replay = NO;
+extern off_t replay_filesize;
+extern int replay_stopcount;
 
 extern void putupwin ();
 extern void putup ();
@@ -88,7 +107,6 @@ extern void exchgcmds ();
 extern void getarg ();
 extern void limitcursor ();
 extern void info ();
-extern void mesg ();
 extern void credisplay ();
 extern void redisplay ();
 extern void screenexit ();
@@ -102,9 +120,14 @@ extern void RecordChar ();
 #endif
 extern int get_profilekey ();
 extern int d_vmove ();
+extern void doMouseReplay();
+void dbg_winlist();
+
 
 void MesgHack ();
 void setmarg ();
+
+void mesg (int, ...);
 
 #define SIGSEGV_PATCH  /* tmp to deal with mem violation */
 
@@ -172,8 +195,18 @@ Scols   ncols;      /* number of columns for partial line redraw */
     if (strtcol > (lcol = curwksp->wcol) + (rlimit = curwin->rtext + 1))
 	goto ret;
 
-/*  dbgpr("putup0: ls=(%d) lf=(%d) strtcol=(%d) ncols=(%d), lcol=(%d), rlimit=(%d)\n",
-    ls,lf,strtcol,ncols,lcol,rlimit);
+    /*  Due to a bug while collecting keys in CMD: mode, this routine is
+     *  sometimes called with curwin pointing to the enterwin.  This causes
+     *  a core dump because some expected members are missing, eg null pointers.
+     */
+    if (curwin == &enterwin) {
+   /* dbgpr("putup:  curwin==&enterwin, returning\n");*/
+      goto ret;
+    }
+
+/**
+    dbgpr("putup0: ls=(%d) lf=(%d) strtcol=(%d) ncols=(%d), lcol=(%d), cursorcol=(%d) cursorlin=(%d) rlimit=(%d), \n",
+    ls,lf,strtcol,ncols,lcol,cursorcol,cursorline,rlimit);
  **/
 
     /* if the caller knows that after the putup he will move the cursor
@@ -226,20 +259,11 @@ Scols   ncols;      /* number of columns for partial line redraw */
 	/* if this is the first line of the putup, back up and fix left    */
 	/*   border as far up as necessary. */
 
-
-#ifdef SIGSEGV_PATCH
-	/*
-	 * 1-2013 tmp patch for mem violation
-	 */
-	if( curwin->lmchars == NULL ) {
-	  curwin->lmchars = (unsigned char *)"\0\0";
-	  curwin->rmchars = (unsigned char *)"\0\0";
-	}
-#endif
 	if (freshputup) {
 	    poscursor (-1, ln);
 	    putch (chgborders == 1 ? lmc : INMCH, NO);
-	    curwin->lmchars[ln] = lmc;
+	    if (curwin->lmchars)
+	      curwin->lmchars[ln] = lmc;
 	} else Block {
 	    Reg1 Slines lt;
 	    Slines lb;
@@ -248,6 +272,10 @@ Scols   ncols;      /* number of columns for partial line redraw */
 	    else
 		lb = ln;
 	    for (lt = ln; lt >= lb; lt--) {
+/**
+dbgpr("e.t.c:270, lt=%d, ln=%d length of lmchars=(%d) curwin=(%o) enterwin=(%o)\n",
+lt, ln, strlen(curwin->lmchars), curwin, enterwin );
+ **/
 		if ((curwin->lmchars[lt] & CHARMASK) == lmc)
 		    break;
 		if (   chgborders
@@ -259,7 +287,8 @@ Scols   ncols;      /* number of columns for partial line redraw */
 		    poscursor (-1, lt);
 		    putch (chgborders == 1 ? lmc : INMCH, NO);
 		}
-		curwin->lmchars[lt] = lmc;
+		if (curwin->lmchars)
+		  curwin->lmchars[lt] = lmc;
 	    }
 	}
 
@@ -280,8 +309,10 @@ Scols   ncols;      /* number of columns for partial line redraw */
 	else
 	    fc -= lcol;
 
-/*  dbgpr("putup1: rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncline=(%d)\n",
-       rlimit, fc, col, offendflg,fc_rval,ncline);  **/
+/* /
+dbgpr("putup1: rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncline=(%d)\n",
+       rlimit, fc, col, offendflg,fc_rval,ncline);
+/ **/
 
 	/* how many leading blanks do we need to put out */
 	if (entfstline) {
@@ -297,7 +328,9 @@ Scols   ncols;      /* number of columns for partial line redraw */
 	}
 	curwin->firstcol[ln] = fc;
 	poscursor ((Scols) col, ln);
-/*  dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);  **/
+/* /
+dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);
+/ */
 #ifdef OUT
 	if (stdout->_cnt < 100)   /* smooth any outputting breaks  */
 	    d_put (0);
@@ -312,7 +345,9 @@ Scols   ncols;      /* number of columns for partial line redraw */
 
 	/* determine the rightmost col of the new text to put up */
 	/* this should do better on lines that go past right border */
-/*  dbgpr("putup3: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);  **/
+/* /
+dbgpr("putup3: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
+/ */
 	if (offendflg)
 	    lstcol = 0;
 	else Block {
@@ -328,14 +363,20 @@ Scols   ncols;      /* number of columns for partial line redraw */
 	}
 	if (lstcol < col)
 	    lstcol = col;
-/*  dbgpr("putup4: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);  **/
+/* /
+dbgpr("putup4: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
+/ */
 	Block {
 	    Reg1 Scols ricol;   /* rightmost col of text to put up */
-/*  dbgpr("putup5: lstcol=(%d), rlimit=(%d) strtcol=(%d) ncols=(%d)\n",
-   rlimit, lstcol, strtcol, ncols);  **/
+/* /
+dbgpr("putup5: lstcol=(%d), rlimit=(%d) strtcol=(%d) ncols=(%d)\n",
+   rlimit, lstcol, strtcol, ncols);
+/ */
 	    ricol = min (lstcol, min (rlimit, strtcol + ncols));
+/* /
+dbgpr("putup6: ricol=(%d), col=(%d) lcol=(%d)\n", ricol, col, lcol);
+/ */
 	    /* put out the text */
-/*  dbgpr("putup6: ricol=(%d), col=(%d) lcol=(%d)\n", ricol, col, lcol);  **/
 	    if (ricol - col > 0) {
 		/*  if (putupdelta && col >= strtcol) {
 			d_hmove (putupdelta, (Short) (ricol - col),
@@ -367,12 +408,12 @@ Scols   ncols;      /* number of columns for partial line redraw */
 		    || ln != newcurline
 		   )
 	       ) {
-/*
+/* /
 dbgpr("(else) freshputup=%d, rmc=%d, curwin->rmchars[ln]=%d\n",
   freshputup,rmc,curwin->rmchars[ln]&CHARMASK);
 dbgpr(" chgborders=%d, borderbullets=%d, ln=%d, newcurline=%d\n",
   chgborders, borderbullets, ln, newcurline);
- ***/
+/ */
 		poscursor (curwin->rmarg - curwin->ltext, ln);
 		putch (chgborders == 1 ? rmc : INMCH, NO);
 	    }
@@ -618,7 +659,7 @@ tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
     rewrites the margin character, based on the current tab data.
     If igntab is true, any tab at the character is ignored.
 #endif
-/*tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)*/
+/*tm_unbullet (allbullets, occ, tb, ordch, xordch, igntab) */
 void
 tm_unbullet (allbullets, occ, tb, ordch, igntab)
     Flag allbullets, igntab;
@@ -645,8 +686,7 @@ tm_unbullet (allbullets, occ, tb, ordch, igntab)
 #ifdef COMMENT
 void
 bm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
-    Flag allbullets;
-    Flag igntab;  /* not used */
+    Flag allbullets, igntab;
     Ncols occ, tb;
     char ordch, xordch;
 .
@@ -660,7 +700,6 @@ bm_unbullet (allbullets, occ, tb, ordch, xordch)
     Flag allbullets;
     Ncols occ, tb;
     char ordch, xordch;
-
 {
     /*Ncols i;*/
 
@@ -803,13 +842,15 @@ Flag wt;
 	Block {
 	    static struct timeval onesec = { 1, 0 };
 
-	    getkey (WAIT_PEEK_KEY, &onesec);
+	    /*getkey (WAIT_PEEK_KEY, &onesec);*/
+	    mGetkey (WAIT_PEEK_KEY, &onesec);
 	    /* either this read will time out
 	     * or a key will have come in, in which case we want to clear
 	     * bullet right away and reset the alarm.
 	     **/
 #else /* SYSSELECT */
-	if (getkey (PEEK_KEY) == NOCHAR) {
+      /*if (getkey (PEEK_KEY) == NOCHAR) {*/
+	if (mGetkey (PEEK_KEY) == NOCHAR) {
 	    (void) signal (SIGALRM, bulalarm);
 	    alarm (1);
 	    if (getkey (WAIT_PEEK_KEY) != NOCHAR)
@@ -965,6 +1006,20 @@ Reg6 Scols   curscol;
     Reg4 Ncols  hdist;      /* horizontal distance to move */
     Reg2 S_wksp *cwksp = curwksp;
 
+/**
+dbgpr("movewin:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
+    curwin, &wholescreen, &enterwin, &infowin);
+dbgpr("movewin:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.wksp=(%o)\n",
+    curwksp, wholescreen.wksp, enterwin.wksp, infowin.wksp);
+ **/
+
+if( 1 && curwin == &enterwin ) {
+  dbgpr("movewin: curwin == &enterwin, chgwindow\n");
+/*return 0;*/
+  chgwindow(-1);
+}
+
+
     winlin = max (0, winlin);
     wincol = max (0, wincol);
 #ifdef LA_LONGFILES
@@ -1078,7 +1133,7 @@ restcurs ()
 void
 restcurs ()
 {
-  /*Reg1 struct svcs *lastsv;*/
+    /*Reg1 struct svcs *lastsv;*/
 
     poscursor (sv_curs->sv_curscol, sv_curs->sv_cursline);
     burncurs();
@@ -1119,6 +1174,16 @@ poscursor (col, lin)
 Reg1 Scols  col;
 Reg2 Slines lin;
 {
+
+/**
+if( 0 || col != 0 || lin != 0 ) {
+ if( DebugVal > 0 ) {
+   dbgpr("poscursor, beg: col=%d lin=%d cursorline=%d cursorcol=%d, ltext=%d, ttext=%d curwin=(%o)\n",
+     col,lin,cursorline,cursorcol,curwin->ltext, curwin->ttext,curwin);
+  }
+}
+ **/
+
     if (cursorline == lin) {
 	/* only need to change column?  */
 	switch (col - cursorcol) {  /* fortran arithmetic if!!      */
@@ -1154,6 +1219,12 @@ Reg2 Slines lin;
     putscbuf[1] = 041 + curwin->ltext + col;
     putscbuf[2] = 041 + curwin->ttext + lin;
     d_write (putscbuf, 3);
+
+/*dbg * /
+if(curmark)
+ dbg_showMarkInfo("poscur");
+/ ***/
+
     return;
 }
 
@@ -1252,6 +1323,8 @@ Reg4 Nlines cnt;
     return;
 }
 
+
+
 #ifdef  SYSSELECT
 #ifdef COMMENT
 unsigned Short
@@ -1293,27 +1366,32 @@ Reg2 Flag peekflg;
 #endif /* SYSSELECT */
 {
     Reg1 unsigned Short rkey;
-    static Flag knockdown  = NO;
+    static Flag knockdown  = NO;    /* set when entering CTRL chars into a file, eg, ^X^CI is a tab */
     /*extern*/ unsigned Short getkey1 ();
 
-    if (peekflg == WAIT_KEY && keyused == NO)
+    if (peekflg == WAIT_KEY && keyused == NO) {
 	return key; /* then getkey is really a no-op */
+    }
+
 #ifdef  SYSSELECT
     rkey = getkey1 (peekflg, timeout);
 #else /* SYSSELECT */
     rkey = getkey1 (peekflg);
 #endif /* SYSSELECT */
+
+#ifdef NCURSES
+/*  debug_inputkey(rkey,"e.t.c, getkey()"); */
+#endif
+
     if (knockdown && rkey < 040)
 	rkey |= 0100;
     if (peekflg != WAIT_KEY)
 	return rkey;
-    knockdown = rkey == CCCTRLQUOTE;
+    knockdown = rkey == CCCTRLQUOTE;    /* ^\ knockdown next char   */
     keyused = NO;
     return key = rkey;
 }
 
-Flag entering = NO;     /* set if e is in the param () routine. */
-			/* looked at by getkey1() */
 #ifdef  SYSSELECT
 #ifdef COMMENT
 static unsigned Short
@@ -1390,7 +1468,9 @@ Small peekflg;
 		dot_profile = NO;
 	    }
 #endif /* STARTUPFILE */
+	    /*goto nonreplay; */
 	    goto nonreplay;
+	    return CCRETURN;
 	}
 	if (   !recovering
 	    && !xempty (STDIN) /* any key stops replay */
@@ -1512,7 +1592,7 @@ Small peekflg;
 		fd_set readmask;
 		FD_ZERO(&readmask);
 		FD_SET(inputfile, &readmask);
-		/*dbgpr("inputfile=(%d)\n", inputfile); **/
+		/*dbgpr("inputfile=(%d)\n", inputfile);*/
 		if (   peekflg == WAIT_PEEK_KEY
 		    && select (inputfile + 1, &readmask, NULL, NULL, timeout) <= 0
 		   )
@@ -1650,6 +1730,7 @@ Small peekflg;
     }
 }
 
+
 #ifdef RDNDELAY
 
 /*  These routines adapt the late-model read() with O_NDELAY
@@ -1701,11 +1782,12 @@ xread (fd, buf, count)
     blocking read.
 #endif
 int
-xread (fd, buf, count)
+out_xread (fd, buf, count)
 int fd;
 char *buf;
 int count;
 {
+/*dbgpr("xread: fd=%d count=$d\n", fd, count);*/
     int retval;
     Reg1 struct rdbuf *rdb;
 
@@ -1786,13 +1868,19 @@ dintrup ()
 {
     Reg1 unsigned Short ichar;
 
+/* todo, modify mGetkey to handle PEEK_KEY in replay mode */
+if( replaying )
+  return 0;
+
     intrupnum = 0;
 #ifdef SYSSELECT
     static struct timeval k_timeval = {1, 0}; /* one-second timeout */
 
     ichar = getkey (PEEK_KEY, &k_timeval);
+/*  ichar = mGetkey (PEEK_KEY, &k_timeval); */
 #else /* SYSSELECT */
     ichar = getkey (PEEK_KEY);
+/*  ichar = mGetkey (PEEK_KEY); */
 #endif /* SYSSELECT */
 
     switch (ichar) {
@@ -1864,7 +1952,8 @@ la_int()
 Flag
 la_int()
 {
-    if (intok)
+/*  if (intok)  */
+    if (intok && !replaying)
 	return sintrup ();
     else
 	return 0;
@@ -1888,25 +1977,28 @@ sintrup ()                        /* Whether to intrup search/exec      */
     struct timeval k_t = {1, 0};
 
     if (getkey (PEEK_KEY, &k_timeval) == CCINT) {
+/*  if (mGetkey (PEEK_KEY, &k_timeval) == CCINT) { */
 	putc (CCINT, keyfile);
 	keyused = YES;
 	k_timeval = k_t; /* C standard best practice: reinitialize
 			    it after use */
+     /* mGetkey (WAIT_KEY, &k_timeval); */
 	getkey (WAIT_KEY, &k_timeval);
 	keyused = YES;
 	return YES;
     }
 #else
     if (getkey (PEEK_KEY) == CCINT) {
+/*  if (mGetkey (PEEK_KEY) == CCINT) { */
 	putc (CCINT, keyfile);
 	keyused = YES;
+    /*  mGetkey (WAIT_KEY); */
 	getkey (WAIT_KEY);
 	keyused = YES;
 	return YES;
     }
 #endif /* SYSSELECT */
 
-/*dbgpr("sintrup(), returning NO\n");*/
     return NO;
 }
 
@@ -1922,11 +2014,11 @@ putch (chr, flg)
 .
     Put a character up at current cursor position.
     The character has to be a space, a printing char, a bell or an 0177.
-    Cannott be negative.
+    Cannot be negative.
     If 'flg' is non-0, then 'chr' is being put into a display window,
     and its position may be before or after existing printing characters
     on the line.  This must be noted for putup ().
-    'flg' is is only YES in 3 places: 2 in printchar and 1 in setbul ().
+    'flg' is only YES in 3 places: 2 in printchar and 1 in setbul ().
 #endif
 void
 putch (chr, flg)
@@ -2042,8 +2134,10 @@ param ()
 	*c1 = '\0';
 	ppos = ccmdlen = lcmdlen;
 #ifdef SYSSELECT
-	struct timeval k_timeval = {1, 0};	/* one-second timer */
-	getkey (WAIT_KEY, &k_timeval);
+	struct timeval k_timeval = {1, 0};      /* one-second timer */
+/*tmp*/
+	/*getkey (WAIT_KEY, &k_timeval);*/
+	mGetkey (WAIT_KEY, &k_timeval);
 #else
 	getkey (WAIT_KEY);
 #endif /* SYSSELECT */
@@ -2059,7 +2153,9 @@ param ()
 rmcmd:
 #endif /* NOCMDCMD */
 #ifdef SYSSELECT
-	getkey (WAIT_KEY, &k_timeval);
+/*      getkey (WAIT_KEY, &k_timeval); */
+/*tmp*/
+	mGetkey (WAIT_KEY, &k_timeval);
 #else
 	getkey (WAIT_KEY);
 #endif /* SYSSELECT */
@@ -2082,11 +2178,20 @@ rmcmd:
 #ifdef SYSSELECT
     struct timeval k_timeval = {1, 0}; /* one-second timer */
 
-    for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY, &k_timeval)) {
+/*  for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY, &k_timeval)) { */
+    for (; ; cmdflg = key == CCCMD, keyused = YES, mGetkey (WAIT_KEY, &k_timeval)) {
 #else
     for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY)) {
 #endif /* SYSSELECT */
 
+/* /
+if (CTRLCHAR) {
+ dbgpr("param: got key=(%o)(%s) curwin=(%o) enterwin=(%o)\n",  key, getEkeyname(key), curwin, &enterwin);
+}
+else {
+ dbgpr("param: got key=(%o)(%c) curwin=(%o) enterwin=(%o)\n",  key, (char)key, curwin, &enterwin);
+}
+/ */
 	if (ccmdlen >= ccmdl)
 	    ccmdp = gsalloc (ccmdp, ccmdlen, ccmdl += LPARAM, YES);
 	if (CTRLCHAR)
@@ -2277,12 +2382,14 @@ rmcmd:
 		    goto parmstrt;
 		}
 		ccmdlen = 0;
+		/* fall through */
 
 	    case CCNULL:                /* added for err ret from .estartup */
 		mesg (TELSTOP);
 		goto err;
 
 	    case CCRETURN:
+	    /*dbgpr("param, got CCRETURN\n");*/
 		goto done;
 
 	    default:
@@ -2505,7 +2612,9 @@ Reg2 char *msg;
     oldwin = curwin;        /* save old window info   */
     oldcol = cursorcol;
     oldlin = cursorline;
-
+/**
+dbgpr("info(), col=(%d) ncols=(%d) msg=(%s)\n", column, ncols, msg);
+ **/
     switchwindow (&infowin);
     poscursor (column, 0);
 
@@ -2550,25 +2659,22 @@ mesg (parm, msgs)
 
 #ifdef OUT
 /* VARARGS 1 */
-#include <varargs.h>
+#include <stdarg.h>
 void
-mesg (va_alist)
-va_dcl
+mesg (int parm, ...)
 {
     Reg3 Scols lastcol;
     Reg6 Small nmsg;
     Reg7 char **msgp;
     Reg4 Flag to_image;         /* YES = to screen image, NO = putchar */
 /* sun4 changes*/
-    int parm;
     va_list ap;
     char *args[10];
     int argno = 0;
     int i;
     char **msgs;
 
-    va_start(ap);
-    parm = va_arg(ap, int);
+    va_start(ap, parm);
     for(i = (parm&07); i>0; i-- ) {
       args[argno++] = va_arg(ap, char *);
     }
@@ -2682,6 +2788,7 @@ va_dcl
 	    putchar (' ');
     }
 
+    va_end(ap);
     return;
 }
 #endif
@@ -2689,10 +2796,12 @@ va_dcl
 char MesgBuf[256];
 
 void
-mesg (parm, s1, s2, s3, s4, s5)
-int parm;
-char *s1,*s2,*s3,*s4,*s5;
+mesg (int parm, ...)
 {
+   va_list ap;
+   char *s1, *s2, *s3, *s4, *s5;
+
+   va_start(ap, parm);
    int n = parm & 7;
    /*static char msg[200] = "";*/
    /*char *t = &msg[0];*/
@@ -2700,18 +2809,33 @@ char *s1,*s2,*s3,*s4,*s5;
 
    switch (n) {
      case 1:
+       s1 = va_arg (ap, char *);
        strcpy(t, s1);
        break;
      case 2:
+       s1 = va_arg (ap, char *);
+       s2 = va_arg (ap, char *);
        sprintf(t, "%s%s", s1,s2);
        break;
      case 3:
+       s1 = va_arg (ap, char *);
+       s2 = va_arg (ap, char *);
+       s3 = va_arg (ap, char *);
        sprintf(t, "%s%s%s", s1,s2,s3);
        break;
      case 4:
+       s1 = va_arg (ap, char *);
+       s2 = va_arg (ap, char *);
+       s3 = va_arg (ap, char *);
+       s4 = va_arg (ap, char *);
        sprintf(t, "%s%s%s%s", s1,s2,s3,s4);
        break;
      case 5:
+       s1 = va_arg (ap, char *);
+       s2 = va_arg (ap, char *);
+       s3 = va_arg (ap, char *);
+       s4 = va_arg (ap, char *);
+       s5 = va_arg (ap, char *);
        sprintf(t, "%s%s%s%s%s", s1,s2,s3,s4,s5);
        break;
      break;
@@ -2721,6 +2845,10 @@ char *s1,*s2,*s3,*s4,*s5;
    parm = parm&0170;
    /*mesg(parm+1, &msg[0]);*/
    MesgHack(parm+1, &MesgBuf[0]);
+/**
+dbgpr("--after MesgHack (%s)\n", t);
+ **/
+    va_end (ap);
 }
 
 void
@@ -2733,7 +2861,6 @@ char *msgs;
     Reg7 char **msgp;
     Reg4 Flag to_image;         /* YES = to screen image, NO = putchar */
 
-
     /*
      *  Added so opt -silent can be used to execute the .e_profile
      *  stuff quietly.
@@ -2742,6 +2869,13 @@ char *msgs;
        return;
 
     to_image = windowsup || replaying;
+
+/* /
+dbgpr("MsgHack:  parm=(%o) to_image=%d\n", parm, to_image);
+
+dbgpr("MsgHack, start:  curwin=(%o) msowin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
+    curwin, msowin, &wholescreen, &enterwin, &infowin);
+/ */
     if (to_image) {
 	if (parm & TELSTRT) {
 	    msowin = curwin;        /* save old window info   */
@@ -2832,6 +2966,10 @@ char *msgs;
 
     if (parm & TELSTOP) {         /* remember last position and.. */
 	if (to_image) {
+/* /
+dbgpr("MsgHack(), TELSTOP:  curwin=(%o) msowin=(%o) enterwin=(%o)\n",
+    curwin, msowin, &enterwin);
+/ */
 	    if (curwin != msowin) {
 		switchwindow (msowin); /* go back to original pos      */
 	    }
@@ -2840,6 +2978,12 @@ char *msgs;
 	else
 	    putchar (' ');
     }
+
+/* /
+dbgpr("MsgHack, end:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
+    curwin, &wholescreen, &enterwin, &infowin);
+/ */
+
     return;
 }
 
@@ -2910,18 +3054,18 @@ Flag    cwkspflg;
     Reg6 Slines first;      /* first line of area in window to be changed */
     Reg2 Slines endwin;     /* height of window -1 */
 
-/**/
+/**
 dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
   fn,from,num,delta,cwkspflg);
-/**/
+ **/
     for (win = Z; win < nwinlist; win++) {
 	if ((tw = winlist[win]->altwksp)->wfile == fn)
-	    /*tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1);*/
+	    /* tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1); */
 	    tw->wlin += readjtop (tw->wlin, from, num, delta);
 	if ((tw = winlist[win]->wksp)->wfile == fn) {
 	    Nlines wmove;
 	    Reg7 S_window *oldwin;
-	    /*wmove = readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1);*/
+	    /* wmove = readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1); */
 	    wmove = readjtop (tw->wlin, from, num, delta);
 	    winfirst = from - (tw->wlin += wmove);
 	    if (tw == curwksp && !cwkspflg)
@@ -2996,7 +3140,7 @@ readjtop (wlin, from, num, delta)
     The logic in redisplay () and the algorithm
     implemented here are closely interdependent.
 #endif
-/*readjtop (wlin, from, num, delta, Slines height)*/
+/*readjtop (wlin, from, num, delta, Slines height) */  /* height not used */
 Nlines
 readjtop (wlin, from, num, delta)
 Reg1 Nlines wlin;
@@ -3237,4 +3381,729 @@ tglstrmode ()
 {
     upnostrip = YES;
     info (inf_str, 3, "NOS");
+}
+
+
+/* mGetkey and mGetkey1 are tmp copies, for debugging */
+
+#ifdef SYSSELECT
+unsigned Short
+mGetkey (peekflg, timeout)
+Flag peekflg;
+struct timeval *timeout;
+#else
+unsigned Short
+mGetkey (peekflg)
+Flag peekflg;
+#endif
+{
+    Reg1 unsigned Short rkey;
+    static Flag knockdown  = NO;
+    /*extern*/ unsigned Short mGetkey1 ();
+
+/*
+dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar, (char) haveChar, (char) peekCh);
+*/
+    if (peekflg == WAIT_KEY && keyused == NO) {
+	return key; /* then getkey is really a no-op */
+    }
+
+#ifdef  SYSSELECT
+    rkey = mGetkey1 (peekflg, timeout);
+#else /* SYSSELECT */
+    rkey = mGetkey1 (peekflg);
+#endif /* SYSSELECT */
+
+#ifdef NCURSES
+/*  dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n", knockdown, rkey,rkey,(char)rkey);*/
+#endif
+
+    if (knockdown && rkey < 040)
+	rkey |= 0100;
+    if (peekflg != WAIT_KEY)
+	return rkey;
+    knockdown = rkey == CCCTRLQUOTE;    /* ^\ knockdown next char   */
+    keyused = NO;
+
+    if( !replaying && !dot_profile ) {
+#ifdef RECORDING
+	if (recording) {
+	    if( rkey != NOCHAR ) {
+		RecordChar (rkey);
+	    }
+	}
+#endif /* RECORDING */
+	if (keyfile != NULL && rkey != CCINT && rkey != CCMOUSE) {
+	    putc (rkey, keyfile);
+	    if (numtyp > MAXTYP) {
+		flushkeys ();
+		numtyp = 0;
+	    }
+	}
+    }
+    return key = rkey;
+}
+
+
+#ifdef  SYSSELECT
+unsigned Short
+mGetkey1 (peekflg, timeout)
+Small peekflg;
+struct timeval *timeout;
+#else /* SYSSELECT */
+unsigned Short
+mGetkey1 (peekflg)
+Small peekflg;
+#endif /* SYSSELECT */
+{
+    static Short lcnt;
+    static int   lexrem = 0;         /* portion of lcnt that is still raw */
+    static Uchar chbuf[NREAD];
+    static Uchar *lp = &chbuf[0];
+
+/**
+dbgpr("mGetkey1: peekflg=%d replaying=%d recovering=%d, silent=%d, entering=%d, winup=%d\n",
+  peekflg, replaying, recovering, silent, entering, windowsup);
+dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
+ **/
+
+    int c;
+    static int replay_cnt;  /* number of chars replayed */
+    if (replaying) Block {
+	static Small replaydone = 0;
+
+	/* better ways to do this, but in the interest
+	 * of minimal recoding, for now ...
+	 */
+
+	if ((c = fgetc(replay_fp)) == EOF) {
+	/*  dbgpr("mGetkey1, replaying, at EOF, entering=%d\n", entering); */
+	    replaydone++;
+	}
+
+	if (replaydone) {
+ finishreplay:
+	    /*close (inputfile);*/
+	    fclose (replay_fp);
+	    inputfile = STDIN;  /* fd 0, not a FILE ptr */
+	    if (silent) {
+		silent = NO;
+		(*term.tt_ini1) (); /* not d_put(VCCICL) because fresh() */
+				    /* follows */
+		windowsup = YES;
+		fresh ();
+	    }
+
+	    /*
+	    mesg (ERRALL + 1, recovering ? "Recovery completed." : replaydone == 1 ?
+		"Replay completed." : "Replay aborted." );
+	    */
+	    char replaymsg[100];
+	    sprintf(replaymsg, "%s Hit RETURN to continue:",
+		recovering ? "Recovery completed." : replaydone == 1 ?
+		    "Replay completed." : "Replay stopped." );
+
+	    mesg ((TELSTRT|TELCLR|TELSTOP) + 1, replaymsg);
+	    /*mesg (ERRALL+1, replaymsg);*/
+	    d_put (0);
+	    fflush(stdout);
+
+	    /* Some replays result in this error condition, eg stopped while in <cmd> mode (5/2021) */
+	    if (curwin == &enterwin) {
+		chgwindow(-1);
+	    }
+
+	 /* int c1; */
+	    nodelay(stdscr, FALSE);
+	 /* c1 =*/ wgetch(stdscr);
+	/*  dbgpr(" c1=(%o)(%c) after continue msg\n", c1, c1 ); */
+
+	    /*
+	    c1 = fgetc(stdin);
+	    dbgpr(" c1=(%o)(%c) hit any key to continue\n", c1, c1 );
+	    */
+
+	    replaying = NO;
+	    recovering = NO;
+	    replaydone = 0;
+	    /*
+	    intok = YES;
+	    */
+	    loopflags.hold = YES;
+	    finished_replay = YES;
+
+#ifdef  STARTUPFILE
+	    /*
+	     *  Don't reread the the .e_profile file if recovering
+	     *  from a crash.
+	     */
+	    if( dot_profile ) {
+		fclose( fp_profile );
+		dot_profile = NO;
+	    }
+#endif /* STARTUPFILE */
+
+/*
+dbgpr("---replaydone\n");
+*/
+
+	    /**
+	    ungetch(CCRETURN);
+	    return CCCMD;
+	    **/
+
+	    return CCNULL;
+
+	    /*goto m_nonreplay; why? */
+	}
+
+	/* any key stops replay */
+	replay_cnt++;
+
+#ifdef NCURSES
+	/*    Keep track of how many chars are left in keystroke file to
+	 *    allow the replay to be cancelled before the last few keystrokes
+	 */
+
+	if (replay_stopcount) {   /* set by user to stop before last few keystrokes */
+	    long pos = ftell (replay_fp);
+	    if ((replay_filesize - pos) <= replay_stopcount) {
+		/* /
+		dbgpr("STOP replay, pos=(%d) replay_size=(%d), stopcount=(%d)\n",
+		    pos, replay_filesize, replay_stopcount);
+		/ */
+		/*mesg(ERRALL+1, "hit any key to interrupt replay");*/
+		nodelay(stdscr,TRUE);
+		wgetch(stdscr);  /* keyboard input, not from keystroke file */
+		nodelay(stdscr, FALSE);
+		lcnt = 0;
+		replaydone = 2;
+		goto endreplay;
+	    }
+	}
+		  /* don't think we need this anymore...*/
+	if( !recovering ) {
+	    nodelay(stdscr,TRUE);
+	    int rc = wgetch(stdscr);  /* keyboard input, not keystroke file */
+	    nodelay(stdscr, FALSE);
+	    if (rc != ERR) {
+		lcnt = 0;
+		replaydone = 2;
+		goto endreplay;
+	    }
+	}
+#else
+	if ( !recovering && !xempty (STDIN) ) {
+	    lcnt = 0;
+	    replaydone = 2;
+	    while (xread (STDIN, chbuf, NREAD) > 0 && !xempty (STDIN))
+		continue;
+	    goto endreplay;
+	}
+#endif /* NCURSES */
+
+
+/*
+dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
+  c, c, cursorcol, cursorline, replay_cnt );
+*/
+
+	/* this is currently the only cmd that needs to peek ahead (need: y,x) */
+
+	if( c == CCMOUSE ) {
+	    int y, x;
+	  /*int mouse_err = 0;*/
+	    int rc = fscanf(replay_fp, "%3d%3d", &y, &x);
+	    if( rc != 2 || feof(replay_fp)) {
+	     /* mouse_err = 1; */
+		/* skip mouse call */
+	    /*  dbgpr("replay err, fscanf returned (%d) expected (%d)\n", rc, 2); */
+		goto endreplay;
+	    }
+	    else {
+		doMouseReplay(y, x);
+		return NOCHAR;  /* or, CCNULL ? */
+	    }
+	}
+
+	if ( c == CCSTOP ) {
+	    replaydone = 1;
+ endreplay:
+	    if (!entering)
+		goto finishreplay;
+	    else {
+		/*
+		*chbuf = CCINT;
+		lp = chbuf;
+		lcnt = 1;
+		*/
+		c = CCINT;
+	    }
+	}
+
+    /*  dbgpr("--replaying, returning (%o)(%c), entering=%d\n",
+	    c, c, entering); */
+	return c;
+    }
+
+#ifdef RECORDING
+    else if (playing) {
+	    extern Flag play_silent;
+
+	lp = (Uchar *)PlayChar (peekflg);
+	if (!playing && play_silent) {
+	    silent = 0;
+	    fresh();
+	}
+	/*
+	 * Any key stops playback
+	 */
+#ifdef NCURSES
+	nodelay(stdscr,TRUE);
+	int rc = getch();
+	nodelay(stdscr, FALSE);
+	if (rc != ERR) {
+	    return (CCINT);
+	}
+	else {
+	  return (unsigned Short)*lp;
+	}
+#else
+	if (!xempty(STDIN)) {
+	    char c;
+	    /*
+	     *  throw away keystroke[s]
+	     */
+	    do {
+		read (inputfile, &c, 1);
+	    } while (!xempty(STDIN));
+	    if( play_silent )
+		silent = 0;
+	    play_count = 0;
+	/*  playing = 0;  */
+	    return (CCINT);
+	}
+	/*goto endGetkey1;*/
+	return (unsigned Short)*lp;
+#endif /* NCURSES */
+    }
+#endif /* RECORDING */
+
+    else {
+	static int firstkey = 1;
+
+/* label not used
+ m_nonreplay:
+*/
+
+/* START HACK */
+	if (firstkey) {
+		static Uchar redraw_buf[] = { CCCMD, 'r', 'e', 'd', '\015', '-' };
+		static Uchar *redraw_ptr = redraw_buf;
+
+		if (*redraw_ptr != '-') {  /* since CCCMD is 0, use '-' as stop point */
+		   return (*redraw_ptr++);
+		}
+
+		firstkey = 0;
+		/* return (CCCMD); */
+	}
+/* END HACK */
+#ifdef  STARTUPFILE
+	/*
+	 *  Input from the .e_profile file?
+	 */
+	if( dot_profile && peekflg == WAIT_KEY )
+	    return( get_profilekey( NO ));
+#endif /* STARTUPFILE */
+
+/**
+dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD=(%d)\n",
+   lcnt, lp-chbuf, lexrem, NREAD);
+ **/
+
+	if (lcnt < 0)
+	    fatal (FATALBUG, "lcnt < 0");
+	if (   (lcnt - lexrem == 0 && peekflg != PEEK_KEY)
+	    || (lcnt < NREAD && !xempty (inputfile))
+	   ) {
+	    /* read some more */
+	    if (lcnt == 0)
+		lp = chbuf;
+	    else if (lp > chbuf) {
+		if (lcnt == 1) {
+		    /* handle frequent case more efficiently */
+		    *chbuf = *lp;
+		}
+		else
+		    my_move (lp, (char *) chbuf, (Uint) lcnt);
+		lp = chbuf;
+	    }
+	    d_put (0);
+#ifdef  SYSSELECT
+#ifdef FDSET
+	    Block {
+		fd_set readmask;
+		FD_ZERO(&readmask);
+		FD_SET(inputfile, &readmask);
+		/*dbgpr("inputfile=(%d)\n", inputfile);*/
+		if (   peekflg == WAIT_PEEK_KEY
+		    && select (inputfile + 1, &readmask, NULL, NULL, timeout) <= 0
+		   )
+		    return NOCHAR;
+	    }
+#else /* FDSET */
+	    Block {
+		int z = 0;
+		int readmask = 1 << inputfile;
+
+		if (   peekflg == WAIT_PEEK_KEY
+		    && select (inputfile + 1, &readmask, &z, &z, timeout) <= 0
+		   )
+		    return NOCHAR;
+	    }
+#endif /* FDSET */
+#endif /* SYSSELECT */
+	    do Block {
+		Reg3 int nread;
+		nread = NREAD - lcnt;
+#ifdef  SYSSELECT
+#ifdef  FSYNCKEYS
+		/*
+		 *  If this 1 min. timer goes off, flush and fsync
+		 *  the keystroke file.  (Needs to be done only once!).
+		 */
+#ifdef FDSET
+		Block {
+		    fd_set readmask;
+		    FD_ZERO(&readmask);
+		    FD_SET(inputfile, &readmask);
+		    /*dbgpr("inputfile=(%d)\n", inputfile); */
+		    struct timeval tval;
+		    int rc = 0;
+
+		    tval.tv_sec = 60, tval.tv_usec = 0;
+		    rc = select (inputfile + 1, &readmask, NULL, NULL, &tval);
+		    if (rc == 0 && numtyp) {
+			fsynckeys();    /* also does a fflush */
+			numtyp = 0;
+		    }
+		}
+#else
+		Block {
+		    int z = 0;
+		    int readmask = 1 << inputfile;
+		    struct timeval tval;
+		    int rc = 0;
+
+		    tval.tv_sec = 60, tval.tv_usec = 0;
+		    rc = select (inputfile + 1, &readmask, &z, &z, &tval);
+		    if (rc == 0 && numtyp) {
+			fsynckeys();    /* also does a fflush */
+			numtyp = 0;
+		    }
+		}
+#endif /* FDSET */
+#endif /* FSYNCKEYS */
+#endif /* SYSSELECT */
+
+/*
+dbgpr("e.t.c, mGetkey1: before xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
+inputfile, lcnt, lexrem, lp-chbuf, nread);
+*/
+
+#ifdef OUT
+		/*
+		 *  With the introduction of Curses initialization, there's a problem
+		 *  displaying the initial edit screen.  These steps seem to force
+		 *  the display.
+		 */
+		static Flag init_redraw = 1;
+		if (init_redraw) {
+		    init_redraw = 0;
+		/*  dbgpr("init_redraw, doing fresh()\n"); */
+		    fresh();
+		    poscursor(cursorcol, cursorline);
+		    /*ungetch(CCRETURN);*/
+		    /*return CCCMD;*/
+		    return (CCNULL);
+		}
+#endif
+
+#ifdef OUT
+		/*
+		 *  With the introduction of Curses initialization, there's a problem
+		 *  displaying the initial edit screen.  We'll do a <CMD>red<CR> to
+		 *  force the display.
+		 */
+		static Uchar redraw_buf[] = { CCCMD, 'r', 'e', 'd', '\015', '-' };
+		static Uchar *redraw_ptr = redraw_buf;
+
+		if (*redraw_ptr != '-') {  /* since CCCMD is 0, use '-' as stop point */
+		   return (*redraw_ptr++);
+		}
+#endif
+
+		/* normal keyboard input begins here */
+		int c, c1;
+		c = wgetch(stdscr);
+		if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
+
+
+#ifdef OUT
+/*debug*/
+char hat = ' ';
+c1 = c;
+if(c1 < ' ') {
+  hat = '^';
+  c1 += 96;
+}
+if( c > 0400 ) {  /* curses KEY_xxx */
+  dbgpr("\nwgetch(),keyboard input c=(%d)(%04o)(%s)\n", c, c, getCursesKeyname(c) );
+}
+else {
+  dbgpr("\nwgetch(),keyboard input c=(%d)(%04o)('%c%c'), entering=%d\n",
+    c, c, hat,c1, entering);
+}
+fflush(dbgfile);
+/*end debug*/
+#endif /* OUT */
+
+		if( c >= KEY_MIN ) {
+		    c1 = MapCursesKey(c);
+		/*  dbgpr("wGetkey1, MapCursesKey:  (%04o)->(%04o) (%s))\n",
+			c, c1, getEkeyname(c1));
+		 */
+		    return (c1);
+		}
+#ifdef NOTYET
+/* Originally I thought a change was also needed to
+ * handle the ^X^{key} and ^X^C{key} functions, but the orig
+ * code seems to handle them ok.  Since the curses keypad is now enabled
+ * each function key sends a single key (instead of eg, ESC followed by
+ * a series of keys, and only need to look ahead for 1 more key. We already
+ * have the ^X, so if the 2nd char is not C, at one more for the
+ * case ^X^C{escchar} which is how a control character is inserted in the file.
+ * If the 2nd char is not C, we have ^X{key} which is a command,
+ * eg, ^X^L is <wright>, ^X^H is <wleft>
+ */
+		else if (c == CTRL('X') ) {   /* start of an two */
+		    chbuf[0] = c;
+		    chbuf[1] = wgetch(stdscr);
+		    stcp = &chbuf[0];
+		    lexrem = 1;
+		      /* does kb_inlex place the CCcode in chbuf[0] */
+		    nread = (*kbd.kb_inlex) (stcp, &lexrem))
+		    c1 = chbuf[0];
+		    return c1;
+		}
+#endif /* NOTYET */
+		else {
+		    chbuf[lcnt] = c;
+		}
+	     /* if ((nread = xread (inputfile, (char *) &chbuf[lcnt], nread)) > 0) Block { */
+		nread = 1;  /* so we don't have to recode the following.... */
+		if( nread > 0 ) Block {
+		    Reg4 Uchar *stcp;
+		    stcp = &chbuf[lcnt -= lexrem];
+		    lexrem += nread;
+		    if ((nread = (*kbd.kb_inlex) (stcp, &lexrem)) > 0) Block {
+			Reg1 Uchar *cp;
+			Reg2 int nr;
+			cp = &stcp[nread];
+			/* look ahead for interrupts */
+			nr = nread;
+			do {
+			    if (*--cp == CCINT)
+				break;
+			} while (--nr);
+			if ((nr = cp - stcp) > 0) {
+			    /* found CCINT character in chars just read */
+			    /* and some characters in front of it are to be */
+			    /* thrown away */
+			    lp += lcnt + nr;
+			    lcnt = nread - nr + lexrem;
+			}
+			else
+			    lcnt += nread + lexrem;
+		    }
+		    else
+			lcnt += lexrem;
+		}
+		else if (nread < 0) {
+		    if (errno != EINTR)
+			fatal (FATALIO, "Error reading input.");
+		    if (peekflg == WAIT_PEEK_KEY)
+			break;
+		}
+		else
+		    fatal (FATALIO, "Unexpected EOF in key input.");
+/*
+dbgpr("e.t.c, mGetkey1: after xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
+inputfile, lcnt, lexrem, lp-chbuf, nread);
+*/
+	    } while (lcnt - lexrem == 0);
+	}
+    }
+
+/*
+dbgpr("e.t.c, mGetkey1: AFTER xread loop, lcnt=(%d), lexrem=(%d), lp-chbuf=(%d)\n",
+lcnt, lexrem, lp-chbuf);
+*/
+
+    if ( lcnt - lexrem <= 0 && peekflg != WAIT_KEY ) {
+/*      dbgpr("mGetkey1: lcnt=%d lexrem=%d, return NOCHAR, peekflg=%d\n", lcnt, lexrem, peekflg); */
+	return NOCHAR;
+    }
+
+    if (peekflg != WAIT_KEY)
+#ifdef UNSCHAR
+    {
+/*
+dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%d)(%c)\n", *lp, *lp);
+*/
+	return *lp;
+    }
+#else
+	return *lp & CHARMASK;
+#endif
+
+    Block {
+	Reg1 unsigned Short rchar;
+
+
+#ifdef UNSCHAR
+	lcnt--;
+	rchar = *lp++;
+#else
+	lcnt--;
+	rchar = *lp++ & CHARMASK;
+#endif
+
+#ifdef OUT
+/* moved to end of mGetKey() */
+	if (keyfile != NULL && rchar != CCINT) {
+	    putc (rchar, keyfile);
+	    if (numtyp > MAXTYP) {
+		flushkeys ();
+		numtyp = 0;
+	    }
+	}
+#endif
+
+/* moved to end of mGetKey() so Curses KEY_xxx keys are saved */
+#ifdef xRECORDING
+	if (recording)
+	    RecordChar (rchar);
+#endif /* RECORDING */
+	return rchar;
+    }
+}
+
+
+int
+MapCursesKey (int c) {
+
+    if( c < KEY_MIN || c > KEY_MAX ) {
+	return ERR;  /* defined in curses as -1, or ?? NOCHAR ?? */
+    }
+    switch( c ) {
+
+	case KEY_MOUSE:             /* enter/send key */
+	    return CCMOUSE;
+	case KEY_ENTER:             /* enter/send key */
+	    return CCRETURN;
+	case KEY_BACKSPACE:         /* backspace key */
+	    return CCBACKSPACE;
+	case KEY_DC:                /* delete-character */
+	    return CCDELCH;
+	case KEY_BREAK:             /* Break key (unreliable) */
+	    return CCCMD;
+	case KEY_DOWN:              /* down-arrow key */
+	    return CCMOVEDOWN;
+	case KEY_UP:                /* up-arrow key */
+	    return CCMOVEUP;
+	case KEY_LEFT:              /* left arrow key */
+	    return CCMOVELEFT;
+	case KEY_RIGHT:             /* right arrow key */
+	    return CCMOVERIGHT;
+	case KEY_HOME:              /* home key */
+	    return CCHOME;
+	case KEY_NPAGE:             /* next-page key */
+	    return CCPLPAGE;
+	case KEY_PPAGE:             /* previous-page key */
+	    return CCMIPAGE;
+
+	/* testing */
+	case 0414:
+       /*   dbgpr("MapCursesKey:  F4 pressed\n"); */
+	    return NOCHAR;
+
+	case 0415:
+	/*  dbgpr("MapCursesKey:  F5 pressed\n"); */
+	    return NOCHAR;
+
+	case KEY_F(2):
+	/*  dbgpr("MapCursesKey:  F2 pressed\n"); */
+	    return KEY_F(2);
+
+	case KEY_F(6):
+	/*  dbgpr("MapCursesKey:  F6 pressed\n"); */
+	/*  return KEY_F(6); */
+	    return CCMOUSEONOFF;
+
+	default:
+	    return NOCHAR;  /* 0400, NOTE this conflicts with KEY_CODE_YES below */
+			    /* but is unlikely to be any issue */
+    }
+    return NOCHAR;
+}
+
+/* debug routines, these require an #include of e.keys.h */
+/*
+ *   Lookup the name of an E command code
+ *   eg, for 012 return "CCMOVEDOWN"
+ */
+
+char *
+getEkeyname(int c) {
+
+    unsigned int i;
+
+    for(i=0; i < sizeof(E_Keys) / sizeof(E_Keys[0]); i++) {
+       if( E_Keys[i].val == c )
+	 return E_Keys[i].name;
+    }
+    return "NOT FOUND";
+}
+
+/*
+ *   Lookup the name of a curses keycode
+ *   eg, for 0402 return "KEY_DOWN"
+ */
+
+char *
+getCursesKeyname (int c) {
+    unsigned int i;
+
+    if( c < KEY_MIN || c > KEY_MAX ) {
+	return "NOT FOUND";
+    }
+    for(i=0; i < sizeof(Curses_Keys) / sizeof(Curses_Keys[0]); i++) {
+       if( Curses_Keys[i].val == c )
+	 return Curses_Keys[i].name;
+    }
+
+    return "NOT FOUND";
+}
+
+
+void
+dbg_winlist() {
+    int i;
+
+    for (i = 0; i < nwinlist; i++) {
+	dbgpr("winlist[%d]=(%o)\n", i, winlist[i]);
+    }
+    return;
 }

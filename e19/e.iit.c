@@ -70,6 +70,7 @@ S_looktbl itsyms[] = {
     {"kbinit",  KBINIT},
     {"left",    CCMOVELEFT},
     {"mark",    CCMARK},
+    {"mouse",   CCMOUSEONOFF},
     {"null",    CCNULL},
     {"open",    CCOPEN},
     {"overlay", CCOVERLAY},

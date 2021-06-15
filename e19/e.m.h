@@ -108,6 +108,10 @@ extern char *nxtop;     /* next word after opstr - use for further getwords */
 #define CMDQMACROS      111
 #endif /* RECORDING */
 
+#ifdef NCURSES
+#define CMDMOUSEONOFF   112
+#endif
+
 /* these came from the top of e.m.c */
 /*extern*/
 struct loopflags {

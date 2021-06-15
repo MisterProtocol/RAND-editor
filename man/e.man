@@ -168,6 +168,12 @@ returns to non-regular expression mode.
 The regular expressions recognized are
 essentially the same as that for \fIed\fR.
 .TP
+.B \-skipmouse
+.br
+Do not enable mouse support.  See
+.SM "MOUSE SUPPORT"
+below for more details.
+.TP
 .B \-state=filename
 .br
 Option \-state=filename causes the initial state of the editor to be
@@ -239,6 +245,25 @@ option
 .B \-search=string
 .br
 Sets the initial search string.
+.PP
+These next four options control the foreground and background colors
+used to highlight the areas selected by the
+.SM MARK
+command.
+See
+.SM "MOUSE SUPPORT"
+for details.
+.TP
+.B \-bgcolor=r,g,b
+.br
+.TP
+.B \-fgcolor=r,g,b
+.br
+.TP
+.B \-setab=N
+.br
+.TP
+.B \-setaf=N
 .SH ENVIRONMENT VARIABLES
 The
 .SM TERM
@@ -343,7 +368,7 @@ and a compile option to save them after a successful recovery.
 files are no longer limited to 32767 lines (LA package revised).
 .bu
 a facility to record and playback keystrokes at a later time.
-
+.PP
 E19 changes include:
 .bu
 a word processing mode (WP) that currently features "word wrap" and support
@@ -412,7 +437,91 @@ e \fIfile\fR expands a leading "~" to the appropriate home directory;
 compiled in code for Ann Arbor Ambassadors now downloads the
 standard keyboard into the function keys;
 .bu
-support added for Sun2 workstation;
+support added for Sun2 workstation.
+.SH MOUSE SUPPORT
+The current (2021) rework of the editor has introduced elementary
+support for the mouse.
+The cursor may be moved arbitrarily by clicking the left mouse button in any window.
+If multiple windows are active in E, clicking in a non-active window will change E's
+focus to that window.
+.PP
+The
+.SM MARK
+command, described in the
+.SM COMMANDS
+section below, is used to select rectangular areas of text for use in
+a subsequent command.
+The middle mouse button can be used to start the beginning of a
+marked area or to cancel the marked area.
+A marked area is normally expanded or reduced
+by cursor movement (arrow keys, \(+-\|page, \(+-\|line);
+the area can now also be changed by clicking the
+left mouse button.
+Dragging with the mouse is not supported; only mouse clicks are detected.
+.PP
+The ability to copy/paste text from a separate desktop window into an
+E window can be very useful.
+In order to return the copy/paste capability to the mouse in E,
+use the
+.I "set mouse off"
+command to temporarily disable the mouse in E, perform the copy/paste into
+E, then reenable the mouse with the command
+.I "set mouse on".
+See the
+.SM SET
+command section below.
+.SH HIGHLIGHTING
+By default, areas selected using the
+.SM MARK
+command are highlighted with black text on a light gray background.
+The foreground and background colors may be set by one of two
+command line option pairs. To choose colors using the RGB
+color system (red, blue, green), use options:
+.sp 4p
+.in +2m
+.I \-bgcolor=r,g,b,
+(background)
+and
+.br
+.I \-fgcolor=r,g,b
+(foreground).
+.in -2m
+.PP
+To choose colors using a terminal's built-in colors, use options:
+.sp 4p
+.in +2m
+.I \-setab=N
+(background),
+and
+.br
+.I \-setaf=N
+(foreground).
+.in -2m
+.PP
+For the RGB method, each
+.I r, g, b
+number may range from 0 to 999; higher numbers specify lighter colors.
+0,0,0 specifies black; 999,999,999 specifies white.
+For a terminal's built-in method,
+.I N
+may range from 0 (white) to 255 (black).
+The colors from 1 to 254 may vary.
+.PP
+Since many desktop terminals support 256 colors, it is recommended
+that custom colors be specified using a terminal's built-in colors:
+.I \-setab
+and
+.I \-setaf.
+The default editor values are:
+.I \-setab=7
+and
+.I \-setaf=0.
+The utilities
+.I colorhints
+and
+.I txcolor,
+distributed with the editor, may give hints on selecting values for
+a terminal.
 .SH MACROS
 The editor has elementary support for macros.
 This support is in the form of a "record/play" capability.
@@ -634,7 +743,7 @@ join | \-split
 split | \-join
 .br
 .RS
-Join (or \-split) combines two lines, split (or \-join)
+Join (or \-spilt) combines two lines, split (or \-join)
 breaks a line in two.
 .RE
 .TP
@@ -767,10 +876,12 @@ nofilldot\*ta fill cmd with no parameters will stop at a line beginning
 \*t  with a period (this is the new default)
 filldot\*tfill will not stop at lines beginning with a period (as before)
 nobell\*tdisable the bell
+highlight\*tset mode to: on\^|\^off\^|\^color\^|\^bold\^|\^rev
 hy\*tenables splitting of hyphenated words by fill/just
 nohy\*tdisables splitting of hyphenated words by fill/just (default)
 left \fIn\fR\*tsets the <window left> key to \fIn\fR cols
 lmar \fIn\fR\*tsets the left margin to \fIn\fR
+mouse\*ton\^|\^off \0enable/disable mouse
 right \fIn\fR\*tsets the <window right> key to \fIn\fR cols
 rmar \fIn\fR\*tsets the right margin (linewidth) to \fIn\fR
 window \fIn\fR\*tsets the <window left> and <window right> keys to \fIn\fR cols
@@ -806,6 +917,7 @@ Save the current recording in a macro named X for later playback by
 "<cmd> $X [N]", which inserts the contents of macro X
 at the current cursor position, once or \fIN\fR times.
 Up to ten macros may be stored for playback.
+
 .RE
 .PP
 tab  [ column ... ]
@@ -1166,7 +1278,23 @@ as input, for example tbl(1) and some nroff commands.  However,
 the new options \fB\-lit, \-nostrip, \-tabs\fR, and \fB\-blanks\fR
 alleviate most of these problems.
 .sp
+The "Terminal" application on the Mac has problems with use
+of the
+.I -bgcolor
+and
+.I -fgcolor
+arguments. The application does its own processing, and prevents
+the specified colors from being used.  The
+.I -setab
+and
+.I -setaf
+arguments work correctly.  An alternative is to use another terminal
+application on the Mac.
+.I iTerm2
+is known to work.
+.sp
 Resizing terminal windows in the parent operating system is not supported.
+
 .SH SEE ALSO
 .sp
 .I

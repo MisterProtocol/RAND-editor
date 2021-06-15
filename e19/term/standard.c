@@ -55,7 +55,7 @@ int
 bad ()
 {
     fatal (FATALBUG, "Impossible cursor address");
-    return (0);	/* keep compiler happy in function pointer table */
+    return (0); /* keep compiler happy in function pointer table */
 }
 
 int
@@ -229,6 +229,9 @@ Flag in_std_p (ic, oc, n)
 		break;
 	    case CTRL ('w'):
 		*(*oc)++ = CCCHWINDOW;
+		break;
+	    case CTRL ('x'):
+		*(*oc)++ = CCCTRLQUOTE;
 		break;
 	    default:
 		*(*oc)++ = CCUNAS1;

@@ -57,6 +57,12 @@ printchar ()
 
     GetLine (ln = curwksp->wlin + cursorline);
 
+/**
+dbgpr("printchar(), key=(%d)(%3o)('%c), curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp->wcol=%d\n",
+  key, key, key,
+  curwksp->clin, curwksp->ccol, curwksp->wlin, curwksp->wcol);
+ **/
+
     curcol = cursorcol + curwksp->wcol;
     if (key == CCDELCH || key == CCBACKSPACE) {
 	if (key == CCBACKSPACE) {
@@ -360,7 +366,7 @@ setwordmode(opt)
 char *opt;
 {
 	Reg1 int ind;
-     /* Reg2 Cmdret retval; */
+    /*  Reg2 Cmdret retval; */
 	static S_looktbl wordopttable[] = {
 	    {"alphanumeric", WORD_ALPHNUM},
 	    {"whitespace",   WORD_WHITESPACE},

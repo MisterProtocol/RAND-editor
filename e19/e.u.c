@@ -141,12 +141,12 @@ Flag    puflg;
     }
 #endif /* SYMLINKS */
 
-    /* dbgpr ("Edit %s\n", file);  **/
+/**  dbgpr ("Edit %s\n", file);   **/
     if ((newfn = hvname (file)) != -1) {
 	/* we have it active */
 	if (newfn == curfile)
 	    puflg = NO;
-	/* dbgpr ("Have %s as %d\n", file, newfn);  **/
+	/*  dbgpr ("Have %s as %d\n", file, newfn);    */
     }
     else if (   (newfn = hvoldname (file)) != -1
 	     || (newfn = hvdelname (file)) != -1
@@ -172,7 +172,9 @@ Flag    puflg;
 	else
 	    dwriteable = access (dir, 2) >= 0;
 
+
 	if ((j = filetype (file)) != -1) {
+/*dbgpr(" -- file exists\n");*/
 	    /* file already exists */
 	    Fn tfn;
 	    fwriteable = access (file, 2) >= 0;
@@ -211,12 +213,12 @@ mesg(TELALL+3, "File ", file, xyz);}
 		La_file   *tlaf;
 		tlaf = nlas->la_file;
 		/* is this another name for one we already have open? */
-		/* dbgpr ("Looking up %s\n", file);  **/
-		for (tfn = FIRSTFILE + NTMPFILES; tfn < MAXFILES; tfn++)
+		/*   dbgpr ("Looking up %s\n", file);  */
+		for (tfn = FIRSTFILE + NTMPFILES; tfn < MAXFILES; tfn++) {
 		    if (   (fileflags[tfn] & (INUSE | NEW)) == INUSE
 			&& tlaf == fnlas[tfn].la_file
 		       ) {
-			/* dbgpr ("Same as %s\n", names[tfn]);  **/
+			/*dbgpr ("Same as %s\n", names[tfn]);  */
 			/* yes it is */
 			/* if it is DELETED, then we go and make a NEW one */
 			if (fileflags[tfn] & DELETED)
@@ -226,11 +228,13 @@ mesg(TELALL+3, "File ", file, xyz);}
 			newfn = tfn;
 			(void) la_close (nlas);
 			toomany = NO;
+/* dbgpr ("editfile(), before mesg\n");*/
 			mesg (TELALL + 3, "EDIT: ", names[tfn], " (linked)");
 			d_put (0);
 			loopflags.hold = YES;
 			goto editit;
 		    }
+		}
 	    }
 	    nopens++;
 	    mesg (TELSTRT + 2, "EDIT: ", file);
@@ -293,6 +297,7 @@ mesg(TELALL+3, "File ", file, xyz);}
 	    if (autocreate)
 		goto createit;
 	    do {
+/*dbgpr("editfile(), waiting do you want to create\n");*/
 		mesg ((TELSTRT|TELCLR) + 3,
 		     "Do you want to create ", file, "? (y): ");
 		keyused = YES;
@@ -303,7 +308,21 @@ mesg(TELALL+3, "File ", file, xyz);}
 		sav_dotprofile = dot_profile;
 		dot_profile = NO;
 #endif /* STARTUPFILE */
+#ifdef NCURSES
+		fflush(stdout);
+		if (initCursesDone) {
+/** dbgpr("editfile:  calling fgetc(stdin)\n"); **/
+		   key = wgetch(stdscr);
+		   /*key = fgetc(stdin);*/
+		}
+		else {
+		    key = fgetc(stdin);
+		}
+#else
+/**/dbgpr("editfile:  calling getkey()\n");/**/
 		getkey (WAIT_KEY);
+#endif /* NCURSES */
+/** /dbgpr("editfile:  key is (%o)(%c)\n", key, key); / **/
 #ifdef  STARTUPFILE
 		dot_profile = sav_dotprofile;
 #endif /* STARTUPFILE */
@@ -345,6 +364,15 @@ mesg(TELALL+3, "File ", file, xyz);}
 	(void) la_close (nlas);
     /*  elasdump (&fnlas[newfn], "open");         **/
     }
+
+
+
+/*  /
+dbgpr("editfile:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
+    curwin, &wholescreen, &enterwin, &infowin);
+dbgpr("editfile:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.wksp=(%o)\n",
+    curwksp, wholescreen.wksp, enterwin.wksp, infowin.wksp);
+/  */
 
 editit:
     doedit (newfn, line, col);

@@ -43,13 +43,16 @@ MV      = mv -f
 
 # laopen.o can be first because it always HAS to be loaded anyway,
 # and it might speed up the linker to get it out of the way.
+#    The following line has been deleted because the file isn't used
+#    by the editor, but only by "test.c".
+#	$Oladeb.o \
+
 OFILES =\
 	$Olaopen.o \
 	$Olaalign.o \
 	$Olablank.o \
 	$Olabsize.o \
 	$Olaclseek.o \
-	$Oladeb.o \
 	$Olaerr.o \
 	$Olafrpl.o \
 	$Olalcnt.o \
@@ -72,6 +75,10 @@ OFILES =\
 	$Olaother.o \
 	$Olaabort.o
 
+#    The following line has been deleted because the file isn't used
+#    by the editor, but only by "test.c".
+#	$Oladeb.o \
+
 CFILES =\
 	laabort.c \
 	laalign.c \
@@ -81,7 +88,6 @@ CFILES =\
 	lacfile.c \
 	laclose.c \
 	laclseek.c \
-	ladeb.c \
 	laerr.c \
 	lafrpl.c \
 	laint.c \

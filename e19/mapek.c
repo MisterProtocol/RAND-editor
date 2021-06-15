@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+extern void exit();
+
 #ifdef INFO
 
 S_looktbl keysyms[] = {
@@ -14,33 +16,54 @@ S_looktbl keysyms[] = {
     "-tab",    CCBACKTAB,
     "-word",   CCLWORD,
     "bksp",    CCBACKSPACE,
+    "blot",    CCBLOT,
+    "box",     CCBOX,
+    "caps",    CCCAPS,
+    "ccase",   CCCCASE,
     "cchar",   CCCTRLQUOTE,
+    "center",  CCCENTER,
     "chwin",   CCCHWINDOW,
+    "clear",   CCCLEAR,
     "close",   CCCLOSE,
+    "cltabs",  CCCLRTABS,
     "cmd",     CCCMD,
+    "cover",   CCCOVER,
     "dchar",   CCDELCH,
     "down",    CCMOVEDOWN,
     "dword",   CCDWORD,
     "edit",    CCSETFILE,
     "erase",   CCERASE,
     "esc",     CCINSMODE,
+    "exit",    CCEXIT,
+    "fill",    CCFILL,
     "home",    CCHOME,
     "insmd",   CCINSMODE,
     "int",     CCINT,
     "join",    CCJOIN,
+    "justify", CCJUSTIFY,
     "left",    CCMOVELEFT,
     "mark",    CCMARK,
+    "null",    CCNULL,
     "open",    CCOPEN,
+    "overlay", CCOVERLAY,
     "pick",    CCPICK,
+    "play",    CCPLAY,
+    "quit",    CCQUIT,
+    "range",   CCRANGE,
+    "record",  CCRECORD,
+    "redraw",  CCREDRAW,
     "replace", CCREPLACE,
     "ret",     CCRETURN,
     "right",   CCMOVERIGHT,
     "split",   CCSPLIT,
     "srtab",   CCTABS,
+    "stopx",   CCSTOPX,
     "tab",     CCTAB,
+    "track",   CCTRACK,
     "undef",   CCUNAS1,
     "up",      CCMOVEUP,
     "wleft",   CCLWINDOW,
+    "wp",      CCAUTOFILL,
     "wright",  CCRWINDOW,
     0
  };
@@ -83,12 +106,12 @@ S_looktbl keysyms[] = {
 #define CCBACKSPACE     036 /* ^^ backspace and erase   */
 #define CCMOVERIGHT     037 /* ^_ forward move          */
 #define CCDEL          0177 /* <del>    -- not assigned --  *** was EXIT */
+
 #define CCSTOP         0200 /* *@ stop replay           */
 #define CCERASE        0201 /* *A erase                 */
 #define CCUNAS1        0202 /* *B -- not assigned --    */
 #define CCSPLIT        0203 /* *C split                 */
 #define CCJOIN         0204 /* *D join                  */
-
 #define CCEXIT         0205
 #define CCABORT        0206
 #define CCREDRAW       0207
@@ -104,76 +127,111 @@ S_looktbl keysyms[] = {
 #define CCCOVER        0221
 #define CCOVERLAY      0222
 #define CCBLOT         0223
-#define CCRANGE        0230
-#define CCNULL         0231
 #define CCHELP         0224
-#define CCHELP         CCUNAS1
 #define CCCCASE        0225
 #define CCCAPS         0226
-#define CCCCASE        CCUNAS1
-#define CCCAPS         CCUNAS1
 #define CCAUTOFILL     0227
-#define CCAUTOFILL     CCUNAS1
+#define CCRANGE        0230
+#define CCNULL         0231
 #define CCDWORD        0232
-
+#define UNASS          0233
+#define CCRECORD       0234
+#define CCPLAY         0235
+#define CCMOUSE        0236
+#define CCLAST         0236
 #endif /* INFO */
 
-
-
+#define CCLAST         0236
 
 struct keymap {
     char *keysym;
 };
 
 struct keymap low_keys[] = {
-	"<cmd>",
-	"<wleft>",
-	"<edit>",
-	"<int>",
-	"<open>",
-	"<-sch>",
-	"<close>",
-	"<mark>",
-	"<left>",
-	"<tab>",
-	"<down>",
-	"<home>",
-	"<pick>",
-	"<ret>",
-	"<up>",
-	"<ins>",
-	"<repl>",
-	"<-page>",
-	"<+sch>",
-	"<wright>",
-	"<+line>",
-	"<dchar>",
-	"<+word>",
-	"<-line>",
-	"<-word>",
-	"<+page>",
-	"<chwin>",
-	"<srtab>",
-	"<cchar>",
-	"<-tab>",
-	"<bksp>",
-	"<right>"
+	{"<cmd>"},
+	{"<wleft>"},
+	{"<edit>"},
+	{"<int>"},
+	{"<open>"},
+	{"<-sch>"},
+	{"<close>"},
+	{"<mark>"},
+	{"<left>"},
+	{"<tab>"},
+	{"<down>"},
+	{"<home>"},
+	{"<pick>"},
+	{"<ret>"},
+	{"<up>"},
+	{"<ins>"},
+	{"<repl>"},
+	{"<-page>"},
+	{"<+sch>"},
+	{"<wright>"},
+	{"<+line>"},
+	{"<dchar>"},
+	{"<+word>"},
+	{"<-line>"},
+	{"<-word>"},
+	{"<+page>"},
+	{"<chwin>"},
+	{"<srtab>"},
+	{"<cchar>"},
+	{"<-tab>"},
+	{"<bksp>"},
+	{"<right>"}
 };
 
 
-struct keymap hi_keys[] = {     /* 0200 - 0204 */
-	"<stop>",
-	"<erase>",
-	"<undef>",
-	"<split>",
-	"<join>"
+struct keymap hi_keys[] = {     /* 0200 - 0236 */
+	{"<stop>"},
+	{"<erase>"},
+	{"<undef>"},
+	{"<split>"},
+	{"<join>"},
+	{"<exit>"},
+	{"<abort>"},
+	{"<redraw>"},
+	{"<clrtabs>"},
+	{"<center>"},
+	{"<fill>"},
+	{"<just>"},
+	{"<clear>"},
+	{"<track>"},
+	{"<box>"},
+	{"<stopx>"},
+	{"<quit>"},
+	{"<cover>"},
+	{"<overlay>"},
+	{"<blot>"},
+	{"<help>"},
+	{"<ccase>"},
+	{"<caps>"},
+	{"<autofill>"},
+	{"<range>"},
+	{"<null>"},
+	{"<dword>"},
+	{"<unass>"},
+	{"<record>"},
+	{"<play>"},
+	{"<mouse>"}
 };
 
 
-
+int
 main()
 {
 	register int c;
+	int y, x;
+
+/* test */
+#ifdef OUT
+int i;
+for(i = 0; i < (CCLAST - 0200); i++) {
+  printf("%d=%s\n",i,hi_keys[i]);
+}
+exit(1);
+#endif
 
 	/*
 	 * skip up to first \r (or \n with new ascii format for 1st line)
@@ -196,9 +254,22 @@ main()
 	    }
 	    else if( c < 0200 )
 		putchar( c );
-	    else if( c < 0205 )
-		printf( "%s", hi_keys[c - 0200]);
+	    else if( c <= CCLAST ) {
+
+		/*fprintf(stderr, "c=(%o)idx=(%d)\n", c, c-0200);*/
+
+		if( c == 0236 ) { /* CCMOUSE */
+		    fscanf(stdin, "%3d%3d", &y, &x);
+		    printf("<CCMOUSE(%d,%d)>", y,x);
+		}
+		else {
+		  printf( "%s", hi_keys[c - 0200]);
+		}
+
+	    }
 	    else
 		fprintf( stderr, "key %o unrecognized\n", c );
 	}
+
+	exit(0);
 }

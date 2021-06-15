@@ -23,10 +23,15 @@ extern char *getenv ();
 extern void reenter ();
 extern int ff_sync ();
 
+#ifdef NCURSES
+extern void exitCurses();
+#endif
+
 #ifdef COMMENT
      both DOSHELL and DOCALL must be defined in e.h
      Do not need these for 4.x
 #endif /* COMMENT */
+
 
 #ifdef DOSHELL
 extern void docall ();
@@ -226,6 +231,10 @@ eexit ()
 	{"quit"    , EXQUIT     },
 	{0, 0}
     };
+
+#ifdef NCURSES
+    exitCurses();
+#endif
 
     if (opstr[0] == '\0')
 	extblind = EXNORMAL;

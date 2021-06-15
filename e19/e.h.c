@@ -11,6 +11,8 @@ file e.h.c
 # include "e.tt.h"
 # include "e.h.h"
 
+extern unsigned Short mGetkey ();
+
 #ifdef COMMENT
 Cmdret
 help_std(filename)
@@ -71,7 +73,11 @@ help_std(filename)
 	printf ("\n\rFor info on a particular key, press that combination;");
 	printf ("\n\rto continue edit, press RETURN. ");
 wait:   keyused = YES;
+#ifdef NCURSES
+	qq = mGetkey (WAIT_KEY, NULL);
+#else
 	qq = getkey (WAIT_KEY);
+#endif
 	if (morehelp(qq) == YES) goto wait;
 	restcurs();
 	mesg(TELALL+1, " ");
@@ -101,7 +107,11 @@ morehelp (key)
 	sprintf (helpfile, "%s/helpkey", etcdir);
 	if ((helpin = fopen (helpfile, "r")) == NULL) {
 		printf ("Can't open %s\n\r", helpfile);
+#ifdef NCURSES
+		mGetkey (WAIT_KEY, NULL);
+#else
 		getkey (WAIT_KEY);
+#endif
 		return (NO);
 	}
 	else {

@@ -45,6 +45,18 @@ extern int zaprpls (), fgetowner ();
 extern void setmarg ();
 extern Flag islocked();
 
+#ifdef NCURSES
+extern int toggle_mouse();
+extern Flag highlight_mode;
+extern Flag redrawflg;
+extern char *smso, *rmso, *bold_str, *setab, *setaf, *sgr0, *setab_p, *setaf_p, *hilite_str;
+extern char *fgbg_pair;
+int doSetHighlight();
+char *highlight_info_str;
+extern int n_colors;
+
+#endif
+
 #include SIG_INCL
 
 S_looktbl cmdtable[] = {
@@ -132,6 +144,7 @@ S_looktbl cmdtable[] = {
    {"logout"  , CMDLOGOUT   },
 #endif /* NOTYET */
    {"mark"    , CMDMARK     },
+   {"mouse"   , CMDMOUSEONOFF},
    {"name"    , CMDNAME     },
    {"open"    , CMDOPEN     },
    {"overlay" , CMDOVERLAY  },
@@ -259,6 +272,7 @@ command (forcecmd, forceopt)
     cmdopstr = nxtop;
     opstr = getword (&nxtop);
     cmdname = cmdtable[cmdtblind].str;
+/*dbgpr("command: cmdname=%s cmdval=(%o)\n", cmdname, cmdval);*/
     switch (cmdval) {
 
     case CMDRANGE:
@@ -491,6 +505,7 @@ command (forcecmd, forceopt)
     case CMDREDRAW:
 	fresh ();
 	retval = CROK;
+	redrawflg = YES;
 	break;
 
     case CMDSPLIT:
@@ -542,6 +557,7 @@ command (forcecmd, forceopt)
 	    break;
 	}
 	retval = edit ();
+/** dbgpr("command, edit() returned %d\n", retval); **/
 	break;
 
     case CMDWINDOW:
@@ -629,6 +645,10 @@ command (forcecmd, forceopt)
 	break;
 #endif /* NOTYET */
 
+    case CMDMOUSEONOFF:
+	retval = toggle_mouse(opstr);
+	break;
+
     default:
 	mesg (ERRALL + 3, "Command \"", cmdtable[cmdtblind].str,
 		"\" not implemented yet");
@@ -638,8 +658,10 @@ command (forcecmd, forceopt)
     if (opstr[0] != '\0')
 	sfree (opstr);
 
-    if (retval >= CROK)
+    if (retval >= CROK) {
+/*dbgpr("command() returning %d\n", retval);*/
 	return retval;
+}
     switch (retval) {
     case CRUNRECARG:
 	mesg (1, " unrecognized argument to ");
@@ -673,6 +695,7 @@ command (forcecmd, forceopt)
 	mesg (ERRSTRT + 1, "Bad argument(s) to ");
     }
     mesg (ERRDONE + 3, "\"", cmdname, "\"");
+
 
     return CROK;
 }
@@ -874,6 +897,11 @@ Flag on;
 #define SET_PLAY        24
 #endif
 
+#define SET_HIGHLIGHT   25
+#define SET_NOHIGHLIGHT 26
+#define SET_MOUSE       27
+
+
 #ifdef COMMENT
 Cmdret
 setoption( showflag )
@@ -900,14 +928,17 @@ setoption( showflag )
 	   {"bell",         SET_BELL},     /* echo \07 */
 	   {"debug",        SET_DEBUG},
 	   {"filldot",      SET_FILLDOT},  /* fill doesn't stops at ^. */
+	   {"highlight",    SET_HIGHLIGHT},/* marked areas are highlighted */
 	   {"hy",           SET_HY},       /* fill: split hyphenated words */
 	   {"left",         SET_WINLEFT},  /* deflwin */
 	   {"line",         SET_LINE},     /* defplline and defmiline */
 #ifdef LMCAUTO
 	   {"lmargin",      SET_LMARG},    /* left margin */
 #endif /* LMCAUTO */
+	   {"mouse",        SET_MOUSE},    /* enable/disable mouse */
 	   {"nobell",       SET_NOBELL},   /* do not echo \07 */
 	   {"nofilldot",    SET_NOFILLDOT},/* fill stops at ^. */
+	   {"nohighlight",  SET_NOHIGHLIGHT},/* marked areas are highlighted */
 	   {"nohy",         SET_NOHY},     /* fill: don't split hy-words */
 	   {"nostick",      SET_RMNOSTICK},/* auto scroll past rt edge */
 	   {"page",         SET_PAGE},     /* defmipage and defplpage */
@@ -948,14 +979,14 @@ setoption( showflag )
 	switch( setopttable[ind].val ) {
 
 	    case SET_SHOW:
-		{       char buf[80];
+		{       char buf[term.tt_width-1];
 #ifndef LMCVBELL
-sprintf(buf, "+li %ld, -li %ld, +pg %ld, -pg %ld, wr %ld, wl %ld, wid %d, \
-bell %s, hy %s",
+snprintf(buf, sizeof(buf), "+li %ld, -li %ld, +pg %ld, -pg %ld, wr %ld, wl %ld, wid %d, \
+bell %s, hy %s, highlight: %s",
     defplline, defmiline, defplpage, defmipage, defrwin, deflwin,
-    linewidth, NoBell ? "off" : "on", fill_hyphenate ? "on" : "off" );
+    linewidth, NoBell ? "off" : "on", fill_hyphenate ? "on" : "off", highlight_info_str);
 #else /* LMCVBELL */
-sprintf(buf, "+li %ld, -li %ld, +pg %ld, -pg %ld, wr %ld, wl %ld, wid %d, \
+snprintf(buf, sizeof(buf), "+li %ld, -li %ld, +pg %ld, -pg %ld, wr %ld, wl %ld, wid %d, \
 bell %s, vb %s, hy %s",
     defplline, defmiline, defplpage, defmipage, defrwin, deflwin,
     linewidth, NoBell ? "off" : "on", VBell ? "on" : "off",
@@ -1131,8 +1162,21 @@ bell %s, vb %s, hy %s",
 		fill_hyphenate = NO;
 		break;
 
+	    case SET_NOHIGHLIGHT:
+		/*highlight_mode = NO;*/
+		doSetHighlight("off");
+		break;
+
+	    case SET_HIGHLIGHT:
+		retval = doSetHighlight(arg);
+		break;
+
 	    case SET_FILLDOT:
 		fill_troffmode = NO;
+		break;
+
+	    case SET_MOUSE:
+		toggle_mouse(arg);
 		break;
 
 	    case SET_NOFILLDOT:
@@ -1156,4 +1200,54 @@ BadVal:         retval = CRBADARG;
 	    sfree(arg);
 
 	return (retval);
+}
+
+
+int
+doSetHighlight(char *arg) {
+
+	static char *l_highlight_info_str;
+
+
+	if (strncmp(arg, "on",2) == 0) {
+	    highlight_mode = YES;
+	    highlight_info_str = l_highlight_info_str;
+	/*  dbgpr("hilite mode on: %d\n", highlight_mode); */
+	}
+	else if (strncmp(arg, "off",3) == 0) {
+	    highlight_mode = NO;
+	    highlight_info_str = "off";
+	/*  dbgpr("hilite mode off: %d\n", highlight_mode); */
+	}
+	else if (strncmp(arg, "bold",4) == 0) {
+	    highlight_mode = YES;
+	    hilite_str = bold_str;
+	    highlight_info_str = "bold";
+	}
+	else if (strncmp(arg, "rev",3) == 0) {
+	    highlight_mode = YES;
+	    hilite_str = smso;
+	    highlight_info_str = "rev";
+	}
+	else if (strncmp(arg, "color",5) == 0) {
+	    if (n_colors == 0) {
+		highlight_mode = NO;
+		highlight_info_str = "bold";
+		l_highlight_info_str = highlight_info_str;
+		hilite_str = bold_str;
+		loopflags.hold = YES;
+		mesg (TELALL + 1, "Highlighting requires a terminal that supports colors");
+		return (CROK);
+	    }
+	    highlight_mode = YES;
+	    hilite_str = fgbg_pair;
+	    highlight_info_str = "color";
+	}
+	else {
+	    loopflags.hold = YES;
+	    mesg (TELALL + 1, "Usage:  set highlight on|off|color|bold|rev");
+	}
+
+	l_highlight_info_str = highlight_info_str;
+	return (CROK);
 }

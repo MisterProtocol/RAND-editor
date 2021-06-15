@@ -4,7 +4,7 @@
 .\" It is built automatically from e.man.
 .\"
 .
-g/^\.TS/s//.\\" .TS Has already been through "tbl" via Makefile, must eliminate double pass./
-g/^\.TE/s//.\\" .TE/
+g/^\.TS/d
+g/^\.TE/d
 w e.1
 q
