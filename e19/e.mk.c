@@ -255,7 +255,7 @@ highlightarea(Flag setmode, Flag redrawflg) {
 	return;
     }
 
-/**
+/* /
 dbgpr("\nhighlightarea: nwinlist=%d, redrawflg=%d, mode=%d\n", nwinlist, redrawflg, setmode);
 dbgpr("curwin->tmarg=%d, curwin->bmarg=%d, curwin->lmarg=%d, curwin->rmarg=%d\n",
 curwin->tmarg, curwin->bmarg, curwin->lmarg, curwin->rmarg);
@@ -266,11 +266,11 @@ curwin->ttext, curwin->btext, curwin->ltext, curwin->rtext);
 dbgpr(" curmark->mrkwinlin=(%d), mrkwincol=(%d), mrklin=(%d), mrkcol=(%d) curwksp->wlin=(%d), curwksp->wcol=(%d)\n",
     curmark->mrkwinlin, curmark->mrkwincol, curmark->mrklin, curmark->mrkcol, curwksp->wlin, curwksp->wcol);
 if (prevmark) {
- dbgpr(" prevmark->mrkwinlin=(%d), mrkwincol=(%d), mrklin=(%d), mrkcol=(%d)\n\n",
+ dbgpr(" prevmark->mrkwinlin=(%d), prevmark->mrkwincol=(%d), prevmark->mrklin=(%d), prevmark->mrkcol=(%d)\n\n",
     prevmark->mrkwinlin, prevmark->mrkwincol, prevmark->mrklin, prevmark->mrkcol);
 }
 dbg_showMarkInfo("hilite");
- **/
+/ **/
 
     if (firsttime) {  /* hilite just one line */
 	top_line = cursorline + curwin->ttext;  /* omit top border */
@@ -281,7 +281,7 @@ dbg_showMarkInfo("hilite");
 	last_cursorline = cursorline;
 	last_col = cursorcol;
 	HiLightLine(top_line, YES);
-      /*dbgpr("firsttime\n");*/
+      /*dbgpr("firsttime\n"); */
 	firsttime = 0;
 	return;
     }
@@ -291,7 +291,7 @@ dbg_showMarkInfo("hilite");
      */
     if (marklines == last_marklines && cursorline == last_cursorline
 	    && cursorcol == last_col && redrawflg == NO) {
-     /* dbgpr("no highlighting needed...\n"); */
+	dbgpr("no highlighting needed...\n");
 	return;
     }
 
@@ -310,8 +310,10 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	return;
     }
 
+
    /*  clear previous mark */
-   for (i = last_top; i<= last_bot; i++)
+   /*for (i = last_top; i<= last_bot; i++)*/
+   for (i = curwin->ttext; i < curwin->bmarg; i++)
       HiLightLine(i, NO);
 
     /*   Try this:  the cursor line is either at the top or bottom
@@ -339,15 +341,21 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	    top_line = curwin->ttext;
 	*/
 
-/* dbgpr("  cursorline == btext, top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** /  dbgpr("  cursorline == btext, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
     else if (cursorline == 0) {    /* cursor at top of window */
 	top_line = curwin->ttext;
-	bot_line = top_line + marklines - 1;
+	/* if cursor at the bottom of a marked area, hilight 1 line */
+	if (topmark() + marklines == curwksp->wlin + 1 ) {
+	    bot_line = top_line;
+	}
+	else {
+	    bot_line = top_line + marklines - 1;
+	}
 	if( bot_line > curwin->btext ) {
 	    bot_line = curwin->btext + 1;
 	}
-/* dbgpr("  cursorline == 0, top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** / dbgpr("  cursorline == 0, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
     else {  /* not top or bottom, and marklines > 1 */
 	if (curmark->mrkwinlin == curwksp->wlin) {
@@ -359,7 +367,7 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 		top_line = curwin->ttext + cursorline;
 		bot_line = top_line + marklines - 1;
 	    }
-/* dbgpr("  mrkwinlin = wlin, top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** / dbgpr("  mrkwinlin = wlin, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	/* if original mark no longer on screen */
 	else if (curwksp->wlin > curwin->bmarg) {
@@ -377,7 +385,7 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 		top_line = curwin->ttext;
 	    }
 
-/* dbgpr("  wlin > curwin->bmarg, top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** / dbgpr("  wlin > curwin->bmarg, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	/* mark extended upward via window scroll */
 	else if (curwksp->wlin < curmark->mrkwinlin) {
@@ -385,23 +393,23 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	 /* top_line = curwin->ttext + curmark->mrklin - (curmark->mrkwinlin - curwksp->wlin);*/
 	    top_line = curwin->ttext + topmark() - curwksp->wlin;
 	    bot_line = top_line + marklines - 1;
-/* dbgpr("  wlin < mrkwinln, top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** / dbgpr("  wlin < mrkwinln, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	else {
 	    top_line = curwin->ttext + topmark() - curwksp->wlin;
 	    bot_line = top_line + marklines - 1;
-/* dbgpr("  default:  top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** / dbgpr("  default:  top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
-/*  dbgpr("not first, ... top_line=%d, bot_line=%d\n", top_line, bot_line); */
+/** /  dbgpr("not first, ... top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
 
-/*
+/** /
 dbgpr("top_line=%d last_top=%d, bot_line=%d, last_bot=%d, last_col=%d, firsttime=%d infoline=%d\n",
   top_line, last_top, bot_line, last_bot, last_col, firsttime, infoline);
 
 dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n",
     marklines, last_marklines, cursorline, last_cursorline);
-*/
+/ **/
 
     /*
      *  The above code sometimes generates values for top_line and bot_line
@@ -413,11 +421,11 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n",
      */
 
     if (bot_line > curwin->btext+1) {
-/*dbgpr("***bot_line out of range (%d)\n", bot_line); */
+/** /dbgpr("***bot_line out of range (%d)\n", bot_line); / **/
 	bot_line = curwin->btext + 1;
     }
     if (top_line <= 0) {
-/*dbgpr("*** top_line out of range (%d)\n", top_line); */
+/** /dbgpr("*** top_line out of range (%d)\n", top_line); / **/
 	top_line = curwin->ttext;
     }
 
@@ -441,7 +449,7 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n",
     last_cursorline = cursorline;
     last_col = cursorcol;
 
-/* dbgpr("setting last_top=top_line = %d, last_bot=bot_line = %d\n", top_line, bot_line ); */
+/** / dbgpr("setting last_top=top_line = %d, last_bot=bot_line = %d\n", top_line, bot_line ); / **/
 
     if (setmode == YES )
 	firsttime = NO;    /* so next time we will check if the marked area has shrunk */
@@ -489,10 +497,10 @@ HiLightLine(int line, Flag setmode) {
     }
     fflush(stdout);
 
-/*
+/** /
 if (setmode == YES)
   dbgpr("HiLightLine: line=%d, setmode=(%d), buf=\n(%s)\n", line, setmode, buf);
-*/
+/ **/
 }
 
 /*
