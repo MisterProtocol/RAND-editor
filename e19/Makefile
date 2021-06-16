@@ -118,7 +118,7 @@ all:
 	cd ..; make linux
 
 
-$(E):   newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
+$(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 #       $(LD) $(LDFLAGS) /lib/crt0.o
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 	   $(O)e.main.o $(O)e.o $(O)e.pa.o $(O)e.iit.o $(O)e.q.o \
@@ -142,7 +142,10 @@ $(E):   newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 #       $(MIS2LIB)
 
 
-ofiles: $(OFILES)
+ofiles: $(O) $(OFILES)
+
+$(O):
+	-mkdir $(O)
 
 newrev:
 	/bin/sh $(NEWVERSION)

@@ -109,7 +109,7 @@ CFILES =\
 
 
 #ll $(LIB) : $P $(OFILES) $(OVFILES)
-$(LIB): $(OFILES) $(OVFILES)
+$(LIB): $(O) $(OFILES) $(OVFILES)
 #       -$(SH) -c "if test -r $(LIB) ; then $(MV) $(LIB) ,$(LIB) ; fi"
 	ar r $(LIB) $(OFILES)
 	$(RANLIB) $(LIB)
@@ -145,6 +145,8 @@ clean :
 distribution :
 	-rm -f o/*.o *.o
 	-rm -f $(OFILES) $(LIB) test
+$(O):
+	-mkdir $(O)
 
 $(OFILES) : lalocal.h la.h $(LOCALINCL)/c_env.h $(FF)ff.h
 

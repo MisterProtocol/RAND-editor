@@ -58,7 +58,7 @@ CFILES = \
 	$(CC) $(CFLAGS) $(DEFS) -I. -I$(LOCALINCL) -c $*.c
 
 
-$(LIB): $(OFILES) $(FILL) $(MOVE)
+$(LIB): $(O) $(OFILES) $(FILL) $(MOVE)
 	ar r $(LIB) $(OFILES) $(MOVE) $(FILL)
 	$(RANLIB) $(LIB)
 
@@ -77,6 +77,8 @@ Calls:  $(CFILES)
 
 clean : 
 	rm -f $(OFILES) $(LIB)
+$(O):
+	-mkdir $(O)
 
 $(OFILES) : ff.local.h ff.h $(LOCALINCL)/c_env.h # /usr/include/stdio.h
 
