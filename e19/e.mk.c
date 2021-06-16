@@ -255,7 +255,7 @@ highlightarea(Flag setmode, Flag redrawflg) {
 	return;
     }
 
-/* /
+/**
 dbgpr("\nhighlightarea: nwinlist=%d, redrawflg=%d, mode=%d\n", nwinlist, redrawflg, setmode);
 dbgpr("curwin->tmarg=%d, curwin->bmarg=%d, curwin->lmarg=%d, curwin->rmarg=%d\n",
 curwin->tmarg, curwin->bmarg, curwin->lmarg, curwin->rmarg);
@@ -269,8 +269,15 @@ if (prevmark) {
  dbgpr(" prevmark->mrkwinlin=(%d), prevmark->mrkwincol=(%d), prevmark->mrklin=(%d), prevmark->mrkcol=(%d)\n\n",
     prevmark->mrkwinlin, prevmark->mrkwincol, prevmark->mrklin, prevmark->mrkcol);
 }
-dbg_showMarkInfo("hilite");
 / **/
+
+/** /
+dbgpr("topmark=%d marklines=%d markcols=%d cursorline=%d cursorcol=%d curwin->btext=%d\n",
+topmark(), marklines, markcols, cursorline, cursorcol, curwin->btext);
+dbgpr(" curwksp->wlin=(%d), curmark->mrkwinlin=(%d), mrklin=(%d)\n",
+    curwksp->wlin, curmark->mrkwinlin, curmark->mrklin);
+/ **/
+/*dbg_showMarkInfo("hilite");*/
 
     if (firsttime) {  /* hilite just one line */
 	top_line = cursorline + curwin->ttext;  /* omit top border */
@@ -291,7 +298,7 @@ dbg_showMarkInfo("hilite");
      */
     if (marklines == last_marklines && cursorline == last_cursorline
 	    && cursorcol == last_col && redrawflg == NO) {
-	dbgpr("no highlighting needed...\n");
+     /* dbgpr("no highlighting needed...\n"); */
 	return;
     }
 
@@ -325,23 +332,23 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
     }
 	/* if cursor is at the bottom of a window */
     else if (cursorline == curwin->btext) {
-	if (marklines > (curwin->btext - curwin->ttext)) {
+	if (topmark() < curwksp->wlin) {
+	    top_line = curwin->ttext;
+	    bot_line = curwin->btext + 1;
+/** / dbgpr("1a: cursor=bottom, topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+	}
+	/***
+	else if (marklines > (curwin->btext - curwin->ttext)) {
 	    top_line = curwin->ttext;
 	    bot_line = curwin->btext + 1;
 	}
+	***/
 	else {
 	    top_line = curwin->ttext + topmark() - curwksp->wlin;
-	    bot_line = top_line + marklines - 1;
+	    /*bot_line = top_line + marklines - 1;*/
+	    bot_line = curwin->btext + 1;
 	}
-
-	/*
-	bot_line = curwin->btext+1;
-	top_line = curwin->btext - marklines + 1;
-	if (top_line < curwin->ttext)
-	    top_line = curwin->ttext;
-	*/
-
-/** /  dbgpr("  cursorline == btext, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+/** /  dbgpr("1: cursorline == btext, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
     else if (cursorline == 0) {    /* cursor at top of window */
 	top_line = curwin->ttext;
@@ -355,59 +362,43 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	if( bot_line > curwin->btext ) {
 	    bot_line = curwin->btext + 1;
 	}
-/** / dbgpr("  cursorline == 0, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+/** / dbgpr("2:  cursorline == 0, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
     else {  /* not top or bottom, and marklines > 1 */
-	if (curmark->mrkwinlin == curwksp->wlin) {
+	/* if topmark() is on previous page... */
+	if (topmark() < curwksp->wlin) {
+	    top_line = curwin->ttext;
+	    bot_line = top_line + cursorline;
+/** / dbgpr("3: topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+	}
+	else if (curmark->mrkwinlin == curwksp->wlin) {
 	    if (cursorline > curmark->mrklin) {
-		top_line = curwin->ttext + curmark->mrklin;
+	       top_line = curwin->ttext + curmark->mrklin;
 		bot_line = top_line + marklines - 1;
 	    }
 	    else {
 		top_line = curwin->ttext + cursorline;
 		bot_line = top_line + marklines - 1;
 	    }
-/** / dbgpr("  mrkwinlin = wlin, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+/** / dbgpr("4: mrkwinlin = wlin, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
-	/* if original mark no longer on screen */
-	else if (curwksp->wlin > curwin->bmarg) {
-	    if( cursorline > last_top ) {
-		bot_line = cursorline;
-	    }
-	    else if (cursorline < last_top ) {
-		top_line = cursorline;
-		bot_line = top_line + marklines + 1;
-	    }
-	    top_line = topmark() + 1 + (curmark->mrkwinlin - curwksp->wlin);
-	    bot_line = curwin->ttext + cursorline;
-
-	    if (top_line < 0) {  /* ?? this occurred after mark, cmd: +page (go to eof) */
-		top_line = curwin->ttext;
-	    }
-
-/** / dbgpr("  wlin > curwin->bmarg, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
-	}
-	/* mark extended upward via window scroll */
-	else if (curwksp->wlin < curmark->mrkwinlin) {
-	 /* top_line = topmark() + 1 - curmark->mrkwinlin + curmark->mrklin; */
-	 /* top_line = curwin->ttext + curmark->mrklin - (curmark->mrkwinlin - curwksp->wlin);*/
-	    top_line = curwin->ttext + topmark() - curwksp->wlin;
+	/* topmark() on current screen */
+	else if (curwksp->wlin < topmark()) {
+	    top_line = topmark() - curwksp->wlin + 1;
 	    bot_line = top_line + marklines - 1;
-/** / dbgpr("  wlin < mrkwinln, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+	    if (bot_line > curwin->btext+1)
+		bot_line = curwin->btext+1;
+/** / dbgpr("5: wlin < topmark(), top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	else {
-	    top_line = curwin->ttext + topmark() - curwksp->wlin;
-	    bot_line = top_line + marklines - 1;
-/** / dbgpr("  default:  top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+/** / dbgpr("6: XXXXX shouldn't see this\n"); / **/
 	}
-/** /  dbgpr("not first, ... top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
 
 /** /
 dbgpr("top_line=%d last_top=%d, bot_line=%d, last_bot=%d, last_col=%d, firsttime=%d infoline=%d\n",
   top_line, last_top, bot_line, last_bot, last_col, firsttime, infoline);
-
-dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n",
+dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n\n",
     marklines, last_marklines, cursorline, last_cursorline);
 / **/
 
