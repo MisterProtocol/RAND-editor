@@ -112,6 +112,45 @@ sent to it.  `run` is a bit different.  It will run an arbitrary program
 given in its argument as a filter, replacing the input text with the output
 text.  `sort` is one possible argument, for example.
 
+### Editor-created files
+
+The editor creates several files beginning with "." in the normal course
+of use.  The first is the "state file", whose name begins with ".es1".
+This file contains everything needed to restore the previous edit session
+to its state when the editor exited, including the name(s) of file(s) being
+edited, the location and size of windows, etc.  The other file, the
+"keystroke file", has a name beginning with ".ek1".  It contains all of
+the keystrokes from the current editing session.  If the session exits
+normally, this file is deleted on exit.  If the editor (or the system)
+crashes, or if the editing session is aborted via "bye abort", this
+file is preserved, and may be used to restore the work done in the
+aborted session.  If a ".ek1" file is found when the editor is started,
+with or without arguments, the editor will present the user with several
+options, including replaying the previous edit session, silently
+recovering the previous edit session, ignoring the previous session
+(and proceeding with the current command as given by the user), or
+exiting without doing anything.
+
+### Other Programs
+
+There are two other programs which may be of use, both in the directory
+"e19".  The first is "pres.c", may be used to present the contents of
+a ".es1" editor state file in human-readable form.  It should be noted
+that historically, the version number of the editor has been increased
+whenever the format of the state file has been changed.
+
+The other program is "e.showkeys.c", which is of recent vintage, and may
+be used to print the contents of a ".ek1" keystroke file from a crashed
+or aborted session.  In particular, it allows the user to determine
+how far they want the recovery to continue, that is, the user may want
+to skip the last few keystrokes if they caused the editor to exit or
+crash.  This may be done by giving an optional argument to the editor
+prompt which asks the user whether to recover the session or not.
+Currently, option "2" recovers the previous session, so answering
+"2 5" would recover all but the last five keystrokes of the previous
+session.  If those keystrokes were "<cmd>b q<ret>", this would prevent
+the editor from exiting at the end of the recovery.
+
 ### Makefiles
 
 There are two Makefiles of particular interest in this distribution.  One
