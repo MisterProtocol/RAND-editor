@@ -1,4 +1,5 @@
 ver=e.r.c
+touch $ver
 mv -f $ver ,$ver
 whoami() {
 	who am i | sed 's/[ 	].*//'
