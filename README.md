@@ -169,7 +169,8 @@ compiled by a shell script.
 
 ### Highlighting
 
-This version of the editor supports highlighting of text using colors,
+This version of the editor supports highlighting of **MARK**ed
+text using colors,
 on terminals which support colored text.  The default highlighting
 uses dark text on a light gray background.  Arbitrary colors may be chosen
 instead using command-line arguments; see the man page for details.

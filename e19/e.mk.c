@@ -416,9 +416,7 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n\n",
 
     savecurs();
 
-    /*if (cursorcol == curmark->mrkcol) { */
-    if (markcols == 0) {
-	/* entire lines */
+    if (markcols == 0) { /* entire lines */
 	for (i = top_line; i <= bot_line; i++) {
 	   HiLightLine(i, setmode);
 	}
@@ -508,21 +506,61 @@ HiLightRect(int from, int to, int mrkcol, int curcol) {
     char *cp;
 
     int beg_mark;
-    int end_mark;
-    int mark_len;
+    int mark_len = markcols;  /* how many chars to highlight */
     int line;
+    int adj_markcol = mrkcol;
 
+    /*
+     * adj_markcol, initially set to curmark->mrkcol, needs to be
+     * adjusted to account for various window shifts.  If the marked area
+     * is increasing to the right, the marked area ends one char before
+     * the cursor position; if increasing to the left, the marked area
+     * starts at the cursor position.
+     */
 
-    if( curcol > mrkcol ) {
-	beg_mark = mrkcol;
-	end_mark = curcol;
+    /* First, the case if the cursor position is 0 when the window is shifted, the mark
+     * started somewhere to the left of the visible window  nd nothing
+     * needs to be highlighted.
+     */
+    if (curcol == 0 && markcols <= curwksp->wcol) {
+    /** /dbgpr("0: marked area is left of our window, wcol=%d curcol=%d markcols=%d\n",
+	    curwksp->wcol, curcol, markcols); / **/
+	return;
+    }
+
+	/* window not shifted right, or mark began in unshifted window */
+    if (curwksp->wcol == curmark->mrkwincol) {  /* both are 0 or equal */
+	adj_markcol = mrkcol;
+	/** /dbgpr("1: wcol=mrkwincol, adj_markcol=%d\n", adj_markcol); / **/
+    }
+    else if (mrkcol < curwksp->wcol) {  /* mark began left of our window */
+	adj_markcol = 0;
+	mark_len = markcols - curwksp->wcol + mrkcol;
+	/** /dbgpr("1a: mrkcol < wksp->wcol, adj_markcol=%d, mrkcol=%d new mark_len=%d\n",
+	   adj_markcol, mrkcol, mark_len); / **/
+    }
+    else if (curmark->mrkwincol == 0 && mrkcol >= curwksp->wcol) {
+	adj_markcol = mrkcol - curwksp->wcol;
+	/** /dbgpr("2: mrkwincol=0, adj_markcol=%d\n", adj_markcol); / **/
+    }
+    else if (curmark->mrkwincol > curwksp->wcol) {
+	adj_markcol = mrkcol + (curmark->mrkwincol - curwksp->wcol);
+	/** /dbgpr("3: mrkwincol > wksp->wcol, adj_markcol=%d\n", adj_markcol); / **/
+    }
+    else if (curwksp->wcol > curmark->mrkwincol) {
+	adj_markcol = mrkcol - (curwksp->wcol - curmark->mrkwincol);
+	/** /dbgpr("4: wcol > mrkwincol, adj_markcol=%d\n", adj_markcol); / **/
+    }
+    else {
+	/** /dbgpr("5: no condition matched\n"); / **/
+    }
+
+    if (curcol > adj_markcol) {
+	beg_mark = adj_markcol;
     }
     else {
 	beg_mark = curcol;
-	end_mark = mrkcol;
     }
-
-    mark_len = end_mark - beg_mark;
 
     /*  use curwin->lmarg and curwin->rtext to account for any windows,
      *  omit left/rt border chars
@@ -530,11 +568,22 @@ HiLightRect(int from, int to, int mrkcol, int curcol) {
     int wid = curwin->rmarg - curwin->lmarg;
     beg_mark += curwin->ltext;
 
-/**
-dbgpr("HiLi: wid=%d lmarg=%d ltext=%d, rmarg=%d, rtext=%d mrkwincol=%d mrkcol=%d wksp->wcol=%d wksp->wlin=%d\n",
-wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
-curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
- **/
+
+    /* marked area lies partly to right of our window */
+    if (beg_mark + mark_len > curwin->rtext) {
+	mark_len = curwin->rtext - beg_mark;
+	if (mark_len <= 0 )
+	    mark_len = 1;
+    /** /dbgpr("6: mark_len reduced to %d from %d\n", mark_len, markcols); / **/
+    }
+
+/** /
+dbgpr("HiLiRect: mrkwincol=%d wksp->wcol=%d mrkcol=%d curwin->ltext=%d\n",
+  curmark->mrkwincol, curwksp->wcol, curmark->mrkcol, curwin->ltext);
+
+dbgpr("end: beg_mark=%d markcols=%d curcol=%d, adj_markcol=%d from=%d to=%d\n\n",
+beg_mark, markcols, curcol, adj_markcol, from, to);
+/ **/
 
     for (line = from; line <= to; line++ ) {
 	cp = (char *)image + w*line;
@@ -544,43 +593,19 @@ curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
 	snprintf(buf, wid, "%s", cp+curwin->ltext);
 	puts(buf);
 
-#ifdef OUT
-/*   hmm, since we've redrawn the line above
- *   we should only need to overlay the marked area
- *   yes, seems to work ok
- */
-	/* left side of marked area */
-	if( beg_mark > 1 ) {
-	    snprintf(buf, beg_mark+1, "%s", cp+1); /* omit left border char */
-	    mvcur(-1,-1, line, 1);
-	    puts(buf);
-	    /* dbgpr("left side=(%s)\n", buf); */
-	}
-#endif /* OUT */
-	/* marked area */
+	/* get a copy of the marked area */
 	snprintf(buf, mark_len+1, "%s", cp + beg_mark );
 	mvcur(-1,-1, line, beg_mark);
 
 	tputs(hilite_str, 1, Pch);      /* user selected mode, see cmd: set highlight */
 	puts(buf);
-	tputs(sgr0, 1, Pch);
+	tputs(sgr0, 1, Pch);  /* end hilite mode */
 
 	/* dbgpr("marked area=(%s)\n", buf); */
 
-#ifdef OUT
-	/* right side of marked area */
-	snprintf(buf, w - end_mark - 1, "%s", cp + 1 + end_mark); /* omit right border char */
-	mvcur(-1,-1, line, end_mark + 1);
-	puts(buf);
-	/*dbgpr("right side=(%s)\n", buf);*/
-#endif /* OUT */
     }
     fflush(stdout);
 
-/*
-dbgpr("HiLightRect: from=%d, to=%d beg_mark=%d end_mark=%d mark_len=%d\n",
-  from, to, beg_mark, end_mark, mark_len);
-*/
     return;
 }
 
