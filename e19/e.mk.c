@@ -255,7 +255,7 @@ highlightarea(Flag setmode, Flag redrawflg) {
 	return;
     }
 
-/**
+/** /
 dbgpr("\nhighlightarea: nwinlist=%d, redrawflg=%d, mode=%d\n", nwinlist, redrawflg, setmode);
 dbgpr("curwin->tmarg=%d, curwin->bmarg=%d, curwin->lmarg=%d, curwin->rmarg=%d\n",
 curwin->tmarg, curwin->bmarg, curwin->lmarg, curwin->rmarg);
@@ -298,7 +298,7 @@ dbgpr(" curwksp->wlin=(%d), curmark->mrkwinlin=(%d), mrklin=(%d)\n",
      */
     if (marklines == last_marklines && cursorline == last_cursorline
 	    && cursorcol == last_col && redrawflg == NO) {
-     /* dbgpr("no highlighting needed...\n"); */
+  /** / dbgpr("no highlighting needed...\n"); / **/
 	return;
     }
 
@@ -318,12 +318,12 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
     }
 
 
-   /*  clear previous mark */
-   /*for (i = last_top; i<= last_bot; i++)*/
-   for (i = curwin->ttext; i < curwin->bmarg; i++)
-      HiLightLine(i, NO);
+    /*  clear previous mark */
+    /*for (i = last_top; i<= last_bot; i++)*/
+    for (i = curwin->ttext; i < curwin->bmarg; i++)
+       HiLightLine(i, NO);
 
-    /*   Try this:  the cursor line is either at the top or bottom
+    /*   The cursor line is always either at the top or bottom
      *   of a marked area
      */
 
@@ -337,12 +337,6 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	    bot_line = curwin->btext + 1;
 /** / dbgpr("1a: cursor=bottom, topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
-	/***
-	else if (marklines > (curwin->btext - curwin->ttext)) {
-	    top_line = curwin->ttext;
-	    bot_line = curwin->btext + 1;
-	}
-	***/
 	else {
 	    top_line = curwin->ttext + topmark() - curwksp->wlin;
 	    /*bot_line = top_line + marklines - 1;*/
@@ -422,7 +416,8 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n\n",
 
     savecurs();
 
-    if (cursorcol == curmark->mrkcol) {
+    /*if (cursorcol == curmark->mrkcol) { */
+    if (markcols == 0) {
 	/* entire lines */
 	for (i = top_line; i <= bot_line; i++) {
 	   HiLightLine(i, setmode);
@@ -469,6 +464,13 @@ HiLightLine(int line, Flag setmode) {
      */
     int wid = curwin->rmarg - curwin->lmarg;
 
+/**
+if (setmode == YES)
+dbgpr("HiLi: wid=%d lmarg=%d ltext=%d, rmarg=%d, rtext=%d mrkwincol=%d mrkcol=%d wksp->wcol=%d wksp->wlin=%d\n",
+wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
+curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
+ **/
+
     snprintf(buf, wid, "%s", cp+curwin->ltext);
     mvcur(-1,-1, line, curwin->ltext);
 
@@ -510,6 +512,7 @@ HiLightRect(int from, int to, int mrkcol, int curcol) {
     int mark_len;
     int line;
 
+
     if( curcol > mrkcol ) {
 	beg_mark = mrkcol;
 	end_mark = curcol;
@@ -526,6 +529,12 @@ HiLightRect(int from, int to, int mrkcol, int curcol) {
      */
     int wid = curwin->rmarg - curwin->lmarg;
     beg_mark += curwin->ltext;
+
+/**
+dbgpr("HiLi: wid=%d lmarg=%d ltext=%d, rmarg=%d, rtext=%d mrkwincol=%d mrkcol=%d wksp->wcol=%d wksp->wlin=%d\n",
+wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
+curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
+ **/
 
     for (line = from; line <= to; line++ ) {
 	cp = (char *)image + w*line;

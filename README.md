@@ -192,5 +192,5 @@ Note that this will not build the
 filter executables or the `man` files.  Look in the subdirectories
 such as `fill` and `man` for those.  The top-level Makefile has 
 additional targets "etc", "help", "clean", "bsd.man" and 
-"s5.man" which will be useful.  Finally, `make bsd.install` or
+"s5.man" which will be useful. Finally, `make bsd.install` or
 `make s5.install` will install the editor on your system.
