@@ -432,12 +432,13 @@ Reg2 char *argv[];
 
 	Block {
 	    char buf[256];
-	    int a_ver, a_h, a_w;
+	    short int a_ver;
+	    int a_h, a_w;
 	    char a_ichar;
 	    char a_term[50];
 
 	    fgets(buf, sizeof(buf), replay_fp);
-	    sscanf (buf, "version=%d ichar=%c term=%s h=%d w=%d",
+	    sscanf (buf, "version=%hd ichar=%c term=%s h=%d w=%d",
 		&a_ver, &a_ichar, a_term, &a_h, &a_w);
 /****/
 fprintf(stdout, "replayinfo: ver=%d ichar=%o term=%s h=%d w=%d\n",

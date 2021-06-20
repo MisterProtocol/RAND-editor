@@ -155,7 +155,9 @@ dbgpr("mainloop:  curmark, nlines=%d ncols=%d\n", marklines, markcols);
 	    }
 
 	    /* display marked area */
-	    highlightarea(YES,redrawflg);
+	        /* Don't highlight if playing a macro or replaying a crash */
+	    if (!playing && !replaying)
+	        highlightarea(YES,redrawflg);
 	}
 	redrawflg = 0;  /* set in e.cm.c, case CMDREDRAW */
 
