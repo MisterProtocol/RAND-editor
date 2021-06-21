@@ -2,7 +2,9 @@ Hello
 Here's text.
 
 Put in some new stuff!
-
+Let's put a line in the middle.
+Inserting a line ending with a period
+Hey hey, another new line
 
 abcde
 abqde

@@ -29,7 +29,8 @@ systems.  The first branch, with the original code, reads terminal input
 in an idiosyncratic way, as it dates from a "do-it-yourself" era when
 third-party libraries were nonexistent.  The second branch handles mouse
 support by means of a completely rewritten input section, which uses
-`ncurses` to multiplex terminal and mouse input.
+`ncurses` to multiplex terminal and mouse input.  The `original` branch
+uses `curses`, but not `ncurses` in particular.
 
 ### Extra files
 
@@ -67,7 +68,7 @@ Almost all commands to the editor are typed as one or two control
 characters.  These hotwired terminals were then provided with
 specially-made brightly colored keycaps with legends like **OPEN**,
 **PICK**, **PUT**,
-and so forth.  Using these terminals, administrative assistance (then
+and so forth.  Using these terminals, administrative assistants (then
 called secretaries) could begin doing useful work in "e" in about half an
 hour.
 
@@ -150,6 +151,21 @@ Currently, option "2" recovers the previous session, so answering
 "2 5" would recover all but the last five keystrokes of the previous
 session.  If those keystrokes were "<cmd>b q<ret>", this would prevent
 the editor from exiting at the end of the recovery.
+
+### Ancillary Files ###
+
+At times, the editor must display messages longer than a single line to
+inform the user of certain events.  These files are installed by some
+of the targets in the top-level Makefile, and are placed into the same
+directory (usually `/usr/local/lib/e`) as the filter programs.  Among
+them are `Crashdoc`, `dummy`, `errmsg`, `helpkey` and `recovermsg`.
+
+### Keyboard Files ###
+
+The editor's keyboard may be remapped.  This is not done by entries in
+a profile file, but by specially-constructed keyboard mapping files.
+Examples are included with the editor, notably `kb.mac`, which solves
+certain problems when using "e" on a Mac.
 
 ### Makefiles
 
