@@ -54,6 +54,15 @@ TERMCAP = $(E_TCLIB)
 # remove o/e.tt.o
 # ---end 2/21/2020 comments
 
+# -- comment by MOB 5/25/21
+# If the Make of e19 fails because of a syntax error in the automatically generated file e.r.c,
+# chances are that your shell and/or your C compiler follow different rules than the ones that
+# went into generating the flavor of "vers.sh" for your system.  Right now there are two versions,
+# "vers.bsd.sh" (for BSD-derived systems like the Mac) and "vers.s5.sh" (for Linux).  If e.r.c blows
+# up, try using the other "vers.sh" file.  The only difference is in the number of backslashes (ugh).
+# -- end comment by MOB 5/25/21
+
+
 CC      = cc
 RM      = rm -f
 
@@ -142,19 +151,25 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 #       $(MIS2LIB)
 
 
-ofiles: $(O) $(OFILES)
+ofiles: $(O) $(OFILES) $(OLA) $(OFFL)
 
 $(O):
 	-mkdir $(O)
+
+$(OLA):
+	-mkdir $(OLA)
+
+$(OFFL):
+	-mkdir $(OFFL)
 
 newrev:
 	/bin/sh $(NEWVERSION)
 	$(CC) $(CFLAGS) $(INCL) -c e.r.c
 	mv e.r.o $(O)e.r.o
 
-$(LALIB):
+$(LALIB): $(OLA)
 
-$(FFLIB):
+$(FFLIB): $(OFFL)
 
 $(MISCLIB):
 
