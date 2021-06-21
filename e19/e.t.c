@@ -3567,7 +3567,7 @@ dbgpr("---replaydone\n");
 
 	if (replay_stopcount) {   /* set by user to stop before last few keystrokes */
 	    long pos = ftell (replay_fp);
-	    if ((replay_filesize - pos) <= replay_stopcount) {
+	    if ((replay_filesize - pos) < replay_stopcount) {
 		/* /
 		dbgpr("STOP replay, pos=(%d) replay_size=(%d), stopcount=(%d)\n",
 		    pos, replay_filesize, replay_stopcount);
