@@ -545,10 +545,10 @@ ev->x - curwin->ltext, ev->y - curwin->ttext);
 	}
     }
 
-/*
+/* /
     if( curmark )
       dbg_showMarkInfo("doMous");
-*/
+/ **/
 
 /* Not used yet */
 /*  last_state = ev->bstate; */
@@ -652,13 +652,13 @@ dbg_showMarkInfo(char *source)
     n_lines = curmark->mrklin;
     n_cols = curmark->mrkcol;
 
-/**
+/** /
     dbgpr("Mark info:  topmark()=%d, leftmark()=%d, curmark->: mrkwinlin=%d, mrkwincol=%d mrkln=%d, mrkcol=%d\n",
       m_top, m_left, w_line, w_col, n_lines, n_cols);
 
     dbgpr("Mark info (%s):  marklines=%d, markcols=%d, cursorline=%d, cursorcol=%d\n\n",
 	source, marklines, markcols, cursorline, cursorcol);
- **/
+/ **/
 
     return;
 

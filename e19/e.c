@@ -49,6 +49,7 @@ extern char *getenv ();
 extern char *ttyname ();
 #endif
 
+
 /*  After the two-byte revision number in the keystroke file
  *  comes a character telling what to use from the state file.
  *  As of this writing, only ALL_WINDOWS and NO_WINDOWS are usable.
@@ -286,6 +287,11 @@ extern int fileno();
 off_t replay_filesize;
 int replay_stopcount = 0; /* set by user when picking replay option */
 
+#ifdef SHOWKEYS_INPLACE
+Flag show_replay_options = 0; /* show options for choosing a replay stopping point */
+extern void showkeys();
+#endif
+
 #ifdef COMMENT
 void
 main1 (argc, argv)
@@ -415,7 +421,7 @@ Reg2 char *argv[];
 	/*
 	 *   Reading replay file with stream routines makes e.t.c much cleaner
 	 */
-/*dbgpr("inpfname=(%s)\n", inpfname);*/
+/* dbgpr("inpfname=(%s)\n", inpfname); */
 	if ((replay_fp = fopen (inpfname, "r")) == NULL) {
 	    getout (YES, "Can't open replay file: %s", inpfname);
 	    fflush(stdout);
@@ -430,24 +436,39 @@ Reg2 char *argv[];
 	    /*dbgpr("replay_filesize=(%d)\n", replay_filesize);*/
 	}
 
+#ifdef SHOWKEYS_INPLACE
+	/* if user selected the option to show good places to halt
+	   replaying at, do so and exit.
+	 */
+	if (show_replay_options) {
+	    /*dbgpr("before showkeys(), %ld\n", replay_filesize);*/
+	    fixtty();   /* is this needed ? */
+	    showkeys(replay_fp, replay_filesize);
+	    printf("\n-----\nNow start E again and specify the replay option you want.\n");
+	    if (keysmoved)
+		mv (bkeytmp, keytmp);
+	    exit(1);  /* don't use getout() or output to stdout will not be seen */
+	}
+#endif /* SHOWKEYS_INPLACE */
+
 	Block {
 	    char buf[256];
-	    short int a_ver;
 	    int a_h, a_w;
+	    short a_ver;
 	    char a_ichar;
 	    char a_term[50];
 
 	    fgets(buf, sizeof(buf), replay_fp);
+dbgpr("buf=%s\n", buf);
 	    sscanf (buf, "version=%hd ichar=%c term=%s h=%d w=%d",
 		&a_ver, &a_ichar, a_term, &a_h, &a_w);
 /****/
-fprintf(stdout, "replayinfo: ver=%d ichar=%o term=%s h=%d w=%d\n",
-    a_ver, a_ichar, a_term, a_h, a_w);
-fflush(stdout);
-/*****/
+dbgpr("replayinfo: ver=%d revision=%d ichar=%o term=%s h=%d w=%d\n",
+    a_ver, revision, a_ichar, a_term, a_h, a_w);
+/***/
 	    if (-a_ver != revision)
-		getout (YES, "Replay file \"%s\" was made by revision %d of %s.",
-		     inpfname, a_ver, progname);
+		getout (YES, "Replay file \"%s\" was made by revision %d (vs %d) of %s.",
+		     inpfname, a_ver, revision, progname);
 	    if (strcmp(tname, a_term))
 	    getout (YES, "\
 Replay file \"%s\" was made by a different type of terminal '%s'.\n \
@@ -1397,7 +1418,13 @@ dorecov (type)
     If the user opts for a recovery or replay, anything which was set by
     checkargs() must be set here to the way we want it for the replay.
 #endif
+
+#ifdef SHOWKEYS_INPLACE
+#define RECOVERMSG  "recovershowkeys"
+#else
 #define RECOVERMSG  "recovermsg"
+#endif /* SHOWKEYS_INPLACE */
+
 void
 dorecov (type)
 Reg3 int type;
@@ -1430,12 +1457,20 @@ Type the number of the option you want then hit <RETURN>: ");
 	     * the 2nd number is used as the number of chars to halt replay
 	     * before the end of the keystroke file.
 	     */
+
+#ifdef SHOWKEYS_INPLACE
+	/* if "2 ?", read keystroke file to display options to halt replay at, then exit */
+	if (index(line, '?') != NULL) {
+	    show_replay_options = YES;
+	}
+	else
+#endif /* SHOWKEYS_INPLACE */
 	if (sscanf(line, "%c %d", &ch, &replay_stopcount) == 2) {
 	    /* eg, 2 5 for option 2, stop 5 chars from end of keyfile */
 	    if (replay_stopcount < 0) {
 	       replay_stopcount = 0;
 	    }
-	  /*dbgpr("replay_stopcount set to %d\n", replay_stopcount);*/
+	    /*dbgpr("replay_stopcount set to %d\n", replay_stopcount);*/
 	}
 
 	if (feof (stdin))
@@ -2334,6 +2369,10 @@ _Noreturn void getout (Flag filclean, char *str, ...)
 
     extern char verstr[];
 
+/***/
+dbgpr("getout:  filclean=%d, crashed=%d, bkeytmp=%s keytmp=%s\n",
+  filclean, crashed, bkeytmp, keytmp);
+/***/
     fixtty ();
     if (windowsup)
 	screenexit (YES);
@@ -2442,3 +2481,6 @@ resize_handler (int sig) {
     signal(SIGWINCH, resize_handler);
 }
 
+#ifdef SHOWKEYS_INPLACE
+#include "e.showkeys.c"
+#endif /* SHOWKEYS_INPLACE */

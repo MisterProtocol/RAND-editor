@@ -155,9 +155,9 @@ dbgpr("mainloop:  curmark, nlines=%d ncols=%d\n", marklines, markcols);
 	    }
 
 	    /* display marked area */
-	        /* Don't highlight if playing a macro or replaying a crash */
+		/* don't hilite if playing a macro or replaying a crash */
 	    if (!playing && !replaying)
-	        highlightarea(YES,redrawflg);
+		highlightarea(YES,redrawflg);
 	}
 	redrawflg = 0;  /* set in e.cm.c, case CMDREDRAW */
 
@@ -225,7 +225,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 	/* use F2 as an emergency exit while debugging,
 	 * beats having to kill the pid...
 	 */
-	if( key == KEY_F(2)) {
+	else if( key == KEY_F(2)) {
 	    dbgpr("mainloop, got F2, exiting...\n");
 	    /*opstr[0] = '\0';*/
 	    opstr = "quit";
@@ -236,7 +236,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 	/* use F6 to enable/disable the mouse so one can use copy/paste
 	 * to insert text into E
 	 */
-	if( key == CCMOUSEONOFF ) {
+	else if( key == CCMOUSEONOFF ) {
 	/*  dbgpr("mainloop, got key CCMOUSEONOFF, toggle mouse\n");*/
 	    toggle_mouse("");
 	    continue;
@@ -293,6 +293,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 			    /* Return on bottom line => +lines    */
 			    vertmvwin (defplline);
 			}
+			flushkeys();
 		    }
 		    /*
 		     *  e18 mod:  An RT (right arrow) at the right window
@@ -556,6 +557,7 @@ dbgpr("after param(): key=%o cmdmode=%d, paramv=(%s)\n", key, cmdmode, paramv);
  **/
 	    if (cmdmode && key != CCRETURN)
 		goto notcmderr;
+	    flushkeys();  /* added 6/21/2021 */
 	    switch (key) {
 		case CCCMD:
 		    goto funcdone;

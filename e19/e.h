@@ -216,12 +216,17 @@ typedef Small Cmdret;           /* comand completion status */
 
 #define FILEMODE 0644           /* mode of editor-created files         */
 
+#ifdef OUT
 #ifdef SYSSELECT
 #define MAXTYP 128              /* # of modifying chars typed before    */
 #else
 #define MAXTYP  28              /* # of modifying chars typed before    */
-#endif /* SYSSELECT */
+#endif /* SYSSELECT */          /* keyfile buffer is flushed            */
+#endif /* OUT */
+
+#define MAXTYP 8                /* # of modifying chars typed before    */
 				/* keyfile buffer is flushed            */
+
 #define DPLYPOL 4               /* how often to poll dintrup            */
 #define SRCHPOL 50              /* how often to poll sintrup            */
 #define EXECTIM 5               /* alarm time limit for Exec function   */

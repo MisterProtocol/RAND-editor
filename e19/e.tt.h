@@ -116,7 +116,13 @@ extern S_kbd  *tkbd[];
 #define VCCINI 001 /* a initialize                                      */
 #define VCCRES 002 /* b reset                                           */
 #define VCCEND 003 /* c restore terminal                                */
-#define VCCICL 004 /* c clear physical terminal screen                  */
+#define VCCICL 004 /* d clear physical terminal screen                  */
+
+#ifdef OUT
+#define VCCMK1 005 /* e start mark highlighting */
+#define VCCMK0 006 /* f end mark highlighting */
+#endif
+
 #define VCCBEL 007 /* g bell						*/
 #define VCCLEF 010 /* h left arrow					*/
 #define VCCHOM 013 /* k cursor home within window			*/

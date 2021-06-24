@@ -5,7 +5,9 @@ extern void exit();
 #define CCLAST         0236
 #define CMD 0
 
+#ifndef SHOWKEYS_INPLACE
 #define STANDALONE
+#endif /* SHOWKEYS_INPLACE */
 
 #ifdef STANDALONE
 #include <sys/types.h>
@@ -14,6 +16,7 @@ void exit();
 long ftell();
 void showkeys();
 int fstat();
+extern void dbgpr();
 
 int
 main(argc, argv)
@@ -42,11 +45,10 @@ char **argv;
 }
 #endif /* STANDALONE */
 
+
 void
 showkeys(FILE *fp, long filesize)
 {
-/*fprintf(stderr, "showkeys: filesize=%ld\n", filesize);*/
-
 	typedef struct keymap {
 	    char *keysym;
 	} keymap;
@@ -135,6 +137,7 @@ for(i = 0; i < (CCLAST - 0200); i++) {
 exit(1);
 #endif
 
+#ifdef STANDALONE
 	/*
 	 * skip up to first \r (or \n with new ascii format for 1st line)
 	 */
@@ -146,8 +149,10 @@ exit(1);
 	    fprintf( stderr, "unexpected end of file!\n" );
 	    exit(1);
 	}
+#endif /* STANDALONE */
 
 	while(( c = fgetc( fp )) != EOF ) {
+/*dbgpr("showkeys: c=%o\n", c);*/
 	    c &= 0377;
 	    if( c < 040 ) {
 		if( c == CMD ) {
@@ -155,12 +160,12 @@ exit(1);
 		    printf("\n----------\nSelect replay option: \"2 %ld\" to stop " \
 		      "replay before the following:\n", pos);
 		}
-		printf( "%s", low_keys[c].keysym );
+		printf("%s", low_keys[c].keysym );
 		if( c == '\r' )
-		    putchar( '\n' );
+		    putchar('\n');
 	    }
 	    else if( c < 0200 )
-		putchar( c );
+		putchar(c);
 	    else if( c <= CCLAST ) {
 
 		/*fprintf(stderr, "c=(%o)idx=(%d)\n", c, c-0200);*/
@@ -170,13 +175,14 @@ exit(1);
 		    printf("<CCMOUSE(%d,%d)>", y,x);
 		}
 		else {
-		  printf( "%s", hi_keys[c - 0200].keysym);
+		  printf("%s", hi_keys[c - 0200].keysym);
 		}
 
 	    }
 	    else
 		fprintf( stderr, "key %o unrecognized\n", c );
 	}
+	fflush(stdout);
 
 	return;
 }

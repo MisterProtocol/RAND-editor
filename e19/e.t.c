@@ -77,7 +77,7 @@ Char MapCursesKey(Char rchar);
 char *getEkeyname(int i);
 char *getCursesKeyname(int i);
 char *dbg_KeyName(int c);
-#endif
+#endif /* NCURSES */
 
 Flag finished_replay = NO;
 extern off_t replay_filesize;
