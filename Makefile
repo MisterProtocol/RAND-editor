@@ -220,6 +220,7 @@ etc:
 	cp help/Crashdoc $(LIB)
 	cp help/errmsg $(LIB)
 	cp help/recovermsg $(LIB)
+	cp help/recovershowkeys $(LIB)
 	chmod 444 $(LIB)/*
 	cd fill; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
 		"ETC=$(LIB)" \

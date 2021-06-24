@@ -5,12 +5,12 @@ You have these choices:
      you continue editing.
        (Normally, select this option.)
 
-  2. If E continues to crash in response to Option 1, you can specifiy this option
-     followed by the number of characters to stop replaying before the end of
-     the keystroke file.  For example, "2 10" would stop the replay 10 characters
-     before the end.  If you enter "2 ?", E will read the keystroke file and show
-     you options for how many characters to specify, and then return you to
-     the shell.
+  2. If E continues to crash in response to Option 1, you can specify
+     this option followed by the number of characters to stop replaying
+     before the end of the keystroke file.  For example, "2 10" would
+     stop the replay 10 characters before the end.  If you enter "2 ?",
+     E will read the keystroke file and show you options for how many
+     characters to specify, and then return you to the shell.
 
   3. E will ignore the crashed or aborted session and forge ahead as per the
        arguments with which it was invoked.
