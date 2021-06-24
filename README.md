@@ -3,6 +3,14 @@
 The RAND editor is one of the oldest text editors in existence.  It has
 features never duplicated by any other editor.
 
+It was in constant use at The RAND Corporation and elsewhere by a
+remarkably broad assortment of users, from secretaries and researchers
+up to the corporation President.  While other text editors have historically
+implemented features specifically for programmers and other professional
+users, the primary design criterion for the RAND editor was that it be
+immediately usable by anyone, regardless of their level of technical
+sophistication.
+
 The contents of this
 repository consist of the original code from RAND of e19, ported to Linux
 and called e19.59, and then ported to the Mac in 2021.
@@ -14,10 +22,13 @@ code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed below.
 
+As far as we are aware the code will compile on any version of Linux
+with either minimal or no changes.
+
 ### Branches
 
 It is intended that there be two branches in this repository, which will
-not be merged.  One branch (`original`)contains the code for the RAND editor as
+not be merged.  One branch (`original`) contains the code for the RAND editor as
 forward-ported to Linux and MacOS, but with no further additions
 made, except for bug fixes.  The second branch (`main`) contains code developed
 from the first branch,
@@ -151,6 +162,14 @@ Currently, option "2" recovers the previous session, so answering
 "2 5" would recover all but the last five keystrokes of the previous
 session.  If those keystrokes were "<cmd>b q<ret>", this would prevent
 the editor from exiting at the end of the recovery.
+
+The `main` branch of the editor now has code which will allow the
+functionality of `showkeys` to be invoked from within the editor
+at the point where the users is choosing recovery options as described
+in the previous paragraph.  The user may ask the editor (by picking
+option "2 ?") to show plausible points at which the recovery may be
+terminated early, to prevent whatever condition caused the editor to
+exit abnormally.
 
 ### Ancillary Files ###
 
