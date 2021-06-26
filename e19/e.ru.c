@@ -407,7 +407,6 @@ Flag    safe;       /* OK for program to write directly on changes file */
     long chgend;
     int  pipe2[2];
 #endif
-
     sprintf (tmp, "%s/run", etcdir);
     runargs[0] = &tmp[0];
     runargs[1] = (char *)NULL;

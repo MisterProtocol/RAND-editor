@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+extern void exit();
+
+
 #ifdef INFO
 
 S_looktbl keysyms[] = {

@@ -278,7 +278,7 @@ register char *s1, *s2;
 
 
 void
-getoptions (int check_only)
+getoptions (check_only)
 {
     register char *p;
 
@@ -315,7 +315,7 @@ getoptions (int check_only)
 
 
 void
-filterfiles(int check_only)
+filterfiles(check_only)
 {
     register FILE *f = (FILE *)-1;
 
@@ -935,20 +935,26 @@ register struct wrd *lw, *cw;       /* ptrs to last and current word */
 void
 docenter()
 {
-    char buf[4096];
+    char buf[512], *cp;
     int llen, n_sp, i;
     int maxlen = lineleng;
 
-    while (fgets(buf, 4096, stdin) != NULL) {
-	llen = (int) strlen(buf) -1;
+    while (fgets(buf, 512, stdin) != NULL) {
+	/* strip leading blanks */
+	for (cp = buf; *cp == ' ' || *cp == '\t'; cp++)
+	    if (*cp == '\n' || *cp == '\0')
+		break;
+
+	llen = (int) strlen(cp) - 1;   /* omit \n */
+
 	if (llen > 0 && llen < maxlen) {
 	    n_sp = (maxlen-llen)/2;
 	/*  fprintf(stderr, "center: llen=%d, n_sp=%d maxlen=%d\n", llen, n_sp, maxlen); */
 	    for (i=0; i < n_sp; i++) {
 		putchar(' ');
 	    }
-	    fputs(buf, stdout);
 	}
+	fputs(cp, stdout);
     }
     fflush(stdout);
     return;

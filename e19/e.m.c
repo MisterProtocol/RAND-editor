@@ -195,6 +195,7 @@ contin:
 			else if (cursorline == curwin->btext)
 			    /* Return on bottom line => +lines    */
 			    vertmvwin (defplline);
+			flushkeys();
 		    }
 		    /*
 		     *  e18 mod:  An RT (right arrow) at the right window
@@ -456,6 +457,7 @@ gotcmd:
 
 	    if (cmdmode && key != CCRETURN)
 		goto notcmderr;
+	    flushkeys();  /* added 6/21/2021 */
 	    switch (key) {
 		case CCCMD:
 		    goto funcdone;
