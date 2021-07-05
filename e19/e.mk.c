@@ -570,7 +570,8 @@ HiLightRect(int from, int to, int mrkcol, int curcol) {
 
 
     /* marked area lies partly to right of our window */
-    if (beg_mark + mark_len > curwin->rtext) {
+/*    if (beg_mark + mark_len > curwin->rtext) { */
+    if (beg_mark + mark_len > curwin->rmarg) {
 	mark_len = curwin->rtext - beg_mark;
 	if (mark_len <= 0 )
 	    mark_len = 1;
