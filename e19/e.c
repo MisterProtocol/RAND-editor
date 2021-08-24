@@ -108,6 +108,10 @@ extern char *ttyname ();
 
 #define OPTNEWFILEMODE 34
 
+/* Don't read the profile if E is entered w/o a filename to edit, but reenable it
+ * if E is entered w/o a filename and no state file exists.
+ */
+Flag noStateFile = NO;
 
 /* Entries must be alphabetized. */
 /* Entries of which there are two in this table must be spelled out. */
@@ -500,6 +504,13 @@ Your current screensize is %d w X %d h.\n",
 	keyedit (argv[curarg]);
     }
     else if (!replaying || ichar != NO_WINDOWS)
+	/*   E was reentered without a cmdline filename.  If present, we don't
+	 *   want to process the rest of a .e_profile (in e.t.c).
+	 *   Note, the 1st line(s) of the the profile beginning with
+	 *   "options:" has already been processed.
+	 */
+	if (!noStateFile)
+	    dot_profile = NO;
 	putupwin ();
     return;
 }
@@ -2013,6 +2024,10 @@ makestate (nofileflg)
 Flag nofileflg;
 {
     Reg1 S_window *window;
+
+    /* Reenable reading of .e_profile if no state file exists */
+    if (nofileflg)
+	noStateFile = YES;
 
     nwinlist = 1;
     window = winlist[0] = (S_window *) salloc (SWINDOW, YES);

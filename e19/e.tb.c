@@ -344,7 +344,8 @@ Flag setclr;
     register Ncols i2;
 
     if (setclr) {
-	if (ntabs + 1 > stabs)
+	/*if (ntabs + 1 > stabs) */
+	if (!ntabs || (ntabs + 1 > stabs))
 	    tabs = (ANcols *) gsalloc ((char *) tabs,
 				       ntabs * sizeof *tabs,
 				       (stabs += NTABS / 2) * sizeof *tabs,

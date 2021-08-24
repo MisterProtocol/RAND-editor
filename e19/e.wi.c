@@ -393,7 +393,11 @@ Small how;
 	putch (TLCMCH, NO);
 	for (i++; i < j; i++)
 #ifdef LMCMARG
-	    if (tabs[k] == i - window->lmarg - 1 + window->wksp->wcol) {
+	    /*  The tabs array can be null if "CMD: -tabs" is followed by
+	     *  an exit, and e is restarted w/o any cmdline args
+	     */
+	/*  if (tabs[k] == i - window->lmarg - 1 + window->wksp->wcol) { */
+	    if (ntabs && tabs[k] == i - window->lmarg - 1 + window->wksp->wcol) {
 		/* no tab mark in col 0 */
 		if( tabs[k] != 0 )
 		    putch (TTMCH, NO);
@@ -427,7 +431,8 @@ Small how;
 /***************  no tab marks on bottom margin ************************/
 #ifdef OUT
 #ifdef LMCMARG
-	    if (tabs[k1] == i - window->lmarg - 1 + window->wksp->wcol) {
+	    /* if (tabs[k1] == i - window->lmarg - 1 + window->wksp->wcol) { */
+	    if (ntabs && tabs[k1] == i - window->lmarg - 1 + window->wksp->wcol) {
 		putch (BTMCH, NO);
 		if (k1 < ntabs) k1++;
 	    } else
