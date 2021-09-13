@@ -41,6 +41,7 @@ S_window       *winlist[MAXWINLIST],
 	       *curwin,         /* current editing window               */
 		wholescreen,	/* whole screen 			*/
 		infowin,        /* window for info                      */
+		buttonwin,      /* window for func buttons              */
 		enterwin;       /* window for CMD                       */
 Small   nwinlist;
 

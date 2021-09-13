@@ -77,6 +77,12 @@ Char MapCursesKey(Char rchar);
 char *getEkeyname(int i);
 char *getCursesKeyname(int i);
 char *dbg_KeyName(int c);
+
+#ifdef MOUSE_BUTTONS
+extern int mouseFuncKey;
+extern void getMouseButtonEvent();
+#endif /* MOUSE_BUTTONS */
+
 #endif /* NCURSES */
 
 Flag finished_replay = NO;
@@ -1175,14 +1181,12 @@ Reg1 Scols  col;
 Reg2 Slines lin;
 {
 
-/**
-if( 0 || col != 0 || lin != 0 ) {
- if( DebugVal > 0 ) {
+/** /
+if( DebugVal ) {
    dbgpr("poscursor, beg: col=%d lin=%d cursorline=%d cursorcol=%d, ltext=%d, ttext=%d curwin=(%o)\n",
      col,lin,cursorline,cursorcol,curwin->ltext, curwin->ttext,curwin);
-  }
 }
- **/
+/ **/
 
     if (cursorline == lin) {
 	/* only need to change column?  */
@@ -1220,10 +1224,10 @@ if( 0 || col != 0 || lin != 0 ) {
     putscbuf[2] = 041 + curwin->ttext + lin;
     d_write (putscbuf, 3);
 
-/*dbg * /
+/** /
 if(curmark)
  dbg_showMarkInfo("poscur");
-/ ***/
+/ **/
 
     return;
 }
@@ -1244,6 +1248,7 @@ Reg4 Nlines cnt;
 {
     Reg3 Slines lin;
     Reg2 Ncols col;
+
 
     lin = cursorline;
     col = cursorcol;
@@ -1295,6 +1300,10 @@ Reg4 Nlines cnt;
 	col -= curwksp->wcol;
 	break;
     }
+
+/** /
+dbgpr("movecursor: func=%d [1=UP 2=DN 5=RT 6=LT] cnt=%d col=%d cursorcol=%d\n", func, cnt, col, cursorcol);
+/ **/
 
     Block {
 	Reg5 Nlines ldif;
@@ -1381,7 +1390,7 @@ Reg2 Flag peekflg;
 
 #ifdef NCURSES
 /*  debug_inputkey(rkey,"e.t.c, getkey()"); */
-#endif
+#endif /* NCURSES */
 
     if (knockdown && rkey < 040)
 	rkey |= 0100;
@@ -1553,6 +1562,7 @@ Small peekflg;
 	/*  playing = 0;  */
 	    return (CCINT);
 	}
+
 	/*goto endGetkey1;*/
 	return (unsigned Short)*lp;
     }
@@ -2108,6 +2118,8 @@ param ()
     Reg5 Flag cmdflg;
     Reg7 Flag uselast;
 
+/* /dbgpr("param(), begin\n"); / */
+
     uselast = NO;
     entering = YES;     /* set this flag so that getkey1() knows you are in
 			 * this routine. */
@@ -2184,14 +2196,34 @@ rmcmd:
     for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY)) {
 #endif /* SYSSELECT */
 
-/* /
+/** /
 if (CTRLCHAR) {
- dbgpr("param: got key=(%o)(%s) curwin=(%o) enterwin=(%o)\n",  key, getEkeyname(key), curwin, &enterwin);
+ dbgpr("param: got ctrlkey=(%o)(%s) curwin=(%o) enterwin=(%o) cmdflg=%d keyused=%d\n",
+    key, getEkeyname(key), curwin, &enterwin, cmdflg, keyused);
 }
 else {
- dbgpr("param: got key=(%o)(%c) curwin=(%o) enterwin=(%o)\n",  key, (char)key, curwin, &enterwin);
+ dbgpr("param: got     key=(%o)(%c) curwin=(%o) enterwin=(%o) cmdflg=%d keyused=%d\n",
+    key, (char)key, curwin, &enterwin, cmdflg, keyused);
 }
-/ */
+/ **/
+
+#ifdef MOUSE_BUTTONS
+	/* check if a mouse button is pressed while in CMD mode */
+	if( key == CCMOUSE ) {
+/* /dbgpr("param, calling getMouseButtonEvent(), mouseFuncKey=(%d)\n",mouseFuncKey); / */
+	    getMouseButtonEvent();
+/* /dbgpr("param, after getMouseButtonEvent(), mouseFuncKey=(%d)\n",mouseFuncKey);  / */
+	    if (mouseFuncKey != -1) {
+		key = mouseFuncKey;
+		mouseFuncKey = -1;
+/* /dbgpr("param(), mouse button clicked, setting key to (%o)(%s)\n", key, getEkeyname(key)); / */
+		/* force move cursor off button row, back to enterwin line */
+		mvcur(-1,-1, curwin->ttext + cursorline, curwin->ltext + cursorcol);
+		d_put(0);
+	    }
+	}
+#endif /* MOUSE_BUTTONS */
+
 	if (ccmdlen >= ccmdl)
 	    ccmdp = gsalloc (ccmdp, ccmdlen, ccmdl += LPARAM, YES);
 	if (CTRLCHAR)
@@ -2311,6 +2343,7 @@ else {
 		break;
 
 	    case CCPICK:
+/* /dbgpr("param: key=CCPICK, cmdflg=%d\n", cmdflg);/ */
 		if (!cmdflg)
 		    goto done;
 		Block {
@@ -2476,6 +2509,10 @@ err:    /* added for .estartup err return */
     restcurs ();
     clrbul ();
     entering = NO;
+/* /
+dbgpr("param() end\n");
+/ */
+
     return;
 }
 
@@ -2586,6 +2623,7 @@ limitcursor ()
     return;
 }
 
+
 #ifdef COMMENT
 void
 info (column, ncols, msg)
@@ -2612,9 +2650,10 @@ Reg2 char *msg;
     oldwin = curwin;        /* save old window info   */
     oldcol = cursorcol;
     oldlin = cursorline;
-/**
+/** /
+if (DebugVal)
 dbgpr("info(), col=(%d) ncols=(%d) msg=(%s)\n", column, ncols, msg);
- **/
+/ **/
     switchwindow (&infowin);
     poscursor (column, 0);
 
@@ -2845,9 +2884,9 @@ mesg (int parm, ...)
    parm = parm&0170;
    /*mesg(parm+1, &msg[0]);*/
    MesgHack(parm+1, &MesgBuf[0]);
-/**
+/* /
 dbgpr("--after MesgHack (%s)\n", t);
- **/
+/ */
     va_end (ap);
 }
 
@@ -3405,6 +3444,7 @@ Flag peekflg;
 dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar, (char) haveChar, (char) peekCh);
 */
     if (peekflg == WAIT_KEY && keyused == NO) {
+	dbgpr("mGetkey: WAIT_KEY==yes and keyused==NO, returning key=%d (a no-op)\n", key);
 	return key; /* then getkey is really a no-op */
     }
 
@@ -3415,8 +3455,9 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 #endif /* SYSSELECT */
 
 #ifdef NCURSES
-/*  dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n", knockdown, rkey,rkey,(char)rkey);*/
-#endif
+/* /dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n",
+      knockdown, rkey,rkey,(char)rkey); / **/
+#endif /* NCURSES */
 
     if (knockdown && rkey < 040)
 	rkey |= 0100;
@@ -3568,10 +3609,10 @@ dbgpr("---replaydone\n");
 	if (replay_stopcount) {   /* set by user to stop before last few keystrokes */
 	    long pos = ftell (replay_fp);
 	    if ((replay_filesize - pos) < replay_stopcount) {
-		/* /
+		/**/
 		dbgpr("STOP replay, pos=(%d) replay_size=(%d), stopcount=(%d)\n",
 		    pos, replay_filesize, replay_stopcount);
-		/ */
+		/**/
 		/*mesg(ERRALL+1, "hit any key to interrupt replay");*/
 		nodelay(stdscr,TRUE);
 		wgetch(stdscr);  /* keyboard input, not from keystroke file */
@@ -3830,25 +3871,40 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		}
 #endif
 
-#ifdef OUT
-		/*
-		 *  With the introduction of Curses initialization, there's a problem
-		 *  displaying the initial edit screen.  We'll do a <CMD>red<CR> to
-		 *  force the display.
-		 */
-		static Uchar redraw_buf[] = { CCCMD, 'r', 'e', 'd', '\015', '-' };
-		static Uchar *redraw_ptr = redraw_buf;
-
-		if (*redraw_ptr != '-') {  /* since CCCMD is 0, use '-' as stop point */
-		   return (*redraw_ptr++);
-		}
-#endif
 
 		/* normal keyboard input begins here */
 		int c, c1;
-		c = wgetch(stdscr);
-		if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 
+#ifdef USE_MOUSE_POSITION
+
+#if 1 /*NCURSES_MOUSE_VERSION == 1*/
+		/* In 5.7, the REPORT_MOUSE_POSITION event results whenever
+		 * the mouse is moved; in 6.2 it is reported only when a key is
+		 * held down and the mouse is moved
+		 */
+
+		/* skip mouse position reports w/o a prior press event */
+		MEVENT evt;
+		while((c = wgetch(stdscr)) == KEY_MOUSE) {
+		    getmouse(&evt);
+		    if (evt.bstate & REPORT_MOUSE_POSITION)
+			continue;
+		    ungetmouse(&evt);   /* push back the event */
+		    c = wgetch(stdscr);
+		    break;
+		}
+#else
+		c = wgetch(stdscr);
+#endif /* NCURSES_MOUSE_VERSION */
+
+#else
+		c = wgetch(stdscr);
+
+#endif /* USE_MOUSE_POSITION */
+
+/** / dbgpr("c=%o\n", c);  / **/
+
+		if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 
 #ifdef OUT
 /*debug*/
@@ -3876,6 +3932,8 @@ fflush(dbgfile);
 		 */
 		    return (c1);
 		}
+
+
 #ifdef NOTYET
 /* Originally I thought a change was also needed to
  * handle the ^X^{key} and ^X^C{key} functions, but the orig
@@ -4000,16 +4058,88 @@ dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%d)(%c)\n", *lp, *lp);
     }
 }
 
+#ifdef NCURSES
+#ifdef USER_FKEYS
+
+/* see /usr/include/ncurses.h for KEY_Fn keycode values */
+
+struct UserDefinedFuncKeys {
+int keycode;    /* these codes are not really used, we index 0-35 */
+int cmdval;
+} UserFuncKeys[] = {
+
+{265,   -1},     /* KEY_F1  0411-0411 = 0 */
+{266,   -1},     /* KEY_F2  0412-0411 = 1 */
+{267,   -1},     /* KEY_F3  0413 */
+{268,   -1},     /* KEY_F4  0414 */
+{269,   -1},     /* KEY_F5  0415 */
+{270,   -1},     /* KEY_F6  0416 */
+{271,   -1},     /* KEY_F7  0417 */
+{272,   -1},     /* KEY_F8  0420 */
+{273,   -1},     /* KEY_F9  0421 */
+{274,   -1},     /* KEY_F10 0422 */
+{275,   -1},     /* KEY_F11 0423 */
+{276,   -1},     /* KEY_F12 0424-0411 = 11 */
+
+{277,   -1},     /* SHIFT_F1 0425-0411 = 12 */
+{278,	-1},     /* SHIFT_F2 */
+{279,	-1},     /* SHIFT_F3 */
+{280,	-1},     /* SHIFT_F4 */
+{281,	-1},     /* SHIFT_F5 */
+{282,	-1},     /* SHIFT_F6 */
+{283,	-1},     /* SHIFT_F7 */
+{284,	-1},     /* SHIFT_F8 */
+{285,	-1},     /* SHIFT_F9 */
+{286,	-1},     /* SHIFT_F10 */
+{287,	-1},     /* SHIFT_F11 */
+{288,   -1},     /* SHIFT_F12 0440-0411 = 23 */
+
+{289,   -1},     /* CTRL_F1 0441-0411 = 24 */
+{290,	-1},     /* CTRL_F2 */
+{291,	-1},     /* CTRL_F3 */
+{292,	-1},     /* CTRL_F4 */
+{293,	-1},     /* CTRL_F5 */
+{294,	-1},     /* CTRL_F6 */
+{295,	-1},     /* CTRL_F7 */
+{296,	-1},     /* CTRL_F8 */
+{297,	-1},     /* CTRL_F9 */
+{298,	-1},     /* CTRL_F10 */
+{299,	-1},     /* CTRL_F11 */
+{300,   -1},     /* CTRL_F12 0454-0411 = 35 */
+
+};
+
+#endif /* USER_FKEYS */
+
 
 int
 MapCursesKey (int c) {
 
+/** / dbgpr("MapCursesKey: c=%o\n", c);  / **/
+
     if( c < KEY_MIN || c > KEY_MAX ) {
 	return ERR;  /* defined in curses as -1, or ?? NOCHAR ?? */
     }
+
+#ifdef USER_FKEYS
+    /* User define KEY_Fn ? */
+
+    /*
+     * 0411 - 0424  (265-276):  KEY_F1 - KEY_F12
+     * 0425 - 0440  (277-288):  SHIFT_F1 - SHIFT_F12
+     * 0441 - 0454  (289-300):  CTRL_F1 - CTRL_F12
+     */
+    if (c >= 0411 && c <= 0454) {
+	int i = c - 0411;   /* i will be 0-11, 12-23, 24-35 */
+	if (UserFuncKeys[i].keycode >= 0) {
+	    return (UserFuncKeys[i].cmdval);
+	}
+    }
+#endif /* USER_FKEYS */
+
     switch( c ) {
 
-	case KEY_MOUSE:             /* enter/send key */
+	case KEY_MOUSE:             /* mouse event */
 	    return CCMOUSE;
 	case KEY_ENTER:             /* enter/send key */
 	    return CCRETURN;
@@ -4033,8 +4163,9 @@ MapCursesKey (int c) {
 	    return CCPLPAGE;
 	case KEY_PPAGE:             /* previous-page key */
 	    return CCMIPAGE;
+	case KEY_IC:                /* insert key */
+	    return CCINSMODE;
 
-	/* testing */
 	case 0414:
        /*   dbgpr("MapCursesKey:  F4 pressed\n"); */
 	    return NOCHAR;
@@ -4043,9 +4174,11 @@ MapCursesKey (int c) {
 	/*  dbgpr("MapCursesKey:  F5 pressed\n"); */
 	    return NOCHAR;
 
+#ifdef OUT
 	case KEY_F(2):
 	/*  dbgpr("MapCursesKey:  F2 pressed\n"); */
 	    return KEY_F(2);
+#endif /* OUT */
 
 	case KEY_F(6):
 	/*  dbgpr("MapCursesKey:  F6 pressed\n"); */
@@ -4107,3 +4240,74 @@ dbg_winlist() {
     }
     return;
 }
+
+
+#ifdef USER_FKEYS
+
+void
+addCursesFuncKey(char *line) {
+
+    extern S_looktbl itsyms[];     /* see e.iit.c */
+
+    int Fnum;           /* 1-12 for now */
+    char ecmd[32];
+    int i;
+    int cmdval = -1;
+
+    /* Offset into UserFuncKeys[]:
+     *    0 for F1-F1, 12 for SHIFT_F1-F12, and 24 for CTRL_F1-F12
+     */
+    int key_offset;
+
+    /* line eg, "KEY_F8:<+page>"  */
+
+    int l_offset = 0;
+
+    if (strstr(line, "KEY_")) {
+	l_offset = 3;
+	key_offset = 0;
+    }
+    else if (strstr(line, "SHIFT_")) {
+	l_offset = 5;
+	key_offset = 12;
+    }
+    else if (strstr(line, "CTRL_")) {
+	l_offset = 4;
+	key_offset = 24;
+    }
+    else {
+	dbgpr("addCursesFKey: bad format: %s\n", line);
+	return;
+    }
+
+    /* sscan the Fnumber, and ecmd:  omitting ending '>')  */
+    if (sscanf (line + l_offset, "_F%d:<%[^>]", &Fnum, ecmd) != 2) {
+	dbgpr("addCursesFKey: bad format: %s\n", line);
+	return;
+    }
+
+    if (Fnum < 1 || Fnum > 12) {
+	dbgpr("addCursesFuncKey:  FKey value (%d) not supported: 1-12\n", Fnum);
+	return;
+    }
+
+    int idx = Fnum + key_offset - 1;
+
+    for (i=0; itsyms[i].str != NULL; i++) {
+    /*  dbgpr("cmp (%s) to (%s)\n", itsyms[i].str, ecmd); */
+	if (strstr(itsyms[i].str, ecmd)) {
+	    cmdval = (int) itsyms[i].val;
+	    UserFuncKeys[idx].cmdval = cmdval;
+	    break;
+	}
+    }
+
+/** /
+    dbgpr("line=(%s)\n", line);
+    dbgpr("Fnum=%d ecmd=%s ECMD=%d idx=%d\n", Fnum, ecmd, cmdval, idx);
+/ **/
+    return;
+}
+
+#endif /* USER_FKEYS */
+#endif /* NCURSES */

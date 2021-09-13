@@ -1,0 +1,93 @@
+<del>:<bksp>
+^@:<cmd>
+^A:<cmd>
+^B:<-word>
+^C:<left>
+^D:<-line>
+^E:<-page>
+^F:<+line>
+^G:<home>
+#^H:<bksp>
+^H:<left>
+^I:<tab>
+^J:<down>
+^K:<up>
+^L:<right>
+^M:<ret>
+^N:<+word>
+^O:<open>
+^P:<pick>
+^R:<+page>
+^T:<-sch>
+^U:<mark>
+^V:<close>
+^W:<dchar>
+^Y:<+sch>
+^Z:<insmd>
+^\:<int>
+^]:<replace>
+#^]:<ret>
+^^:<ccase>
+^_:<edit>
+^X^A:<edit>
+^X^B:<split>
+^X^C:<cchar>
+^X^D:<dword>
+^X^E:<erase>
+#^X^E:<cmd>"exit"<ret>
+^X^F:<redraw>
+^X^H:<wleft>
+^X^I:<-tab>
+^X^J:<join>
+^X^L:<wright>
+^X^N:<dword>
+#^X^R:<replace>
+^X^P:<play>
+^X^R:<record>
+^X^T:<srtab>
+^X^U:<-tab>
+^X^W:<chwin>
+#^X^X:<cchar>
+#
+# raw xterm codes (0411-0454)
+#
+KEY_F1:<cmd>
+KEY_F2:<redraw>
+KEY_F3:<+word>
+KEY_F4:<-word>
+KEY_F5:<replace>
+#
+SHIFT_F1:<+page>
+SHIFT_F2:<-page>
+SHIFT_F3:<caps>
+SHIFT_F4:<ccase>
+SHIFT_F5:<insmd>
+#
+CTRL_F1:<split>
+CTRL_F2:<join>
+CTRL_F3:<mouse>
+CTRL_F4:<record>
+CTRL_F5:<play>
+#
+# gnome terminal:
+# gnome SHIFT-F1:
+<esc>"O1;2P":<+page>
+# gnome SHIFT-F2:
+<esc>"O1;2Q":<-page>
+# gnome SHIFT-F3:
+<esc>"O1;2R":<caps>
+# gnome SHIFT-F4:
+<esc>"O1;2S":<ccase>
+# gnome SHIFT-F5:
+<esc>"[15;2~":<-page>
+#
+# gnome CTRL-F1:
+<esc>"O1;5P":<undef>
+# gnome CTRL-F2:
+<esc>"O1;5Q":<split>
+# gnome CTRL-F3:
+<esc>"O1;5R":<join>
+# gnome CTRL-F4:
+<esc>"O1;5S":<record>
+# gnome CTRL-F5:
+<esc>"[15;5~":<play>

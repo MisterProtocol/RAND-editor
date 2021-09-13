@@ -1730,6 +1730,11 @@ dostop ()
 #endif /* SIGTSTP */
 #endif /* SIGNALS */
 
+#ifdef MOUSE_BUTTONS
+extern void overlayButtons();
+extern Flag optshowbuttons;
+#endif /* MOUSE_BUTTONS */
+
 #ifdef COMMENT
 void
 fresh ()
@@ -1745,6 +1750,14 @@ fresh ()
     d_write (image, screensize);
     redraw = NO;
     restcurs ();
+
+#ifdef MOUSE_BUTTONS
+#ifdef BUTTON_FONT
+    if (optshowbuttons)
+	overlayButtons();
+#endif
+#endif /* MOUSE_BUTTONS */
+
     return;
 }
 

@@ -65,6 +65,7 @@ S_looktbl keysyms[] = {
 #ifdef RECORDING
     {"record",  CCRECORD},
 #endif
+    {"redraw",  CCREDRAW},      /* added for KEY_F ekbfile support */
     {"replace", CCREPLACE},
     {"ret",     CCRETURN},
     {"right",   CCMOVERIGHT},

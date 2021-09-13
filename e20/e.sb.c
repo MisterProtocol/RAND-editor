@@ -159,13 +159,19 @@ char *getmypath ()
 #ifdef COMMENT
 void
 fixtty ()
-.
+
     Restore tty modes to original state.
 #endif
 void
 fixtty ()
 {
     d_put (0);
+
+#ifdef xNCURSES
+    resetty();
+/* /dbgpr("fixtty, calling resetty(), return\n");   / **/
+    return;
+#endif
 
     if (ostyflg) {
 #ifdef SYSIII
@@ -409,6 +415,9 @@ dofatal (Flag type, char *msg, va_list ap)
     if (ischild)
 	exit (-1);
     fixtty ();
+#ifdef NCURSES
+    endwin();
+#endif
     if (windowsup) {
 	screenexit (YES);
 	windowsup = NO;

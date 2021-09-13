@@ -211,7 +211,7 @@ my_getprogname()
 
 
 void
-getoptions(int check_only)
+getoptions(check_only)
 {
     register char *p;
 
@@ -324,7 +324,7 @@ getoptions(int check_only)
 
 
 void
-filterfiles(int check_only)
+filterfiles(check_only)
 {
     register FILE *f = (FILE *)-1;
 
@@ -398,7 +398,7 @@ filter()
 void
 doit()
 {
-    register int c = 1;
+    register int c = 1;     /* so we don't exit too early */
     register unsigned int n;
 
     for (n=1; n<start; ) {

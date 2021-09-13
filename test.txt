@@ -1,19 +1,8 @@
-Hello
-Here's text.
+Some text!
+No more.
+More stuff.
+Hello again!
 
-Put in some new stuff!
-Let's put a line in the middle.
-Inserting a line ending with a period
-Hey hey, another new line
+we're adding more text.
 
-abcde
-abqde
-abqde
-abqde
-abqde
-abqde
-abqde
-abqde
-abqde
-
-Here's a very long line that goes beyond the right margin at least it will when I get over that far which I've now done hooray for me I'm such a good boy!
+New version!

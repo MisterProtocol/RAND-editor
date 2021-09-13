@@ -9,7 +9,7 @@
 #define LINKS                   /* file system has links */
 #define CANFORK                 /* system has fork() */
 /* fine VFORK                   / * system has vfork() */
-#define ABORT_SIG SIGABRT       /* which signal does abort() use */
+#define ABORT_SIG SIGABRT       / * which signal does abort() use */
 /* fine SIGCHLD SIGCLD             */
 #define SIGARG                  /* signal catch routine has sig num as arg */
 #define SIG_INCL <signal.h>
@@ -35,10 +35,4 @@
 #endif
 #define TERMCAPFILE	"/usr/local/etc/termcap"
 
-#define NCURSES
-#ifdef NCURSES_MOUSE_VERSION
-#define NCURSES_MOUSE
-#endif
 
-/* for a recovery, show user places in keystroke file to halt replay */
-#define SHOWKEYS_INPLACE

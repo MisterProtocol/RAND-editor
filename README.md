@@ -3,14 +3,6 @@
 The RAND editor is one of the oldest text editors in existence.  It has
 features never duplicated by any other editor.
 
-It was in constant use at The RAND Corporation and elsewhere by a
-remarkably broad assortment of users, from secretaries and researchers
-up to the corporation President.  While other text editors have historically
-implemented features specifically for programmers and other professional
-users, the primary design criterion for the RAND editor was that it be
-immediately usable by anyone, regardless of their level of technical
-sophistication.
-
 The contents of this
 repository consist of the original code from RAND of e19, ported to Linux
 and called e19.59, and then ported to the Mac in 2021.
@@ -22,13 +14,10 @@ code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed below.
 
-As far as we are aware the code will compile on any version of Linux
-with either minimal or no changes.
-
 ### Branches
 
 It is intended that there be two branches in this repository, which will
-not be merged.  One branch (`original`) contains the code for the RAND editor as
+not be merged.  One branch (`original`)contains the code for the RAND editor as
 forward-ported to Linux and MacOS, but with no further additions
 made, except for bug fixes.  The second branch (`main`) contains code developed
 from the first branch,
@@ -40,8 +29,7 @@ systems.  The first branch, with the original code, reads terminal input
 in an idiosyncratic way, as it dates from a "do-it-yourself" era when
 third-party libraries were nonexistent.  The second branch handles mouse
 support by means of a completely rewritten input section, which uses
-`ncurses` to multiplex terminal and mouse input.  The `original` branch
-uses `curses`, but not `ncurses` in particular.
+`ncurses` to multiplex terminal and mouse input.
 
 ### Extra files
 
@@ -107,6 +95,30 @@ make use of `curses` to write to terminals that do not have built-in
 support.
 However, the newer version, with mouse support, uses the `ncurses`
 library to multiplex input from the mouse.
+#### NCURSES versions
+Currently, the editor appears to compile and run without problems
+with the ncurses library versions 5.4 and 5.7, using the
+terminfo files distributed with those library versions.
+The editor also compiles and runs with the 6.2 ncurses library, but
+we ran into a problem initializing mouse position reporting
+using the 6.2 distributed terminfo "xterm-256color" file.
+
+(The issue, for those interested,
+is in the mouse initialization and parsing definitions used in the
+terminfo entries "XM" and "kmous".)
+
+An alternative, if using the terminfo files distributed with ncurses-6.2
+is to compile and use the terminal definition "xterm-256color-a"
+in the "terminfo" subdirectory.  If this is compiled into "~/.terminfo",
+the editor will run without problems.  Other alternatives are to use a XTERM
+setting of xterm-1002, xterm-1003, or xterm-x11mouse.
+We also added a -mouseinit=value
+option to specify a custom mouse initialization.
+
+On the Mac, we recommend installing and using the third-party program
+"iTerm2", available at http://iterm2.com.  Using "TERM=iTerm2", the
+editor runs fine when compiled against ncurses-6.2.
+
 
 ### Filter Programs
 
@@ -163,14 +175,6 @@ Currently, option "2" recovers the previous session, so answering
 session.  If those keystrokes were "<cmd>b q<ret>", this would prevent
 the editor from exiting at the end of the recovery.
 
-The `main` branch of the editor now has code which will allow the
-functionality of `showkeys` to be invoked from within the editor
-at the point where the users is choosing recovery options as described
-in the previous paragraph.  The user may ask the editor (by picking
-option "2 ?") to show plausible points at which the recovery may be
-terminated early, to prevent whatever condition caused the editor to
-exit abnormally.
-
 ### Ancillary Files ###
 
 At times, the editor must display messages longer than a single line to
@@ -202,31 +206,18 @@ out on the whole `config` thing by quite a few decades.  Frankly, I'm
 surprised it even uses `make`.  It didn't used to.  In the old days it was
 compiled by a shell script.
 
-### Highlighting
-
-This version of the editor supports highlighting of **MARK**ed
-text using colors,
-on terminals which support colored text.  The default highlighting
-uses dark text on a light gray background.  Arbitrary colors may be chosen
-instead using command-line arguments; see the man page for details.
-
-To assist in choosing pleasing colors, a directory `t_xcolor` is included
-with programs to display possible color combinations.  N.B.: These programs
-have not been extensively tested on a variety of systems; some work
-may be needed to compile them.
-
 ### What to Do First
 
 Read the `README` file.  Read the top level `Makefile`, and `e19/Makefile`.
 Do what those Makefiles say.  The most common way to build the editor,
 after everything has been set up, is to say `make clean bsd` or
-`make clean s5` at the top level. 
+`make clean s5` at the top level.
 Before installing, you should test the editor.  The editor executable
 is left in `e19/le`.  The origin of the name `le` as opposed to `e`
 is lost to history.
 Note that this will not build the
 filter executables or the `man` files.  Look in the subdirectories
-such as `fill` and `man` for those.  The top-level Makefile has 
-additional targets "etc", "help", "clean", "bsd.man" and 
+such as `fill` and `man` for those. The top-level Makefile has
+additional targets "etc", "help", "clean", "bsd.man" and
 "s5.man" which will be useful. Finally, `make bsd.install` or
 `make s5.install` will install the editor on your system.

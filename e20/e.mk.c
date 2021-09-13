@@ -19,11 +19,16 @@ extern Uchar *image;
 
 /* highlight modes, see cmd: set highlight */
 extern char *smso, *rmso, *bold_str, *setab, *setaf, *sgr0, *setab_p, *setaf_p, *hilite_str;
+extern char *brace_p;   /* hilight mode for brace matching */
 extern char *fgbg_pair;
 
 void highlightarea(Flag setmode, Flag redrawflg);
 void HiLightLine(int line, Flag setmode);
 void HiLightRect(int from, int to, int mrkcol, int ccol);
+
+/*void HiLightBraces();*/
+void HiLightBracePairs();
+int brace_marked;
 /*void dbg_showMarkInfo();*/
 Flag highlight_mode = YES;
 Flag redrawflg; /* set after CMD: redraw */
@@ -31,6 +36,9 @@ Flag redrawflg; /* set after CMD: redraw */
 int Pch(int ch) { putchar(ch); return (0); }
 
 extern void markprev ();
+
+/* brace matching/highlighting */
+int bracematching;
 
 #ifdef COMMENT
 void
@@ -248,10 +256,12 @@ highlightarea(Flag setmode, Flag redrawflg) {
     static int last_cursorline = -1;
 
     if (setmode == NO) {
-	for (i = last_top; i<= last_bot; i++) {
+	for (i = last_top; i <= last_bot && i > 0; i++) {
 	    HiLightLine(i, NO);
 	}
 	last_top = last_bot = last_marklines = last_cursorline = last_col = -1;
+	poscursor(cursorcol, cursorline);
+	d_put(0);
 	return;
     }
 
@@ -277,7 +287,11 @@ topmark(), marklines, markcols, cursorline, cursorcol, curwin->btext);
 dbgpr(" curwksp->wlin=(%d), curmark->mrkwinlin=(%d), mrklin=(%d)\n",
     curwksp->wlin, curmark->mrkwinlin, curmark->mrklin);
 / **/
-/*dbg_showMarkInfo("hilite");*/
+
+/** /
+dbgpr("highlightarea:  curmark:  mrkwincol=%d, mrkwinlin=%d, mrkcol=%d, mrklin=%d wcol=%d\n\n",
+    curmark->mrkwincol, curmark->mrkwinlin, curmark->mrkcol, curmark->mrklin, curwksp->wcol);
+/ **/
 
     if (firsttime) {  /* hilite just one line */
 	top_line = cursorline + curwin->ttext;  /* omit top border */
@@ -287,25 +301,32 @@ dbgpr(" curwksp->wlin=(%d), curmark->mrkwinlin=(%d), mrklin=(%d)\n",
 	last_marklines = marklines;
 	last_cursorline = cursorline;
 	last_col = cursorcol;
-	HiLightLine(top_line, YES);
-      /*dbgpr("firsttime\n"); */
 	firsttime = 0;
-	return;
+	if (markcols == 0) {    /* added for dragging */
+	    HiLightLine(top_line, YES);
+/*          dbgpr("firsttime, returning after making top_line\n"); */
+	    return;
+	}
+	else {
+/*          dbgpr("firsttime, continue to mark rectangle\n"); */
+	}
     }
 
     /*   no action needed when cursor motion is suppressed, eg,
      *   moving up at line 1 of a file, or left at col 1
      */
-    if (marklines == last_marklines && cursorline == last_cursorline
-	    && cursorcol == last_col && redrawflg == NO) {
-  /** / dbgpr("no highlighting needed...\n"); / **/
-	return;
+    if (markcols == 0) {  /* added for draging */
+	if (marklines == last_marklines && cursorline == last_cursorline
+		&& cursorcol == last_col && redrawflg == NO && loopflags.hold == NO) {
+      /** / dbgpr("***** no highlighting needed...\n"); / **/
+	    return;
+	}
     }
 
-/*
+/** /
 dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=%d firsttime=%d infoline=%d\n",
   redrawflg, last_top, last_bot, last_col, last_marklines, firsttime, infoline);
-*/
+/ **/
     if (redrawflg) {    /* eg, CMD: redraw */
 	if (cursorcol == curmark->mrkcol) {
 	    for (i = last_top; i <= last_bot; i++)
@@ -318,9 +339,9 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
     }
 
 
-    /*  clear previous mark */
-    /*for (i = last_top; i<= last_bot; i++)*/
-    for (i = curwin->ttext; i < curwin->bmarg; i++)
+    /*  clear previous mark, no need to clear entire window */
+/*  for (i = curwin->ttext; i < curwin->bmarg; i++) */
+    for (i = last_top; i <= last_bot; i++)
        HiLightLine(i, NO);
 
     /*   The cursor line is always either at the top or bottom
@@ -334,13 +355,15 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
     else if (cursorline == curwin->btext) {
 	if (topmark() < curwksp->wlin) {
 	    top_line = curwin->ttext;
-	    bot_line = curwin->btext + 1;
+	    /*bot_line = curwin->btext + 1;*/
+	    bot_line = curwin->ttext + curwin->btext;
 /** / dbgpr("1a: cursor=bottom, topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	else {
 	    top_line = curwin->ttext + topmark() - curwksp->wlin;
 	    /*bot_line = top_line + marklines - 1;*/
-	    bot_line = curwin->btext + 1;
+	    /*bot_line = curwin->btext + 1; */
+	    bot_line = curwin->ttext + curwin->btext;
 	}
 /** /  dbgpr("1: cursorline == btext, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
@@ -353,8 +376,8 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	else {
 	    bot_line = top_line + marklines - 1;
 	}
-	if( bot_line > curwin->btext ) {
-	    bot_line = curwin->btext + 1;
+	if (bot_line > curwin->ttext + curwin->btext) {
+	    bot_line = curwin->ttext + curwin->btext;
 	}
 /** / dbgpr("2:  cursorline == 0, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
     }
@@ -367,7 +390,7 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	}
 	else if (curmark->mrkwinlin == curwksp->wlin) {
 	    if (cursorline > curmark->mrklin) {
-	       top_line = curwin->ttext + curmark->mrklin;
+		top_line = curwin->ttext + curmark->mrklin;
 		bot_line = top_line + marklines - 1;
 	    }
 	    else {
@@ -378,10 +401,10 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	}
 	/* topmark() on current screen */
 	else if (curwksp->wlin < topmark()) {
-	    top_line = topmark() - curwksp->wlin + 1;
+	    top_line = curwin->ttext + topmark() - curwksp->wlin;
 	    bot_line = top_line + marklines - 1;
-	    if (bot_line > curwin->btext+1)
-		bot_line = curwin->btext+1;
+	    if (bot_line > curwin->ttext + curwin->btext)
+		bot_line = curwin->ttext + curwin->btext;
 /** / dbgpr("5: wlin < topmark(), top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	else {
@@ -405,16 +428,24 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n\n",
      *  size when moving several pages.  Todo, rethink this...
      */
 
-    if (bot_line > curwin->btext+1) {
-/** /dbgpr("***bot_line out of range (%d)\n", bot_line); / **/
-	bot_line = curwin->btext + 1;
+    if (bot_line > curwin->ttext + curwin->btext) {
+/** / dbgpr("***bot_line out of range (%d), btext=%d ttext=%d\n",
+	bot_line, curwin->btext, curwin->btext);
+/ **/
+	bot_line = curwin->ttext + curwin->btext + 1;
     }
+
     if (top_line <= 0) {
 /** /dbgpr("*** top_line out of range (%d)\n", top_line); / **/
 	top_line = curwin->ttext;
     }
 
     savecurs();
+
+/** /
+dbgpr("top_line=%d, bot_line=%d, last_top=%d, last_bot=%d\n",
+top_line, bot_line, last_top, last_bot);
+/ **/
 
     if (markcols == 0) { /* entire lines */
 	for (i = top_line; i <= bot_line; i++) {
@@ -455,6 +486,9 @@ HiLightLine(int line, Flag setmode) {
     int w = term.tt_width;
     char buf[w+1];
 
+    if (line < 0)
+	return;
+
     char *cp = (char *)image + w*line;
 
     /*  use curwin->lmarg and curwin->rtext to account for any windows,
@@ -462,12 +496,12 @@ HiLightLine(int line, Flag setmode) {
      */
     int wid = curwin->rmarg - curwin->lmarg;
 
-/**
-if (setmode == YES)
-dbgpr("HiLi: wid=%d lmarg=%d ltext=%d, rmarg=%d, rtext=%d mrkwincol=%d mrkcol=%d wksp->wcol=%d wksp->wlin=%d\n",
-wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
+/** /
+if (1 || setmode == YES)
+dbgpr("HiLightLine: setmode=%d line=%d wid=%d lmarg=%d ltext=%d, rmarg=%d, rtext=%d mrkwincol=%d mrkcol=%d wksp->wcol=%d wksp->wlin=%d\n",
+setmode, line, wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
 curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
- **/
+/ **/
 
     snprintf(buf, wid, "%s", cp+curwin->ltext);
     mvcur(-1,-1, line, curwin->ltext);
@@ -497,7 +531,6 @@ if (setmode == YES)
 /*
  *   visually mark a portion of a line
  */
-
 void
 HiLightRect(int from, int to, int mrkcol, int curcol) {
 
@@ -570,7 +603,7 @@ HiLightRect(int from, int to, int mrkcol, int curcol) {
 
 
     /* marked area lies partly to right of our window */
-/*    if (beg_mark + mark_len > curwin->rtext) { */
+/*  if (beg_mark + mark_len > curwin->rtext) { */
     if (beg_mark + mark_len > curwin->rmarg) {
 	mark_len = curwin->rtext - beg_mark;
 	if (mark_len <= 0 )
@@ -602,11 +635,437 @@ beg_mark, markcols, curcol, adj_markcol, from, to);
 	puts(buf);
 	tputs(sgr0, 1, Pch);  /* end hilite mode */
 
-	/* dbgpr("marked area=(%s)\n", buf); */
+	/** / dbgpr("marked area=(%s)\n", buf); / **/
 
     }
     fflush(stdout);
 
     return;
 }
+
+
+#ifdef OUT
+/*
+ *   visually mark all {}
+ */
+void
+HiLightBraces(int set) {
+
+    int w = term.tt_width;
+    char buf[w+1];
+    char *cp;
+
+    int beg_mark;
+    int line;
+    int from, to;
+    int lcol, rcol;
+    int mark_len;
+    int wid;
+
+    /*
+     * adj_markcol, initially set to curmark->mrkcol, needs to be
+     * adjusted to account for various window shifts.  If the marked area
+     * is increasing to the right, the marked area ends one char before
+     * the cursor position; if increasing to the left, the marked area
+     * starts at the cursor position.
+     */
+
+    from = curwin->ttext;
+    to = curwin->ttext + curwin->btext;
+    lcol = curwin->ltext;
+    rcol = curwin->rtext;
+
+/** /
+dbgpr("from=%d, to=%d, lcol=%d, rcol=%d\n", from, to, lcol, rcol);
+dbgpr("HiLiBrace: curwin->ttext=%d, curwin->btext=%d, curwin->ltext=%d, curwin->rtext=%d\n",
+    curwin->ttext, curwin->btext, curwin->ltext, curwin->rtext);
+dbgpr("curwin->tmarg=%d, curwin->bmarg=%d, curwin->lmarg=%d, curwin->rmarg=%d\n",
+    curwin->tmarg, curwin->bmarg, curwin->lmarg, curwin->rmarg);
+dbgpr("curwksp->wlin=%d, curwksp->wcol=%d cursorline=%d cursorcol=%d\n\n",
+   curwksp->wlin, curwksp->wcol, cursorline, cursorcol);
+/ **/
+
+    int i;
+    int ch;
+    int nMatches = 0;
+    int done = 0;
+
+    int cursor_char;    /* current cursor char */
+    int cursor_screenline = cursorline + curwin->ttext;
+
+
+    char *h_str;
+    for (line = from; line <= to; line++) {
+	cp = (char *)image + w*line;
+
+	for (i=lcol; i<=rcol; i++) {
+	    if (*(cp+i) == '{' || *(cp+i) == '}') {
+		ch = *(cp+i);
+		nMatches++;
+
+		/** /
+		dbgpr("found %c at line %d col %d, cursor_screenline=%d nMatches=%d\n",
+		    ch, line, i, cursor_screenline, nMatches);
+		/ **/
+		mvcur(-1,-1, line, i);
+
+		if (set) {
+		    tputs(hilite_str, 1, Pch);
+		    putc(ch,stdout);
+		    tputs(sgr0, 1, Pch);  /* end hilite mode */
+		}
+		else {
+		    putc(ch);
+		}
+	    }
+	}
+	if (done) break;
+    }
+
+    int col = cursorcol;
+    int lin = cursorline;
+    cursorcol = cursorline = -1;
+    poscursor(col, lin);
+    d_put(0);
+    mvcur(-1, -1, cursor_screenline, cursorcol+1);
+    fflush(stdout);
+
+    return;
+
+}
+#endif /* OUT */
+
+/*
+ *   visually mark matching {} pairs
+ */
+void
+HiLightBracePairs(int set) {      /* 0 when we're only clearing a mark */
+
+    int w = term.tt_width;
+    char buf[w+1];
+    char *cp;
+
+    int line;
+    int from, to;
+    int lcol, rcol;
+
+    /* save these values to clear the last marked end brace */
+    static int last_y = 0;
+    static int last_x = 0;
+    static int last_wlin = 0;
+/*  static int last_ch = '\0'; */
+    static char last_ch_type;      /* R=closing, L=opening */
+
+    from = curwin->ttext;
+    to = curwin->ttext + curwin->btext;
+    lcol = curwin->ltext;
+    rcol = curwin->rtext;
+
+/** /
+dbgpr("-----\n");
+dbgpr("ttext=%d, btext=%d, lcol=%d, rcol=%d\n", from, to, lcol, rcol);
+
+dbgpr("HiLiBrace: curwin->ttext=%d, curwin->btext=%d, curwin->ltext=%d, curwin->rtext=%d\n",
+    curwin->ttext, curwin->btext, curwin->ltext, curwin->rtext);
+
+dbgpr("curwin->tmarg=%d, curwin->bmarg=%d, curwin->lmarg=%d, curwin->rmarg=%d\n",
+    curwin->tmarg, curwin->bmarg, curwin->lmarg, curwin->rmarg);
+
+dbgpr("curwksp->wlin=%d, curwksp->wcol=%d cursorline=%d cursorcol=%d\n\n",
+   curwksp->wlin, curwksp->wcol, cursorline, cursorcol);
+/ **/
+
+    /** /
+    dbgpr("check unmark %c at (%d,%d) wlin=%d lwlin=%d\n",
+	last_ch, last_y, last_x, curwksp->wlin, last_wlin);
+    / **/
+
+    int end_ch;
+
+    int cursor_ch;    /* char pointed to by cursor */
+    int cursor_screenline = cursorline + curwin->ttext;
+    from = cursor_screenline;
+    int cursor_screencol = cursorcol + lcol;
+
+/** /
+dbgpr("cursorline=%d cursor_screenline=%d cursorcol=%d cursor_screencol=%d\n",
+   cursorline, cursor_screenline, cursorcol, cursor_screencol);
+/ **/
+
+    /* clear previous highlight ch, if still on current screen */
+    if (last_y > 0) {
+	if (last_wlin >= curwksp->wlin && last_wlin <= (curwksp->wlin + curwin->btext)) {
+	    if (last_wlin < curwksp->wlin) {
+		last_y -= (curwksp->wlin - last_wlin);
+	    }
+	    else if (last_wlin > curwksp->wlin) {
+		last_y += (last_wlin - curwksp->wlin);
+	    }
+
+	    /* for some reason, redrawing only the rt matching brace
+	     * left an earlier portion of the line messed up, so we'll
+	     * try redrawing the line upto and including the rt brace
+	     */
+
+	    cp = (char *)image + w*last_y;
+	/*  int wid = curwin->rtext - curwin->ltext;  */ /* not whole line */
+	    int wid = last_x - curwin->ltext + 2;   /* +1 for marg char, +1 for rt brace */
+	    mvcur(-1, -1, last_y, curwin->ltext);
+	    snprintf(buf, wid, "%s", cp+curwin->ltext);
+	    tputs(buf,1,Pch);
+	    /** /
+	    dbgpr("clear, buf='%s'\n", buf);
+	    / **/
+	    /* restoring the cursor doesn't work well when
+	     * one is scrolling using the arrow keys (or LT, RT keys).
+	     * Searching for an opening brace, or tabbing works ok
+	     * w/o this...
+	     */
+
+	    int col = cursorcol;
+	    int lin = cursorline;
+	    cursorcol = cursorline = -1;
+
+	    poscursor(0,0); /* probably don't need this now... */
+	    d_put(0);
+	    poscursor(col,lin);
+	    d_put(0);
+
+	    mvcur(-1, -1, cursor_screenline, cursor_screencol);
+	    last_y = last_x = 0;
+	    /** /
+	    dbgpr("unmark %c at (%d,%d), then moving cur back to (%d,%d)\n",
+		    last_ch, last_y, last_x, cursor_screenline, cursor_screencol );
+	    / **/
+	    fflush(stdout);
+	    brace_marked = 0;
+	}
+    }
+
+    if (set == 0)   /* we're only clearing prev mark */
+	return;
+
+/** /
+dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_screencol=(%d,%d)\n",
+   cursorline, cursorcol, cursor_screenline, cursor_screencol );
+/ **/
+
+    /* if we're not pointing at an opening brace, eg '{', return */
+    int i;
+    cp = (char *)image + cursor_screenline*w;
+    i = cursorcol + lcol;
+    cursor_ch = *(cp+i);
+
+/** /dbgpr("cursor_ch=%c\n", cursor_ch); / **/
+
+    /* if cursor isn't pointing at an opening brace, return */
+    switch (cursor_ch) {
+	case '{':
+	    end_ch = '}';
+	    last_ch_type = 'R';
+	    break;
+	case '(':
+	    end_ch = ')';
+	    last_ch_type = 'R';
+	    break;
+	case '[':
+	    end_ch = ']';
+	    last_ch_type = 'R';
+	    break;
+	case '}':
+	    end_ch = '{';
+	    last_ch_type = 'L';
+	    break;
+	case ')':
+	    end_ch = '(';
+	    last_ch_type = 'L';
+	    break;
+	case ']':
+	    end_ch = '[';
+	    last_ch_type = 'L';
+	    break;
+	default:
+	    return;
+    }
+
+#ifdef OUT
+/* if we want to do this, need add vars to keep
+ * track of position in order to clear it next time
+ */
+
+    /* Cursor is resting on opening brace.
+     * Do we want to hilight it in some other way?
+     */
+    mvcur(-1, -1, cursor_screenline, cursor_screencol);
+    if( curs_set(0) == ERR)
+	dbgpr("curs_set rc=ERR\n");
+    tputs(hilite_str, 1, Pch);
+    /*tputs(smso, 1, Pch);*/
+    fputc(cursor_ch, stdout);
+    tputs(sgr0, 1, Pch);
+    fflush(stdout);
+#endif
+
+    /*  Keep a tally of left braces found before an ending one.
+     *  Have a match when we find an end brace and cnt returns to 0.
+     */
+    int cnt = 0;
+    int found_match = 0;
+
+    if (last_ch_type == 'R') {  /* look for closing brace */
+	/** /
+	dbgpr("closing brace search, from=%d to=%d\n", from, to);
+	/ **/
+	for (line = from; line <= to; line++) {
+	/** /dbgpr("checking line %d for }, cnt=%d\n", line, cnt); / **/
+	    cp = (char *)image + w*line;
+	    for (i=lcol; i<=rcol; i++) {
+		if (*(cp+i) == cursor_ch) {
+		    /* don't include the chars left of cursor, or the one cursor is pointing at */
+		    if (line == cursor_screenline && i <= (cursor_screencol))
+			continue;
+		    cnt++;
+		    /*dbgpr("got %c, cnt=%d\n", cursor_ch, cnt);*/
+		    continue;
+		}
+
+		if (*(cp+i) == end_ch) {
+		    /* on the cursor line, don't include matches left of the cursor */
+		    if (line == cursor_screenline && i <= (cursor_screencol))
+			continue;
+		    if (cnt > 0) {
+		       /*dbgpr("got %c at col=%d, cnt=%d\n", end_ch, i, cnt);*/
+		       cnt--;
+		       continue;
+		    }
+		    /** /
+		    dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wlin=%d\n\n",
+			end_ch, line, i, cursor_screenline, cursor_screencol, curwksp->wlin);
+		    / **/
+		    found_match = 1;
+		}
+		if (found_match) break;
+	    }
+	    if (found_match) break;
+	}
+    }
+    else {  /* look for opening brace */
+	from = curwin->ttext + cursorline;
+	to = curwin->ttext;
+	/** /
+	dbgpr("open brace search, from=%d to=%d\n", from, to);
+	/ **/
+	for (line = from; line >= to; line--) {
+	    /** /
+	    dbgpr("checking line (reverse) %d for %c, cnt=%d\n", line, end_ch, cnt);
+	    / **/
+	    cp = (char *)image + w*line;
+	    for (i=rcol; i>=lcol; i--) {
+		if (*(cp+i) == cursor_ch) {
+		    /* don't include the chars right of cursor, or the one cursor is pointing at */
+		    if (line == cursor_screenline && i >= (cursor_screencol))
+			continue;
+		    cnt++;
+		    /*dbgpr("got %c, cnt=%d\n", cursor_ch, cnt);*/
+		    continue;
+		}
+
+		if (*(cp+i) == end_ch) {
+		    /* on the cursor line, don't include matches right of the cursor */
+		    if (line == cursor_screenline && i >= (cursor_screencol))
+			continue;
+		    if (cnt > 0) {
+		       /*dbgpr("got %c at col=%d, cnt=%d\n", end_ch, i, cnt);*/
+		       cnt--;
+		       continue;
+		    }
+		    /** /
+		    dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wlin=%d\n\n",
+			end_ch, line, i, cursor_screenline, cursor_screencol, curwksp->wlin);
+		    / **/
+		    found_match = 1;
+		}
+		if (found_match) break;
+	    }
+	    if (found_match) break;
+	}
+	/*dbgpr("reverse match not implemented yet.\n");*/
+    }
+
+    if( !found_match ) {
+	char msg[128];
+	snprintf(msg, 128, " Matching %c not found on this screen.", end_ch);
+/** /   dbgpr(" matching %c not found on this screen", end_ch);  / **/
+	mesg(ERRALL + 1, msg);
+	return;
+    }
+
+
+    int match_col = i;
+
+    /* Highlight matching brace */
+    mvcur(-1,-1, line, match_col);
+/** /
+    dbgpr("moving to line %d col %i to highlight %c\n", line, match_col, end_ch);
+/ **/
+
+    /* save these in order to clear the mark, next time */
+    last_y = line;
+    last_x = match_col;
+    last_wlin = curwksp->wlin;
+/*  last_ch = end_ch; */
+
+    /*tputs(hilite_str, 1, Pch);*/
+    /*tputs(smso, 1, Pch);*/
+    tputs(brace_p, 1, Pch);
+    fputc(end_ch, stdout);
+    tputs(sgr0, 1, Pch);
+
+    fflush(stdout);
+
+    brace_marked = 1;
+
+
+/*DebugVal=1;*/
+
+    /*  redraw first part of line, something
+     *  is getting messed up when closing brace is found
+     */
+    if (last_ch_type == 'R') {
+	cp = (char *)image + w*line;
+	int wid = last_x - curwin->ltext + 1;   /* redraw upto the ending match char */
+	mvcur(-1, -1, last_y, curwin->ltext);
+	snprintf(buf, wid, "%s", cp+curwin->ltext);
+	tputs(buf,1,Pch);
+    /** /
+	dbgpr("buf='%s'\n", buf);
+    / **/
+    }
+
+    /* seem to have trouble restoring cursor
+     * to original position; this seems to help
+     */
+    int col = cursorcol;
+    int lin = cursorline;
+
+    cursorcol = cursorline = -1;
+
+
+    poscursor(0,0);
+    d_put(0);
+    poscursor(col, lin);
+    d_put(0);
+
+    mvcur(-1, -1, cursor_screenline, cursor_screencol);
+    fflush(stdout);
+
+/** /
+dbgpr(" calling poscursor(%d,%d)  mvcur(-1,-1, %d,%d)\n",
+col, lin, cursor_screenline, cursor_screencol);
+/ **/
+
+    return;
+
+}
+
 

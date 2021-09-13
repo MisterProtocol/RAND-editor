@@ -54,15 +54,6 @@ TERMCAP = $(E_TCLIB)
 # remove o/e.tt.o
 # ---end 2/21/2020 comments
 
-# -- comment by MOB 5/25/21
-# If the Make of e19 fails because of a syntax error in the automatically generated file e.r.c,
-# chances are that your shell and/or your C compiler follow different rules than the ones that
-# went into generating the flavor of "vers.sh" for your system.  Right now there are two versions,
-# "vers.bsd.sh" (for BSD-derived systems like the Mac) and "vers.s5.sh" (for Linux).  If e.r.c blows
-# up, try using the other "vers.sh" file.  The only difference is in the number of backslashes (ugh).
-# -- end comment by MOB 5/25/21
-
-
 CC      = cc
 RM      = rm -f
 
@@ -110,6 +101,7 @@ CFILES  = \
 	e.record.c \
 	e.ru.c \
 	e.sb.c \
+	e.showkeys.c \
 	e.se.c \
 	e.sv.c \
 	e.t.c \
@@ -127,7 +119,7 @@ all:
 	cd ..; make linux
 
 
-$(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
+$(E):   $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
 #       $(LD) $(LDFLAGS) /lib/crt0.o
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 	   $(O)e.main.o $(O)e.o $(O)e.pa.o $(O)e.iit.o $(O)e.q.o \
@@ -151,31 +143,22 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 #       $(MIS2LIB)
 
 
-ofiles: $(O) $(OFILES) $(OLA) $(OFFL)
-
-$(O):
-	-mkdir $(O)
-
-$(OLA):
-	-mkdir $(OLA)
-
-$(OFFL):
-	-mkdir $(OFFL)
+ofiles: $(OFILES)
 
 newrev:
-	/bin/sh $(NEWVERSION)
+	/bin/bash $(NEWVERSION)
 	$(CC) $(CFLAGS) $(INCL) -c e.r.c
 	mv e.r.o $(O)e.r.o
 
-$(LALIB): $(OLA)
+$(LALIB):
 
-$(FFLIB): $(OFFL)
+$(FFLIB):
 
 $(MISCLIB):
 
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
 depend:
-	/bin/sh Makedep $(HFILES) $(CFILES)
+	/bin/bash Makedep $(HFILES) $(CFILES)
 
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
 Comments: $(CFILES)
@@ -314,10 +297,6 @@ $(O)e.se.o: e.se.c
 	$(CC) $(CFLAGS) $(INCL) -c e.se.c
 	mv e.se.o $(O)e.se.o
 
-#$(O)e.showkeys.o: e.showkeys.c
-#        $(CC) $(CFLAGS) $(INCL) -c e.showkeys.c
-#        mv e.showkeys.o $(O)e.showkeys.o
-
 $(O)e.sv.o: e.sv.c
 	$(CC) $(CFLAGS) $(INCL) -c e.sv.c
 	mv e.sv.o $(O)e.sv.o
@@ -418,6 +397,9 @@ $(O)e.main.o: e.h
 $(O)e.mk.o: e.h
 $(O)e.mk.o: e.inf.h
 $(O)e.mk.o: e.m.h
+$(O)e.mouse.o: e.h
+$(O)e.mouse.o: e.m.h
+$(O)e.mouse.o: e.cm.h
 $(O)e.nm.o: e.h
 $(O)e.nm.o: e.inf.h
 $(O)e.nm.o: e.m.h

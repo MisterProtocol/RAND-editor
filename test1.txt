@@ -1,0 +1,19 @@
+This is the first line.
+This is the second line.
+Line 3 is gone again.
+This is the fourth line, with a blank line above.
+Line 5.
+This is the sixth line.
+
+Yay!
+
+Here is a bunch of text.  We've got a lot of keystrokes to enter, so I can't
+just cut and paste.  I have to do an honest day's work to test this out.
+
+But we can leave the occasional blank line with no problems.  We just have
+to ensure that the total number of keystrokes is large enough to get the job done.
+
+Here (is) a {brace matching} test including [brackets and such].
+
+
+	       A line for fun.

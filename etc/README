@@ -2,3 +2,13 @@
 Copy the keyboard files to $LIB (typically /usr/local/etc/e).
 
 Usage eg.: 'setenv EKBFILE $LIB/kb.sun'.
+
+kb_ncurses is a sample keyboard file that allows definition of actions for
+function keys, e.g. KEY_F2, etc.  Note that this file depends upon code
+present in the "ncurses" library which is not supported by the non-mouse
+version of the editor, so that if e19 and e20 editors are in simultaneous
+use on your system, it is wise to put the keyboard files for the two version
+in different places, and use the EKBFILE and EKBFILE_NCURSES environment
+variables to keep them in separate places.  e20 will use EKBFILE
+if EKBFILE_NCURSES is not set, otherwise it will use EKBFILE_NCURSES.
+The non-mouse version of the editor will only use EKBFILE.

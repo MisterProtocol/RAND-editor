@@ -2,11 +2,18 @@
 #include <stdint.h>
 
 #define M1L -1L
-int64_t
 
 
 main()
 {
+	int i = abs(3 - 4)+1;
+	printf("i=%d\n", i);
+
+	i = abs(4 - 3)+1;
+	printf("i=%d\n", i );
+	exit(1);
+
+
 /*
 	Test1(1);
 	Test1(-1);

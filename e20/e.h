@@ -17,7 +17,12 @@
 #define USE_MKSTEMP     /* instead of mktemp which is unsafe */
 #endif /* GCC */
 
+
 /* various options.  All should be turned on. */
+
+/* for a recovery, show places in keystroke file to halt replay */
+#define SHOWKEYS_INPLACE
+
 #define RECORDING       /* simple record/playback facility */
 #define STARTUPFILE     /* .e_profile startup mechanism */
 #define TRACK           /* track command */
@@ -47,11 +52,53 @@
 /** ine LMCSRMFIX       / * Replace "stuck at rt margin" with reasonable sub */
 /** #define VBSTDIO		/ * Can't cheat by using _sobuf -- it doesn't exist */
 
+
+/*
+ * Our use of ncurses is primarily for low-level support of the mouse.
+ * Curses is not (yet) used to handle screen management of text and windows.
+ */
+
 #include <ncurses.h>
 #include <term.h>
 
 #include <c_env.h>
 #include <localenv.h>
+
+#define NCURSES
+#ifdef NCURSES_MOUSE_VERSION
+#define NCURSES_MOUSE
+#define MOUSE_BUTTONS
+
+#define USER_FKEYS  /* ekbfile:  KEY_F[1-10]:<efunc>  (eg: <+page>) */
+
+#ifdef NCURSES_MOUSE
+#ifdef MOUSE_BUTTONS  /* experimental */
+/* MOUSE_BUTTONS displays a row of E function keys (eg, "+Pg/-Pg") at the bottom
+ * of the screen that can be useful for "hands-off" browsing through a file.
+ * The option -showbuttons enables this feature.
+ */
+
+#define BUTTON_FONT  /* highlight the buttons in eg, bold */
+
+typedef struct button_table {
+    short bnum;
+    short begx;
+    short endx;
+    int   ecmd;
+    char *label;
+} mouse_button_table;
+
+
+/*
+ * USE_MOUSE_POSITION enables mouse selecting and highlighting text.
+ * In the 1980s, we called this "marking".
+ */
+#define USE_MOUSE_POSITION
+
+
+#endif /* MOUSE_BUTTONS */
+#endif /* NCURSES_MOUSE */
+#endif /* NCURSEs */
 
 #ifdef UNIXV7
 #include <sys/types.h>
@@ -211,7 +258,7 @@ typedef Small Cmdret;           /* comand completion status */
 #define TABCOL 8                /* num of cols per tab character        */
 
 #define NENTERLINES 1           /* number of ENTER lines on screen      */
-#define NINFOLINES 1            /* number of ENTER lines on screen      */
+#define NINFOLINES 1            /* number of INFO lines on screen      */
 #define NPARAMLINES (NENTERLINES + NINFOLINES)
 
 #define FILEMODE 0644           /* mode of editor-created files         */
@@ -423,7 +470,8 @@ S_window       *winlist[MAXWINLIST],
 	       *curwin,         /* current editing win                  */
 		wholescreen,    /* whole screen                         */
 		infowin,        /* window for info                      */
-		enterwin;       /* window for CMD and ARG               */
+		enterwin,       /* window for CMD and ARG               */
+		buttonwin;      /* window for function buttons          */
 extern
 Small   nwinlist;
 
@@ -532,8 +580,12 @@ typedef struct savebuf {
 #ifdef NCURSES
 #define CCMOUSE        0236
 #define CCMOUSEONOFF   0237
+#define CCBRACE        0240     /* toggle brace match mode */
 #endif
-#define CCHIGHEST      0237
+
+#define CCPUT          0241     /* insert PICK buffer */
+
+#define CCHIGHEST      0241
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */
@@ -725,7 +777,7 @@ Flag cmdmode;
 extern
 Flag litmode;           /* is YES when in literalmode Added 2/8/83 MAB */
 extern
-Flag patmode;           /* is YES when in patternmode Added 10/18/82 MAB */
+Flag patmode;           /* is YES when in patternmode (RE) Added 10/18/82 MAB */
 extern
 Flag insmode;           /* is YES when in insertmode                      */
 extern
@@ -778,6 +830,7 @@ extern _Noreturn void getout (Flag, char *, ...);
 extern Cmdret command ();
 extern Cmdret gotocmd ();
 extern Cmdret my_doupdate ();
+extern char *highlight_info_str;
 /* e.dif.c */
 extern Cmdret diff ();
 /* e.e.c */
@@ -956,4 +1009,5 @@ extern Flag play_silent;
 
 extern char *etcdir;
 extern char *keytmp;
+
 

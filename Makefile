@@ -5,7 +5,7 @@
 #  First do this:
 #       cd termcap; make
 #
-#  Then specify the desired library in ./e19/Makefile before running
+#  Then specify the desired library in ./e20/Makefile before running
 #  'make linux'
 #------------------------------------------------------------------------
 #
@@ -44,6 +44,8 @@ GROUP = wheel
 # RAND CHANGES 88/89:
 #    Do all makes from this top level makefile.  Usually:
 #       make clean; make e19; make install.e19
+# (CHANGE 8/21: DON'T try to make these targets.
+# Use "make bsd/sys5" and "make install.bsd/install.sys5" instead.)
 #    -DWPMODESET will bring up E in WP mode by default.
 #    -DSUNOS4 for SunOS4.x
 #    -DETC=... completely defines the old /etc/e directory.  The default
@@ -84,10 +86,10 @@ S5DEFINES = -DUNIXV7 -DASCIIKEYINFO -DSYSIII -DSYSV \
 BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO -DFSYNCKEYS \
 	  -DBSD \
 	  -DHOSTTMPNAMES -DSAVETMPFILES \
-	  -DTERMCAP $(LINUX)
-
-# -DFILELOCKING -DFLOCK -DBCOPY
-
+	  -DTERMCAP $(LINUX) \
+	  -DFILELOCKING -DFLOCK
+#  -DBCOPY
+# Don't use -DBCOPY any more: the default is now memmove(), which is preferred
 
 #trw:11.19.06
 S5CFLAGS    = -g -Wall -Wextra -Wno-implicit-fallthrough # -O
@@ -121,24 +123,24 @@ linux:  sys5
 
 
 sys5:   $(S5LIBS)
-	cd e19; $(MAKE) E_TCLIB=$(E_TCLIB) \
+	cd e20; $(MAKE) E_TCLIB=$(E_TCLIB) \
 		LOCALINCL="$(LOCALINCL)" \
 		CC="$(CC)" \
 		CFLAGS="$(S5DEFINES) $(S5CFLAGS)" \
 		LDFLAGS="$(S5LDFLAGS)" \
 		ETC_D=$(ETC) \
-		NEWVERSION=vers.s5.sh \
+		NEWVERSION="vers.sh" \
 		le
 
 
 bsd:    $(BSDLIBS)
-	cd e19; $(MAKE) E_TCLIB=$(E_TCLIB) \
+	cd e20; $(MAKE) E_TCLIB=$(E_TCLIB) \
 		LOCALINCL="$(LOCALINCL)" \
 		CC="$(CC)" \
 		CFLAGS="$(BSDDEFINES) $(BSDCFLAGS)" \
 		LDFLAGS="$(BSDLDFLAGS)" \
 		ETC_D="$(ETC)" \
-		NEWVERSION="vers.bsd.sh" \
+		NEWVERSION="vers.sh" \
 		le
 
 s5.lalib:
@@ -192,7 +194,7 @@ bsd.libtmp:
 sys5.install:   sys5 s5.help s5.man s5.tmp
 	touch $(BIN)/$(NAME)
 	mv $(BIN)/$(NAME) $(BIN)/$(NAME).old
-	ln e19/le $(NAME)
+	ln e20/le $(NAME)
 #       install -u $(OWNER) -g $(GROUP) -f $(BIN) $(NAME)
 	install -s -o $(OWNER) -g $(GROUP) -m 755 $(NAME) $(BIN)
 	strip $(BIN)/$(NAME)
@@ -202,7 +204,7 @@ sys5.install:   sys5 s5.help s5.man s5.tmp
 bsd.install:   bsd bsd.help bsd.man bsd.tmp
 	touch $(BIN)/$(NAME)
 	mv $(BIN)/$(NAME) /$(BIN)/$(NAME).old
-	ln e19/le $(NAME)
+	ln e20/le $(NAME)
 	install -s -o $(OWNER) -g $(GROUP) -m 755 $(NAME) $(BIN)
 	rm -f $(NAME)
 
@@ -220,7 +222,6 @@ etc:
 	cp help/Crashdoc $(LIB)
 	cp help/errmsg $(LIB)
 	cp help/recovermsg $(LIB)
-	cp help/recovershowkeys $(LIB)
 	chmod 444 $(LIB)/*
 	cd fill; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
 		"ETC=$(LIB)" \
@@ -234,24 +235,24 @@ etc:
 	chmod 755 $(LIB)/fill $(LIB)/just $(LIB)/center $(LIB)/run
 
 help:   etc
-	cp help/helpkey $(LIB)
-	cp help/k?.* $(LIB)
-	ln $(LIB)/kl.vt100 $(LIB)/kl.vt100w
-	ln $(LIB)/kl.vt100 $(LIB)/kl.tab132
-	ln $(LIB)/kl.vt100 $(LIB)/kl.tab132w
-	ln $(LIB)/kl.vt100 $(LIB)/kl.cit101
-	ln $(LIB)/kl.vt100 $(LIB)/kl.cit101w
-	ln $(LIB)/kl.free100 $(LIB)/kl.fr100
-	ln $(LIB)/kl.wy50 $(LIB)/kl.wy50w
-	ln $(LIB)/kr.vt100 $(LIB)/kr.vt100w
-	ln $(LIB)/kr.vt100 $(LIB)/kr.tab132
-	ln $(LIB)/kr.vt100 $(LIB)/kr.tab132w
-	ln $(LIB)/kr.vt100 $(LIB)/kr.cit101
-	ln $(LIB)/kr.vt100 $(LIB)/kr.cit101w
-	ln $(LIB)/kr.free100 $(LIB)/kr.fr100
-	ln $(LIB)/kr.wy50 $(LIB)/kr.wy50w
-	ln $(LIB)/kl.tv910 $(LIB)/kr.tv910
-	ln $(LIB)/kl.standard $(LIB)/kr.standard
+	cp lib/e/helpkey $(LIB)
+	cp lib/e/k?.* $(LIB)
+	-ln $(LIB)/kl.vt100 $(LIB)/kl.vt100w
+	-ln $(LIB)/kl.vt100 $(LIB)/kl.tab132
+	-ln $(LIB)/kl.vt100 $(LIB)/kl.tab132w
+	-ln $(LIB)/kl.vt100 $(LIB)/kl.cit101
+	-ln $(LIB)/kl.vt100 $(LIB)/kl.cit101w
+	-ln $(LIB)/kl.free100 $(LIB)/kl.fr100
+	-ln $(LIB)/kl.wy50 $(LIB)/kl.wy50w
+	-ln $(LIB)/kr.vt100 $(LIB)/kr.vt100w
+	-ln $(LIB)/kr.vt100 $(LIB)/kr.tab132
+	-ln $(LIB)/kr.vt100 $(LIB)/kr.tab132w
+	-ln $(LIB)/kr.vt100 $(LIB)/kr.cit101
+	-ln $(LIB)/kr.vt100 $(LIB)/kr.cit101w
+	-ln $(LIB)/kr.free100 $(LIB)/kr.fr100
+	-ln $(LIB)/kr.wy50 $(LIB)/kr.wy50w
+	-ln $(LIB)/kl.tv910 $(LIB)/kr.tv910
+	-ln $(LIB)/kl.standard $(LIB)/kr.standard
 	chmod 444 $(LIB)/k?.* $(LIB)/helpkey
 
 s5.tmp:
@@ -275,7 +276,7 @@ s5.man:
 s5.clean: clean
 
 s5.lint:
-	cd e19; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
+	cd e20; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
 		"CFLAGS=$(S5DEFINES) $(S5CFLAGS)" \
 		"LINTFLAGS=$(S5LINTFLAGS)" \
 		lint
@@ -292,7 +293,7 @@ learn:
 	@echo "*** the e editor lessons."
 
 clean:
-	cd e19; $(MAKE) clean
+	cd e20; $(MAKE) clean
 	cd fill; $(MAKE) clean
 	cd la1; $(MAKE) clean
 	cd ff3; $(MAKE) clean
@@ -300,7 +301,7 @@ clean:
 	-rm -f ,* #* a.out .e?1*
 
 pres:
-	cd e19; $(MAKE) LOCALINCL="$(LOCALINCL)" \
+	cd e20; $(MAKE) LOCALINCL="$(LOCALINCL)" \
 		CC="$(CC)" \
 		CFLAGS="$(S5DEFINES) $(S5CFLAGS)" \
 		LDFLAGS="$(S5LDFLAGS)" \

@@ -23,6 +23,30 @@ extern char *getenv ();
 extern void reenter ();
 extern int ff_sync ();
 
+extern Flag fg_rgb_options;
+extern Flag bg_rgb_options;
+extern int opt_fg_r;
+extern int opt_fg_g;
+extern int opt_fg_b;
+extern int opt_bg_r;
+extern int opt_bg_g;
+extern int opt_bg_b;
+extern Flag setaf_set;
+extern Flag setab_set;
+extern int opt_setaf;
+extern int opt_setab;
+
+extern char *optkbfile;
+extern char *opttname;
+extern char *optprofile;
+
+extern Flag optshowbuttons;
+extern Flag optskipmouse;
+extern Flag optuseextnames;
+
+extern int bracematching;
+extern char *highlight_info_str;
+
 #ifdef NCURSES
 extern void exitCurses();
 #endif
@@ -232,10 +256,6 @@ eexit ()
 	{0, 0}
     };
 
-#ifdef NCURSES
-    exitCurses();
-#endif
-
     if (opstr[0] == '\0')
 	extblind = EXNORMAL;
     else {
@@ -268,6 +288,10 @@ eexit ()
 	return CRBADARG;
     }
 
+#ifdef NCURSES
+    exitCurses();
+#endif
+
     switch (extblind) {
     case EXDUMP:
 	fatal (FATALEXDUMP, "Aborted");
@@ -288,6 +312,7 @@ eexit ()
 	    /* NOTREACHED */
 	}
     }
+
 #ifdef PROFILE
     monexit (1);
 #else
@@ -344,6 +369,9 @@ saveall ()
 		windowsup = YES;
 		fresh ();
 		return NO;
+	    } else {
+		putchar ('\r');
+		fflush (stdout);
 	    }
 	}
 	if (j-- == 0)
@@ -457,6 +485,66 @@ savestate ()
     putc (uptabs, stfile);     /* Added Purdue CS 2/8/83 MAB */
     putc (upblanks, stfile);     /* Added Purdue CS 2/8/83 MAB */
     putc (upnostrip, stfile);     /* Added Purdue CS 2/8/83 MAB */
+
+    /*  Put out new changes for color and mouse support in editor.
+     *  Terry West & Mike O'Brien, ex-RANDoms
+     *  8/24/2021
+     ***/
+
+    putc (inplace, stfile);     /* inplace flag */
+    if (optkbfile) {
+	putshort ((short) (strlen (optkbfile) + 1), stfile);
+	fputs (optkbfile, stfile);      /* keyboard file */
+	putc ('\0', stfile);
+    } else {
+	putshort ((short) 0, stfile);
+    }
+    if (opttname) {
+	putshort ((short) (strlen (opttname) + 1), stfile);
+	fputs (opttname, stfile);       /* terminal name */
+	putc ('\0', stfile);
+    } else {
+	putshort ((short) 0, stfile);
+    }
+#ifdef COMMENT
+    if (optprofile) {
+	putshort ((short) (strlen (optprofile) + 1), stfile);
+	fputs (optprofile, stfile); /* profile file name */
+	putc ('\0', stfile);
+    } else {
+	putshort ((short) 0, stfile);
+    }
+#endif /* COMMENT */
+
+    putc (fg_rgb_options, stfile);
+    putshort ((short) opt_fg_r, stfile);
+    putshort ((short) opt_fg_g, stfile);
+    putshort ((short) opt_fg_b, stfile);
+    putc (bg_rgb_options, stfile);
+    putshort ((short) opt_bg_r, stfile);
+    putshort ((short) opt_bg_g, stfile);
+    putshort ((short) opt_bg_b, stfile);
+
+    putc (setaf_set, stfile);
+    putshort ((short) opt_setaf, stfile);
+    putc (setab_set, stfile);
+    putshort ((short) opt_setab, stfile);
+
+    putc (optshowbuttons, stfile);      /* show clickable buttons */
+    putc (optskipmouse, stfile);        /* skip ncurses mouse init */
+    putc (optuseextnames, stfile);      /* use external names in curses defs */
+    putc (bracematching, stfile);               /* highlight matching braces */
+    if (highlight_info_str) {
+	putshort ((short) (strlen (highlight_info_str) + 1), stfile);
+	fputs (highlight_info_str, stfile);             /* on, off, bold, reverse, color */
+	putc ('\0', stfile);
+    } else {
+	putshort ((short) 0, stfile);
+    }
+
+    /*  End of Terry & Mike's changes for color & mouse support
+     *  8/24/2021
+     ***/
 
     putc (curmark != 0, stfile);
     if (curmark) {

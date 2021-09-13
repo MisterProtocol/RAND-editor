@@ -13,6 +13,12 @@ file e.iit.c
 #ifdef  KBFILE
 #include "e.it.h"
 
+#ifdef NCURSES
+#ifdef USER_FKEYS
+extern void addCursesFuncKey();
+#endif /* USER_FKEYS */
+#endif /* NCURSES */
+
 extern char *salloc();
 
 void itparse (), itadd(), itprint();
@@ -115,13 +121,27 @@ char *filename;
     FILE *f;
     int str_len, val_len;
 
+
+
     if ((f = fopen (filename, "r")) == NULL)
+	/* todo, try filename in user's home directory */
+	/* dbgpr("mypath=%s\n", mypath); */
 	getout (YES, "Can't open keyboard file \"%s\"", filename);
     while (fgets (line, sizeof line, f) != NULL) {
 	line[strlen (line)-1] = '\0';   /* Stomp on the newline */
+/** / dbgpr("getkbfile: line=%s\n", line); / **/
 	if(line[0] == '#'               /* gww 21 Feb 82 */
 	|| line[0] == '\0')             /* gww 21 Feb 82 */
 		continue;               /* gww 21 Feb 82 */
+#ifdef NCURSES
+#ifdef USER_FKEYS
+	/* eg, KEY_F4,  SHIFT_F8,  CTRL_F2 */
+	if(strstr(line, "KEY_") || strstr(line, "SHIFT_") || strstr(line, "CTRL_")) {
+	    addCursesFuncKey(line);
+	    continue;
+	}
+#endif /* USER_FKEYS */
+#endif /* NCURSES */
 	itparse (line, string, &str_len, value, &val_len);
 	switch (string[0]) {
 	case KBINIT:

@@ -76,6 +76,14 @@ void dosets();
 void doalt();
 void dofile();
 void my_dotabs();
+void doinplace();
+void dokbfile();
+void dotermname();
+void docolors();
+void domouse();
+void dobrace();
+void dohighlight();
+void doinplace();
 
 #define STATSIZE 100     /* max num of characters returned by stat call */
 #define BELL 07
@@ -372,6 +380,7 @@ contcase:
     case 17:
     case 18:
     case 19:
+    case 20:
 	dotermtype();
 	doscrsize();
 	dotime();
@@ -382,6 +391,15 @@ contcase:
 	if (revision >= 18) {
 		dorexp();
 		domodes();
+	}
+	if (revision >= 20) {
+	    doinplace();
+	    dokbfile();
+	    dotermname();
+	    docolors();
+	    domouse();
+	    dobrace();
+	    dohighlight();
 	}
 	domark();
 	if (revision >= 19)
@@ -566,6 +584,124 @@ dorexp ()
 	    printf ("on\n");
 	else
 	    printf ("off\n");
+}
+
+void
+doinplace()
+{
+	
+	printf ("INPLACE %s.\n",  getc(input) ? "on" : "off" );
+}
+
+void
+dokbfile()
+{
+	short nletters;
+
+	if ((nletters = getshort (input))) {
+	    printf ("Keyboard file name is \"");
+	    while (--nletters > 0)
+		fputc (getc (input), stdout);
+	    if (getc (input))
+		badstart();
+	    printf ("\"\n");
+	}
+	else
+	    printf ("No keyboard file.\n");
+}
+
+void
+dotermname()
+{
+	short nletters;
+
+	if ((nletters = getshort (input))) {
+	    printf ("Terminal name is \"");
+	    while (--nletters > 0)
+		fputc (getc (input), stdout);
+	    if (getc (input))
+		badstart();
+	    printf ("\"\n");
+	}
+	else
+	    printf ("No terminal name.\n");
+}
+
+void
+docolors()
+{
+	char fg_rgb_options;
+	char bg_rgb_options;
+	short fg_r, fg_g, fg_b;
+	short bg_r, bg_g, bg_b;
+
+	char setaf_set, setab_set;
+	short setaf, setab;
+
+	fg_rgb_options = getc (input);
+	fg_r = getshort (input);
+	fg_g = getshort (input);
+	fg_b = getshort (input);
+	bg_rgb_options = getc (input);
+	bg_r = getshort (input);
+	bg_g = getshort (input);
+	bg_b = getshort (input);
+
+	setaf_set = getc (input);
+	setaf = getshort (input);
+	setab_set = getc (input);
+	setab = getshort (input);
+
+	if (fg_rgb_options)
+	    printf ("Foreground colors: %d, %d, %d\n", fg_r, fg_g, fg_b);
+	else
+	    printf ("No foreground colors set.\n");
+
+	if (bg_rgb_options)
+	    printf ("Background colors: %d, %d, %d\n", bg_r, bg_g, bg_b);
+	else
+	    printf ("No background colors set.\n");
+
+	if (setaf_set)
+	    printf ("ANSI foreground color set: %d\n", setaf);
+	else
+	    printf ("No ANSI foreground color set.\n");
+	if (setab_set)
+	    printf ("ANSI background color set: %d\n", setab);
+	else
+	    printf ("No ANSI background color set.\n");
+}
+
+void
+domouse()
+{
+	printf ("SHOWBUTTONS %s.\n",   getc(input) ? "on" : "off" );
+	printf ("SKIPMOUSE %s.\n",   getc(input) ? "on" : "off" );
+	printf ("USEEXTNAMES %s.\n",   getc(input) ? "on" : "off" );
+}
+
+void
+dobrace()
+{
+	printf ("BRACEMATCH %s.\n",   getc(input) ? "on" : "off" );
+}
+
+void
+dohighlight()
+{
+	int nletters;
+
+	if ((nletters = getshort (input))) {
+	/***/ printf ("highlight nletters = %d\n", nletters);
+	    if (feoferr (input))
+		badstart();
+	    fputs ("Highlight info: ", stdout);
+	    while (--nletters > 0)
+		fputc (getc (input), stdout);
+	    fputc ('\n', stdout);
+	    if (getc (input))
+		badstart();
+	}
 }
 
 void

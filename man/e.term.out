@@ -1,223 +1,575 @@
-.ds f. e.term.tbl
+.if !\n(.g .ab GNU tbl requires GNU troff.
+.if !dTS .ds TS
+.if !dTE .ds TE
+.lf 1 e.term.tbl
 .TS
-.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
-.de 35
-.ps \n(.s
-.vs \n(.vu
-.in \n(.iu
-.if \n(.u .fi
-.if \n(.j .ad
-.if \n(.j=0 .na
+.nr 3c \n(.C
+.cp 0
+.nr 3lps \n[.s]
+.nr 3cent \n[.ce]
+.de 3init
+.ft \n[.f]
+.ps \n[.s]
+.vs \n[.v]u
+.in \n[.i]u
+.ll \n[.l]u
+.ls \n[.L]
+.ad \n[.j]
+.ie \n[.u] .fi
+.el .nf
+.ce \n[.ce]
 ..
-.nf
-.nr #~ 0
-.if \n(.T .if n .nr #~ 0.6n
-.ds #d .d
-.if \(ts\n(.z\(ts\(ts .ds #d nl
-.fc
-.nr 33 \n(.s
-.rm 46 47
-.nr 46 0
-.nr 38 \wDESCRIPTION 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wAnn Arbor S001901/2 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wNew ann arbor (Model Q2878) 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wAnn Arbor Ambassador 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \w and Ann Arbor XLs 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wBeehive MicroBee 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wTermcap terminal 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wINTERACTIVE Systems Intext2 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wLear Siegler ADM3a 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wLiberty Freedom 100 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wHeathkit H19 & H89 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wINTERACTIVE Systems Intext 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wPerkin Elmer 1251 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wStandard keyboard 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wDEC VT100  (needs termcap) 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wLear Siegler ADM31 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wLear Siegler ADM42 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wConcept 100 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wDatamedia DM4000 
-.if \n(46<\n(38 .nr 46 \n(38
-.nr 38 \wWyse 50 
-.if \n(46<\n(38 .nr 46 \n(38
-.46
-.rm 46
-.nr 47 0
-.nr 38 \w TERMINAL TYPE
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w aa, aa0, annarbor, default
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w aa1
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w aaa, ambas, ambassador, aaa-N
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w (N is one of 18,20,22,24,26,28,
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w  30,36,40,48 or 60 )
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w microb
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w [from /etc/termcap]
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w intext2, T_2intext
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w 3a, adm3a, la
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w fr10, free100
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w h19, k1
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w in, intext
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w po
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w standard
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w vt100, vt100w (wide)
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w 31, adm31, l1
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w adm42, l4
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w c100, co, concept, concept100
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w dm4000
-.if \n(47<\n(38 .nr 47 \n(38
-.nr 38 \w wyse50, wyse50w (wide)
-.if \n(47<\n(38 .nr 47 \n(38
-.47
-.rm 47
-.nr 38 1n
-.nr 45 0
-.nr 40 \n(45+((0*\n(38)/2)
-.nr 46 +\n(40
-.nr 41 \n(46+((6*\n(38)/2)
-.nr 47 +\n(41
-.nr TW \n(47
-.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 28 file e.term.tbl is too wide - \n(TW units
-.fc  
-.nr #T 0-1
-.nr #a 0-1
+.nr 3ind \n[.i]
+.nr 3fnt \n[.f]
+.nr 3sz \n[.s]
+.nr 3fll \n[.u]
+.nr T. 0
+.nr 3crow 0-1
+.nr 3passed 0-1
+.nr 3sflag 0
+.ds 3trans
+.ds 3quote
+.nr 3brule 1
+.nr 3supbot 0
 .eo
-.de T#
-.nr 35 1m
-.ds #d .d
-.if \(ts\n(.z\(ts\(ts .ds #d nl
-.mk ##
-.nr ## -1v
+.de 3rmk
+.mk \$1
+.if !'\n(.z'' \!.3rmk "\$1"
+..
+.de 3rvpt
+.vpt \$1
+.if !'\n(.z'' \!.3rvpt "\$1"
+..
+.de 3keep
+.if '\n[.z]'' \{.ds 3quote \\
+.ds 3trans \!
+.di 3section
+.nr 3sflag 1
+.in 0
+.\}
+..
+.de 3release
+.if \n[3sflag] \{.di
+.in \n[3ind]u
+.nr 3dn \n[dn]
+.ds 3quote
+.ds 3trans
+.nr 3sflag 0
+.if \n[.t]<=\n[dn] \{.nr T. 1
+.T#
+.nr 3supbot 1
+.sp \n[.t]u
+.nr 3supbot 0
+.mk #T
+.\}
+.if \n[.t]<=\n[3dn] .tm warning: page \n%: table text block will not fit on one page
+.nf
 .ls 1
+.3section
 .ls
+.rm 3section
+.\}
+..
+.nr 3tflag 0
+.de 3tkeep
+.if '\n[.z]'' \{.di 3table
+.nr 3tflag 1
+.\}
+..
+.de 3trelease
+.if \n[3tflag] \{.br
+.di
+.nr 3dn \n[dn]
+.ne \n[dn]u+\n[.V]u
+.ie \n[.t]<=\n[3dn] .tm error: page \n%: table will not fit on one page; use .TS H/.TH with a supporting macro package
+.el \{.in 0
+.ls 1
+.nf
+.3table
+.\}
+.rm 3table
+.\}
 ..
 .ec
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'DESCRIPTION \h'|\n(41u' TERMINAL TYPE
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'\h'|\n(41u'
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Ann Arbor S001901/2 \h'|\n(41u' aa, aa0, annarbor, default
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'New ann arbor (Model Q2878) \h'|\n(41u' aa1
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Ann Arbor Ambassador \h'|\n(41u' aaa, ambas, ambassador, aaa-N
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u' and Ann Arbor XLs \h'|\n(41u' (N is one of 18,20,22,24,26,28,
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'\h'|\n(41u'  30,36,40,48 or 60 )
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Beehive MicroBee \h'|\n(41u' microb
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Termcap terminal \h'|\n(41u' [from /etc/termcap]
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'INTERACTIVE Systems Intext2 \h'|\n(41u' intext2, T_2intext
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Lear Siegler ADM3a \h'|\n(41u' 3a, adm3a, la
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Liberty Freedom 100 \h'|\n(41u' fr10, free100
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Heathkit H19 & H89 \h'|\n(41u' h19, k1
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'INTERACTIVE Systems Intext \h'|\n(41u' in, intext
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Perkin Elmer 1251 \h'|\n(41u' po
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Standard keyboard \h'|\n(41u' standard
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'DEC VT100  (needs termcap) \h'|\n(41u' vt100, vt100w (wide)
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Lear Siegler ADM31 \h'|\n(41u' 31, adm31, l1
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Lear Siegler ADM42 \h'|\n(41u' adm42, l4
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Concept 100 \h'|\n(41u' c100, co, concept, concept100
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Datamedia DM4000 \h'|\n(41u' dm4000
-.ta \n(46u \n(47u 
-.nr 35 1m
-.nr 31 \n(.f
-\&\h'|\n(40u'Wyse 50 \h'|\n(41u' wyse50, wyse50w (wide)
-.fc
+.ce 0
+.nf
+.nr 3sep 1n
+.nr 3w0 \n(.H
+.nr 3aw0 0
+.nr 3lnw0 0
+.nr 3rnw0 0
+.nr 3w1 \n(.H
+.nr 3aw1 0
+.nr 3lnw1 0
+.nr 3rnw1 0
+.lf 6 e.term.tbl
+.nr 3w0 \n[3w0]>?\w\[tbl]DESCRIPTION \[tbl]
+.lf 6
+.nr 3w1 \n[3w1]>?\w\[tbl] TERMINAL TYPE\[tbl]
+.lf 8
+.nr 3w0 \n[3w0]>?\w\[tbl]Ann Arbor S001901/2 \[tbl]
+.lf 8
+.nr 3w1 \n[3w1]>?\w\[tbl] aa, aa0, annarbor, default\[tbl]
+.lf 9
+.nr 3w0 \n[3w0]>?\w\[tbl]New ann arbor (Model Q2878) \[tbl]
+.lf 9
+.nr 3w1 \n[3w1]>?\w\[tbl] aa1\[tbl]
+.lf 10
+.nr 3w0 \n[3w0]>?\w\[tbl]Ann Arbor Ambassador \[tbl]
+.lf 10
+.nr 3w1 \n[3w1]>?\w\[tbl] aaa, ambas, ambassador, aaa-N\[tbl]
+.lf 11
+.nr 3w0 \n[3w0]>?\w\[tbl] and Ann Arbor XLs \[tbl]
+.lf 11
+.nr 3w1 \n[3w1]>?\w\[tbl] (N is one of 18,20,22,24,26,28,\[tbl]
+.lf 12
+.nr 3w1 \n[3w1]>?\w\[tbl]  30,36,40,48 or 60 )\[tbl]
+.lf 13
+.nr 3w0 \n[3w0]>?\w\[tbl]Beehive MicroBee \[tbl]
+.lf 13
+.nr 3w1 \n[3w1]>?\w\[tbl] microb\[tbl]
+.lf 14
+.nr 3w0 \n[3w0]>?\w\[tbl]Termcap terminal \[tbl]
+.lf 14
+.nr 3w1 \n[3w1]>?\w\[tbl] [from /etc/termcap]\[tbl]
+.lf 15
+.nr 3w0 \n[3w0]>?\w\[tbl]INTERACTIVE Systems Intext2 \[tbl]
+.lf 15
+.nr 3w1 \n[3w1]>?\w\[tbl] intext2, T_2intext\[tbl]
+.lf 16
+.nr 3w0 \n[3w0]>?\w\[tbl]Lear Siegler ADM3a \[tbl]
+.lf 16
+.nr 3w1 \n[3w1]>?\w\[tbl] 3a, adm3a, la\[tbl]
+.lf 17
+.nr 3w0 \n[3w0]>?\w\[tbl]Liberty Freedom 100 \[tbl]
+.lf 17
+.nr 3w1 \n[3w1]>?\w\[tbl] fr10, free100\[tbl]
+.lf 18
+.nr 3w0 \n[3w0]>?\w\[tbl]Heathkit H19 & H89 \[tbl]
+.lf 18
+.nr 3w1 \n[3w1]>?\w\[tbl] h19, k1\[tbl]
+.lf 19
+.nr 3w0 \n[3w0]>?\w\[tbl]INTERACTIVE Systems Intext \[tbl]
+.lf 19
+.nr 3w1 \n[3w1]>?\w\[tbl] in, intext\[tbl]
+.lf 20
+.nr 3w0 \n[3w0]>?\w\[tbl]Perkin Elmer 1251 \[tbl]
+.lf 20
+.nr 3w1 \n[3w1]>?\w\[tbl] po\[tbl]
+.lf 21
+.nr 3w0 \n[3w0]>?\w\[tbl]Standard keyboard \[tbl]
+.lf 21
+.nr 3w1 \n[3w1]>?\w\[tbl] standard\[tbl]
+.lf 22
+.nr 3w0 \n[3w0]>?\w\[tbl]DEC VT100  (needs termcap) \[tbl]
+.lf 22
+.nr 3w1 \n[3w1]>?\w\[tbl] vt100, vt100w (wide)\[tbl]
+.lf 23
+.nr 3w0 \n[3w0]>?\w\[tbl]Lear Siegler ADM31 \[tbl]
+.lf 23
+.nr 3w1 \n[3w1]>?\w\[tbl] 31, adm31, l1\[tbl]
+.lf 24
+.nr 3w0 \n[3w0]>?\w\[tbl]Lear Siegler ADM42 \[tbl]
+.lf 24
+.nr 3w1 \n[3w1]>?\w\[tbl] adm42, l4\[tbl]
+.lf 25
+.nr 3w0 \n[3w0]>?\w\[tbl]Concept 100 \[tbl]
+.lf 25
+.nr 3w1 \n[3w1]>?\w\[tbl] c100, co, concept, concept100\[tbl]
+.lf 26
+.nr 3w0 \n[3w0]>?\w\[tbl]Datamedia DM4000 \[tbl]
+.lf 26
+.nr 3w1 \n[3w1]>?\w\[tbl] dm4000\[tbl]
+.lf 27
+.nr 3w0 \n[3w0]>?\w\[tbl]Wyse 50 \[tbl]
+.lf 27
+.nr 3w1 \n[3w1]>?\w\[tbl] wyse50, wyse50w (wide)\[tbl]
+.nr 3w0 \n[3w0]>?(\n[3lnw0]+\n[3rnw0])
+.if \n[3aw0] .nr 3w0 \n[3w0]>?(\n[3aw0]+2n)
+.nr 3w1 \n[3w1]>?(\n[3lnw1]+\n[3rnw1])
+.if \n[3aw1] .nr 3w1 \n[3w1]>?(\n[3aw1]+2n)
+.nr 3cd0 0
+.nr 3cl0 0*\n[3sep]
+.nr 3ce0 \n[3cl0]+\n[3w0]
+.nr 3cl1 \n[3ce0]+(3*\n[3sep])
+.nr 3cd1 \n[3ce0]+\n[3cl1]/2
+.nr 3ce1 \n[3cl1]+\n[3w1]
+.nr 3cd2 \n[3ce1]+(0*\n[3sep])
+.nr TW \n[3cd2]
+.if \n[3cent] \{.in +(u;\n[.l]-\n[.i]-\n[TW]/2>?-\n[.i])
+.nr 3ind \n[.i]
+.\}
+.eo
+.de T#
+.if !\n[3supbot] \{.3rvpt 0
+.mk 3vert
+.ls 1
+.ls
+.nr 3passed \n[3crow]
+.sp |\n[3vert]u
+.3rvpt 1
+.\}
+..
+.ec
+.fc 
+.3keep
+.3rmk 3rt0
+\*[3trans].nr 3crow 0
+.3keep
+.mk 3rs0
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 6
+\&\h'|\n[3cl0]u'DESCRIPTION \h'|\n[3cl1]u' TERMINAL TYPE
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs0]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt1
+\*[3trans].nr 3crow 1
+.3keep
+.mk 3rs1
+.mk 3bot
+.3rvpt 0
+.ta
+.lf 7
+\&
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs1]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt2
+\*[3trans].nr 3crow 2
+.3keep
+.mk 3rs2
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 8
+\&\h'|\n[3cl0]u'Ann Arbor S001901/2 \h'|\n[3cl1]u' aa, aa0, annarbor, default
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs2]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt3
+\*[3trans].nr 3crow 3
+.3keep
+.mk 3rs3
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 9
+\&\h'|\n[3cl0]u'New ann arbor (Model Q2878) \h'|\n[3cl1]u' aa1
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs3]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt4
+\*[3trans].nr 3crow 4
+.3keep
+.mk 3rs4
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 10
+\&\h'|\n[3cl0]u'Ann Arbor Ambassador \h'|\n[3cl1]u' aaa, ambas, ambassador, aaa-N
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs4]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt5
+\*[3trans].nr 3crow 5
+.3keep
+.mk 3rs5
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 11
+\&\h'|\n[3cl0]u' and Ann Arbor XLs \h'|\n[3cl1]u' (N is one of 18,20,22,24,26,28,
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs5]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt6
+\*[3trans].nr 3crow 6
+.3keep
+.mk 3rs6
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce1]u
+.lf 12
+\&\h'|\n[3cl1]u'  30,36,40,48 or 60 )
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs6]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt7
+\*[3trans].nr 3crow 7
+.3keep
+.mk 3rs7
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 13
+\&\h'|\n[3cl0]u'Beehive MicroBee \h'|\n[3cl1]u' microb
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs7]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt8
+\*[3trans].nr 3crow 8
+.3keep
+.mk 3rs8
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 14
+\&\h'|\n[3cl0]u'Termcap terminal \h'|\n[3cl1]u' [from /etc/termcap]
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs8]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt9
+\*[3trans].nr 3crow 9
+.3keep
+.mk 3rs9
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 15
+\&\h'|\n[3cl0]u'INTERACTIVE Systems Intext2 \h'|\n[3cl1]u' intext2, T_2intext
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs9]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt10
+\*[3trans].nr 3crow 10
+.3keep
+.mk 3rs10
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 16
+\&\h'|\n[3cl0]u'Lear Siegler ADM3a \h'|\n[3cl1]u' 3a, adm3a, la
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs10]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt11
+\*[3trans].nr 3crow 11
+.3keep
+.mk 3rs11
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 17
+\&\h'|\n[3cl0]u'Liberty Freedom 100 \h'|\n[3cl1]u' fr10, free100
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs11]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt12
+\*[3trans].nr 3crow 12
+.3keep
+.mk 3rs12
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 18
+\&\h'|\n[3cl0]u'Heathkit H19 & H89 \h'|\n[3cl1]u' h19, k1
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs12]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt13
+\*[3trans].nr 3crow 13
+.3keep
+.mk 3rs13
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 19
+\&\h'|\n[3cl0]u'INTERACTIVE Systems Intext \h'|\n[3cl1]u' in, intext
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs13]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt14
+\*[3trans].nr 3crow 14
+.3keep
+.mk 3rs14
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 20
+\&\h'|\n[3cl0]u'Perkin Elmer 1251 \h'|\n[3cl1]u' po
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs14]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt15
+\*[3trans].nr 3crow 15
+.3keep
+.mk 3rs15
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 21
+\&\h'|\n[3cl0]u'Standard keyboard \h'|\n[3cl1]u' standard
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs15]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt16
+\*[3trans].nr 3crow 16
+.3keep
+.mk 3rs16
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 22
+\&\h'|\n[3cl0]u'DEC VT100  (needs termcap) \h'|\n[3cl1]u' vt100, vt100w (wide)
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs16]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt17
+\*[3trans].nr 3crow 17
+.3keep
+.mk 3rs17
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 23
+\&\h'|\n[3cl0]u'Lear Siegler ADM31 \h'|\n[3cl1]u' 31, adm31, l1
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs17]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt18
+\*[3trans].nr 3crow 18
+.3keep
+.mk 3rs18
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 24
+\&\h'|\n[3cl0]u'Lear Siegler ADM42 \h'|\n[3cl1]u' adm42, l4
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs18]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt19
+\*[3trans].nr 3crow 19
+.3keep
+.mk 3rs19
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 25
+\&\h'|\n[3cl0]u'Concept 100 \h'|\n[3cl1]u' c100, co, concept, concept100
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs19]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt20
+\*[3trans].nr 3crow 20
+.3keep
+.mk 3rs20
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 26
+\&\h'|\n[3cl0]u'Datamedia DM4000 \h'|\n[3cl1]u' dm4000
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs20]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.3keep
+.3rmk 3rt21
+\*[3trans].nr 3crow 21
+.3keep
+.mk 3rs21
+.mk 3bot
+.3rvpt 0
+.ta \n[3ce0]u \n[3ce1]u
+.lf 27
+\&\h'|\n[3cl0]u'Wyse 50 \h'|\n[3cl1]u' wyse50, wyse50w (wide)
+.nr 3bot \n[3bot]>?\n[.d]
+.sp |\n[3rs21]u
+.3rvpt 1
+.sp |\n[3bot]u
+\*[3trans].nr 3brule 1
+.3release
+.mk 3rt22
+.nr 3brule 1
 .nr T. 1
-.T# 1
-.35
+.T#
+.3init
+.fc
+.cp \n(3c
+.lf 28
 .TE
-.if \n-(b.=0 .nr c. \n(.c-\n(d.-27

@@ -88,6 +88,22 @@ regardless of line speed or terminal type.  Line speeds of 1200
 baud and slower and some terminal types set border bullets off in
 the absence of these options.
 .TP
+.B \-create
+.br
+If the file named on the command line does not exist, the editor
+will ordinarily ask if you want to create it.
+This option causes the editor to create the file immediately,
+without asking.
+.TP
+.B \-newfilemode=mode
+If the editor creates a new file, it will be created with mode "mode".
+This is of the typical UNIX octal form, e.g. "0644".
+.TP
+.B \-debug=filename
+.br
+The \-debug option causes the editor to write debugging information
+to the file "filename".
+.TP
 .B \-inplace
 .br
 Option \-inplace preserves file links except for singly\-linked
@@ -114,12 +130,14 @@ be supported by compiled\-in code (varies with installation).
 .PP
 .B \-keyboard=termtype
 .br
-.B \-dkeyboard=termtype
+.B \-dkeyboard
 .RS
 Option \-keyboard=termtype sets the keyboard type to "termtype".  It
 overrides any "\-terminal=" argument and also any
 .SM EKBD
 environment variable.
+Option \-dkeyboard sets the keyboard type to "standard".
+This is a shortcut for "\-keyboard=standard".
 .RE
 .ne 2v
 .TP
@@ -167,12 +185,7 @@ is displayed at the bottom of the screen.  The command "\-re[gexp]"
 returns to non-regular expression mode.
 The regular expressions recognized are
 essentially the same as that for \fIed\fR.
-.TP
-.B \-skipmouse
-.br
-Do not enable mouse support.  See
-.SM "MOUSE SUPPORT"
-below for more details.
+
 .TP
 .B \-state=filename
 .br
@@ -242,6 +255,17 @@ Turns off file locking if the editor was compiled with the
 option
 .SM FILELOCKING.
 .TP
+.B \-nowinshift
+In previous editions of the editor, creating a new window on the current
+file by typing "CMD: window" would obscure one line of text in the file
+with the top border of the new window.
+This avoided the necessity of repainting the text in the new window by
+shifting it down, which was desirable in the days of slow serial lines.
+The current version of the editor shifts the new window down by one line,
+to allow all of the text in the file to be visible in one window or the
+other.
+Option \-nowinshift causes the editor to revert to the old behavior.
+.TP
 .B \-search=string
 .br
 Sets the initial search string.
@@ -264,6 +288,44 @@ for details.
 .br
 .TP
 .B \-setaf=N
+
+.PP
+These next options apply to mouse support.
+.TP
+.B \-skipmouse
+.br
+Do not enable mouse support.  See
+.SM "MOUSE SUPPORT"
+below for more details.
+.TP
+.B \-mouseinit="initstr"
+.br
+Set a custom mouse initialization string.  Example:  -mouseinit="\\E[?1006;1002h".
+.br
+The default is "\\E[?1002h";
+.TP
+.B \-mousestop="resetstr"
+.br
+Set a custom mouse reset string.  Example:  -mousestop="\\E[?1006;1002l".
+.br
+The default is "\\E[?1002l";
+.TP
+.B \-useextnames
+.br
+Enable the use of extended names for TERM entries in the terminfo library.
+For example, many terminfo entries include a XM entry which defines the
+mouse protocol mode.  By default, E sends the mouse initialzation
+string of "\\E[?1002h" which enables
+mouse position reporting while a button is pressed and dragged.
+.TP
+.B \-showbuttons
+.br
+This option displays a row of pseudo buttons across the bottom
+of the screen that execute E functions by a mouse click.  The buttons
+appear as ascii text, eg: "... open/close  pick/put ...".
+This feature should be considered
+.I experimental.
+
 .SH ENVIRONMENT VARIABLES
 The
 .SM TERM
@@ -288,9 +350,12 @@ The
 .SM EKBFILE
 environment variable points to a keyboard definition file
 (see the
-.I e19/term
+.I ./etc
 directory in the distribution for examples)
 to allow the editor to use keyboard layouts that are not built in.
+If you're using both e19 and e20 and have added function key definitions
+supported in e20, set the environment variable EKBFILE_NCURSES to
+the e20 keyboard file definitions (see ./etc/kb_ncurses for an example).
 .PP
 The
 .SM EDITALT
@@ -355,6 +420,36 @@ There are also a few utility files in the directory /etc/e.
 .ti \\nxu
 \(bu\0\0\c
 ..
+E20 changes include:
+.bu
+code cleanup eliminating compiler warnings; bug fixes
+.bu
+new crash recover options, allowing playback to stop early
+.bu
+revised state file (.es1.userid.host) to restore the settings
+and options when resuming a previous E session (ie, when E is
+started without a filename).
+.bu
+added mouse support to:  move cursor, change windows, and press/drag
+left button to mark a rectangular area
+.bu
+added color options to highlight marked areas.
+.bu
+added brace matching mode;
+when enabled, resting the cursor on a open/closing brace will highlight the
+corresponding closing/opening brace.  See the
+.I set options
+section below.
+.bu
+added the
+.B -showbuttons
+option to display row of clickable function buttons
+.bu
+added keyboard file options to map F1-12 function keys to E commands,
+example:  KEY_F2:<redraw>, see etc/kb_ncurses for other examples.
+The environemnt variable EKBFILE_NCURSES may be set to a custom e20 kbfile
+for sites using both e19 and e20.
+.PP
 E19+ changes include:
 .bu
 new options \fB\-tab, \-lit, \-nostrip, \-nolocks\fR.
@@ -443,7 +538,8 @@ The current (2021) rework of the editor has introduced elementary
 support for the mouse.
 The cursor may be moved arbitrarily by clicking the left mouse button in any window.
 If multiple windows are active in E, clicking in a non-active window will change E's
-focus to that window.
+focus to that window.  Dragging with the left mouse button will mark rectangular areas
+of text.
 .PP
 The
 .SM MARK
@@ -457,16 +553,17 @@ A marked area is normally expanded or reduced
 by cursor movement (arrow keys, \(+-\|page, \(+-\|line);
 the area can now also be changed by clicking the
 left mouse button.
-Dragging with the mouse is not supported; only mouse clicks are detected.
 .PP
 The ability to copy/paste text from a separate desktop window into an
 E window can be very useful.
-In order to return the copy/paste capability to the mouse in E,
-use the
+One method to copy/paste text into an E window is to
+hold down the Shift key before doing the paste.
+An alternate method is to temporarily disable the mouse in E by
+issuing the
 .I "set mouse off"
-command to temporarily disable the mouse in E, perform the copy/paste into
+command to disable the mouse in E, perform the copy/paste into
 E, then reenable the mouse with the command
-.I "set mouse on".
+.I set mouse on.
 See the
 .SM SET
 command section below.
@@ -533,7 +630,18 @@ by the command \fI<cmd>play [N]\fR. The optional count \fIN\fR gives the
 number of times the macro should be replayed; once is the default.
 The macro thus recorded may be assigned
 a name by executing \fI<cmd>store [name]\fR. The named macros may
-be replayed by the command \fI<cmd>play $name [N]\fR. 
+be replayed by the command \fI<cmd>play $name [N]\fR.
+.br
+Macros may be saved to a file.
+This is done via the
+.SM update macros
+editor command.
+The file is named, by default, "~/.e_macros".
+This name may be overridden either by the environment variable
+.SM EMACROFILE
+or by means of the "\-macrofile=filename" command line option.
+This file will be read in automatically.
+The command line option "\-nomacros" prevents this.
 .SH COMMANDS
 The following commands are available to the user by opening the
 command line via the
@@ -567,34 +675,34 @@ The following table give the complete exit story.
 .ta \w'exit nosave\ \ 'u +\w'Saves\ \ 'u +\w'Update\ \ 'u +\w'Keys\ file\ \ 'u
 .RS
 .sp
-	Saves	Update	Remove	Remove
+	Saves   Update  Remove  Remove
 .br
-	Files	State	Keys\ file	Change file
+	Files   State   Keys\ file      Change file
 .br
 .sp
-exit	 X	 X	 X	 X
+exit     X       X       X       X
 .br
-exit nosave	 -	 X	 X	 X
+exit nosave      -       X       X       X
 .br
-exit quit	 -	 -	 X	 X
+exit quit        -       -       X       X
 .br
-exit abort	 -	 -	 -	 X
+exit abort       -       -       -       X
 .br
-exit dump	 -	 -	 -	 -
+exit dump        -       -       -       -
 .RE
 .ta \w'underlay\ \ \ \ 'u
 .sp
-blot	adjust | close | erase | pick | run | box
+blot    adjust | close | erase | pick | run | box
 .br
-\-blot	adjust | close | erase | pick | run | box
+\-blot  adjust | close | erase | pick | run | box
 .br
-cover	adjust | close | erase | pick | run | box
+cover   adjust | close | erase | pick | run | box
 .br
-insert	adjust | close | erase | pick | run | box
+insert  adjust | close | erase | pick | run | box
 .br
-overlay	adjust | close | erase | pick | run | box
+overlay adjust | close | erase | pick | run | box
 .br
-underlay	adjust | close | erase | pick | run | box
+underlay        adjust | close | erase | pick | run | box
 .RS
 .PP
 All of these commands take the named buffer (one of
@@ -864,6 +972,8 @@ used to set various options:
 .ta \n(,iu +1P
 .nf
 .sp 4p
+bracematch\*ton\^|\^off, toggles brace matching mode
+{}\*ton\^|\^off, toggles brace matching mode (shortcut)
 +line \fIn\fR\*tsets the <+line> key to \fIn\fR lines
 \-line \fIn\fR\*tsets the <\-line> key to \fIn\fR lines
 line \fIn\fR\*tsets the <+line> and <\-line> keys to \fIn\fR lines
@@ -967,7 +1077,7 @@ changed so that it toggles the TRACK mode, in the same way as does
 INSERT.
 .RE
 .TP
-update | \-update [ inplace | \-inplace | \-readonly]
+update | \-update [ inplace | \-inplace | \-readonly | macros]
 .br
 The update command tells the editor what to do on
 exit with the current file.  The update command
@@ -977,6 +1087,9 @@ the current file to be ignored.
 The \-\fIreadonly\fR option is used to enable modifications to
 files which (1) you own but lack write permission on,
 or, (2) to override a "\-readonly" invocation argument.
+The \fImacros\fR option causes any defined macros to be
+saved to the macros file as specified in the section
+.SM MACROS.
 .PP
 w | window [filename]
 .br

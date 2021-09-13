@@ -55,6 +55,11 @@ int doSetHighlight();
 char *highlight_info_str;
 extern int n_colors;
 
+/* brace matching/hilighting */
+extern int bracematching;
+int doSetBraceMode();
+extern int Pch();
+
 #endif
 
 #include SIG_INCL
@@ -901,6 +906,7 @@ Flag on;
 #define SET_NOHIGHLIGHT 26
 #define SET_MOUSE       27
 
+#define SET_BRACEMATCH  28
 
 #ifdef COMMENT
 Cmdret
@@ -919,13 +925,15 @@ setoption( showflag )
 	Cmdret retval;
 	extern Flag fill_hyphenate;
 	extern Flag fill_troffmode;
-	static S_looktbl setopttable[] = {
+	static S_looktbl setopttable[] = {    /* Must be in sort order!!! */
 	   {"+line",        SET_PLLINE},   /* defplline */
 	   {"+page",        SET_PLPAGE},   /* defplpage */
 	   {"-line",        SET_MILINE},   /* defmiline */
 	   {"-page",        SET_MIPAGE},   /* defmipage */
 	   {"?",            SET_SHOW},     /* show options */
+	   {"[]",           SET_BRACEMATCH},   /* set brace matching mode, shortcut */
 	   {"bell",         SET_BELL},     /* echo \07 */
+	   {"bracematch",   SET_BRACEMATCH},   /* set brace matching mode */
 	   {"debug",        SET_DEBUG},
 	   {"filldot",      SET_FILLDOT},  /* fill doesn't stops at ^. */
 	   {"highlight",    SET_HIGHLIGHT},/* marked areas are highlighted */
@@ -942,6 +950,7 @@ setoption( showflag )
 	   {"nohy",         SET_NOHY},     /* fill: don't split hy-words */
 	   {"nostick",      SET_RMNOSTICK},/* auto scroll past rt edge */
 	   {"page",         SET_PAGE},     /* defmipage and defplpage */
+
 #ifdef RECORDING
 	   {"play",         SET_PLAY},     /* play options */
 #endif
@@ -956,6 +965,7 @@ setoption( showflag )
 	   {"width",        SET_WIDTH},    /* linewidth */
 	   {"window",       SET_WIN},      /* deflwin and defrwin */
 	   {"worddelimiter",SET_WORDDELIM},/* set word delimiter */
+	   {"{}",           SET_BRACEMATCH},   /* set brace matching mode, shortcut */
 	   {0, 0}
 	};
 
@@ -1171,6 +1181,10 @@ bell %s, vb %s, hy %s",
 		retval = doSetHighlight(arg);
 		break;
 
+	    case SET_BRACEMATCH:
+		retval = doSetBraceMode(arg);
+		break;
+
 	    case SET_FILLDOT:
 		fill_troffmode = NO;
 		break;
@@ -1206,12 +1220,12 @@ BadVal:         retval = CRBADARG;
 int
 doSetHighlight(char *arg) {
 
-	static char *l_highlight_info_str;
+	extern char *highlight_info_str;
 
 
 	if (strncmp(arg, "on",2) == 0) {
 	    highlight_mode = YES;
-	    highlight_info_str = l_highlight_info_str;
+	    highlight_info_str = "on";
 	/*  dbgpr("hilite mode on: %d\n", highlight_mode); */
 	}
 	else if (strncmp(arg, "off",3) == 0) {
@@ -1233,7 +1247,6 @@ doSetHighlight(char *arg) {
 	    if (n_colors == 0) {
 		highlight_mode = NO;
 		highlight_info_str = "bold";
-		l_highlight_info_str = highlight_info_str;
 		hilite_str = bold_str;
 		loopflags.hold = YES;
 		mesg (TELALL + 1, "Highlighting requires a terminal that supports colors");
@@ -1248,6 +1261,60 @@ doSetHighlight(char *arg) {
 	    mesg (TELALL + 1, "Usage:  set highlight on|off|color|bold|rev");
 	}
 
-	l_highlight_info_str = highlight_info_str;
 	return (CROK);
 }
+
+
+int
+doSetBraceMode(char *arg) {
+
+	int off = 0;   /* arg was "off" */
+
+	/* for now, we're only matching open/close pairs */
+
+	if (arg == NULL || *arg == '\0') {
+	    bracematching = bracematching == 1 ? 0 : 1;
+	}
+	else if (strncmp(arg, "on",2) == 0) {
+	    bracematching = YES;
+	}
+	else if (strncmp(arg, "pairs",2) == 0) {
+	    bracematching = YES;
+	}
+	else if (strncmp(arg, "off",3) == 0) {
+	    bracematching = 0;
+	    off++;
+	    info(7, 2, "  ");  /* clear instead of hilight */
+	}
+
+	char *msg = bracematching ? "{}" : "  ";
+	info(7, 2, msg);
+
+	return (CROK);
+}
+
+#ifdef NOTYET
+void
+toggleBracemode(int mode, int reset_cursor) {
+
+    char buf[64];
+    extern char *brace_p;
+
+    if (mode) {
+	snprintf(buf, 64, "%s{}%s", brace_p, sgr0);
+    }
+    else {
+	snprintf(buf, 64, "%s{}%s", hilite_str, sgr0);
+    }
+
+    mvcur(-1, -1, LINES, 7);
+    tputs(buf, 1, Pch);
+    if (reset_cursor) /* eg, mouse click toggled mode */
+       mvcur(-1, -1, curwin->ttext + cursorline, curwin->ltext + cursorcol);
+
+    fflush(stdout);
+
+    return;
+
+}
+#endif /* NOTYET */
