@@ -1,6 +1,6 @@
 /* useful for debugging */
 
-#define CCHIGHEST      0237
+#define CCHIGHEST      0241
 
 /* because we're inialized here,
  * don't #include in multiple files
@@ -77,6 +77,8 @@ KeyNameTable E_Keys[] = {
 {0234,           "CCRECORD"},
 {0235,           "CCPLAY"},
 {0237,           "CCMOUSEONOFF"},
+{0240,           "CCBRACE"},
+{0241,           "CCPUT"},
 {0400,           "NOCHAR"},
 {-1,             ""}
 };
@@ -93,6 +95,18 @@ KeyNameTable Curses_Keys[] = {
 {0406,    "KEY_HOME"},
 {0407,    "KEY_BACKSPACE"},
 {0410,    "KEY_F0"},
+{0411,    "KEY_F1"},
+{0412,    "KEY_F2"},
+{0413,    "KEY_F3"},
+{0414,    "KEY_F4"},
+{0415,    "KEY_F5"},
+{0416,    "KEY_F6"},
+{0417,    "KEY_F7"},
+{0420,    "KEY_F8"},
+{0421,    "KEY_F9"},
+{0422,    "KEY_F10"},
+{0423,    "KEY_F11"},
+{0424,    "KEY_F12"},
 {0510,    "KEY_DL"},
 {0511,    "KEY_IL"},
 {0512,    "KEY_DC"},

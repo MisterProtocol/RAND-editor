@@ -30,6 +30,8 @@ extern void drawsides ();
 extern void draw1side ();
 extern void infotrack ();
 
+extern Flag winshift;
+
 #ifdef COMMENT
 Cmdret
 makewindow (file)
@@ -85,7 +87,6 @@ char   *file;
        ) )
 	return NOMEMERR;
     winlist[nwinlist] = newwin;
-
     if (horiz) Block {
 	/* newwin is below oldwin on the screen  */
 	Reg1 Slines i;
@@ -146,12 +147,28 @@ char   *file;
 	else {
 	    if (oaltfile)
 		editfile (names[oaltfile], (Ncols) -1, (Nlines) -1, 0, NO);
-	    editfile (names[ocurfile],
+	    if (winshift == YES) {
+	        editfile (names[ocurfile],
+		      (Ncols) (horiz ? -1
+			       : oldwin->wksp->wcol + oldwin->rtext + 2),
+		      (Nlines) (horiz
+			       ? oldwin->wksp->wlin + oldwin->btext + 1 : -1),
+		      0, YES);  /* puflg is YES to initalize border chars */
+	    }
+	    else {
+			   /*  Why do we want new window to start at btext + 2 ?? */
+			   /* Because that way, the lower window doesn't have to 
+			    * shift one line down. Instead, one line is hidden by
+			    * the new window's horizontal top border.  Default
+			    * behavior, above, is to do the shift so all of the
+			    * text in the file is visible. */
+	        editfile (names[ocurfile],
 		      (Ncols) (horiz ? -1
 			       : oldwin->wksp->wcol + oldwin->rtext + 2),
 		      (Nlines) (horiz
 			       ? oldwin->wksp->wlin + oldwin->btext + 2 : -1),
 		      0, YES);  /* puflg is YES to initalize border chars */
+	    }
 	    poscursor (0, 0);
 	}
     }
@@ -393,7 +410,11 @@ Small how;
 	putch (TLCMCH, NO);
 	for (i++; i < j; i++)
 #ifdef LMCMARG
-	    if (tabs[k] == i - window->lmarg - 1 + window->wksp->wcol) {
+	    /*  The tabs array can be null if "CMD: -tabs" is followed by
+	     *  an exit, and e is restarted w/o any cmdline args
+	     */
+	/*  if (tabs[k] == i - window->lmarg - 1 + window->wksp->wcol) { */
+	    if (ntabs && tabs[k] == i - window->lmarg - 1 + window->wksp->wcol) {
 		/* no tab mark in col 0 */
 		if( tabs[k] != 0 )
 		    putch (TTMCH, NO);
@@ -427,7 +448,8 @@ Small how;
 /***************  no tab marks on bottom margin ************************/
 #ifdef OUT
 #ifdef LMCMARG
-	    if (tabs[k1] == i - window->lmarg - 1 + window->wksp->wcol) {
+	    /* if (tabs[k1] == i - window->lmarg - 1 + window->wksp->wcol) { */
+	    if (ntabs && tabs[k1] == i - window->lmarg - 1 + window->wksp->wcol) {
 		putch (BTMCH, NO);
 		if (k1 < ntabs) k1++;
 	    } else
