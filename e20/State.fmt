@@ -18,11 +18,42 @@ Strings include trailing null byte.
     char            insert mode flag
     char            regular expression mode
 /*  char            borderbullets       <- todo in next version (e19) */
+    char	    flag: insert mode
+    char	    flag: regular expression mode
+    char	    flag: literal mode
+    char	    flag: uptabs
+    char	    flag: blanks
+    char	    flag: nostrip
+    char	    flag: inplace
+    short	    kbfile name length
+    str		    kbfile name
+    short	    terminal name string length
+    str		    terminal name
+    char	    foreground rgboptions for highlighting
+    short	    fg_red
+    short	    fg_green
+    short	    fg_blue
+    char	    background rgboptions for highlighting
+    short	    bg_red
+    short	    bg_green
+    short	    bg_blue
+    char	    flag: ANSI foreground color set
+    short	    ANSI foreground color
+    char	    flag: ANSI background color set
+    short	    ANSI background color
+    char	    flag: showbuttons
+    char	    flag: skipmouse (no mouse init string sent)
+    char	    flag: useextnames (init mouse using curses "extnames")
+    char	    flag: bracematching
+    short	    highlight_info_str length
+    str		    highlight_info_str ("on", "off", "bold", "reverse", "color")
     char            flag: curmark follows
      long            curmark->mrkwinlin
      short           curmark->mrkwincol
      char            curmark->mrklin
      short           curmark->mrkcol
+     char	    flag: autofill
+     short	    autofill left margin
     char            number of windows
     char            current window
     struct {
