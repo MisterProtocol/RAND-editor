@@ -891,10 +891,10 @@ vertmvwin (nl)
 #endif
 Small
 vertmvwin (nl)
-Reg2 Slines nl;
+Reg2 Nlines nl;
 {
     Reg3 Nlines winlin;
-    Reg1 Slines cl;
+    Reg1 Nlines cl;
 
     winlin = curwksp->wlin;
     if (winlin == 0 && nl <= 0)

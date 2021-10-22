@@ -710,7 +710,7 @@ gotcmd:
 		case CCPLLINE:
 		    switch (paramtype) {
 		    case 0:
-			vertmvwin (cursorline - (key == CCPLLINE
+			vertmvwin ((Nlines) cursorline - (key == CCPLLINE
 				   ? 0 : curwin->btext));
 			break;
 

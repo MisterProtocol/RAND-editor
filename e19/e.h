@@ -847,7 +847,7 @@ extern Cmdret save ();
 extern Flag savefile ();
 extern Flag svrename ();
 /* e.t.c */
-extern Small vertmvwin ();
+extern Small vertmvwin (Nlines);
 extern Small horzmvwin ();
 extern Small movewin ();
 extern unsigned Short getkey ();
