@@ -121,7 +121,7 @@ all:
 $(O):
 	mkdir $(O)
 
-$(E):   $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
+$(E):   $(O) $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
 #       $(LD) $(LDFLAGS) /lib/crt0.o
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 	   $(O)e.main.o $(O)e.o $(O)e.pa.o $(O)e.iit.o $(O)e.q.o \
