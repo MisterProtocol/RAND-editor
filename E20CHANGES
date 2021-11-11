@@ -1,0 +1,114 @@
+
+Sep. 17, 2021
+E20 Changes:
+
+-   Major code cleanup eliminating compiler warnings; bug fixes.
+
+-   New crash recover options, allowing playback to stop early
+
+-   Revised the state file to include the options to restore an E
+    session (eg: "% e <return>") to the same state as when one exited.
+    Traditionally, "e" has incremented its version number when the
+    state file format has changed; hence, "e" is now "e20".
+
+-   Added mouse support using the left button to move the cursor,
+    change windows, and press/drag to mark a rectangular area.  The middle
+    button can be used to begin a "mark" and to "unmark" an area.  The
+    middle button will also scroll up/down if E20 is compiled with version 6.2
+    or greater of the ncurses library.  The right button is not used in E.
+
+-   Added the following color options for highlighting a marked area:
+
+      -setab=N [0-255] set background color number (black=0, white=255)
+      -setaf=N [0-255] set foreground color number (black=0, white=255)
+    or
+      -bgcolor=r,g,b (background color)
+      -fgcolor=r,g,b (foreground color)
+
+    "-setab" and "-setaf" use the ANSI color numbers.
+    (Tip:  if you have 256 colors available, background values
+    for the -setab option to try are: 3, 7, 11, 117, 151, 178, 194, 195, 222).
+
+
+-   Brace matching mode, {}, (), []
+
+    In brace matching mode, placing the cursor on an opening/closing brace
+    will search for the corresponding closing/opening brace.  If found in the
+    current window, the match will be highlighted.  If a match is found
+    outside the window, the line and column number of the match is shown
+    in the info window.  By default, brace matching is set to "coding"
+    mode, where a match for a closing curly brace stops at the end of the
+    current function() definition (which is assumed to be a "}" in column
+    one).   If "coding" mode is disabled ("set brace coding off"), a default
+    of +/- 100 lines are searched.  Use "set brace range N" to change the
+    line limit, (N=0 or "off" to disable).  If the range is 0, the search will
+    go to the end of file, or back to start of the file, unless a match is
+    found earlier.  The search is forward if the cursor is on an opening brace,
+    or backward if the cursor is on a closing brace.
+
+    Options:
+	CMD: set bracemode on|off
+	CMD: set {}  (shortcut to toggle on/off)
+	CMD: set brace range N|off
+	CMD: set brace ? shows limit value
+	CMD: set brace coding on|off
+	CMD: set brace toggle (cycle between modes: coding, limit, off)
+	    This last option is used by the -showbuttons {} function.
+
+-   Added the option "-showbuttons" to display clickable buttons
+    to run E commands.  For example, clicking on the "redr" button will
+    redraw the screen.  The following functions can be executed with a
+    mouse click:
+
+	cmd, ins, mark/unmrk, +sch/-sch, caps, ccase, spl/join, delC,
+	+W/-W, re, redr, +Pg/-Pg, +L/-L, +wd/-wd, open, close/-cl, pick/put,
+	erase/-er, {}, exit.
+
+    Because of the number of buttons, this options looks best in a screensize
+    of at least 92 chars.  The option -buttonfont=N [1-255] specifies a
+    button background color (the default area highlighting color is used
+    if not specified).
+
+-   The "window" command now displays the cursor line as the first line in
+    the new window.  Previously, the cursor line plus one was the first line
+    in the new window and the cursor line was obscured by the window
+    border.  The option -nowinshift reverts to the previous behavior
+    starting the new window at cursor line plus one.
+
+-   Added #define NORUNCMD_IN_PROFILE to disallow <cmd>run xxx</ret>
+    in the .e_profile
+
+-   Added environment variable EPROFILE20 to enable use of a separate .e_profile
+    file for e20.  Useful when both e20 and e19 are in use.
+
+-   New keyboard file options to map F1-12 to E commands.
+    Examples:
+
+	KEY_F1:<cmd>
+	KEY_F2:<redraw>
+	KEY_F3:<+page>
+	KEY_F4:<-page>
+	KEY_F5:<replace>
+	SHIFT_F1:<+page>
+	SHIFT_F2:<-page>
+	SHIFT_F3:<caps>
+	SHIFT_F4:<ccase>
+	SHIFT_F5:<insmd>
+	CTRL_F1:<split>
+	CTRL_F2:<join>
+	CTRL_F3:<mouse>
+	CTRL_F4:<close>
+	CTRL_F5:<-close>
+
+    Set EKBFILE_NCURSES if using both e20 and e19 (use EKBFILE for e19)
+
+    Note that some terminal emulators use a few function keys for their
+    own purposes, eg: gnome-terminal uses F1 for a Help menu, and F11 to
+    toggle full screen mode.
+
+    On Linux, ncurses appears to enable the xterm "altSendsEscape" resource,
+    which allows the definition of keyboard file entries like:
+
+	<esc>"o":<open>
+	<esc>"p":<pick>
+
