@@ -1,5 +1,7 @@
 #include <unistd.h>
 
+#include	"prototypes.h"
+
 int
 intss()
 {

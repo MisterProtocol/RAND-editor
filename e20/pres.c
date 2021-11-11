@@ -205,7 +205,7 @@ my_getprogname()
 
 
 void
-getoptions(check_only)
+getoptions(int check_only)
 {
     register char *p;
 
@@ -263,7 +263,7 @@ getoptions(check_only)
 }
 
 void
-filterfiles(check_only)
+filterfiles(int check_only)
 {
     register FILE *f = NULL;
 
@@ -464,7 +464,7 @@ stop ()
 }
 
 void
-my_getout (status)
+my_getout (int status)
 {
     fixtty ();
     exit (status);
@@ -637,6 +637,7 @@ docolors()
 
 	char setaf_set, setab_set;
 	short setaf, setab;
+	short btn_font_n;
 
 	fg_rgb_options = getc (input);
 	fg_r = getshort (input);
@@ -651,6 +652,7 @@ docolors()
 	setaf = getshort (input);
 	setab_set = getc (input);
 	setab = getshort (input);
+	btn_font_n = getshort (input);
 
 	if (fg_rgb_options)
 	    printf ("Foreground colors: %d, %d, %d\n", fg_r, fg_g, fg_b);
@@ -670,6 +672,8 @@ docolors()
 	    printf ("ANSI background color set: %d\n", setab);
 	else
 	    printf ("No ANSI background color set.\n");
+
+	printf ("ANSI buttonfont color number:  %d\n", btn_font_n);
 }
 
 void

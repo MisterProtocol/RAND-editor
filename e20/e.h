@@ -17,6 +17,11 @@
 #define USE_MKSTEMP     /* instead of mktemp which is unsafe */
 #endif /* GCC */
 
+/* This is an arbitrary limit, E will handle more.
+ * primarily for the error case in movewin(), e.t.c
+ */
+#define E_MAXNLINES 20000000
+
 
 /* various options.  All should be turned on. */
 
@@ -173,6 +178,7 @@ typedef char  AFd;              /* unix file descriptor */
 typedef Char  Fn;               /* index into files we are editing */
 typedef Uchar AFn;              /* index into files we are editing */
 typedef Small Cmdret;           /* comand completion status */
+typedef unsigned long ulong;	/* God knows why this is needed */
 
 #ifdef NOSIGNEDCHAR
 # define Uchar char
@@ -583,9 +589,16 @@ typedef struct savebuf {
 #define CCBRACE        0240     /* toggle brace match mode */
 #endif
 
-#define CCPUT          0241     /* insert PICK buffer */
+#define CCPUT          0241     /* insert PICK buffer (button func) */
+#define CCUNMARK       0242     /* unmark (for button funct) */
+#define CCREGEX        0243     /* RE toggle (for button func) */
 
-#define CCHIGHEST      0241
+#define CCPLWIN        0244     /* +w (for button function) */
+#define CCMIWIN        0245     /* -w (for button function) */
+#define CCMICLOSE      0246     /* -close (for button function) */
+#define CCMIERASE      0247     /* -close (for button function) */
+
+#define CCHIGHEST      0247 /* nxt is 0250 */
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */
@@ -769,6 +782,8 @@ extern Flag VBell;
 extern Flag NoBell;
 extern int DebugVal;
 
+int d_vmove (Slines, Scols, Slines, Scols, int, Flag);
+
 /* these used to be in e.c only */
 
 
@@ -803,8 +818,9 @@ extern Flag ischild;    /* YES if this is a child process */
 
 extern int zero;
 extern Flag uptabs, upblanks, upnostrip;
-extern void tgltabmode (), tglinsmode (), tglpatmode (),
-    tglblamode (), tgllitmode(), tglstrmode (), d_init();
+extern void tgltabmode (void), tglinsmode (void), tglpatmode (void),
+    tglblamode (void), tgllitmode(void), tglstrmode (void);
+extern void d_init (Flag, Flag);
 
 #ifdef LMCLDC
 
@@ -817,186 +833,255 @@ Flag line_draw;       /* we are in line drawing mode */
 /* Functions */
 
 /* ../lib/getshort.c */
-extern short getshort ();
-extern void putshort ();
+extern short getshort (FILE *);
+extern void putshort (short, FILE *);
 
 /* ../lib/getlong.c */
-extern long getlong ();
-extern long putlong ();
+extern long getlong (FILE *);
+extern long putlong (long, FILE *);
 
 /* e.c */
 extern _Noreturn void getout (Flag, char *, ...);
+extern void checkargs (void);
+extern void startup (void);
+extern void showhelp (void);
+extern void gettermtype (void);
+extern void setitty (void);
+extern void setotty (void);
+extern void makescrfile (void);
+extern void infoinit (void);
+extern Small getcap (char *);
+#ifdef LMCAUTO
+extern void infoint0 (void);
+#endif /* LMCAUTO */
+#ifdef  KBFILE
+extern void getkbfile (char *);
+#endif /* KBFILE */
+
 /* e.cm.c */
-extern Cmdret command ();
+extern Cmdret command (int, char *);
 extern Cmdret gotocmd ();
-extern Cmdret my_doupdate ();
+extern Cmdret my_doupdate (Flag);
 extern char *highlight_info_str;
+extern int doSetBraceMode (char *);
 /* e.dif.c */
-extern Cmdret diff ();
+extern Cmdret diff (Small);
 /* e.e.c */
-extern Cmdret areacmd ();
-extern Cmdret splitmark ();
-extern Cmdret splitlines ();
-extern Cmdret joinmark ();
+extern Cmdret areacmd (Small);
+extern Cmdret splitmark (void);
+extern Cmdret splitlines (Nlines, Ncols, Nlines, Ncols, Flag);
+extern Cmdret joinmark (void);
+extern Cmdret split (void);
+extern Cmdret join (void);
+Cmdret ed (Small, Small, Nlines, Ncols, Nlines, Ncols, Flag);
+Cmdret edmark (Small, Small);
 /* e.f.c */
-extern Flag multlinks ();
-extern Flag fmultlinks ();
-extern Fn hvname ();
-extern Fn hvoldname ();
-extern Fn hvdelname ();
-/* e.h.c */
-#ifdef LMCHELP
-extern Cmdret morehelp();
-#endif
+extern Flag multlinks (char *);
+extern Flag fmultlinks (Fd);
+extern Fn hvname (char *);
+extern Fn hvoldname (char *);
+extern Fn hvdelname (char *);
+extern int dircheck (char *, char **, char **, Flag, Flag);
+extern int dirncheck (char *, Flag, Flag);
+extern int filetype (char *);
+extern int fgetpriv (Fd);
+/* e.iit.c */
+
 /* e.la.c */
-extern Flag putline ();
-extern Ncols dechars ();
-extern Flag extend ();
-extern Nlines lincnt ();
+extern void GetLine (Nlines);
+
+extern Flag putline (void);
+extern void chkcline (void);
+extern void shortencline (void);
+
+extern Ncols dechars (char *);
+extern Flag extend (Nlines);
+extern Nlines lincnt (Nlines, Nlines, Flag);
+extern void excline (Ncols);
 /* e.mk.c */
-extern Nlines topmark ();
-extern Ncols leftmark ();
-extern Flag gtumark ();
-extern Small exchmark ();
+extern Nlines topmark (void);
+extern Ncols leftmark (void);
+extern Flag gtumark (Flag);
+extern Small exchmark (Flag);
+extern int Pch(int);
+extern void markprev (void);
+extern int FindBraceBack(int, int, int, long *, int *);
+extern int FindBraceForw(int, int, int, long *, int *);
+extern int win_has_eof(void);
 /* e.nm.c */
-extern Cmdret name ();
+extern Cmdret name (void);
 extern Cmdret delete ();
 extern Flag dotdot ();
 /* e.p.c */
-extern Small printchar ();
+extern Small printchar (void);
+extern void infoauto (Flag);
+extern Cmdret dodword (int);
+Cmdret setwordmode (char *);
+extern Small mword (int, int);
 /* e.pa.c */
-extern Small getpartype ();
-extern char *getword ();
-extern Cmdret scanopts ();
+extern Small getpartype (char **, Flag, Flag, Nlines);
+extern char *getword (char **);
+extern Cmdret scanopts (char **, Flag, S_looktbl *, int (*)());
 extern Small getopteq ();
-extern Small doeq ();
-extern int lookup ();
+extern Small doeq (char **, int *);
+extern int lookup (char *, S_looktbl *);
 /* e.put.c */
 extern Cmdret insert ();
 extern Cmdret insbuf ();
 /* e.q.c */
-extern Cmdret eexit ();
-extern Flag saveall ();
-extern Flag savestate ();
+extern Cmdret eexit (void);
+extern Flag saveall (void);
+extern Flag savestate (void);
+/* e.ra.c */
+extern Cmdret rangecmd (Small);
+extern Nlines rangelimit (Nlines, Small, Nlines);
+extern void showrange ();
+/* e.re.c */
+extern char *re_comp (char *);
+extern char *re_exec (char *);
+extern char *re_replace (char *);
+extern int re_len (void);
+extern Small patsearch (char *, Nlines, Ncols, Nlines, Small, Flag);
 /* e.ru.c */
 extern Cmdret print ();
-extern Cmdret my_filter ();
-extern Cmdret filtmark ();
-extern Cmdret filtlines ();
-extern Cmdret run ();
-extern Cmdret runlines ();
-extern Flag dowait ();
-extern Flag receive ();
+extern Cmdret my_filter (Small, Flag);
+extern Cmdret filtmark (Small, Flag);
+extern Cmdret filtlines (Small, Nlines, Nlines, Flag, Flag);
+extern Cmdret parsauto (Flag);
+extern Cmdret run (char *, Short);
+extern Cmdret runlines(char *,char*,char **,Nlines,Nlines,Small,Flag,Flag,Flag);
+#ifdef RUNSAFE
+extern Flag dowait (int);
+#else
+extern Flag dowait (int,int,int);
+#endif
+extern Flag receive (long, Nlines, Nlines, Small, Flag);
 /* e.sb.c */
-extern char *getmypath ();
-extern char *gsalloc ();
-extern char *salloc ();
-extern char *okalloc ();
-extern char *append ();
-extern char *copy ();
-extern char *s2i ();
+extern void getpath (char *, char **, Flag);
+extern char *getmypath (void);
+extern char *gsalloc (char *, int, int, Flag);
+extern char *salloc (Ncols, Flag);
+extern char *okalloc (int);
+extern char *append (char *, char *);
+extern char *copy (char *, char*);
+extern char *s2i (char *, long *);
 extern char *itoa();
-extern Flag mv ();
-extern Flag okwrite ();
-extern Small filecopy ();
-extern void sig ();
+extern Flag mv (char *, char *);
+extern Flag okwrite (void);
+extern Small filecopy (char *, Fd, char *, Fd, Flag, int);
+extern void sig (int);
 extern void srprintf ();
+extern Flag islocked (Flag);
 /* e.se.c */
-extern Cmdret replace ();
-extern Small dsplsearch ();
-extern Small strsearch ();
-extern Ncols skeylen ();
+extern Cmdret replace (Small);
+extern Small dsplsearch (char *, Nlines, Ncols, Nlines, Small, Flag, Flag);
+extern Small strsearch (char *, Nlines, Ncols, Nlines, Small, Flag);
+extern Ncols skeylen (char *, Flag, Flag, Flag);
+extern int zaprpls (void);
 /* e.sv.c */
-extern Cmdret save ();
-extern Flag savefile ();
-extern Flag svrename ();
+extern Cmdret save (void);
+extern Flag savefile (char *, Fn, Flag, Flag);
+extern Flag svrename (Fn);
 /* e.t.c */
-extern Small vertmvwin ();
-extern Small horzmvwin ();
-extern Small movewin ();
-extern unsigned Short getkey ();
+extern Small vertmvwin (Nlines);
+extern Small horzmvwin (Ncols);
+extern Small movewin (Nlines, Ncols, Slines, Scols, Flag);
+extern unsigned Short getkey (Flag, struct timeval *);
+extern unsigned Short mGetkey (Flag, struct timeval *);
 extern Flag dintrup ();
 extern Flag la_int();
-extern Flag sintrup ();
+extern Flag sintrup (void);
+extern void setmarg (Ncols *, Ncols);
+extern void offbullets (void);
+extern void dobullets (Flag, Flag);
+
 /* e.tb.c */
-extern Cmdret dotab ();
-extern Cmdret dotabs ();
-extern Small getptabs ();
-extern Cmdret tabfile ();
-extern Flag gettabs ();
+extern Cmdret dotab (Flag);
+extern Cmdret dotabs (Flag);
+/*extern Small getptabs ();*/
+extern Cmdret tabfile (Flag);
+extern Flag gettabs (char *, Flag);
 /* e.u.c */
 extern Cmdret use ();
-extern Small editfile ();
-extern Fn getnxfn ();
+extern Cmdret edit (void);
+extern Small editfile (char *, Ncols, Nlines, Small, Flag);
+/*extern Fn getnxfn ();*/
 /* e.wi.c */
-extern S_window *setupwindow ();
+extern S_window *setupwindow (S_window *,Scols,Slines,Scols,Slines,Flag,Flag);
+extern Cmdret makewindow (char *);
 /* e.wk.c */
-extern Flag swfile ();
+extern Flag swfile (void);
+extern void switchfile (void);
 
-extern void chgwindow ();
+extern void chgwindow (Small);
 extern void clean ();
-extern void cleanup ();
-extern void clrbul ();
-extern void credisplay ();
+extern void cleanup (Flag, Flag);
+extern void clrbul (void);
+extern void credisplay (Flag);
 extern void d_write ();
 extern void dbgpr (char *, ...);
 extern void dobullets ();
 extern void dosearch ();
+extern void dostop (void);
 extern void drawborders ();
 extern void eddeffile ();
 extern void edscrfile ();
-extern void exchgwksp ();
+extern void exchgwksp (Flag);
 extern void excline ();
 _Noreturn extern void fatal (Flag, char*, ...);
 extern void fatalpr (char *, ...);
-extern void fixtty ();
-extern void flushkeys ();
-extern void fresh ();
-extern void getarg ();
+extern void fixtty (void);
+extern void flushkeys (void);
+extern void fsynckeys (void);
+extern void fresh (void);
+extern void getarg (void);
 extern ssize_t getline ();	/* type changed from "void" 2/11/21 MOB */
 extern void getpath ();
-extern void gotomvwin ();
+extern void gotomvwin (Nlines);
 extern void igsig ();
-extern void info ();
-extern void infoprange ();
-extern void inforange ();
-extern void infotrack ();
-extern void limitcursor ();
-extern void mainloop ();
-extern void mark ();
+extern void info (Scols, Scols, char *);
+extern void inforange (Flag);
+extern void infoprange (Nlines);
+extern void infotrack (Flag);
+extern void limitcursor (void);
+extern void mainloop (void);
+extern void mark (void);
 /*extern void mesg ();*/
 extern void mesg (int, ...);
-extern void movecursor ();
-extern void param ();
-extern void poscursor ();
+extern void movecursor (Small, Nlines);
+extern void multchar (Char, Scols);
+extern void param (void);
+extern void poscursor (Scols, Slines);
 extern void putbks ();
-extern void putch ();
-extern void putup ();
-extern void putupwin ();
-extern void redisplay ();
-extern void releasewk ();
-extern void removewindow ();
-extern void replkey ();
-extern void restcurs ();
-extern void savecurs ();
-extern void savewksp ();
-extern void screenexit ();
-extern void sctab ();
-extern void setbul ();
+extern void putch (int, Flag);
+extern void putup (Slines, Slines, Scols, Scols);
+extern void putupwin (void);
+extern void redisplay (Fn, Nlines, Nlines, Nlines, Flag);
+extern void releasewk (S_wksp *);
+extern void removewindow (void);
+extern void replkey (void);
+extern void burncurs (void);
+extern void restcurs (void);
+extern void savecurs (void);
+extern void savewksp (S_wksp *);
+extern void screenexit (Flag);
+extern void sctab (Ncols, Flag);
+extern void setbul (Flag);
 extern void setitty ();
 extern void setotty ();
 extern void switchfile ();
 extern void switchwindow ();
 extern void tabevery ();
-extern void tglpatmode ();      /* added MAB */
-extern void tglinsmode ();
-extern void unmark ();
-extern void writekeys ();
+extern void tglpatmode (void);      /* added MAB */
+extern void tglinsmode (void);
+extern void unmark (void);
+extern void writekeys (int, char *, int);
 
 #ifdef  STARTUPFILE
 /* e.profile.c */
 extern Flag dot_profile;
 extern FILE *fp_profile;
+#define NORUNCMD_IN_PROFILE /* don't allow <cmd>run xxx<ret> in .e_profile */
 #endif /* STARTUPFILE */
 
 #ifdef RECORDING
@@ -1005,9 +1090,22 @@ extern Flag recording, playing;
 extern Uchar *rec_p, *rec_text;
 extern int rec_size, rec_count, rec_len, play_count;
 extern Flag play_silent;
+extern Cmdret SetRecording (Short);
+extern void RecordChar (unsigned Short);
+extern Cmdret UnSetRecording (void);
+extern Cmdret PlayRecording (int);
+extern Uchar *PlayChar(Flag);
+extern Cmdret DoMacro (char *, char *);
+extern Cmdret UndefMacro (char *);
+extern Cmdret StoreMacro (char *);
+extern void SaveMacros (void);
+extern void ReadMacroFile (void);
+extern Cmdret ShowMacros (char *);
+
 #endif
 
 extern char *etcdir;
 extern char *keytmp;
 
+extern char *my_move (char *, char *, unsigned long);
 

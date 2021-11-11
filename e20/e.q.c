@@ -20,7 +20,7 @@ file e.q.c
 #include SIG_INCL
 
 extern char *getenv ();
-extern void reenter ();
+extern void reenter (void);
 extern int ff_sync ();
 
 extern Flag fg_rgb_options;
@@ -35,6 +35,10 @@ extern Flag setaf_set;
 extern Flag setab_set;
 extern int opt_setaf;
 extern int opt_setab;
+
+#ifdef MOUSE_BUTTONS
+extern int btn_font_n;
+#endif
 
 extern char *optkbfile;
 extern char *opttname;
@@ -58,7 +62,7 @@ extern void exitCurses();
 
 
 #ifdef DOSHELL
-extern void docall ();
+extern void docall (char *args[]);
 
 #ifdef COMMENT
 Cmdret
@@ -224,6 +228,7 @@ reenter ()
 #define EXNORMAL        2
 #define EXNOSAVE        3
 #define EXQUIT          4
+#define EXUNSAFE        5
 
 #ifdef COMMENT
 Cmdret
@@ -253,8 +258,10 @@ eexit ()
 	{"dump"    , EXDUMP     },
 	{"nosave"  , EXNOSAVE   },
 	{"quit"    , EXQUIT     },
+	{"unsafe"  , EXUNSAFE   },
 	{0, 0}
     };
+    extern char *exitmessage;
 
     if (opstr[0] == '\0')
 	extblind = EXNORMAL;
@@ -279,6 +286,7 @@ eexit ()
     case EXDUMP:
     case EXNOSAVE:
     case EXQUIT:
+    case EXUNSAFE:
 	d_put (0);
 	fixtty ();
 	screenexit (YES);
@@ -311,6 +319,13 @@ eexit ()
 #endif
 	    /* NOTREACHED */
 	}
+	break;
+
+    case EXUNSAFE:
+	cleanup (YES, YES);     /* 2nd YES will remove keys file */
+	if (exitmessage)
+	    printf("%s\n", exitmessage);
+	fflush(stdout);
     }
 
 #ifdef PROFILE
@@ -403,6 +418,7 @@ saveall ()
 	    goto err;
     }
 
+    putchar ('\r');
     putchar ('\n');
     fflush (stdout);
     return YES;
@@ -529,6 +545,13 @@ savestate ()
     putshort ((short) opt_setaf, stfile);
     putc (setab_set, stfile);
     putshort ((short) opt_setab, stfile);
+
+#ifdef MOUSE_BUTTONS
+    /* must come right after other color options as an initColor()
+     * is called in getstate
+     */
+    putshort ((short) btn_font_n, stfile);
+#endif
 
     putc (optshowbuttons, stfile);      /* show clickable buttons */
     putc (optskipmouse, stfile);        /* skip ncurses mouse init */

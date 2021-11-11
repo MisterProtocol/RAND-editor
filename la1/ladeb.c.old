@@ -11,7 +11,7 @@ char *txt;
     for (;ffsd;) {
 	printf ("fsd 0x%lx\n", ffsd);
 	printf (" back= 0x%04x, forw= 0x%04x, ",
-		ffsd->fsdback,  ffsd->fsdforw);
+		(unsigned int)ffsd->fsdback,  (unsigned int)ffsd->fsdforw);
 #ifdef LA_BP
 	printf ("nbytes =%5d, ", ffsd->fsdnbytes);
 #endif
@@ -85,7 +85,7 @@ char *txt;
     printf ("La_file dump:                  %r", &txt);
     putchar ('\n');
     printf ("  ffsd= 0x%04x, lfsd= 0x%04x, ffs= 0x%04x, ",
-	    plaf->la_ffsd, plaf->la_lfsd, plaf->la_ffs);
+	    (unsigned int)plaf->la_ffsd, (unsigned int)plaf->la_lfsd, (unsigned int)plaf->la_ffs);
     printf ("fsrefs= %d, refs= %d, mode= %d\n",
 	    plaf->la_fsrefs, plaf->la_refs, plaf->la_mode);
     printf ("  maxline= %d, ", plaf->la_maxline);

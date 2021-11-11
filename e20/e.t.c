@@ -64,19 +64,25 @@ Scols putupdelta;               /* nchars to insert (delete) in putup() */
 
 Flag entering = NO;     /* set if e is in the param () routine. */
 
-int fnbcol ();
+int fnbcol (char *, Ncols, Ncols);
+
+unsigned Short getkey1 (Flag, struct timeval *);
+Flag dintrup (void);
+Flag la_int (void);
+void exchgcmds (void);
 
 #ifdef NCURSES
-extern void debug_inputkey ();
-extern void dbg_showMarkInfo();
-/* these are tmp copies of getkey and getkey1 for debugging... */
-unsigned Short mGetkey (Flag peekflg, struct timeval *timeout);
-unsigned Short mGetkey1(Flag peekflg, struct timeval *timeout);
-Char MapCursesKey(Char rchar);
+
+/* these are replacement versions of getkey and getkey1 */
+unsigned Short mGetkey (Flag, struct timeval *);
+unsigned Short mGetkey1(Flag, struct timeval *);
+Char MapCursesKey(Char);
+
 #include "e.keys.h"
-char *getEkeyname(int i);
-char *getCursesKeyname(int i);
-char *dbg_KeyName(int c);
+
+char *getEkeyname(int);
+char *getCursesKeyname(int);
+char *dbg_KeyName(int);
 
 #ifdef MOUSE_BUTTONS
 extern int mouseFuncKey;
@@ -89,49 +95,43 @@ Flag finished_replay = NO;
 extern off_t replay_filesize;
 extern int replay_stopcount;
 
+extern void scvtab (Ncols, Flag);
 extern void putupwin ();
 extern void putup ();
 extern void multchar ();
+extern void offbullets ();
 extern void dobullets ();
 #ifdef LMCMARG
-extern void tm_unbullet ();
-extern void bm_unbullet ();
-extern void stmarg0 ();
+extern void tm_unbullet (Flag, Ncols, Ncols, int, Flag);
+extern void bm_unbullet (Flag, Ncols, Ncols, int, int);
+extern void stmarg0 (Ncols, Flag, Flag);
 #endif /* LMCMARG */
 extern void setbul ();
 extern void clrbul ();
-extern void gotomvwin ();
 extern void savecurs ();
 extern void restcurs ();
 extern void burncurs ();
 extern void poscursor ();
-extern void movecursor ();
 extern void writekeys ();
-extern void putch ();
+/*extern void putch ();*/
 extern void param ();
 extern void exchgcmds ();
 extern void getarg ();
 extern void limitcursor ();
 extern void info ();
 extern void credisplay ();
-extern void redisplay ();
 extern void screenexit ();
 extern void tglinsmode ();
-extern void GetLine ();
 extern void fsynckeys ();
-extern Flag vinsdel ();
-#ifdef RECORDING
-extern Uchar *PlayChar();
-extern void RecordChar ();
-#endif
-extern int get_profilekey ();
+extern Flag vinsdel (Slines, Slines, Flag);
+extern int get_profilekey (Flag);
 extern int d_vmove ();
-extern void doMouseReplay();
-void dbg_winlist();
+extern void doMouseReplay(int, int);
+
+/*void dbg_winlist();*/
 
 
-void MesgHack ();
-void setmarg ();
+void MesgHack (Small, char *);
 
 void mesg (int, ...);
 
@@ -210,10 +210,11 @@ Scols   ncols;      /* number of columns for partial line redraw */
       goto ret;
     }
 
-/**
-    dbgpr("putup0: ls=(%d) lf=(%d) strtcol=(%d) ncols=(%d), lcol=(%d), cursorcol=(%d) cursorlin=(%d) rlimit=(%d), \n",
-    ls,lf,strtcol,ncols,lcol,cursorcol,cursorline,rlimit);
- **/
+/** /
+dbgpr("putup0: ls=(%d) lf=(%d) strtcol=(%d) ncols=(%d), lcol=(%d), cursorcol=(%d) cursorlin=(%d) rlimit=(%d), \n",
+ls,lf,strtcol,ncols,lcol,cursorcol,cursorline,rlimit);
+dbgpr("putup0a:  curwksp->wlin=%d\n", curwksp->wlin);
+/ **/
 
     /* if the caller knows that after the putup he will move the cursor
      * to someplace other than where it is, then he will set newcurline
@@ -267,7 +268,7 @@ Scols   ncols;      /* number of columns for partial line redraw */
 
 	if (freshputup) {
 	    poscursor (-1, ln);
-	    putch (chgborders == 1 ? lmc : INMCH, NO);
+	    putch ((Uchar)(chgborders == 1 ? lmc : INMCH), NO);
 	    if (curwin->lmchars)
 	      curwin->lmchars[ln] = lmc;
 	} else Block {
@@ -670,7 +671,7 @@ void
 tm_unbullet (allbullets, occ, tb, ordch, igntab)
     Flag allbullets, igntab;
     Ncols occ, tb;
-    char ordch;
+    Uchar ordch;
 {
     Ncols i;
 
@@ -694,7 +695,7 @@ void
 bm_unbullet (allbullets, occ, tb, ordch, xordch, igntab)
     Flag allbullets, igntab;
     Ncols occ, tb;
-    char ordch, xordch;
+    Uchar ordch, xordch;
 .
     bm_unbullet is called to move the bottom bullets. It essentially
     rewrites the margin character, based on current margin data.
@@ -705,7 +706,7 @@ void
 bm_unbullet (allbullets, occ, tb, ordch, xordch)
     Flag allbullets;
     Ncols occ, tb;
-    char ordch, xordch;
+    Uchar ordch, xordch;
 {
     /*Ncols i;*/
 
@@ -941,7 +942,25 @@ vertmvwin (nl)
 Reg2 Nlines nl;
 {
     Reg3 Nlines winlin;
-    Reg1 Nlines cl;
+    Reg1 Slines cl;
+
+/** /
+dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d\n",
+ nl, curwksp->wlin, cursorline, curwin->btext);
+/ **/
+
+    /* We have seen the value of nl arrive as a very large
+     * number (MAXLONG) as a result of an expression with
+     * ints and longs.  We believe it is fixed but just in
+     * case.  It is not fun to move to line 9223372036854775807L!
+     */
+    if (nl > la_lsize(curlas)) {
+	char buf[128];
+	dbgpr("nl=%ld > filesize=%ld\n", nl, la_lsize(curlas));
+	sprintf(buf, "data error, can't move to line %ld\n", nl);
+	mesg(ERRALL+1, buf);
+	return -1;
+    }
 
     winlin = curwksp->wlin;
     if (winlin == 0 && nl <= 0)
@@ -950,7 +969,7 @@ Reg2 Nlines nl;
 	nl -= winlin;
 	winlin = Z;
     }
-    cl = cursorline - nl;
+    cl = (Slines) cursorline - nl;
 
     if (abs (nl) > curwin->btext)
 	cl = cursorline;
@@ -1012,15 +1031,22 @@ Reg6 Scols   curscol;
     Reg4 Ncols  hdist;      /* horizontal distance to move */
     Reg2 S_wksp *cwksp = curwksp;
 
-/**
+/** /
+dbgpr("--movewin: winlin=%d, wincol=%d, curslin=%d, \
+cursorcol=%d, curwksp->wlin=%d, puflg=%d\n",
+  winlin, wincol, curslin, curscol, curwksp->wlin, puflg);
+/ **/
+
+
+/** /
 dbgpr("movewin:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
     curwin, &wholescreen, &enterwin, &infowin);
 dbgpr("movewin:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.wksp=(%o)\n",
     curwksp, wholescreen.wksp, enterwin.wksp, infowin.wksp);
- **/
+/ **/
 
 if( 1 && curwin == &enterwin ) {
-  dbgpr("movewin: curwin == &enterwin, chgwindow\n");
+/** / dbgpr("movewin: curwin == &enterwin, chgwindow\n"); / **/
 /*return 0;*/
   chgwindow(-1);
 }
@@ -1031,9 +1057,11 @@ if( 1 && curwin == &enterwin ) {
 #ifdef LA_LONGFILES
     if (winlin + defplline < 0)
 #else
-    if ((long) winlin + defplline > LA_MAXNLINES)
+/*  if ((long) winlin + defplline > LA_MAXNLINES) */
+    if ((long) winlin + defplline > E_MAXNLINES)
 #endif
-	winlin = LA_MAXNLINES - defplline;
+    /*  winlin = LA_MAXNLINES - defplline; */
+	winlin = E_MAXNLINES - defplline;
     curslin = max (0, curslin);
     curslin = min (curslin, curwin->btext);
     curscol = max (0, curscol);
@@ -1050,9 +1078,11 @@ if( 1 && curwin == &enterwin ) {
 #ifdef LA_LONGFILES
 		else if (awksp->wlin + defplline < 0)
 #else
-		else if ((long) awksp->wlin + defplline > LA_MAXNLINES)
+	  /*    else if ((long) awksp->wlin + defplline > LA_MAXNLINES) */
+		else if ((long) awksp->wlin + defplline > E_MAXNLINES)
 #endif
-		    awksp->wlin = LA_MAXNLINES - defplline;
+	       /*   awksp->wlin = LA_MAXNLINES - defplline; */
+		    awksp->wlin = E_MAXNLINES - defplline;
 	    }
 	    cwksp->wlin = winlin;
 	    newdisplay |= WLINMOVED;
@@ -1099,6 +1129,7 @@ if( 1 && curwin == &enterwin ) {
     if (newdisplay & WCOLMOVED)
 	drawborders (curwin, WIN_ACTIVE);
 #endif /* LMCMARG */
+
     poscursor (curscol, curslin);
     return newdisplay;
 }
@@ -1223,11 +1254,6 @@ if( DebugVal ) {
     putscbuf[1] = 041 + curwin->ltext + col;
     putscbuf[2] = 041 + curwin->ttext + lin;
     d_write (putscbuf, 3);
-
-/** /
-if(curmark)
- dbg_showMarkInfo("poscur");
-/ **/
 
     return;
 }
@@ -1379,7 +1405,7 @@ Reg2 Flag peekflg;
     /*extern*/ unsigned Short getkey1 ();
 
     if (peekflg == WAIT_KEY && keyused == NO) {
-	return key; /* then getkey is really a no-op */
+	return (Uint)key; /* then getkey is really a no-op */
     }
 
 #ifdef  SYSSELECT
@@ -1388,17 +1414,14 @@ Reg2 Flag peekflg;
     rkey = getkey1 (peekflg);
 #endif /* SYSSELECT */
 
-#ifdef NCURSES
-/*  debug_inputkey(rkey,"e.t.c, getkey()"); */
-#endif /* NCURSES */
-
     if (knockdown && rkey < 040)
 	rkey |= 0100;
     if (peekflg != WAIT_KEY)
 	return rkey;
     knockdown = rkey == CCCTRLQUOTE;    /* ^\ knockdown next char   */
     keyused = NO;
-    return key = rkey;
+    key = (int)rkey;
+    return rkey;
 }
 
 #ifdef  SYSSELECT
@@ -1501,7 +1524,7 @@ Small peekflg;
 		cp = lp = chbuf;
 		if (charsaved)
 		    *cp++ = svchar;
-		if ((lcnt = xread (inputfile, (char *) cp, NREAD - charsaved))
+		if ((lcnt = xread (inputfile, (char *) cp, (size_t)(NREAD - charsaved)))
 		    >= 0) {
 		    if (lcnt > 0) {
 			svchar = cp[lcnt - 1];
@@ -1576,7 +1599,7 @@ Small peekflg;
 	 *  Input from the .e_profile file?
 	 */
 	if( dot_profile && peekflg == WAIT_KEY )
-	    return( get_profilekey( NO ));
+	    return( (Uint)get_profilekey( NO ));
 #endif /* STARTUPFILE */
 
 	if (lcnt < 0)
@@ -1592,7 +1615,7 @@ Small peekflg;
 		    /* handle frequent case more efficiently */
 		    *chbuf = *lp;
 		else
-		    my_move (lp, (char *) chbuf, (Uint) lcnt);
+		    my_move ((char *)lp, (char *) chbuf, (ulong) lcnt);
 		lp = chbuf;
 	    }
 	    d_put (0);
@@ -1662,7 +1685,7 @@ Small peekflg;
 #endif /* FDSET */
 #endif /* FSYNCKEYS */
 #endif /* SYSSELECT */
-		if ((nread = xread (inputfile, (char *) &chbuf[lcnt], nread))
+		if ((nread = xread (inputfile, (char *) &chbuf[lcnt], (size_t)nread))
 		    > 0) Block {
 		    Reg4 Uchar *stcp;
 		    stcp = &chbuf[lcnt -= lexrem];
@@ -1726,7 +1749,7 @@ Small peekflg;
 #endif
 
 	if (keyfile != NULL && rchar != CCINT) {
-	    putc (rchar, keyfile);
+	    putc ((int)rchar, keyfile);
 	    if (numtyp > MAXTYP) {
 		flushkeys ();
 		numtyp = 0;
@@ -2083,7 +2106,7 @@ Flag    flg;
     return;
 }
 
-extern char *pkarg ();
+extern char *pkarg (S_wksp *wksp, Nlines line, Ncols col, int *len);
 
 static S_window *msowin;
 static Scols  msocol;
@@ -2142,7 +2165,7 @@ param ()
 	if (lcmdlen >= ccmdl)
 	    ccmdp = gsalloc (ccmdp, 0, ccmdl = lcmdlen + LPARAM, YES);
 	for (c1 = ccmdp, c2 = lcmdp, i = lcmdlen; i--; )
-	    putch (*c1++ = *c2++, NO);
+	    putch ((Uchar)(*c1++ = *c2++), NO);
 	*c1 = '\0';
 	ppos = ccmdlen = lcmdlen;
 #ifdef SYSSELECT
@@ -2210,9 +2233,9 @@ else {
 #ifdef MOUSE_BUTTONS
 	/* check if a mouse button is pressed while in CMD mode */
 	if( key == CCMOUSE ) {
-/* /dbgpr("param, calling getMouseButtonEvent(), mouseFuncKey=(%d)\n",mouseFuncKey); / */
+/** /dbgpr("param, calling getMouseButtonEvent(), mouseFuncKey=(%d)\n",mouseFuncKey); / **/
 	    getMouseButtonEvent();
-/* /dbgpr("param, after getMouseButtonEvent(), mouseFuncKey=(%d)\n",mouseFuncKey);  / */
+/** /dbgpr("param, after getMouseButtonEvent(), mouseFuncKey=(%d)\n",mouseFuncKey);  / **/
 	    if (mouseFuncKey != -1) {
 		key = mouseFuncKey;
 		mouseFuncKey = -1;
@@ -2241,7 +2264,7 @@ else {
 			    if ((i = ccmdlen - ppos) > 0) {
 				c2 = &(c1 = ccmdp)[ppos];
 				do {
-				    putch (*c1++ = *c2++, NO);
+				    putch ((Uchar)(*c1++ = *c2++), NO);
 				} while (--i);
 			    }
 			    i = ppos;
@@ -2257,7 +2280,7 @@ else {
 			    c1 = ccmdp;
 			    poscursor (cursorcol - ppos, cursorline);
 			    do {
-				putch (*c1++ = ' ', NO);
+				putch ((Uchar)(*c1++ = ' '), NO);
 			    } while (--i);
 			}
 		    }
@@ -2292,11 +2315,11 @@ else {
 			else {
  delchr:                    if (i > 0)
 				my_move (&ccmdp[ppos + 1], &ccmdp[ppos],
-				      (Uint) i);
+				      (ulong) i);
 			    ccmdlen--;
 			    savecurs ();
 			    for (i = ppos; i < ccmdlen; )
-				putch (ccmdp[i++], NO);
+				putch ((Uchar)ccmdp[i++], NO);
 			    putch (' ', NO);
 			    restcurs ();
 			}
@@ -2379,7 +2402,7 @@ else {
 			lin = cursorline;
 			c1 = &ccmdp[ppos];
 			for (i = ccmdlen - ppos; i-- > 0; )
-			    putch (*c1++, NO);
+			    putch ((Uchar)*c1++, NO);
 			poscursor (col, lin);
 		    }
 		    ppos += wlen;
@@ -2441,7 +2464,7 @@ else {
 		col = cursorcol + 1;
 		lin = cursorline;
 		for (i = ppos++; i < ccmdlen; )
-		    putch (ccmdp[i++], NO);
+		    putch ((Uchar)ccmdp[i++], NO);
 		poscursor (col, lin);
 	    }
 	}
@@ -2565,7 +2588,7 @@ getarg ()
     if (ccmdl < len + 1)
 	ccmdp = gsalloc (ccmdp, 0, ccmdl = len + 1, YES);
     /* arg = rest of "word" */
-    strncpy (ccmdp, cp, len);
+    strncpy (ccmdp, cp, (size_t)len);
     ccmdp[len] = '\0';
     ccmdlen = len;
     paramv = ccmdp;
@@ -2652,7 +2675,8 @@ Reg2 char *msg;
     oldlin = cursorline;
 /** /
 if (DebugVal)
-dbgpr("info(), col=(%d) ncols=(%d) msg=(%s)\n", column, ncols, msg);
+dbgpr("info(), col=(%d) ncols=(%d) msg=(%s) infowin.{tmarg ttext}=%d %d\n",
+column, ncols, msg, infowin.tmarg, infowin.ttext);
 / **/
     switchwindow (&infowin);
     poscursor (column, 0);
@@ -2943,7 +2967,7 @@ dbgpr("MsgHack, start:  curwin=(%o) msowin=(%o) wholescreen=(%o) enterwin=(%o) i
 	cp = "\007 *** ";
 	if (to_image)
 	    for (; cursorcol < enterwin.redit && *cp; )
-		putch (*cp++, NO);
+		putch ((Uchar)*cp++, NO);
 	else
 	    for (; cursorcol < enterwin.redit && *cp; )
 		putchar (*cp++);
@@ -3054,7 +3078,7 @@ Flag cwkspflg;
     return;
 }
 
-extern Nlines readjtop ();
+extern Nlines readjtop (Nlines win, Nlines from, Nlines num, Nlines delta);
 
 #ifdef COMMENT
 void
@@ -3093,10 +3117,10 @@ Flag    cwkspflg;
     Reg6 Slines first;      /* first line of area in window to be changed */
     Reg2 Slines endwin;     /* height of window -1 */
 
-/**
+/** /
 dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
   fn,from,num,delta,cwkspflg);
- **/
+/ **/
     for (win = Z; win < nwinlist; win++) {
 	if ((tw = winlist[win]->altwksp)->wfile == fn)
 	    /* tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1); */
@@ -3237,7 +3261,7 @@ Flag scroll;
 #else
     putscbuf[0] = VCCAAD;
     putscbuf[1] = 041 + 0;
-    putscbuf[2] = 041 + term.tt_height - 1;
+    putscbuf[2] = (unsigned char) (041 + term.tt_height - 1);
     putscbuf[3] = 0;
     d_write (putscbuf, 4);
     (*kbd.kb_end) ();
@@ -3260,7 +3284,8 @@ tglinsmode ()
 void
 tglinsmode ()
 {
-    info (inf_insert, 6, (insmode = !insmode) ? "INSERT" : "");
+/*  info (inf_insert, 6, (insmode = !insmode) ? "INSERT" : ""); */
+    info (inf_insert, 4, (insmode = !insmode) ? "INS" : "");
     return;
 }
 
@@ -3321,17 +3346,17 @@ Flag mainwin;
 		restcurs ();
 		return YES;
 	    }
-	    nmove = curwin->btext + 1 - (stplnum = start + num);
-	    my_move (&curwin->firstcol[start], &curwin->firstcol[stplnum],
-		  nmove * sizeof curwin->firstcol[0]);
+	    nmove = (Uint)(curwin->btext + 1 - (stplnum = start + num));
+	    my_move ((char *)&curwin->firstcol[start], (char *)&curwin->firstcol[stplnum],
+		  (ulong) nmove * sizeof curwin->firstcol[0]);
 	    fill (&curwin->firstcol[start],
-		  num * sizeof curwin->firstcol[0], 0);
-	    my_move (&curwin->lastcol[start], &curwin->lastcol[stplnum],
-		  nmove * sizeof curwin->lastcol[0]);
+		  (Uint)(num * (int)sizeof curwin->firstcol[0]), 0);
+	    my_move ((char *)&curwin->lastcol[start], (char *)&curwin->lastcol[stplnum],
+		  (ulong) nmove * sizeof curwin->lastcol[0]);
 	    fill (&curwin->lastcol[start],
-		  num * sizeof curwin->lastcol[0], 0);
-	    my_move (&curwin->lmchars[start], &curwin->lmchars[stplnum], nmove);
-	    my_move (&curwin->rmchars[start], &curwin->rmchars[stplnum], nmove);
+		  (Uint)(num * (int)sizeof curwin->lastcol[0]), 0);
+	    my_move ((char *)&curwin->lmchars[start], (char *)&curwin->lmchars[stplnum], (ulong) nmove);
+	    my_move ((char *)&curwin->rmchars[start], (char *)&curwin->rmchars[stplnum], (ulong) nmove);
 	    savecurs ();
 	    freshputup = YES;
 	    nodintrup = YES;
@@ -3357,17 +3382,17 @@ Flag mainwin;
 			   YES);
 	    if (num <= 0)
 		goto doputup;
-	    nmove = curwin->btext + 1 - (stplnum = start + num);
-	    my_move (&curwin->firstcol[stplnum], &curwin->firstcol[start],
-		  nmove * sizeof curwin->firstcol[0]);
+	    nmove = (Uint)(curwin->btext + 1 - (stplnum = start + num));
+	    my_move ((char *)&curwin->firstcol[stplnum], (char *)&curwin->firstcol[start],
+		  (ulong) nmove * sizeof curwin->firstcol[0]);
 	    fill (&curwin->firstcol[curwin->btext + 1 - num],
-		  num * sizeof curwin->firstcol[0], 0);
-	    my_move (&curwin->lastcol[stplnum], &curwin->lastcol[start],
-		  nmove * sizeof curwin->lastcol[0]);
+		  (Uint)(num * (int)sizeof curwin->firstcol[0]), 0);
+	    my_move ((char *)&curwin->lastcol[stplnum], (char *)&curwin->lastcol[start],
+		  (ulong) nmove * sizeof curwin->lastcol[0]);
 	    fill (&curwin->lastcol[curwin->btext + 1 - num],
-		  num * sizeof curwin->firstcol[0], 0);
-	    my_move (&curwin->lmchars[stplnum], &curwin->lmchars[start], nmove);
-	    my_move (&curwin->rmchars[stplnum], &curwin->rmchars[start], nmove);
+		  (Uint)(num * (int)sizeof curwin->firstcol[0]), 0);
+	    my_move ((char *)&curwin->lmchars[stplnum], (char *)&curwin->lmchars[start], (ulong) nmove);
+	    my_move ((char *)&curwin->rmchars[stplnum], (char *)&curwin->rmchars[start], (ulong) nmove);
 	    savecurs ();
 	    freshputup = YES;
 	    nodintrup = YES;
@@ -3445,7 +3470,7 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 */
     if (peekflg == WAIT_KEY && keyused == NO) {
 	dbgpr("mGetkey: WAIT_KEY==yes and keyused==NO, returning key=%d (a no-op)\n", key);
-	return key; /* then getkey is really a no-op */
+	return (Uint)key; /* then getkey is really a no-op */
     }
 
 #ifdef  SYSSELECT
@@ -3475,14 +3500,15 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 	}
 #endif /* RECORDING */
 	if (keyfile != NULL && rkey != CCINT && rkey != CCMOUSE) {
-	    putc (rkey, keyfile);
+	    putc ((int)rkey, keyfile);
 	    if (numtyp > MAXTYP) {
 		flushkeys ();
 		numtyp = 0;
 	    }
 	}
     }
-    return key = rkey;
+    key = (int)rkey;
+    return rkey;
 }
 
 
@@ -3609,10 +3635,10 @@ dbgpr("---replaydone\n");
 	if (replay_stopcount) {   /* set by user to stop before last few keystrokes */
 	    long pos = ftell (replay_fp);
 	    if ((replay_filesize - pos) < replay_stopcount) {
-		/**/
+		/** /
 		dbgpr("STOP replay, pos=(%d) replay_size=(%d), stopcount=(%d)\n",
 		    pos, replay_filesize, replay_stopcount);
-		/**/
+		/ **/
 		/*mesg(ERRALL+1, "hit any key to interrupt replay");*/
 		nodelay(stdscr,TRUE);
 		wgetch(stdscr);  /* keyboard input, not from keystroke file */
@@ -3684,7 +3710,7 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 
     /*  dbgpr("--replaying, returning (%o)(%c), entering=%d\n",
 	    c, c, entering); */
-	return c;
+	return (Uint)c;
     }
 
 #ifdef RECORDING
@@ -3755,7 +3781,7 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	 *  Input from the .e_profile file?
 	 */
 	if( dot_profile && peekflg == WAIT_KEY )
-	    return( get_profilekey( NO ));
+	    return( (Uint)get_profilekey( NO ));
 #endif /* STARTUPFILE */
 
 /**
@@ -3777,7 +3803,7 @@ dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD
 		    *chbuf = *lp;
 		}
 		else
-		    my_move (lp, (char *) chbuf, (Uint) lcnt);
+		    my_move ((char *)lp, (char *) chbuf, (ulong) lcnt);
 		lp = chbuf;
 	    }
 	    d_put (0);
@@ -3927,10 +3953,11 @@ fflush(dbgfile);
 
 		if( c >= KEY_MIN ) {
 		    c1 = MapCursesKey(c);
-		/*  dbgpr("wGetkey1, MapCursesKey:  (%04o)->(%04o) (%s))\n",
+		/** /
+		   dbgpr("wGetkey1, MapCursesKey:  (%04o)->(%04o) (%s))\n",
 			c, c1, getEkeyname(c1));
-		 */
-		    return (c1);
+		/ **/
+		    return ((Uint)c1);
 		}
 
 
@@ -4113,7 +4140,8 @@ int cmdval;
 
 
 int
-MapCursesKey (int c) {
+MapCursesKey (int c)
+{
 
 /** / dbgpr("MapCursesKey: c=%o\n", c);  / **/
 
@@ -4131,7 +4159,8 @@ MapCursesKey (int c) {
      */
     if (c >= 0411 && c <= 0454) {
 	int i = c - 0411;   /* i will be 0-11, 12-23, 24-35 */
-	if (UserFuncKeys[i].keycode >= 0) {
+    /*  if (UserFuncKeys[i].keycode >= 0) {  */
+	if (UserFuncKeys[i].cmdval >= 0) {
 	    return (UserFuncKeys[i].cmdval);
 	}
     }
@@ -4166,6 +4195,7 @@ MapCursesKey (int c) {
 	case KEY_IC:                /* insert key */
 	    return CCINSMODE;
 
+#ifdef OUT
 	case 0414:
        /*   dbgpr("MapCursesKey:  F4 pressed\n"); */
 	    return NOCHAR;
@@ -4174,7 +4204,6 @@ MapCursesKey (int c) {
 	/*  dbgpr("MapCursesKey:  F5 pressed\n"); */
 	    return NOCHAR;
 
-#ifdef OUT
 	case KEY_F(2):
 	/*  dbgpr("MapCursesKey:  F2 pressed\n"); */
 	    return KEY_F(2);
@@ -4231,8 +4260,10 @@ getCursesKeyname (int c) {
 }
 
 
+#ifdef OUT
 void
-dbg_winlist() {
+dbg_winlist()
+{
     int i;
 
     for (i = 0; i < nwinlist; i++) {
@@ -4240,12 +4271,16 @@ dbg_winlist() {
     }
     return;
 }
+#endif /* OUT */
 
 
 #ifdef USER_FKEYS
 
+void addCursesFuncKey (char *);
+
 void
-addCursesFuncKey(char *line) {
+addCursesFuncKey(char *line)
+{
 
     extern S_looktbl itsyms[];     /* see e.iit.c */
 

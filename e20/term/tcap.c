@@ -75,6 +75,19 @@ char *SE;       /* se - end standout mode               */
 char *VB;       /* vb - visual bell                     */
 #endif /* LMCVBELL */
 
+int pch (int);
+int lt_tcap (void);
+int rt_tcap (void);
+int dn_tcap (void);
+int up_tcap (void);
+int cr_tcap (void);
+int nl_tcap (void);
+int clr_tcap (void);
+int clr1_tcap (void);
+int hm_tcap (void);
+int bsp_tcap (void);
+int addr_tcap (int, int);
+
 int
 pch(int ch) { putchar(ch); return (0); }
 
@@ -100,6 +113,28 @@ int
 bsp_tcap () { tputs(BC, 1, pch); putchar(' '); tputs(BC, 1, pch); return (0); }
 int
 addr_tcap (int lin, int col) { tputs(tgoto(CM, col, lin), 1, pch); return (0); }
+
+int il_tcap (int);
+int dl_tcap (int);
+int ic_tcap (void);
+int dc_tcap (void);
+int cle_tcap (void);
+#ifdef LMCHELP
+int so_tcap (void);
+int soe_tcap (void);
+#endif /* LMCHELP */
+#ifdef LMCVBELL
+int vb_tcap (void);
+#endif /* LMCVBELL */
+Flag vsc_tcap (int, int, int);
+int ini1_tcap (void);
+int end_tcap (void);
+int punt_tcap (void);
+#ifdef LMCLDC
+int tcap_xl (int);
+#endif /* LMCLDC */
+Small getcap (char *);
+
 
 /* ARGSUSED */
 /*il_tcap (num) { tputs(AL, 1, pch); return 1; }*/
@@ -324,7 +359,7 @@ char *term;
 	     *  all hi bits of ws_col when >= 128 cols...
 	     *  So mask if off for now
 	     */
-	t_tcap.tt_height = winsize.ws_row & 0377;
+	t_tcap.tt_height = (char) (winsize.ws_row & 0377);
 	t_tcap.tt_width = winsize.ws_col & 0377;
     } else t_tcap.tt_width = 0;
     if(t_tcap.tt_width<=0 || t_tcap.tt_height<=0)

@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include	"prototypes.h"
+
 /* Thanks to Berkeley termcap */
 
 /*

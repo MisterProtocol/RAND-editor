@@ -14,8 +14,11 @@ file e.p.c
 #include "e.cm.h"
 #include <sys/stat.h>
 
-extern void dlfile ();
-extern int dircheck ();
+extern void dlfile (Fn);
+Flag dotdot (char *);
+extern Cmdret name();
+
+
 
 #ifdef COMMENT
 Cmdret

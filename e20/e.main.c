@@ -10,7 +10,7 @@ file e.main.c
 
 #include "e.h"
 
-extern void main1 ();
+extern void main1 (int argc, char *argv[]);
 extern void mainloop ();
 
 #ifdef COMMENT

@@ -14,16 +14,15 @@ file e.u.c
 #include <sys/stat.h>
 #include <pwd.h>
 
-extern void doedit ();
+extern void doedit (Fn, Nlines, Ncols);
 extern char *getmypath ();
-extern char *ExpandName ();
-extern int dircheck ();
-extern int dirncheck ();
-extern int filetype ();
-extern void GetLine ();
+extern char *ExpandName (char *);
 extern Flag readonly;
 extern Flag noreadonly;
 extern Flag autocreate;
+extern char *ReadSymLink (char *);
+extern Cmdret edit();
+Fn getnxfn (void);
 
 #ifdef COMMENT
 Cmdret

@@ -7,7 +7,7 @@
 
 extern char *my_move ();
 
-size_t
+int
 ff_write(ff, buf, count)
 Reg2 Ff_stream *ff;
 char *buf;

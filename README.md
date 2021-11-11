@@ -8,19 +8,24 @@ repository consist of the original code from RAND of e19, ported to Linux
 and called e19.59, and then ported to the Mac in 2021.
 
 The code in the
-repository can build binaries of the editor for both Linux and MacOS
-Mojave.  Small tweaks to the Makefiles are necessary to compile the
+repository can build binaries of the editor for both Linux and MacOS.
+Small tweaks to the Makefiles are necessary to compile the
 code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed below.
 
+The code can also be compiled and run under Windows using WSL, the Windows
+Subsystem for Linux, in which case it builds and runs just as it would
+on a native Linux system.
+
 ### Branches
 
 It is intended that there be two branches in this repository, which will
-not be merged.  One branch (`original`)contains the code for the RAND editor as
-forward-ported to Linux and MacOS, but with no further additions
-made, except for bug fixes.  The second branch (`main`) contains code developed
-from the first branch,
+not be merged.  One branch (`original`) contains the code for
+the RAND editor as forward-ported to Linux and MacOS, but with no further
+additions made, except for bug fixes.  This version is called e19.
+
+The second branch (`main`) contains code developed from the first branch,
 which supports use of the mouse, and colored text highlighting on terminal
 emulators that support it.  It is expected that most people will be interested
 in the second branch.  The first branch exists for historical interest, and
@@ -29,7 +34,8 @@ systems.  The first branch, with the original code, reads terminal input
 in an idiosyncratic way, as it dates from a "do-it-yourself" era when
 third-party libraries were nonexistent.  The second branch handles mouse
 support by means of a completely rewritten input section, which uses
-`ncurses` to multiplex terminal and mouse input.
+`ncurses` to multiplex terminal and mouse input. This version is
+called e20.
 
 ### Extra files
 
@@ -97,27 +103,38 @@ However, the newer version, with mouse support, uses the `ncurses`
 library to multiplex input from the mouse.
 #### NCURSES versions
 Currently, the editor appears to compile and run without problems
-with the ncurses library versions 5.4 and 5.7, using the
+with the ncurses library versions 5.4 and 5.7 using the
 terminfo files distributed with those library versions.
-The editor also compiles and runs with the 6.2 ncurses library, but
-we ran into a problem initializing mouse position reporting
-using the 6.2 distributed terminfo "xterm-256color" file.
 
-(The issue, for those interested,
-is in the mouse initialization and parsing definitions used in the
-terminfo entries "XM" and "kmous".)
+The editor also compiles and runs with the 6.2 ncurses library.
+We did run into a problem initializing mouse position reporting
+using the 6.2 distributed terminfo xterm-256color file with an old
+xterm terminal emulator that did not support the SGR xterm mouse
+protocol.  The SGR protocol was implemented around 2015 and is now
+supported by most modern terminal emulators.
+
+(The issue, for those interested, is in the mouse initialization and
+parsing definitions used in the terminfo entries "XM" and "kmous".)
 
 An alternative, if using the terminfo files distributed with ncurses-6.2
-is to compile and use the terminal definition "xterm-256color-a"
-in the "terminfo" subdirectory.  If this is compiled into "~/.terminfo",
-the editor will run without problems.  Other alternatives are to use a XTERM
-setting of xterm-1002, xterm-1003, or xterm-x11mouse.
-We also added a -mouseinit=value
-option to specify a custom mouse initialization.
+with a xterm emulator lacking SGR support is to compile and use the
+terminal definition "xterm-256color-a" in the "terminfo" subdirectory.
+If this is compiled into "~/.terminfo", the editor will run without
+problems.  Other alternatives are to use a TERM setting of xterm-color,
+xterm-1002, xterm-1003, or xterm-x11mouse.  We also added a
+-mouseinit=value option to specify a custom mouse initialization.
 
 On the Mac, we recommend installing and using the third-party program
 "iTerm2", available at http://iterm2.com.  Using "TERM=iTerm2", the
 editor runs fine when compiled against ncurses-6.2.
+However, if the editor is compiled against ncurses-5.4, it is necessary
+to "unsetenv TERMINFO_DIRS" for iTerm2 to work correctly.
+(Recent versions of iTerm2 include a private TERMINFO description file
+for "xterm-256color" which does not work well with versions of ncurses
+prior to 6.2.  Unsetting the TERMINFO_DIRS environment variable, which
+is set by iTerm2, causes the system definition to be used.  Unsetting
+this environment variable in .cshrc or .profile is feasible because
+the shell executes these after iTerm2 has set up the environment.)
 
 
 ### Filter Programs
@@ -127,7 +144,7 @@ text being edited.  The editor takes marked text, feeds it to the filter,
 and replaces the text with the filter's output.  There are three main
 executables which are regarded as part of the editor: `fill/just`,
 `center`, and `run`.  `fill/just` are the same executable, linked to by two
-named.  The `fill` link will fill in ragged text to a margin given in an
+names.  The `fill` link will fill in ragged text to a margin given in an
 argument, or to a default margin if no argument is given.  `just` does the
 same thing, but right-justifies the text.  In today's environment of
 variable-width fonts and kerning, `just` is probably of little use, but
@@ -146,7 +163,7 @@ edited, the location and size of windows, etc.  The other file, the
 "keystroke file", has a name beginning with ".ek1".  It contains all of
 the keystrokes from the current editing session.  If the session exits
 normally, this file is deleted on exit.  If the editor (or the system)
-crashes, or if the editing session is aborted via "bye abort", this
+crashes, or if the editing session is aborted via "exit abort", this
 file is preserved, and may be used to restore the work done in the
 aborted session.  If a ".ek1" file is found when the editor is started,
 with or without arguments, the editor will present the user with several
@@ -158,7 +175,7 @@ exiting without doing anything.
 ### Other Programs
 
 There are two other programs which may be of use, both in the directory
-"e19".  The first is "pres.c", may be used to present the contents of
+"e20".  The first is "pres.c", may be used to present the contents of
 a ".es1" editor state file in human-readable form.  It should be noted
 that historically, the version number of the editor has been increased
 whenever the format of the state file has been changed.
@@ -188,7 +205,8 @@ them are `Crashdoc`, `dummy`, `errmsg`, `helpkey` and `recovermsg`.
 The editor's keyboard may be remapped.  This is not done by entries in
 a profile file, but by specially-constructed keyboard mapping files.
 Examples are included with the editor, notably `kb.mac`, which solves
-certain problems when using "e" on a Mac.
+certain problems when using "e" on a Mac.  See also etc/kb_ncurses
+which includes examples to map various Fn keys.
 
 ### Makefiles
 
@@ -198,22 +216,22 @@ its ancillary programs, `fill/just`, `center`, and `run`.  It contains
 definitions to specify the installation location for the various pieces of
 the editor.
 
-The second Makefile, in `e19/Makefile`, contains the information necessary to
+The second Makefile, in `e20/Makefile`, contains the information necessary to
 actually compile the editor, including termcap compilation options, the
 locations of `#include` files, and so forth.  Both Makefiles should be read
 carefully and changed as necessary for the local environment.  "e" missed
-out on the whole `config` thing by quite a few decades.  Frankly, I'm
-surprised it even uses `make`.  It didn't used to.  In the old days it was
-compiled by a shell script.
+out on the whole `config` thing by quite a few decades.  (Personal note: 
+Frankly, I'm surprised it even uses `make`.  It didn't used to.  In the
+old days it was compiled by a shell script. --MOB)
 
 ### What to Do First
 
-Read the `README` file.  Read the top level `Makefile`, and `e19/Makefile`.
+Read the `README` file.  Read the top level `Makefile`, and `e20/Makefile`.
 Do what those Makefiles say.  The most common way to build the editor,
 after everything has been set up, is to say `make clean bsd` or
 `make clean s5` at the top level.
 Before installing, you should test the editor.  The editor executable
-is left in `e19/le`.  The origin of the name `le` as opposed to `e`
+is left in `e20/le`.  The origin of the name `le` as opposed to `e`
 is lost to history.
 Note that this will not build the
 filter executables or the `man` files.  Look in the subdirectories

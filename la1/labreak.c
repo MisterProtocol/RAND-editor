@@ -1,6 +1,8 @@
 #include "lalocal.h"
 #include <stdlib.h>
 
+#include "la_prototypes.h"
+
 #ifdef GCC
 extern void	*malloc ();
 #else
@@ -234,7 +236,7 @@ La_bytepos *nbytes;
 	Reg1 La_fsd *tfsd;
 
 	if ((n1fsd = tfsd =
-	    (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + fsbyte1)))
+	    (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + (unsigned long)fsbyte1)))
 	    == NULL) {
  bad1:      la_errno = LA_NOMEM;
 	    return (NO);
@@ -249,7 +251,7 @@ La_bytepos *nbytes;
 	Reg1 La_fsd *tfsd;
 
 	if ((n3fsd = tfsd =
-	    (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + fsbyte3)))
+	    (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + (unsigned long)fsbyte3)))
 	    == NULL) {
  bad2:
 #ifndef REALLOC
@@ -267,7 +269,7 @@ La_bytepos *nbytes;
 	Reg1 La_fsd *tfsd;
 
 	if ((n2fsd = tfsd =
-	    (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + fsbyte2)))
+	    (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + (unsigned long)fsbyte2)))
 	    == NULL) {
 	    free ((char *) n3fsd);
 	    goto bad2;
@@ -286,7 +288,7 @@ La_bytepos *nbytes;
     if (mode == BRK_REAL) {
 #ifdef  REALLOC
 	if ((n1fsd = (La_fsd *) realloc ((char *) cfsd,
-		    (unsigned int) (LA_FSDSIZE + fsbyte1))) == NULL) {
+		    (unsigned int) (LA_FSDSIZE + (unsigned long)fsbyte1))) == NULL) {
 	    if (n2fsd)
 		free ((char *) n2fsd);
 	    goto bad1;

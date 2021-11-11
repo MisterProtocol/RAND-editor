@@ -105,7 +105,6 @@ extern char *ttyname ();
 #define OPTNOMACROS    32
 #define OPTMACROFILE   33
 #endif
-#define OPTNOWINSHIFT  34
 
 #define OPTNEWFILEMODE 34
 
@@ -121,23 +120,32 @@ extern char *ttyname ();
 #endif
 
 #ifdef MOUSE_BUTTONS
+extern int btn_font_n;          /* set via -buttonfont=N */
 #define OPTSHOWBUTTONS 40
 /* start w/o showing buttons */
 int nButtonLines = 0;           /* number of BUTTON lines on screen      */
 #else
-int nButtonLines = 2;
+int nButtonLines = 4;
 #endif
+
+#define OPTNOWINSHIFT 44
 
 #ifdef NCURSES
 #define OPTEXTNAMES  41   /* enable use of extended names in terminfo entries */
+
 #ifdef NCURSES_MOUSE
 #define OPTMOUSEINIT 42   /* eg, -mouseinit="E[?1006;1002h" */
 #define OPTMOUSESTOP 43   /* eg, -mousestop="E[?1006;1002l" */
+#define OPTBTNFONT    45  /* eg, -buttonfont=N (1-255) */
+
 char *optmouse_init;
 char *optmouse_stop;
+
 #endif /* NCURSES_MOUSE */
 #endif /* NCURSES */
 
+/*************************/
+/* next OPT number is 46 */
 
 /* Don't read the profile if E is entered w/o a filename to edit, but reenable it
  * if E is entered w/o a filename and no state file exists.
@@ -148,9 +156,10 @@ Flag noStateFile = NO;
 /* Entries of which there are two in this table must be spelled out. */
 S_looktbl opttable[] = {
    {"bg"       , OPTBGRGB    },  /* -bg=r,g,b */
-   {"bgcolor"  , OPTBGRGB    },  /* -bg=r,g,b */
+   {"bgcolor"  , OPTBGRGB    },  /* -bgcolor=r,g,b */
    {"blanks"   , OPTBLANKS   },  /* expand tabs to blanks */
    {"bullets"  , OPTBULLETS  },
+   {"buttonfont" , OPTBTNFONT  },  /* -buttonfont=N (1-255) */
    {"create"   , OPTCREATE   },
    {"debug"    , OPTDEBUG    },
    {"dkeyboard", OPTSTDKBD   },
@@ -158,7 +167,7 @@ S_looktbl opttable[] = {
    {"dtermcap" , OPTDTERMCAP },
 #endif /* TERMCAP */
    {"fg"       , OPTFGRGB    },  /* -fg=r,g,b */
-   {"fgcolor"  , OPTFGRGB    },  /* -fg=r,g,b */
+   {"fgcolor"  , OPTFGRGB    },  /* -fgcolor=r,g,b */
    {"help"     , OPTHELP     },
    {"inplace"  , OPTINPLACE  },
 #ifdef  KBFILE
@@ -180,6 +189,7 @@ S_looktbl opttable[] = {
 #ifdef NOCMDCMD
    {"nocmdcmd" , OPTNOCMDCMD },
 #endif /* NOCMDCMD */
+   {"noextnames"  , OPTEXTNAMES },   /* curses, set use_extended_names(NO) in e.mouse.c */
 #ifdef FILELOCKING
    {"nolocks"  , OPTNOLOCKS  },
 #endif /* FILELOCKING */
@@ -217,19 +227,22 @@ S_looktbl opttable[] = {
    {"stick"    , OPTSTICK    },
    {"tabs"     , OPTTABS     },  /* don't convert tabs to spaces */
    {"terminal" , OPTTERMINAL },
+#ifdef OUT
    {"useextnames"  , OPTEXTNAMES },   /* curses, set use_extended_names(TRUE) in e.mouse.c */
+#endif
    {0          , 0}
 };
 
 #ifdef NCURSES
-Flag optuseextnames = NO;  /* YES 8/4/21: set use_extended_names(TRUE) */
+/*Flag optuseextnames = NO;*/  /* YES 8/4/21: sets ncurses use_extended_names(TRUE) */
+Flag optuseextnames = YES;  /* YES 8/4/21: sets ncurses use_extended_names(TRUE) */
 Flag optskipmouse = NO;  /* YES 3/19/21: added to skip ncurses mouse initialization */
 #ifdef MOUSE_BUTTONS
 /*Flag optskipbuttons = YES;*/  /* 6/19/21: added to skip function button initialization */
 Flag optshowbuttons = NO;   /* 6/19/21: added to skip function button initialization */
 #endif /* MOUSE_BUTTONS */
-extern void initCurses();
-extern void initCursesColor();
+extern void initCurses(void);
+extern void initCursesColor(void);
 /* variables for user to set custom rgb values for highlighting */
 extern int opt_bg_r;
 extern int opt_bg_g;
@@ -302,7 +315,6 @@ extern Flag setab_set;
 extern char *highlight_info_str;
 
 extern int bracematching;
-int doSetBraceMode(char*);
 
 #ifdef  RECORDING
 Flag    optnomacros;    /* YES = don't read .e_macros */
@@ -310,31 +322,17 @@ char    *optmacrofile;  /* -macrofile=filename option specified */
 void    ReadMacroFile (void);
 #endif /* RECORDING */
 
-extern void main1 ();
-extern void my_getprogname ();
-extern void checkargs ();
-extern void startup ();
-extern void showhelp ();
-extern void dorecov ();
-extern void gettermtype ();
-extern void setitty ();
-extern void setotty ();
-extern void makescrfile ();
-extern void getstate ();
-extern void getskip ();
-extern void makestate ();
-extern void infoinit ();
-extern Small getcap ();
-#ifdef LMCAUTO
-extern void infoint0 ();
-#endif /* LMCAUTO */
-#ifdef  KBFILE
-extern void getkbfile ();
-#endif /* KBFILE */
+extern void main1 (int argc, char *argv[]);
+extern void my_getprogname (char *);
+extern void keyedit (char *);
+extern void dorecov (int);
+extern void getstate (Char);
+extern void getskip (int, FILE *);
+extern void makestate (Flag);
 #ifdef  STARTUPFILE
-extern void chk_profile();
+extern void chk_profile(char *);
 #endif /* STARTUPFILE */
-extern void initwindows();
+extern void initwindows(Flag);
 _Noreturn void getout (Flag, char *, ...);
 extern int fileno();
 off_t replay_filesize;
@@ -405,7 +403,7 @@ Reg2 char *argv[];
      *  at sites that don't have a full installation.
      */
     if ((cp = getenv ("E_ETCDIR"))) {
-	etcdir = salloc (strlen(cp)+1, YES);
+	etcdir = salloc ((Ncols)(strlen(cp)+1), YES);
 	strcpy(etcdir, cp);
     }
     else
@@ -592,7 +590,7 @@ dbgpr("main1, after infoinit, replaying=%d, recovering=%d\n",
     /* dbgpr("e.c, curarg < argc, file=%s\n", argv[curarg]);*/
     /*  extern void keyedit ();  */
     /*  static void keyedit ();  */
-	void keyedit ();
+	void keyedit (char *);
 	Block {
 	    Reg1 char *cp;
 	    extern char *getenv ();
@@ -699,6 +697,7 @@ checkargs ()
 	Reg2 Flag opteqflg;
 	Reg3 Short tmp;
 	Reg4 char *opterr;
+	char opt_name[64]; /* extracts -'opt_name'=xxx from an option */
 	curargchar = argarray[curarg];
 	if (*curargchar != '-')
 	    break;
@@ -712,6 +711,17 @@ checkargs ()
 	    }
 	if (cp == curargchar)
 	    goto unrecog;
+
+	/* Save the -arg= name to accurately report the
+	 * name in an error.  Eg, an error using -bg=r,g,b
+	 * and -bgcolor=r,g,b both report Usage:  -bg=r,g,b
+	 */
+
+	strncpy(opt_name, curargchar, sizeof(opt_name));
+	if (opteqflg) {
+	    opt_name[cp-curargchar] = '\0';
+	}
+
 	tmp = lookup (curargchar, opttable);
 	if (opteqflg)
 	    *cp++ = '=';
@@ -862,7 +872,7 @@ checkargs ()
 
 	case OPTSEARCH:
 	    if (opteqflg && *cp) {
-		searchkey = salloc (strlen(cp)+1, YES);
+		searchkey = salloc ((Ncols)(strlen(cp)+1), YES);
 		strcpy(searchkey, cp);
 	    }
 	    break;
@@ -905,7 +915,14 @@ checkargs ()
 #ifdef MOUSE_BUTTONS
 	case OPTSHOWBUTTONS:
 	    optshowbuttons = YES;
-	    nButtonLines = 2;
+	    nButtonLines = 4;
+	    break;
+
+	case OPTBTNFONT:
+	    if (!opteqflg || *cp == 0 || (sscanf(cp, "%d", &btn_font_n) != 1))
+		getout (YES, "Usage:  -buttonfont=N (1-255)");
+	    if (btn_font_n < 1 || btn_font_n > 255)
+		getout (YES, "buttonfont value must be 1-255");
 	    break;
 #endif /* MOUSE_BUTTONS */
 #endif /* NCURSES_MOUSE */
@@ -913,17 +930,21 @@ checkargs ()
 #ifdef NCURSES
 	case OPTBGRGB:
 	    if (!opteqflg || *cp == 0)
-		getout (YES, "Usage:  -bg=r,g,b");
+	    /*  getout (YES, "Usage:  -bg=r,g,b"); */
+		getout (YES, "Usage:  -%s=r,g,b", opt_name);
 	    if (sscanf(cp, "%4d,%4d,%4d", &opt_bg_r, &opt_bg_g, &opt_bg_b) != 3)
-		getout (YES, "Usage:  -bg=r,g,b");
+		getout (YES, "Usage:  -%s=r,g,b", opt_name);
+	    /*  getout (YES, "Usage:  -bg=r,g,b"); */
 	    bg_rgb_options = YES;
 	    break;
 
 	case OPTFGRGB:
 	    if (!opteqflg || *cp == 0)
-		getout (YES, "Usage:  -fg=r,g,b");
+	    /*  getout (YES, "Usage:  -fg=r,g,b"); */
+		getout (YES, "Usage:  -%s=r,g,b", opt_name);
 	    if (sscanf(cp, "%d,%d,%d", &opt_fg_r, &opt_fg_g, &opt_fg_b) != 3)
-		getout (YES, "Usage:  -fg=r,g,b");
+	    /*  getout (YES, "Usage:  -fg=r,g,b"); */
+		getout (YES, "Usage:  -%s=r,g,b", opt_name);
 	    fg_rgb_options = YES;
 	    break;
 
@@ -944,9 +965,10 @@ checkargs ()
 	    break;
 
 	case OPTEXTNAMES:
-	    optuseextnames = YES;
+	/*  optuseextnames = YES; */
+	    optuseextnames = NO;
 	    break;
-#endif
+#endif /* NCURSES */
 
 	case OPTTABS:
 	    if (upblanks || litmode){
@@ -1081,8 +1103,8 @@ startup ()
     gettermtype ();
 
 #ifdef MOUSE_BUTTONS
-    if (optshowbuttons && term.tt_width < 84) {
-	getout (NO, "-showbuttons requires a screenwidth of at least 85 chars\n");
+    if (optshowbuttons && term.tt_width < 80) {
+	getout (NO, "-showbuttons requires a screenwidth of at least 80 chars\n");
     }
 #endif
 
@@ -1454,6 +1476,9 @@ options are:\n", progname);
     printf ("\
 %c -notracks\n", notracks ? '*' : ' ');
 
+    printf ("\
+%c -nowinshift\n", winshift == 0 ? '*' : ' ');
+
 #ifdef STARTUPFILE
     printf ("\
 %c -profile\n", optprofile != NULL ? '*' : ' ');
@@ -1461,7 +1486,7 @@ options are:\n", progname);
 
 #ifdef MOUSE_BUTTONS
     printf ("\
-%c -showbuttons\n", optshowbuttons ? '*' : ' ');
+%c -showbuttons, display clickable button functions", optshowbuttons ? '*' : ' ');
 
 /*
     printf ("\
@@ -1477,7 +1502,7 @@ options are:\n", progname);
 %c -skipmouse\n", optskipmouse ? '*' : ' ');
 
     printf ("\
-%c -useextnames\n", optuseextnames ? '*' : ' ');
+%c -noextnames\n", optuseextnames == NO ? '*' : ' ');
 #endif
 
     printf ("\
@@ -1505,10 +1530,12 @@ options are:\n", progname);
 
     printf ("Color options for highlighting marked areas:\n");
     printf ("\
-  -setab=N [0-255] set background color number (black=0, white=255)\n");
+%c  -setab=N [0-255] set background color number (black=0, white=255)\n",
+setab_set ? '*' : ' ');
 
     printf ("\
-  -setaf=N [0-255] set foreground color number\n");
+%c  -setaf=N [0-255] set foreground color number\n",
+setaf_set ? '*' : ' ');
 
     printf ("\
    or:\n");
@@ -1516,7 +1543,11 @@ options are:\n", progname);
 %c -bgcolor=r,g,b (background color)\n", ' ');
 
     printf ("\
-%c -fgcolor=r,g,b (foreground color)\n\n", ' ');
+%c -fgcolor=r,g,b (foreground color)\n", ' ');
+
+    printf ("\
+%c -buttonfont=N [1-255] set button font when -showbuttons is in effect.\n\n",
+btn_font_n ? '*' :  ' ');
 
     printf ("\
 *  means option was in effect.");
@@ -1740,7 +1771,7 @@ gettermtype ()
 	|| (kbfile = getenv ("EKBFILE"))
 #endif
        ) {
-	extern int in_file();
+	extern int in_file(Uchar *, int *);
 	extern int nop ();
 
 	getkbfile (kbfile);
@@ -1823,12 +1854,12 @@ setitty ()
 #ifdef  TIOCGETC
     if (cbreakflg) Block {
 	static struct tchars tchars = {
-	    0xff,       /* char t_intrc;   / * interrupt */
-	    0xff,       /* char t_quitc;   / * quit */
-	    'Q' & 0x1f, /* char t_startc;  / * start output */
-	    'S' & 0x1f, /* char t_stopc;   / * stop output */
-	    0xff,       /* char t_eofc;    / * end-of-file */
-	    0xff,       /* char t_brkc;    / * input delimiter (like nl) */
+	    (char)0xff,     /* char t_intrc;   / * interrupt */
+	    (char)0xff,     /* char t_quitc;   / * quit */
+	    'Q' & 0x1f,	    /* char t_startc;  / * start output */
+	    'S' & 0x1f,	    /* char t_stopc;   / * stop output */
+	    (char)0xff,     /* char t_eofc;    / * end-of-file */
+	    (char)0xff,     /* char t_brkc;    / * input delimiter (like nl) */
 	};
 	if (   ioctl (STDOUT, TIOCGETC, &spchars) < 0
 	    || tchars.t_startc != spchars.t_startc
@@ -1842,12 +1873,12 @@ setitty ()
 #ifdef  TIOCGLTC
     if (cbreakflg) Block {
 	static struct ltchars ltchars = {
-	    0xff,       /* char t_suspc;   / * stop process signal */
-	    0xff,       /* char t_dsuspc;  / * delayed stop process signal */
-	    0xff,       /* char t_rprntc;  / * reprint line */
-	    0xff,       /* char t_flushc;  / * flush output (toggles) */
-	    0xff,       /* char t_werasc;  / * word erase */
-	    0xff,       /* char t_lnextc;  / * literal next character */
+	    (char)0xff,       /* char t_suspc;   / * stop process signal */
+	    (char)0xff,       /* char t_dsuspc;  / * delayed stop process signal */
+	    (char)0xff,       /* char t_rprntc;  / * reprint line */
+	    (char)0xff,       /* char t_flushc;  / * flush output (toggles) */
+	    (char)0xff,       /* char t_werasc;  / * word erase */
+	    (char)0xff,       /* char t_lnextc;  / * literal next character */
 	};
 	if (   ioctl (STDOUT, TIOCGLTC, &lspchars) < 0
 	    || ioctl (STDOUT, TIOCSLTC, &ltchars) < 0
@@ -1995,7 +2026,7 @@ getstate (ichar)
 Char ichar;
 {
     Small winnum;
-    Reg1 FILE *gbuf;
+    Reg1 FILE *gbuf = NULL;
     char *x;
     short statef_revision;  /* state file revision number */
 
@@ -2064,7 +2095,7 @@ Delete it or give a filename after the %s command.",
 		}
 		getout (YES, "\
 Startup file: \"%s\" was made for a terminal with a different screen size. \n\
-(%d h X %d w).  Delete it or give a filename after the %s command.",
+(%d h X %d w).  Delete it or give a filename after the %s command.\n",
 		    rfile, nlin, ncol, progname);
 	    }
 	    /*
@@ -2083,7 +2114,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 	if (feoferr (gbuf))
 	    goto badstart;
 	stabs = max (ntabs, NTABS);
-	tabs = (ANcols *) salloc (stabs * sizeof *tabs, YES);
+	tabs = (ANcols *) salloc ((Ncols)(stabs * (int)sizeof *tabs), YES);
 	for (ind = 0; ind < ntabs; ind++)
 	    tabs[ind] = (ANcols) getshort (gbuf);
 	if (feoferr (gbuf))
@@ -2098,7 +2129,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 	    if (feoferr (gbuf))
 		goto badstart;
 	    searchkey = salloc (i, YES);
-	    fread (searchkey, 1, i, gbuf);
+	    fread (searchkey, 1, (size_t)i, gbuf);
 	    if (feoferr (gbuf))
 		goto badstart;
 	}
@@ -2125,7 +2156,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 		if (feoferr (gbuf))
 		    goto badstart;
 		optkbfile = salloc (i, YES);
-		fread (optkbfile, 1, i, gbuf);
+		fread (optkbfile, 1, (size_t)i, gbuf);
 		if (feoferr (gbuf))
 		    goto badstart;
 	    }
@@ -2137,7 +2168,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 		if (feoferr (gbuf))
 		    goto badstart;
 		opttname = salloc (i, YES);
-		fread (opttname, 1, i, gbuf);
+		fread (opttname, 1, (size_t)i, gbuf);
 		if (feoferr (gbuf))
 		    goto badstart;
 	    }
@@ -2150,7 +2181,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 		if (feoferr (gbuf))
 		    goto badstart;
 		optprofile = salloc (i, YES);
-		fread (optprofile, 1, i, gbuf);
+		fread (optprofile, 1, (size_t)i, gbuf);
 		if (feoferr (gbuf))
 		    goto badstart;
 	    }
@@ -2173,12 +2204,17 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 	if (getc(gbuf) || setab_set)    setab_set = YES;
 	opt_setab = getshort (gbuf);
 
+#ifdef MOUSE_BUTTONS
+	/* button font number */
+	btn_font_n = getshort (gbuf);
+#endif
+
 	initCursesColor();
 
 	/* show clickable mouse buttons on screen */
 	if (getc(gbuf) || optshowbuttons) {
 	    optshowbuttons = YES;
-	    nButtonLines = 2;
+	    nButtonLines = 4;  /* todo, save this value in state file */
 	    initwindows(YES);  /* YES=free/reallocate utility windows */
 	}
 
@@ -2200,7 +2236,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 		if (feoferr (gbuf))
 		    goto badstart;
 		highlight_info_str = salloc (i, YES);
-		fread (highlight_info_str, 1, i, gbuf);
+		fread (highlight_info_str, 1, (size_t)i, gbuf);
 		if (feoferr (gbuf))
 		    goto badstart;
 	    }
@@ -2343,7 +2379,7 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%d, mrklin=%d mrkcol=%d\n",
 		    if (feoferr (gbuf))
 			goto badstart;
 		    fname = salloc (nletters, YES);
-		    fread (fname, 1, nletters, gbuf);
+		    fread (fname, 1, (size_t)nletters, gbuf);
 		    Block {
 			Reg2 Nlines  lin;
 			Reg4 Ncols   col;
@@ -2379,7 +2415,7 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%d, mrklin=%d mrkcol=%d\n",
 		    if (feoferr (gbuf))
 			goto badstart;
 		    fname = salloc (nletters, YES);
-		    fread (fname, 1, nletters, gbuf);
+		    fread (fname, 1, (size_t)nletters, gbuf);
 		}
 		Block {
 		    Reg2 Nlines  lin;
@@ -2481,10 +2517,10 @@ Flag nofileflg;
 	noStateFile = YES;
 
     nwinlist = 1;
-    window = winlist[0] = (S_window *) salloc (SWINDOW, YES);
+    window = winlist[0] = (S_window *) salloc ((Ncols)SWINDOW, YES);
 
     stabs = NTABS;
-    tabs = (ANcols *) salloc (stabs * sizeof *tabs,YES);
+    tabs = (ANcols *) salloc ((Ncols)(stabs * (int)sizeof *tabs),YES);
     ntabs = 0;
 
     setupwindow (winlist[0], 0, 0,
@@ -2513,7 +2549,7 @@ infoint0 ()
 {
     Reg1 Scols col;
 
-    inf_insert = 0; col = 7;    /* "INSERT" */
+    inf_insert = 0; col = 7;    /* "INS" was "INSERT", keep the 7, room for {} */
 #ifdef RECORDING
     inf_record = col; col += 4;    /* "REC" */
 #endif
@@ -2526,10 +2562,11 @@ infoint0 ()
     inf_tab = col; col += 4;    /* "TAB"/"LIT"/"BL" Added 2/8/83 MAB */
     inf_str = col; col += 4;    /* "NOS" Added 2/8/83 MAB */
     inf_mark = col; col += 5;   /* "MARK" */
-    inf_area = col; col += 7;   /* "30x16" etc. */
+/*  inf_area = col; col += 7;*/ /* "30x16" etc. */
+    inf_area = col; col += 9;   /* "999x9999" etc. */
 
     inf_at = col; col += 3;     /* "At"         */
-    inf_line = col; col += 7;   /* line         */
+    inf_line = col; col += 8;   /* line         */
     inf_in = col; col += 3;     /* "in"         */
     inf_file = col;             /* filename     */
 
@@ -2576,13 +2613,19 @@ infoinit ()
 
     inf_mark = col; col += 5;   /* "MARK" */
 
-    inf_area = col; col += 7;   /* "30x16" etc. */
+/*  inf_area = col; col += 7;*/ /* "30x16" etc. */
+    inf_area = col; col += 9;   /* "999x9999" etc. */
 
     inf_at = col; col += 3;     /* "At"         */
     inf_line = col; col += 7;   /* line         */
     inf_in = col; col += 3;     /* "in"         */
     inf_file = col;             /* filename     */
 #endif /* LMCAUTO */
+
+/** /
+dbgpr("e.c: inf_area=%d inf_at=%d inf_line=%d\n",
+inf_area, inf_at, inf_line);
+/ **/
 
     info (inf_at, 2, "At");
     info (inf_in, 2, "in");
@@ -2634,6 +2677,7 @@ char   *str, *a1;
     extern char verstr[];
 
     fixtty ();
+
 #ifdef NCURSES
     endwin();
 #endif
@@ -2645,6 +2689,7 @@ char   *str, *a1;
     if (keysmoved)
 	mv (bkeytmp, keytmp);
     d_put (0);
+
     if (*str)
 /*      dopr (stdout, &str);    */
 	/* fprintf (stdout, str, a1,a2,a3,a4,a5,a6); */
@@ -2688,7 +2733,7 @@ dbgpr("getout:  filclean=%d, crashed=%d, bkeytmp=%s keytmp=%s\n",
     }
 #endif /* NCURSES */
 
-    fixtty ();
+/*  fixtty (); */
 
     if (windowsup)
 	screenexit (YES);
@@ -2703,6 +2748,9 @@ dbgpr("getout:  filclean=%d, crashed=%d, bkeytmp=%s keytmp=%s\n",
 	vfprintf (stdout, str, ap);
     printf ("\nThis is %s revision %d\n%s", progname, -revision, verstr);
     fflush(stdout);
+
+    ostyflg = istyflg = 0;
+    fixtty ();
 
 #ifdef PROFILE
     monexit (-1);
@@ -2795,12 +2843,13 @@ buttonwin.tmarg, buttonwin.bmarg, buttonwin.ttext, buttonwin.btext, term.tt_heig
  * know resizing is not supported (yet)
  */
 void
-resize_handler (int sig) {
+resize_handler (int sig)
+{
 
     signal(SIGWINCH, SIG_IGN);
 
     struct winsize winsize;
-    int h, w;
+    int h=0, w=0;
     if (ioctl(0, TIOCGWINSZ, (char *) &winsize) == 0) {
 	h = winsize.ws_row;
 	w = winsize.ws_col;

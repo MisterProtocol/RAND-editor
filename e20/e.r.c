@@ -1,2 +1,2 @@
 short revision = -20;
-char verstr[] = "E20 version of Mon Sep 13 16:11:54 PDT 2021\nmade in /Users/obrien/Projects/RAND-editor/e20 by obrien@Abaia.local.\n";
+char verstr[] = "E20 version of Wed Nov 10 17:55:58 PST 2021\nmade in /Users/obrien/Projects/RAND-Editor/e20 by obrien@Abaia.local.\n";

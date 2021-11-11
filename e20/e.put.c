@@ -23,7 +23,9 @@ S_looktbl qbuftable[] = {
     {0         , 0}
 };
 
-Cmdret ed (), edmark ();
+Cmdret insert (int);
+Cmdret qbufopts (char *, char **, Small, Flag);
+Cmdret insbuf (Small);
 
 Small insqbuf;
 Small nbufargs;

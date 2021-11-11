@@ -1,6 +1,8 @@
 #include	<stdio.h>
 #include	<sys/types.h>
 
+#include	"prototypes.h"
+
 void
 putlong (i, iop)
 long i;

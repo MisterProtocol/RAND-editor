@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 #define DORMANT    0
 #define COLLECTING 1
 static La_flag prevstate = DORMANT;

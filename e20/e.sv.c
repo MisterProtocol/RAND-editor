@@ -18,10 +18,8 @@ file e.sv.c
 #include <sys/stat.h>   /* added for UMASK */
 #include <sys/types.h>  /* added for UMASK */
 
-extern int filetype ();
-extern int dircheck ();
 extern int fgetpriv ();
-extern int la_freplace ();
+extern int la_freplace (char *, La_stream *);
 
 #ifdef COMMENT
 Cmdret
@@ -40,7 +38,8 @@ save ()
 	return CRTOOMANYARGS;
 
 
-    savefile (opstr, curfile, NO);
+/*  savefile (opstr, curfile, NO); */
+    savefile (opstr, curfile, NO, NO);
     return CROK;
 }
 
@@ -206,7 +205,7 @@ Flag rmbak;
 	 * by someone else, leaving me stranded.
 	 * But current unix can't truncate except by doing a creat.
 	 **/
-	if ((origfd = creat (origfile, origpriv)) == -1) {
+	if ((origfd = creat (origfile, (mode_t)origpriv)) == -1) {
 	    mesg (ERRALL + 2, "Unable to create ", origfile);
 	    return NO;
 	}
@@ -285,7 +284,7 @@ Flag rmbak;
 		chmod (origfile, (int) stbuf.st_mode & 0777);
 	    }
 	    else
-		chmod (origfile, fgetpriv (la_chan (&fnlas[fn])));
+		chmod (origfile, (mode_t)fgetpriv (la_chan (&fnlas[fn])));
 	}
 	else {
 #ifdef xxx_UMASK

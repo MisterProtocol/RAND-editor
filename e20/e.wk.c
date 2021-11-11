@@ -12,12 +12,7 @@ file e.wk.c
 #include "e.inf.h"
 
 extern void switchfile ();
-extern void exchgwksp ();
-extern void savewksp ();
-extern void releasewk ();
-extern void inforange ();
-extern void infoprange ();
-extern void GetLine ();
+extern Flag swfile ();
 
 #ifdef COMMENT
 void

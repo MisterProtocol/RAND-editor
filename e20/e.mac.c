@@ -40,7 +40,7 @@ domacrodef()
     savecurs();
     svcnt = 1;
     mesg (TELSTRT|TELCLR + 1, "MACRO: ");
-    while ((key = getkey (WAIT_KEY)) != CCINT) {
+    while ((key = getkey (WAIT_KEY, NULL)) != CCINT) {
 	if (key != CCNULL && key != CCUNAS1) {
 	    if (key == CCDEL) {
 		if (cp > macroline) {

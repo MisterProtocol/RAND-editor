@@ -76,12 +76,12 @@ S5DEFINES = -DUNIXV7 -DASCIIKEYINFO -DSYSIII -DSYSV \
 # Use following for Solaris 2.3
 #
 #S5DEFINES = -DUNIXV7 -DASCIIKEYINFO \
-#	  -DSOLARIS \
-#	  -DSAVETMPFILES \
-#	  -DHOSTTMPNAMES \
-#	  -DBSD_COMP \
-#	  -DFSYNCKEYS \
-#	  -DCBREAK -DTERMCAP -DFILELOCKING
+#         -DSOLARIS \
+#         -DSAVETMPFILES \
+#         -DHOSTTMPNAMES \
+#         -DBSD_COMP \
+#         -DFSYNCKEYS \
+#         -DCBREAK -DTERMCAP -DFILELOCKING
 
 BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO -DFSYNCKEYS \
 	  -DBSD \
@@ -92,7 +92,9 @@ BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO -DFSYNCKEYS \
 # Don't use -DBCOPY any more: the default is now memmove(), which is preferred
 
 #trw:11.19.06
-S5CFLAGS    = -g -Wall -Wextra -Wno-implicit-fallthrough # -O
+S5CFLAGS    = -g -Wall -Wextra -Wno-implicit-fallthrough -Wsign-conversion \
+  -Wmissing-prototypes # -O
+
 #S5CFLAGS   = -g # -O
 #S5CFLAGS   = -g -traditional -traditional-cpp # -O
 #S5CFLAGS   = -g # -O
@@ -102,9 +104,23 @@ S5CFLAGS    = -g -Wall -Wextra -Wno-implicit-fallthrough # -O
 target bsd: E_TCLIB = -lncurses
 #target sys5: E_TCLIB = -ltinfo
 target sys5: E_TCLIB = -lncurses
-BSDCFLAGS  = -g # -O
+
+# The alternate definitions of BSDCFLAGS and BSDLDFLAGS indicate how to
+# build a version of "e" that uses the ncurses-6.2 "terminfo" library.
+# The "-L" and "-I" directives cause the compilation and load process
+# to use a local version of ncurses.  The two different "-I" directives
+# in BSDCFLAGS are made necessary by the fact that ncurses-6.2 installs
+# its include files in a subdirectory, "include/ncurses".  By including
+# both directories, the #include directives in the actual code can
+# remain unchanged. N.B.: You will of course have to change these to
+# point to wherever you have ncurses-6.2 installed.
+# mob 10/17/2021
+BSDCFLAGS  = -g -Wall -Wextra -Wno-implicit-fallthrough -Wsign-conversion \
+    -Wmissing-prototypes # -O
+#BSDCFLAGS  = -g -I/Users/obrien/Projects/ncurses/include -I/Users/obrien/Projects/ncurses/include/ncurses # -O
 S5LDFLAGS  = -g
 BSDLDFLAGS = -g
+#BSDLDFLAGS = -g -L/Users/obrien/Projects/ncurses/lib
 S5LIBS     = s5.libtmp s5.fflib s5.lalib
 BSDLIBS    = bsd.libtmp bsd.fflib bsd.lalib
 LOCALINCL = ../include/

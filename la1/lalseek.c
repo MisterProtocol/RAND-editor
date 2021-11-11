@@ -15,6 +15,8 @@
 
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 La_linepos
 la_lseek (plas, nlines, type)
 La_stream *plas;
@@ -157,11 +159,11 @@ int type;
 	    plas->la_cfsd = cfsd;
 	    fsoff = 0;
 	} else
-	    fsoff = plas->la_ffpos;
+	    fsoff = (unsigned short)plas->la_ffpos;
 	/* If the fsd at this point is a special fsd, then nlines == 0 */
 	plas->la_fsline += j = nlines;
 	{
-	    Reg4 short ffpos;
+	    Reg4 unsigned short ffpos;
 
 	    ffpos = 0;
 	    for (;j--;) {
@@ -237,7 +239,7 @@ int type;
 #endif
 		    ffpos += *cp++;
 		}
-		fsoff = ffpos;
+		fsoff = (unsigned short)ffpos;
 	    }
 	    plas->la_fsbyte = cp - cfsd->fsdbytes;
 #ifdef LA_BP
@@ -281,14 +283,14 @@ int type;
 		    ffpos += - (*cp-- | LA_LLINE) << LA_NLLINE;
 #endif
 	    }
-	    fsoff = plas->la_ffpos - ffpos;
+	    fsoff = (unsigned short)(plas->la_ffpos - ffpos);
 #ifdef LA_BP
 	    bp -= ffpos;
 #endif
 	    plas->la_fsbyte = (cp - cfsd->fsdbytes) + 1;
 	}
     }
-    plas->la_ffpos = fsoff;
+    plas->la_ffpos = (short)fsoff;
 #ifdef LA_BP
     plas->la_bpos = bp;
 #endif

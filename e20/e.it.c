@@ -15,7 +15,8 @@ file e.it.c
 
 struct itable *ithead;
 
-int itget ();
+extern int in_file (Uchar *, int *);
+int itget (Uchar **, int *, struct itable *, Uchar *);
 
 /****************************************/
 /* file-driven input (no associated terminal number) */
@@ -52,7 +53,7 @@ int *count;
 	inp++;       /* Skip over this key */
 	--*count;
     }
-    my_move (inp, outp, *count);
+    my_move ((char *) inp, (char *) outp, (ulong) *count);
     return outp - lexp;
 }
 
@@ -73,13 +74,14 @@ cpp and countp are not changed in the last two cases.
 
 int
 itget (cpp, countp, head, valp)
-char **cpp;
+Uchar **cpp;
 int *countp;
 struct itable *head;
-char *valp;
+Uchar *valp;
 {
     register struct itable *it;
-    register char *cp;
+/*  register char *cp; */
+    register Uchar *cp;
     int count;
     int len;
 
@@ -95,7 +97,7 @@ next:
 	    if (it->it_leaf) {
 		    *cpp = cp;
 		    len = it->it_len;
-		    my_move (it->it_val, valp, len);
+		    my_move (it->it_val, (char *)valp, (ulong) len);
 		    *countp = count;
 		    return len;
 	    }

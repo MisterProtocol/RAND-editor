@@ -11,12 +11,16 @@ file e.f.c
 #include "e.h"
 #include <sys/stat.h>
 
+int filepriv (Fd);
 extern void fwrprep ();
 extern void freset ();
-extern void eddeffile ();
-int dirncheck ();
-
-
+extern void eddeffile (Flag);
+Flag multilinks (char *);
+Flag fmultlinks (Fd);
+Fn hvname (char *);
+Fn hvoldname (char *);
+Fn hvdelname (char *);
+extern uid_t fgetowner (Fd);
 
 #ifdef COMMENT
 int
@@ -317,13 +321,13 @@ Flag puflg;
 }
 
 #ifdef COMMENT
-int
+uid_t
 fgetowner (fildes)
     Fd fildes;
 .
     Return the uid for fildes.
 #endif
-int
+uid_t
 fgetowner (fildes)
 Fd fildes;
 {

@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 void
 la_fsddump (ffsd, lfsd, fsdbyteflg, txt)
 Reg3 La_fsd *ffsd;

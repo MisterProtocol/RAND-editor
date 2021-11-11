@@ -19,12 +19,9 @@ extern Scols putupdelta;
 extern char *deletdwd;
 extern void shortencline ();
 
-extern Cmdret GetLine ();
 extern void shortencline ();
-extern void setmarg ();
 extern void domark ();
-Small inword ();
-extern Flag islocked();
+Small inword (int);
 
 #ifdef COMMENT
 Small
@@ -228,7 +225,7 @@ infoauto (cmdmod)
 #ifdef LMCMARG
 	    setmarg (&autolmarg, leftmark());
 	    if (markcols)
-		setmarg (&linewidth, autolmarg + markcols);
+		setmarg ((Ncols *) &linewidth, autolmarg + markcols);
 #else /* LMCMARG */
 	    autolmarg = leftmark();
 	    linewidth = autolmarg + markcols;
@@ -471,7 +468,8 @@ dodword (ind)
 	ncline += (putupdelta = curcol - cwcol);
 	if (deletdwd != (char *) 0) sfree (deletdwd);
 	deletdwd = salloc ((int) 1 - putupdelta, YES);
-	my_move (&cline[curcol], deletdwd, (int) - putupdelta);
+/*      my_move (&cline[curcol], deletdwd, (int) - putupdelta); */
+	my_move (&cline[curcol], deletdwd, (ulong) - putupdelta);
 /*      deletdwd [-putupdelta] = '\0';  */
 
 	/*
@@ -517,7 +515,7 @@ dodword (ind)
 	if (xcline)
 	    extend (ln - la_lsize(curlas));
 	putbks (curcol, putupdelta);
-	my_move (deletdwd, &cline [curcol], putupdelta);
+	my_move (deletdwd, &cline [curcol], (ulong) putupdelta);
     }
     savecurs();
     curcol -= curwksp->wcol;

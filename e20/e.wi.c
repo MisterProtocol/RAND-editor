@@ -14,23 +14,23 @@ file e.wi.c
 #include "e.tt.h"
 #include "e.wi.h"
 
-extern S_window *setupwindow ();
 
 /* defined in e.t.c, set outside putup (), looked at by putup () */
 extern Flag entfstline;     /* says write out entire first line */
 
 extern void removewindow ();
-extern void chgwindow ();
-extern void drawborders ();
-extern void switchwindow ();
+extern void chgwindow (Small);
+extern void drawborders (S_window *, Small);
+extern void switchwindow (S_window *);
 #ifdef LMCMARG
-extern void drawmarg ();
+extern void drawmarg (S_window *, Ncols, Nlines, int);
 #endif /* LMCMARG */
-extern void drawsides ();
-extern void draw1side ();
-extern void infotrack ();
+extern void drawsides (S_window *, Small);
+extern void draw1side (S_window *, Scols, Small);
 
 extern Flag winshift;
+Cmdret makewindow (char *);
+
 
 #ifdef COMMENT
 Cmdret
@@ -92,11 +92,11 @@ char   *file;
 	Reg1 Slines i;
 	oldwin->bmarg = oldwin->tmarg + cursorline + 1;
 	oldwin->btext = oldwin->bedit = cursorline - 1;
-	if ((i = (newwin->btext + 1) * sizeof oldwin->firstcol[0]) > 0) {
-	    my_move (&oldwin->firstcol[cursorline + 1],
-		   newwin->firstcol, (Uint) i);
-	    my_move (&oldwin->lastcol[cursorline + 1],
-		   newwin->lastcol, (Uint) i);
+	if ((i = (newwin->btext + 1) * (int)sizeof oldwin->firstcol[0]) > 0) {
+	    my_move ((char *)&oldwin->firstcol[cursorline + 1],
+		   (char *)newwin->firstcol, (ulong) i);
+	    my_move ((char *)&oldwin->lastcol[cursorline + 1],
+		   (char *)newwin->lastcol, (ulong) i);
 	}
     }
     else Block {
@@ -145,30 +145,27 @@ char   *file;
 		eddeffile (1);
 	}
 	else {
+	    /* 9/21:  Why do we want new window to start at btext + 2 ?? */
+	    /* Because that way, the lower window doesn't have to
+	     * shift one line down. Instead, one line is hidden by
+	     * the new window's horizontal top border.
+	     * The new default behavior, is to do the shift (winshift = 1)
+	     * so all of the text in the file is visible.
+	     * The -nowinshift option sets winshift to 0 and starts
+	     * the new window at btext + 2, the previous behavior.
+	     */
+	    int topln = winshift ? 1 : 2;
+
 	    if (oaltfile)
 		editfile (names[oaltfile], (Ncols) -1, (Nlines) -1, 0, NO);
-	    if (winshift == YES) {
-	        editfile (names[ocurfile],
-		      (Ncols) (horiz ? -1
-			       : oldwin->wksp->wcol + oldwin->rtext + 2),
-		      (Nlines) (horiz
-			       ? oldwin->wksp->wlin + oldwin->btext + 1 : -1),
-		      0, YES);  /* puflg is YES to initalize border chars */
-	    }
-	    else {
-			   /*  Why do we want new window to start at btext + 2 ?? */
-			   /* Because that way, the lower window doesn't have to 
-			    * shift one line down. Instead, one line is hidden by
-			    * the new window's horizontal top border.  Default
-			    * behavior, above, is to do the shift so all of the
-			    * text in the file is visible. */
-	        editfile (names[ocurfile],
-		      (Ncols) (horiz ? -1
-			       : oldwin->wksp->wcol + oldwin->rtext + 2),
-		      (Nlines) (horiz
-			       ? oldwin->wksp->wlin + oldwin->btext + 2 : -1),
-		      0, YES);  /* puflg is YES to initalize border chars */
-	    }
+
+	    editfile (names[ocurfile],
+		  (Ncols) (horiz ? -1
+			   : oldwin->wksp->wcol + oldwin->rtext + 2),
+		  (Nlines) (horiz
+		       /*  ? oldwin->wksp->wlin + oldwin->btext + 2 : -1), */
+			   ? oldwin->wksp->wlin + oldwin->btext + topln : -1),
+		  0, YES);  /* puflg is YES to initalize border chars */
 	    poscursor (0, 0);
 	}
     }
@@ -197,10 +194,10 @@ S_window *
 setupwindow (win, cl, lt, cr, lb, wf, editflg)
 Reg3 S_window *win;
 Scols   cl;
-Scols   cr;
 Slines  lt;
+Scols   cr;
 Slines  lb;
-AFlag   wf;
+Flag   wf;
 Flag    editflg;
 {
     if (   !win
@@ -242,10 +239,10 @@ Flag    editflg;
 	if ((win->altwksp = (S_wksp *) okalloc (sizeof (S_wksp)))) Block {
 	    Reg2 Slines size;
 	    size = term.tt_height - NINFOLINES - NENTERLINES - NHORIZBORDERS;
-	    if ((win->firstcol = (AScols *) okalloc (2 * size * (sizeof *win->firstcol)))) {
+	    if ((win->firstcol = (AScols *) okalloc (2 * size * ((int)sizeof *win->firstcol)))) {
 		win->lastcol = &win->firstcol[size];
 		if ((win->lmchars
-		    = (unsigned char *)okalloc (2 * size * (sizeof *win->lmchars)))) Block {
+		    = (unsigned char *)okalloc (2 * size * ((int)sizeof *win->lmchars)))) Block {
 		    Reg1 int i;
 		    win->rmchars = &win->lmchars[size];
 		    /* can't use bfill here because firstcol may not be a char */
@@ -294,11 +291,11 @@ removewindow ()
 	register Slines tmp;
 	pwin->firstcol[j = pwin->btext + 1] = 0;
 	pwin->lastcol[j++] = pwin->rtext + 1;
-	if ((tmp = (thewin->btext + 1) * sizeof *thewin->firstcol) > 0) {
-	    my_move (&thewin->firstcol[0],
-		  &pwin->firstcol[j], (Uint) tmp);
-	    my_move (&thewin->lastcol[0],
-		  &pwin->lastcol[j], (Uint) tmp);
+	if ((tmp = (thewin->btext + 1) * (int)sizeof *thewin->firstcol) > 0) {
+	    my_move ((char *)&thewin->firstcol[0],
+		  (char *)&pwin->firstcol[j], (ulong) tmp);
+	    my_move ((char *)&thewin->lastcol[0],
+		  (char *)&pwin->lastcol[j], (ulong) tmp);
 	}
 	stcol = 0;
 	stlin = pwin->btext + 1;
@@ -480,7 +477,7 @@ drawmarg (window, col, line, chr)
     S_window *window;
     Nlines line;
     Ncols col;
-    char chr;
+    Uchar chr;
 .
     This routine will draw the margin indicator character chr in the window
     at line, col if it is within the current window frame.
@@ -488,10 +485,9 @@ drawmarg (window, col, line, chr)
 void
 drawmarg (window, col, line, chr)
     S_window *window;
-    Nlines line;
     Ncols col;
-    char chr;
-
+    Nlines line;
+    Uchar chr;
 {
     col -= (window->wksp->wcol - 1);
     if (col >= 0 && col <= window->rtext) {

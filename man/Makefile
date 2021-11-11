@@ -5,14 +5,13 @@
 
 MANPATH=/usr/local/share/man/man1
 
+
 e.1:    e.man
 	soelim e.man | sed -f sed.script > e.1
+#       ed e.tmp < ed.script
+#       rm e.tmp
 
-#	soelim e.man > e.tmp
-#	ed e.tmp < ed.script
-#	rm e.tmp
-
-e.man:  e.stdkey.out  e.term.out
+e.man:	e.stdkey.out  e.term.out
 
 e.stdkey.out: e.stdkey.tbl
 	tbl e.stdkey.tbl > e.stdkey.out
@@ -23,6 +22,9 @@ e.term.out: e.term.tbl
 hardcopy:  e.1
 #	ditroff -Tpsc -man  e.1 | psdit > e.1.ps
 	man -t ./e.1 > e.1.ps
-
-install:   e.1
+install:
 	install -c e.1 $(MANPATH)
+
+# may not work on Mac
+pdf:
+	ps2pdf e.1.ps > e.1.pdf

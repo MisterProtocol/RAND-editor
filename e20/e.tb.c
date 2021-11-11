@@ -16,11 +16,14 @@ ANcols *ptabs;          /* new tabstops requested (each is +1 from actual) */
 Short   pntabs;         /* num of new tabstops requested */
 Short   pstabs;         /* num of new tabstops alloced */
 
-extern void alcptabs ();
-extern void tabevery ();
-extern void stclptabs ();
-extern void sctab ();
-extern void scvtab ();
+void alcptabs (void);
+Small getptabs (void);
+
+extern void tabevery (Ncols interval, Ncols stcol, Ncols endcol, Flag setclr);
+
+extern void stclptabs (Flag);
+extern void sctab (Ncols, Flag);
+extern void scvtab (Ncols, Flag);
 
 #ifdef COMMENT
 Cmdret
@@ -108,7 +111,8 @@ getptabs ()
 Small
 getptabs ()
 {
-    int tmpi;
+/*  int tmpi; */
+    Ncols tmpi;
     char *cp;
     char *cp1;
 
@@ -127,8 +131,8 @@ getptabs ()
 	if (pntabs >= pstabs) {
 	    ptabs = (ANcols *)
 		    gsalloc ((char *) ptabs,
-			     pntabs * sizeof *ptabs,
-			     (pstabs = ((3 * pntabs) / 2)) * sizeof *ptabs,
+			     pntabs * (int)sizeof *ptabs,
+			     (pstabs = ((3 * pntabs) / 2)) * (int)sizeof *ptabs,
 			     YES);
 	}
 	ptabs[pntabs++] = tmpi;
@@ -183,7 +187,8 @@ Flag setclr;
     register Short  gc;
     char    ts[TNDIG],
             nambuf[128];
-    Short   i;
+  /*Short   i; */
+    Ncols   i;
     FILE  *iob;
 
 #ifdef OLD
@@ -252,8 +257,8 @@ Flag setclr;
 	if (pntabs >= pstabs) {
 	    ptabs = (ANcols *)
 		    gsalloc ((char *) ptabs,
-			     pntabs * sizeof *ptabs,
-			     (pstabs = ((3 * pntabs) / 2)) * sizeof *ptabs,
+			     pntabs * (int)sizeof *ptabs,
+			     (pstabs = ((3 * pntabs) / 2)) * (int)sizeof *ptabs,
 			     YES);
 	}
 	ptabs[pntabs++] = i;
@@ -276,7 +281,7 @@ alcptabs ()
 void
 alcptabs ()
 {
-    ptabs = (ANcols *) salloc (NTABS * sizeof *ptabs, YES);
+    ptabs = (ANcols *) salloc ((Ncols)(NTABS * (int)sizeof *ptabs), YES);
     pntabs = 0;
     pstabs = NTABS;
     return;
@@ -344,10 +349,11 @@ Flag setclr;
     register Ncols i2;
 
     if (setclr) {
-	if (ntabs + 1 > stabs)
+	/*if (ntabs + 1 > stabs) */
+	if (!ntabs || (ntabs + 1 > stabs))
 	    tabs = (ANcols *) gsalloc ((char *) tabs,
-				       ntabs * sizeof *tabs,
-				       (stabs += NTABS / 2) * sizeof *tabs,
+				       ntabs * (int)sizeof *tabs,
+				       (stabs += NTABS / 2) * (int)sizeof *tabs,
 				       YES);
 
 	for (i1 = Z; ; i1++) {
@@ -359,7 +365,7 @@ Flag setclr;
 	    if ((i2 = col - tabs[i1]) == 0)
 		break;
 	    if (i2 < 0) {
-		if ((i2 = (ntabs - i1) * sizeof *tabs) > 0)
+		if ((i2 = (ntabs - i1) * (int)sizeof *tabs) > 0)
 		    my_move ((char *) &tabs[i1], (char *) &tabs[i1 + 1],
 			  (Uint) i2);
 		goto setit;
@@ -377,7 +383,7 @@ Flag setclr;
 	    if ((i2 = col - tabs[i1]) < 0)
 		break;
 	    if (i2 == 0) {
-		if ((i2 = (--ntabs - i1) * sizeof *tabs) > 0)
+		if ((i2 = (--ntabs - i1) * (int)sizeof *tabs) > 0)
 		    my_move ((char *) &tabs[i1 + 1], (char *) &tabs[i1],
 			  (Uint) i2);
 		break;

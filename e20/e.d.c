@@ -81,30 +81,30 @@ Scols   icol;                   /* current internal image column */
 Scols   ocol;                   /* column position of the terminal */
 Slines  olin;                   /* line   position of the terminal */
 
-extern void d_init ();
-extern void d_write ();
-extern void putmult ();
-extern void rollifnec ();
-extern void my_scroll ();
-extern void clwindow ();
-extern void dbfill ();
-extern void dbmove ();
-extern void putscr ();
+extern void d_init (Flag, Flag);
+extern void d_write (Uchar *, Short);
 extern void fresh ();
+extern void dostop ();
+extern void putmult (Char);
+extern void rollifnec (Slines);
+extern void my_scroll (Slines, Slines, Flag);
+extern void clwindow ();
+extern void dbfill (int, Short, Short, Flag, Flag);
+extern void dbmove (Short, Short, Short, Flag, Flag);
+extern void putscr (int);
 extern Flag NoBell;
 #ifdef LMCVBELL
 extern Flag VBell;
 #endif /* LMCVBELL */
 extern int kill();
 
+
+
+#ifdef OUT
 /* debug */
 #include <ncurses.h>
 #include <term.h>
-
-/* test vid modes */
-int
-PCH(int ch) { putchar(ch); return (0); }
-extern char *smso, *rmso, *bold, *setab, *setaf, *sgr0;
+#endif
 
 char *
 getVCCname(int c);
@@ -177,7 +177,7 @@ Flag clearscr;
     ilin = 0;
     icol = 0;
     if (clearmem)
-	dbfill (' ', 0, screensize, NO, YES);
+	dbfill ((Uchar)' ', 0, screensize, NO, YES);
     if (clearscr) {
 	MCLEAR ();
 	MHOME ();
@@ -313,21 +313,6 @@ if( 0 || debug_d_write ) {
 		    state = 3;
 		    break;
 
-#ifdef OUT
-		/* next two are *tests* of start/end of standout mode */
-		case VCCMK1:
-		    /*tputs(smso,1,PCH);*/
-		    tputs(tparm(setab,7),1,PCH);
-		    /*fflush(stdout);*/
-		    goto nextchar;
-
-		case VCCMK0:
-		  /*tputs(rmso,1,PCH);*/
-		    tputs(sgr0,1,PCH);
-		    /*flush(stdout);*/
-		    goto nextchar;
-#endif /* OUT */
-
 		case VCCINI:
 		    MINI0 ();
 		    d_init (YES, NO);
@@ -336,7 +321,7 @@ if( 0 || debug_d_write ) {
 		case VCCEND:
 		    MEND ();
 #ifdef  KBFILE
-		    fwrite (kbendstr, sizeof (char), kbendlen, stdout);
+		    fwrite (kbendstr, sizeof (char), (size_t) kbendlen, stdout);
 #endif /* KBFILE */
 		    fflush (stdout);
 		    goto nextchar;
@@ -345,7 +330,7 @@ if( 0 || debug_d_write ) {
 		    MINI1 ();
 		    d_init (NO, YES);
 #ifdef  KBFILE
-		    fwrite (kbinistr, sizeof (char), kbinilen, stdout);
+		    fwrite (kbinistr, sizeof (char), (size_t) kbinilen, stdout);
 #endif /* KBFILE */
 		    fflush (stdout);
 		    goto nextchar;
@@ -484,13 +469,13 @@ if( 0 || debug_d_write ) {
 			    MBSP ();
 			    ocursor--;
 			} while (--j);
-			dbfill (' ', icursor, arg, NO, YES);
+			dbfill ((Uchar)' ', icursor, arg, NO, YES);
 		    }
 		    break;
 
 #ifndef DUMB
 		case VCCEOL:
-		    dbfill (' ', icursor, winr - icol + 1, 1, 1);
+		    dbfill ((Uchar)' ', icursor, winr - icol + 1, 1, 1);
 		    break;
 #endif /* DUMB */
 
@@ -528,7 +513,7 @@ if( 0 || debug_d_write ) {
 		    if (noclear)
 			noclear = 0;
 		    else
-			dbfill (' ', icursor + i - j, j, 1, 1);
+			dbfill ((Uchar)' ', icursor + i - j, j, 1, 1);
 		    break;
 
 		case VCCINM:
@@ -542,7 +527,7 @@ if( 0 || debug_d_write ) {
 		    if (noclear)
 			noclear = 0;
 		    else
-			dbfill (' ', icursor, j, 1, 1);
+			dbfill ((Uchar)' ', icursor, j, 1, 1);
 		    break;
 
 		case VCCMVL:
@@ -552,7 +537,7 @@ if( 0 || debug_d_write ) {
 		    do {
 			dbmove (to + j, to, width - j, 1, 1);
 			if (!noclear)
-			    dbfill (' ', to + width - j, j, 1, 1);
+			    dbfill ((Uchar)' ', to + width - j, j, 1, 1);
 			to += term.tt_width;
 		    } while (--i);
 		    noclear = 0;
@@ -566,7 +551,7 @@ if( 0 || debug_d_write ) {
 		    do {
 			dbmove (to, to + j, width - j, 1, 1);
 			if (!noclear)
-			    dbfill (' ', to, j, 1, 1);
+			    dbfill ((Uchar)' ', to, j, 1, 1);
 			to += term.tt_width;
 		    } while (--i);
 		    noclear = 0;
@@ -982,7 +967,7 @@ Flag clearok;
 	    } while (--i);
 	    i = num;
 	    do {
-		dbfill (' ', to, awidth, NO, 1);
+		dbfill ((Uchar)' ', to, awidth, NO, 1);
 		to += term.tt_width;
 	    } while (--i);
 	} else {
@@ -1048,7 +1033,7 @@ Flag clearok;
 	    i = num;
 	    do {
 		to -= term.tt_width;
-		dbfill (' ', to, awidth, 0, 1);
+		dbfill ((Uchar)' ', to, awidth, 0, 1);
 	    } while (--i);
 	}
     }
@@ -1116,7 +1101,7 @@ register Char chr;
 	i = winr - (icursor - lincurs) + 1;
 	j = min (i, arg);
 	arg -= j;
-	dbfill (chr, icursor, j, 1, 1);
+	dbfill ((Uchar)chr, icursor, j, 1, 1);
 	if (j < i) {
 	    icursor += j;
 	    arg = 1;
@@ -1201,7 +1186,7 @@ Flag upflg;
 	    noclear = 0;
 	else
 	    do {
-		dbfill (' ', to, width, 1, 1);
+		dbfill ((Uchar)' ', to, width, 1, 1);
 		to += term.tt_width;
 	    } while (--i);
     }
@@ -1214,7 +1199,7 @@ Flag upflg;
 	    to += term.tt_width * i;
 	else
 	    do {
-		dbfill (' ', to, width, 1, 0);
+		dbfill ((Uchar)' ', to, width, 1, 0);
 		to += term.tt_width;
 	    } while (--i);
 	i = winb - lin + 1 - nn;
@@ -1237,7 +1222,7 @@ Flag upflg;
 	    noclear = 0;
 	else
 	    do {
-		dbfill (' ', to, width, 0, 1);
+		dbfill ((Uchar)' ', to, width, 0, 1);
 		to -= term.tt_width;
 	    } while (--i);
     }
@@ -1257,7 +1242,7 @@ clwindow ()
     to = icursor;
     i = winb - wint + 1;
     do {
-	dbfill (' ', to, width, 1, 1);
+	dbfill ((Uchar)' ', to, width, 1, 1);
 	to += term.tt_width;
     } while (--i);
     return;
@@ -1418,7 +1403,7 @@ Flag wrtflg;
     if (wrtflg) {
     /*  dbgpr("dbmove: calling move: nchars=(%ld)\n", nchars); */
 	my_move ((char *) &image[from], (char *) &image[to],
-	      (long) nchars);
+	      (ulong) nchars);
     }
     return;
 }
@@ -1731,7 +1716,7 @@ dostop ()
 #endif /* SIGNALS */
 
 #ifdef MOUSE_BUTTONS
-extern void overlayButtons();
+extern void overlayButtons(void);
 extern Flag optshowbuttons;
 #endif /* MOUSE_BUTTONS */
 

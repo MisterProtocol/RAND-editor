@@ -25,8 +25,8 @@ extern char *malloc ();
 #endif /*GCC*/
 
 
-Ff_stream *ff_gfil ();
-Ff_stream *_doffopen ();
+Ff_stream *ff_gfil (Ff_file *, int);
+Ff_stream *_doffopen (char *, int, int, int);
 Ff_stream ff_streams[NOFFFDS];
 Ff_file   ff_files[NOFILE];
 Ff_rbuf   ff_flist =
@@ -386,7 +386,7 @@ int release;    /* if non-0, then release the block from the active chain */
 	}
 #endif
 	for ( try = 1
-	    ; (cnt = write (fp->fn_fd, fb->fb_buf, fb->fb_count))
+	    ; (cnt = write (fp->fn_fd, fb->fb_buf, (size_t) fb->fb_count))
 	      != fb->fb_count
 	    ; try++
 	    ) {

@@ -16,7 +16,9 @@ file e.re.c
 #include "e.cm.h"
 #include "e.se.h"
 
-extern char *re_comp (), *re_exec(), *re_replace();
+int re_advance (char *, unsigned char *, char **);
+int re_cclass (unsigned char *, int, int);
+int re_backref (int, char *);
 
 extern Nlines srchline;
 extern Ncols srchcol;
@@ -26,16 +28,13 @@ extern int DebugVal;
 
 static Flag re_zerolen1;        /* we KNOW the length is zero when set */
 
-int BegOrEnd ();
-int re_advance ();
-int re_cclass ();
-int re_backref ();
-extern Nlines rangelimit ();
-extern void GetLine ();
-extern void setmarg ();
+int BegOrEnd (int, Nlines, Ncols, Nlines, Small, Flag);
 extern void nopipemesg ();
 extern void noforkmesg ();
 extern void noexecmesg ();
+
+
+
 
 #ifdef COMMENT
 Small
@@ -595,7 +594,7 @@ char *
 re_exec(p1)
 	register char	*p1;
 {
-	register char	*p2 = expbuf;
+	register char   *p2 = expbuf;
 	register int    c;
      /* register char   *rv; */
 	register char *m;
@@ -613,7 +612,7 @@ re_exec(p1)
 		braelist[c] = 0;
 	}
 	if (circf){
-		if (re_advance(m = p1, p2, &last))
+		if (re_advance(m = p1, (unsigned char *)p2, &last))
 			goto gotit;
 		return(NULL);
 	}
@@ -626,7 +625,7 @@ re_exec(p1)
 		do {
 			if (*p1 != c)
 				continue;
-			if (re_advance(m = p1, p2, &last))
+			if (re_advance(m = p1, (unsigned char *)p2, &last))
 				goto gotit;
 		} while (*p1++);
 		return(NULL);
@@ -635,7 +634,7 @@ re_exec(p1)
 	 * regular algorithm
 	 */
 	do
-		if (re_advance(m = p1, p2, &last)){
+		if (re_advance(m = p1, (unsigned char *)p2, &last)){
 gotit:
 			c = 0;
 			while(m < last)
@@ -656,7 +655,8 @@ gotit:
 #ifdef COMMENT
 static  int
 re_advance(lp, ep, last)
-	register char   *lp, *ep, **last;
+	register char   *lp, **last;
+	register unsigned char *ep;
 .
     try to match the next thing in the dfa
     returns 1 if re *ep matches (a prefix of) *lp, 0 if not;
@@ -806,7 +806,8 @@ re_backref(i, lp)
 #ifdef COMMENT
 int
 re_cclass(set, c, af)
-	register char	*set, c;
+	register unsigned char *set;
+	register char   c;
 	int	af;
 .
     if char c is a member of set *set,
@@ -817,7 +818,8 @@ re_cclass(set, c, af)
 #endif
 int
 re_cclass(set, c, af)
-	register char	*set, c;
+	register unsigned char *set;
+	register char   c;
 	int	af;
 {
 	register int	n;

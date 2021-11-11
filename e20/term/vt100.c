@@ -125,6 +125,10 @@ df|dw4|decwriter IV:\
 #endif
 #define _BAD_ CCUNAS1
 
+int in_vt100 (char *, int *);
+int kini_vt100 (void);
+int kend_vt100 (void);
+
 int
 in_vt100 (lexp, count)
 char *lexp;
@@ -176,7 +180,7 @@ int *count;
 		    break;
 
 		default:
-		    *ocp++ = CCUNAS1;
+		    *ocp++ = (char)CCUNAS1;
 		    break;
 		}
 	    }
@@ -205,7 +209,7 @@ int *count;
 			CCPLLINE       , /* x  8 */
 			CCSETFILE      , /* y  9 */
 		    };
-		    *ocp++ = xlt[chr - 'l'];
+		    *ocp++ = (char)xlt[chr - 'l'];
 		}
 		else if ('M' <= chr && chr <= 'S') Block {
 		    static Uchar xlt[] = {
@@ -217,13 +221,13 @@ int *count;
 			CCBACKTAB      , /* R  PF3   */
 			CCCLOSE        , /* S  PF4   */
 		    };
-		    *ocp++ = xlt[chr - 'M'];
+		    *ocp++ = (char)xlt[chr - 'M'];
 		}
 		else
-		    *ocp++ = CCUNAS1;
+		    *ocp++ = (char)CCUNAS1;
 	    }
 	    else
-		*ocp++ = CCUNAS1;
+		*ocp++ = (char)CCUNAS1;
 	}
 	else if (chr == ('X' & 31)) {
 	    if (nr < 2) {
@@ -237,19 +241,19 @@ int *count;
 		*ocp++ = CCSETFILE;
 		break;
 	    case CTRL ('b'):
-		*ocp++ = CCSPLIT;
+		*ocp++ = (char)CCSPLIT;
 		break;
 	    case CTRL ('c'):
 		*ocp++ = CCCTRLQUOTE;
 		break;
 	    case CTRL ('e'):
-		*ocp++ = CCERASE;
+		*ocp++ = (char)CCERASE;
 		break;
 	    case CTRL ('h'):
 		*ocp++ = CCLWINDOW;
 		break;
 	    case CTRL ('j'):
-		*ocp++ = CCJOIN;
+		*ocp++ = (char)CCJOIN;
 		break;
 	    case CTRL ('l'):
 		*ocp++ = CCRWINDOW;
@@ -267,12 +271,12 @@ int *count;
 		*ocp++ = CCCHWINDOW;
 		break;
 	    default:
-		*ocp++ = CCUNAS1;
+		*ocp++ = (char)CCUNAS1;
 		break;
 	    }
 	}
 	else
-	    *ocp++ = lexstd[chr];
+	    *ocp++ = (char)lexstd[chr];
     }
  nomore:
     Block {

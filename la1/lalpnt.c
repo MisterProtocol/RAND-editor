@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 /*
  * la_lpnt (plas, &buf)
  *

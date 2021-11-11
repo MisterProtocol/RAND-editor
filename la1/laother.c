@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 La_stream *
 la_other (plas)
 Reg2 La_stream *plas;

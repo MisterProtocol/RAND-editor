@@ -1,6 +1,8 @@
 #include	<stdio.h>
 #include	<sys/types.h>
 
+#include	"prototypes.h"
+
 short
 getshort (iop)
 register FILE *iop;

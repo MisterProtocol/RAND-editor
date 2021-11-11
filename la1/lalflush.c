@@ -6,6 +6,8 @@ unsigned alarm ();
 
 #include <signal.h>
 
+#include "la_prototypes.h"
+
 /* VARARGS 5 */
 La_linepos
 la_lflush (plas, start, nlines, chan, oktoint, timeout)
@@ -78,7 +80,7 @@ Reg6 unsigned int timeout;
 	    }
 	    if (timeout)
 		alarm (timeout);
-	    nwr = write (chan, wcp, cnt);
+	    nwr = write (chan, wcp, (size_t)cnt);
 	    if (timeout)
 		alarm (0);
 	    if (nwr == cnt)
@@ -105,11 +107,12 @@ Reg6 unsigned int timeout;
     return (totlines);
 }
 
-#ifdef GCC
+/* #ifdef GCC */
 void
-#endif /* GCC */
-la_lflalarm ()
+/* #endif / * GCC */
+la_lflalarm (const int i __attribute__((unused)))
 {
+    /* i++;    / * keep compiler happy; we don't care about the mandatory arg */
     signal (SIGALRM, la_lflalarm);
     return;
 }

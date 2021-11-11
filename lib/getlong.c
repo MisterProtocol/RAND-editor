@@ -1,6 +1,8 @@
 #include	<stdio.h>
 #include	<sys/types.h>
 
+#include	"prototypes.h"
+
 long
 getlong (iop)
 register FILE *iop;

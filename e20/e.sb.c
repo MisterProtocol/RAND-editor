@@ -34,18 +34,16 @@ file e.sb.c
 Flag HaveBkeytmp = 0;
 #endif
 
-extern void getpath ();
-extern void fixtty ();
-extern void cleanup ();
 _Noreturn void la_abort (char *);
 _Noreturn void fatal (Flag, char*, ...);
-_Noreturn void dofatal ();
+_Noreturn void dofatal (Flag, char *, va_list ap);
 void fatalpr (char*, ...);
 void dbgpr (char *, ...);
-void dbgpr1 ();
+void dbgpr1 (char *, va_list ap);
 extern void flushkeys ();
-extern void edscrfile ();
-extern void monexit ();
+extern void edscrfile (Flag);
+extern void monexit (int);
+extern int fileno(FILE *);
 
 #ifdef COMMENT
 void
@@ -167,12 +165,6 @@ fixtty ()
 {
     d_put (0);
 
-#ifdef xNCURSES
-    resetty();
-/* /dbgpr("fixtty, calling resetty(), return\n");   / **/
-    return;
-#endif
-
     if (ostyflg) {
 #ifdef SYSIII
 	ioctl (STDOUT, TCSETAW, &out_termio);           /* System III */
@@ -241,7 +233,10 @@ Flag rmkeysflg;
 	}
     }
 
-    if (keyfile != NULL) { /* cleanup may be called before keyfile is open */
+    /* cleanup may be called before keyfile is open,
+     * or after it's closed
+     */
+    if (keyfile != NULL && fileno(keyfile) != -1) {
 	if (rmkeysflg) {
 #ifdef SAVETMPFILES
 	    if (HaveBkeytmp) {
@@ -276,14 +271,14 @@ Flag rmkeysflg;
 #ifdef COMMENT
 void
 sig (num)
-    unsigned Small num;
+    int num;
 .
     Catch a signal, and call fatal.
 #endif
 #ifdef SIGARG
 void
 sig (num)
-Uint num;
+int num;
 {
     char errstr[100];
     static char *signames[] = {
@@ -339,7 +334,7 @@ Uint num;
 
     if (num > NSIG)  /* hedge against old signal routine */
 	num = 0;
-    if (   num >= sizeof signames / sizeof signames[0]
+    if (   num >= (int) (sizeof signames / sizeof signames[0])
 	|| signames[num] == 0
        )
 	sprintf (errstr, "Signal %d.", num);
@@ -577,7 +572,8 @@ int n;
 #ifdef COMMENT
 char *
 salloc (n, fatalflg)
-    int n;
+    /*int n;*/
+    Ncols n;
     Flag fatalflg;
 .
     Do a calloc().
@@ -606,7 +602,7 @@ if( n > 2 * 32768L ) {
   exit (-1);
 }
     /*if ((cp = calloc ((unsigned) n, 1)) == NULL) {*/
-    if ((cp = calloc ((Ncols) n, 1)) == NULL) {
+    if ((cp = calloc ((size_t) n, 1)) == NULL) {
 	if (fatalflg)
 	    fatal (FATALMEM, "");
 	else
@@ -835,6 +831,10 @@ fsynckeys ()
 void
 fsynckeys ()
 {
+    /* may be called after keyfile is closed */
+    if (keyfile == NULL || fileno(keyfile) == -1)
+	return;
+
     fflush (keyfile);
     if (fsync(fileno(keyfile)) != 0) {
 	mesg (ERRALL + 1, "sync on keys file failed.");
@@ -905,7 +905,7 @@ int crmode;
     }
 
     if (file2) {
-	if ((fd2 = creat (file2, crmode)) < 0) {
+	if ((fd2 = creat (file2, (mode_t)crmode)) < 0) {
 	    if (!file1)
 		close (fd1);
 	    return -2;
@@ -927,7 +927,7 @@ int crmode;
 	}
 	if (j < 0)
 	    retval = -3;
-	else if (write (fd2, buf, j) != j)
+	else if (write (fd2, buf, (size_t)j) != j)
 	    retval = -4;
 	else
 	    continue;

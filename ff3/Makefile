@@ -1,5 +1,5 @@
 #
-#	Copyright abandoned, 1983, The Rand Corporation
+#       Copyright abandoned, 1983, The Rand Corporation
 #
 
 O       = o/
@@ -62,6 +62,9 @@ $(LIB): $(O) $(OFILES) $(FILL) $(MOVE)
 	ar r $(LIB) $(OFILES) $(MOVE) $(FILL)
 	$(RANLIB) $(LIB)
 
+$(O):
+	mkdir $(O)
+
 ranlib:
 	$(RANLIB) $(LIB)
 
@@ -75,10 +78,8 @@ lintlib:
 Calls:  $(CFILES)
 	Makecalls $(CFILES)
 
-clean : 
+clean :
 	rm -f $(OFILES) $(LIB)
-$(O):
-	-mkdir $(O)
 
 $(OFILES) : ff.local.h ff.h $(LOCALINCL)/c_env.h # /usr/include/stdio.h
 

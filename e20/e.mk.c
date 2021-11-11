@@ -13,32 +13,37 @@ file e.mk.c
 #include "e.inf.h"
 #include "e.m.h"
 
-#include <ncurses.h>
-#include <term.h>
 extern Uchar *image;
 
 /* highlight modes, see cmd: set highlight */
 extern char *smso, *rmso, *bold_str, *setab, *setaf, *sgr0, *setab_p, *setaf_p, *hilite_str;
 extern char *brace_p;   /* hilight mode for brace matching */
 extern char *fgbg_pair;
+extern char *font_red;
 
-void highlightarea(Flag setmode, Flag redrawflg);
-void HiLightLine(int line, Flag setmode);
-void HiLightRect(int from, int to, int mrkcol, int ccol);
+void highlightarea(Flag, Flag);
+void HiLightLine(int, Flag);
+void HiLightRect(int, int, int, int);
 
 /*void HiLightBraces();*/
-void HiLightBracePairs();
+void HiLightBracePairs(Flag);
 int brace_marked;
-/*void dbg_showMarkInfo();*/
 Flag highlight_mode = YES;
 Flag redrawflg; /* set after CMD: redraw */
+/*
+int FindBraceBack();
+int FindBraceForw();
+*/
+void GetLine();
+extern int braceRange;  /* limit match to +/- braceRange lines */
+int win_has_eof();
 
 int Pch(int ch) { putchar(ch); return (0); }
 
-extern void markprev ();
 
 /* brace matching/highlighting */
 int bracematching;
+extern Flag bracematchCoding;
 
 #ifdef COMMENT
 void
@@ -211,36 +216,14 @@ markprev ()
 
 
 
-#ifdef OUT
-/*
- */
-void
-testImageLine(int linenum, int *count) {
-    int w = term.tt_width;
-    char buf[w];
-
-    char *cp = (char *)image + w;
-
-    snprintf(buf, w-1, "%s", cp+1); /* skip left border char */
- /* dbgpr("image line 1 len=(%d):\n%s\n", strlen(buf), buf); */
-
-    cp = (char *)image + w*2;
-    snprintf(buf, w-1, "%s", cp+1);
-/*  dbgpr("image line 2 len=(%d):\n%s\n", strlen(buf), buf); */
-
-    cp = (char *)image + w*3;
-    snprintf(buf, w-1, "%s", cp+1);
-/*  dbgpr("image line 3 len=(%d):\n%s\n", strlen(buf), buf); */
-}
-#endif /* OUT */
-
 /*
  *    Redraw the marked area of the screen in a
  *    highlighted screen mode; setmode = YES/NO
  */
 
 void
-highlightarea(Flag setmode, Flag redrawflg) {
+highlightarea(Flag setmode, Flag redrawflg)
+{
 
     if (highlight_mode == NO)  /* CMD: set [no]hightlight */
 	return;
@@ -341,6 +324,7 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 
     /*  clear previous mark, no need to clear entire window */
 /*  for (i = curwin->ttext; i < curwin->bmarg; i++) */
+/*dbgpr("--last_top=%d last_bot=%d\n", last_top, last_bot); */
     for (i = last_top; i <= last_bot; i++)
        HiLightLine(i, NO);
 
@@ -464,7 +448,10 @@ top_line, bot_line, last_top, last_bot);
     last_cursorline = cursorline;
     last_col = cursorcol;
 
-/** / dbgpr("setting last_top=top_line = %d, last_bot=bot_line = %d\n", top_line, bot_line ); / **/
+/** /
+dbgpr("setting last_top=top_line = %d, last_bot=bot_line = %d\n",
+top_line, bot_line );
+/ **/
 
     if (setmode == YES )
 	firsttime = NO;    /* so next time we will check if the marked area has shrunk */
@@ -481,7 +468,8 @@ top_line, bot_line, last_top, last_bot);
  */
 
 void
-HiLightLine(int line, Flag setmode) {
+HiLightLine(int line, Flag setmode)
+{
 
     int w = term.tt_width;
     char buf[w+1];
@@ -503,7 +491,7 @@ setmode, line, wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
 curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
 / **/
 
-    snprintf(buf, wid, "%s", cp+curwin->ltext);
+    snprintf(buf, (size_t)wid, "%s", cp+curwin->ltext);
     mvcur(-1,-1, line, curwin->ltext);
 
 #ifdef OLD
@@ -532,7 +520,8 @@ if (setmode == YES)
  *   visually mark a portion of a line
  */
 void
-HiLightRect(int from, int to, int mrkcol, int curcol) {
+HiLightRect(int from, int to, int mrkcol, int curcol)
+{
 
     int w = term.tt_width;
     char buf[w+1];
@@ -624,11 +613,11 @@ beg_mark, markcols, curcol, adj_markcol, from, to);
 
 	/* clear any full line highlighting */
 	mvcur(-1,-1, line, curwin->ltext);
-	snprintf(buf, wid, "%s", cp+curwin->ltext);
+	snprintf(buf, (size_t)wid, "%s", cp+curwin->ltext);
 	puts(buf);
 
 	/* get a copy of the marked area */
-	snprintf(buf, mark_len+1, "%s", cp + beg_mark );
+	snprintf(buf, (size_t)mark_len+1, "%s", cp + beg_mark );
 	mvcur(-1,-1, line, beg_mark);
 
 	tputs(hilite_str, 1, Pch);      /* user selected mode, see cmd: set highlight */
@@ -644,103 +633,12 @@ beg_mark, markcols, curcol, adj_markcol, from, to);
 }
 
 
-#ifdef OUT
-/*
- *   visually mark all {}
- */
-void
-HiLightBraces(int set) {
-
-    int w = term.tt_width;
-    char buf[w+1];
-    char *cp;
-
-    int beg_mark;
-    int line;
-    int from, to;
-    int lcol, rcol;
-    int mark_len;
-    int wid;
-
-    /*
-     * adj_markcol, initially set to curmark->mrkcol, needs to be
-     * adjusted to account for various window shifts.  If the marked area
-     * is increasing to the right, the marked area ends one char before
-     * the cursor position; if increasing to the left, the marked area
-     * starts at the cursor position.
-     */
-
-    from = curwin->ttext;
-    to = curwin->ttext + curwin->btext;
-    lcol = curwin->ltext;
-    rcol = curwin->rtext;
-
-/** /
-dbgpr("from=%d, to=%d, lcol=%d, rcol=%d\n", from, to, lcol, rcol);
-dbgpr("HiLiBrace: curwin->ttext=%d, curwin->btext=%d, curwin->ltext=%d, curwin->rtext=%d\n",
-    curwin->ttext, curwin->btext, curwin->ltext, curwin->rtext);
-dbgpr("curwin->tmarg=%d, curwin->bmarg=%d, curwin->lmarg=%d, curwin->rmarg=%d\n",
-    curwin->tmarg, curwin->bmarg, curwin->lmarg, curwin->rmarg);
-dbgpr("curwksp->wlin=%d, curwksp->wcol=%d cursorline=%d cursorcol=%d\n\n",
-   curwksp->wlin, curwksp->wcol, cursorline, cursorcol);
-/ **/
-
-    int i;
-    int ch;
-    int nMatches = 0;
-    int done = 0;
-
-    int cursor_char;    /* current cursor char */
-    int cursor_screenline = cursorline + curwin->ttext;
-
-
-    char *h_str;
-    for (line = from; line <= to; line++) {
-	cp = (char *)image + w*line;
-
-	for (i=lcol; i<=rcol; i++) {
-	    if (*(cp+i) == '{' || *(cp+i) == '}') {
-		ch = *(cp+i);
-		nMatches++;
-
-		/** /
-		dbgpr("found %c at line %d col %d, cursor_screenline=%d nMatches=%d\n",
-		    ch, line, i, cursor_screenline, nMatches);
-		/ **/
-		mvcur(-1,-1, line, i);
-
-		if (set) {
-		    tputs(hilite_str, 1, Pch);
-		    putc(ch,stdout);
-		    tputs(sgr0, 1, Pch);  /* end hilite mode */
-		}
-		else {
-		    putc(ch);
-		}
-	    }
-	}
-	if (done) break;
-    }
-
-    int col = cursorcol;
-    int lin = cursorline;
-    cursorcol = cursorline = -1;
-    poscursor(col, lin);
-    d_put(0);
-    mvcur(-1, -1, cursor_screenline, cursorcol+1);
-    fflush(stdout);
-
-    return;
-
-}
-#endif /* OUT */
-
 /*
  *   visually mark matching {} pairs
  */
 void
-HiLightBracePairs(int set) {      /* 0 when we're only clearing a mark */
-
+HiLightBracePairs(Flag set)      /* 0 when we're only clearing a mark */
+{
     int w = term.tt_width;
     char buf[w+1];
     char *cp;
@@ -811,7 +709,7 @@ dbgpr("cursorline=%d cursor_screenline=%d cursorcol=%d cursor_screencol=%d\n",
 	/*  int wid = curwin->rtext - curwin->ltext;  */ /* not whole line */
 	    int wid = last_x - curwin->ltext + 2;   /* +1 for marg char, +1 for rt brace */
 	    mvcur(-1, -1, last_y, curwin->ltext);
-	    snprintf(buf, wid, "%s", cp+curwin->ltext);
+	    snprintf(buf, (size_t)wid, "%s", cp+curwin->ltext);
 	    tputs(buf,1,Pch);
 	    /** /
 	    dbgpr("clear, buf='%s'\n", buf);
@@ -842,7 +740,7 @@ dbgpr("cursorline=%d cursor_screenline=%d cursorcol=%d cursor_screencol=%d\n",
 	}
     }
 
-    if (set == 0)   /* we're only clearing prev mark */
+    if (set == NO)   /* we're only clearing prev mark */
 	return;
 
 /** /
@@ -911,33 +809,85 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
      */
     int cnt = 0;
     int found_match = 0;
+    char msg[128];
+    int ln_eof = (int) (la_lsize(curlas) - curwksp->wlin);
 
-    if (last_ch_type == 'R') {  /* look for closing brace */
-	/** /
-	dbgpr("closing brace search, from=%d to=%d\n", from, to);
-	/ **/
+    int match_error = 0; /* set to show where the err is detected */
+
+    if (last_ch_type == 'R') {  /* look forw for closing brace */
+/** /
+dbgpr("closing brace search, from=%d to=%d ln_eof=%d wlin=%ld, lcol=%d curs_col=%d\n",
+from, to, ln_eof, curwksp->wlin, lcol, cursor_screencol);
+/ **/
 	for (line = from; line <= to; line++) {
-	/** /dbgpr("checking line %d for }, cnt=%d\n", line, cnt); / **/
+	    if (line > ln_eof) {
+		snprintf(msg, sizeof(msg),
+		    " Matching %c not found thru end of file", end_ch);
+		mesg(ERRALL+1, msg);
+		return;     /* NOT FOUND */
+	    }
+
+       /** / dbgpr("checking line %d for }, cnt=%d\n", line, cnt); / **/
 	    cp = (char *)image + w*line;
 	    for (i=lcol; i<=rcol; i++) {
 		if (*(cp+i) == cursor_ch) {
-		    /* don't include the chars left of cursor, or the one cursor is pointing at */
+		    /* omit chars left of cursor or the one cursor is at */
 		    if (line == cursor_screenline && i <= (cursor_screencol))
 			continue;
 		    cnt++;
-		    /*dbgpr("got %c, cnt=%d\n", cursor_ch, cnt);*/
+		 /** / dbgpr("got %c, cnt=%d\n", cursor_ch, cnt);  / **/
 		    continue;
 		}
 
 		if (*(cp+i) == end_ch) {
+
+	      /** /  dbgpr("got %c at line=%d col=%d, cnt=%d\n", end_ch, line, i, cnt); / **/
+
 		    /* on the cursor line, don't include matches left of the cursor */
 		    if (line == cursor_screenline && i <= (cursor_screencol))
 			continue;
+
+		    /*  if bracematchCoding mode, and } appears in column 1
+		     *  we only have a match if we started in column 1
+		     *  and cnt is 0
+		     */
+		    if (i == lcol && end_ch == '}' && bracematchCoding) {
+			    /* { and } both in column 1, ie have match  */
+			if (cnt == 0 && cursor_screencol == lcol) {
+			    found_match = 1;
+			    break;
+			}
+
+			snprintf(msg, sizeof(msg),
+"Matching %c not found in current function, ending at line %ld.",
+end_ch, line + curwksp->wlin);
+			mesg(ERRALL+1, msg);
+		    /*  return; *//* NO MATCH */
+			found_match = 1;
+			match_error = 1;
+			break;
+		    }
+
 		    if (cnt > 0) {
-		       /*dbgpr("got %c at col=%d, cnt=%d\n", end_ch, i, cnt);*/
+		 /** / dbgpr("got %c at col=%d, cnt=%d\n", end_ch, i, cnt);  / **/
 		       cnt--;
 		       continue;
 		    }
+
+		    /* cnt is 0 */
+
+		    /* if bracematchCoding and cursor_screencol == lcol, no match */
+		    if (cursor_screencol == lcol && bracematchCoding && i > lcol
+			   && end_ch == '}' ) {
+			snprintf(msg, sizeof(msg),
+"The matching %c at line %ld, col %d is not at the end of a function.",
+end_ch, line + curwksp->wlin, i);
+			mesg(ERRALL+1, msg);
+		     /*  return;*/   /* NO MATCH */
+			found_match = 1;
+			match_error = 1;
+		    }
+
 		    /** /
 		    dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wlin=%d\n\n",
 			end_ch, line, i, cursor_screenline, cursor_screencol, curwksp->wlin);
@@ -948,6 +898,48 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
 	    }
 	    if (found_match) break;
 	}
+	    /* search forward, start at lines not in current window */
+	if (!found_match) {
+	    long l_num = -1;
+	    int c_num = -1;
+
+	    int rc = FindBraceForw(cursor_ch, end_ch, cnt, &l_num, &c_num);
+/** /
+dbgpr("rc=%d from FindBraceForw, l_num=%d c_num=%d\n", rc, l_num, c_num);
+/ **/
+	    /* found match looking forward */
+	    if (rc == 1) {
+		snprintf(msg, sizeof(msg), " Matching %c found at line %ld col %d.",
+		    end_ch, l_num+1, c_num+1);
+	  /** / dbgpr("%s\n", msg);    / **/
+		mesg(ERRALL + 1, msg);
+		/* todo?? hilite match */
+		return;  /* MATCH FOUND */
+	    }
+
+	    snprintf(msg, sizeof(msg), " Matching %c not found ", end_ch);
+	    int len = strlen(msg);
+
+
+	    if (rc == 2) {  /* bracematchCoding mode, not found */
+		snprintf (msg+len, sizeof(msg), "in current function() \
+ending at line %ld col %d.", l_num+1, c_num+1);
+	    }
+	    else if (rc == 3 || win_has_eof()) {
+		strcat (msg, "searching to the end of the file.");
+	    }
+	    else {  /* eof not in win  */
+		if (braceRange == 0) {
+		    strcat (msg, "searching to the end of file.");
+		}
+		else {
+		    sprintf (msg+len, "in the next %d lines.", braceRange);
+		}
+	    }
+
+	    mesg(ERRALL + 1, msg);
+	    return;     /* NOT FOUND */
+	}
     }
     else {  /* look for opening brace */
 	from = curwin->ttext + cursorline;
@@ -955,6 +947,11 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
 	/** /
 	dbgpr("open brace search, from=%d to=%d\n", from, to);
 	/ **/
+/** /
+dbgpr("opening brace search, from=%d to=%d ln_eof=%d wlin=%ld, lcol=%d curs_col=%d\n",
+from, to, ln_eof, curwksp->wlin, lcol, cursor_screencol);
+/ **/
+
 	for (line = from; line >= to; line--) {
 	    /** /
 	    dbgpr("checking line (reverse) %d for %c, cnt=%d\n", line, end_ch, cnt);
@@ -962,7 +959,10 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
 	    cp = (char *)image + w*line;
 	    for (i=rcol; i>=lcol; i--) {
 		if (*(cp+i) == cursor_ch) {
-		    /* don't include the chars right of cursor, or the one cursor is pointing at */
+		    /* don't include the chars right of cursor, or the one
+		     * cursor is pointing at
+		     */
+
 		    if (line == cursor_screenline && i >= (cursor_screencol))
 			continue;
 		    cnt++;
@@ -974,32 +974,130 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
 		    /* on the cursor line, don't include matches right of the cursor */
 		    if (line == cursor_screenline && i >= (cursor_screencol))
 			continue;
+/** /
+dbgpr("have %c at i=%d line=%d cnt=%d\n", end_ch, i, line, cnt);
+dbgpr("  lcol=%d cursor_screencol=%d\n", lcol, cursor_screencol);
+/ **/
+
 		    if (cnt > 0) {
 		       /*dbgpr("got %c at col=%d, cnt=%d\n", end_ch, i, cnt);*/
 		       cnt--;
 		       continue;
 		    }
-		    /** /
-		    dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wlin=%d\n\n",
-			end_ch, line, i, cursor_screenline, cursor_screencol, curwksp->wlin);
-		    / **/
+
+		    /*  if bracematchCoding mode, and { appears in column 1
+		     *  we only have a match if we started in column 1
+		     *  and cnt is 0
+		     */
+		    if (end_ch == '{' && bracematchCoding) {
+			    /* { and } both in column 1, ie have match  */
+
+/** /
+dbgpr("  end_ch is } and braceCoding is on, i=%d cnt=%d\n", i, cnt);
+dbgpr("  lcol=%d cursor_screencol=%d\n", lcol, cursor_screencol);
+/ **/
+
+			if (i == lcol && cnt == 0 && cursor_screencol == lcol) {
+			    dbgpr("x1 found match\n");
+			    found_match = 1;
+			    break;
+			}
+
+			/* also a match if i != lcol && cursor_screencol != lcol */
+			if (i != lcol && cursor_screencol != lcol) {
+			/*  dbgpr("x2 found match\n"); */
+			    found_match = 1;
+			    break;
+			}
+
+
+			snprintf(msg, sizeof(msg),
+"Matching %c not found in current function, starting at line %ld.",
+end_ch, line + curwksp->wlin);
+			mesg(ERRALL+1, msg);
+		    /*  return;*/ /* NO MATCH */
+			found_match = 1;
+			match_error = 1;
+			break;
+		    }
+
+/** /
+dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wlin=%d\n\n",
+    end_ch, line, i, cursor_screenline, cursor_screencol, curwksp->wlin);
+/ **/
 		    found_match = 1;
 		}
 		if (found_match) break;
 	    }
 	    if (found_match) break;
 	}
-	/*dbgpr("reverse match not implemented yet.\n");*/
+	    /* search backward, start at 1st line not in current window */
+	if (!found_match) {
+
+	    if (curwksp->wlin > 0) {  /* line 1 of file not in current window */
+		long l_num = -1;
+		int c_num = -1;
+		int rc = FindBraceBack(cursor_ch, end_ch, cnt, &l_num, &c_num);
+
+		/** /
+		dbgpr("rc=%d from FindBraceBack, l_num=%d c_num=%d\n", rc, l_num, c_num);
+		/ **/
+
+		if (rc == 1) {
+		    snprintf(msg, sizeof(msg), " Matching %c found at line %ld col %d.",
+			end_ch, l_num+1, c_num+1);
+	       /*   dbgpr("%s\n", msg); */
+		    mesg(ERRALL + 1, msg);
+		    return; /* FOUND MATCH */
+		}
+
+		snprintf(msg, sizeof(msg), " Matching %c not found ", end_ch);
+		int len = strlen(msg);
+
+		if (braceRange == 0) {
+		    strcat(msg, "searching to beginning of the file");
+		}
+		else {
+		    sprintf (msg+len, "in the preceeding %d lines", braceRange);
+		}
+	    }
+	    else {  /* no match, line 1 of file at top of window */
+		snprintf(msg, sizeof(msg), " Matching %c not found %s ", end_ch,
+		    "searching to beginning of the file");
+	    }
+	    mesg(ERRALL + 1, msg);
+	    return;  /* NOT FOUND */
+
+	}
     }
 
+    /* have a match on the screen */
+
+#ifdef OUT
     if( !found_match ) {
-	char msg[128];
-	snprintf(msg, 128, " Matching %c not found on this screen.", end_ch);
+	snprintf(msg, 128, " Matching %c not found ", end_ch);
+	int len = strlen(msg);
+	if (last_ch_type == 'R') {  /* search forw for closing */
+	    if (braceRange == 0) {
+		sprintf (msg+len, " searching to the end of the file");
+	    }
+	    else {
+		sprintf (msg+len, " in the following %d lines", braceRange);
+	    }
+	}
+	else {
+	    if (braceRange == 0) {
+		sprintf (msg+len, " searching to beginning of the file");
+	    }
+	    else {
+		sprintf (msg+len, " in the preceeding %d lines", braceRange);
+	    }
+	}
 /** /   dbgpr(" matching %c not found on this screen", end_ch);  / **/
 	mesg(ERRALL + 1, msg);
 	return;
     }
-
+#endif /* OUT */
 
     int match_col = i;
 
@@ -1015,9 +1113,12 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
     last_wlin = curwksp->wlin;
 /*  last_ch = end_ch; */
 
-    /*tputs(hilite_str, 1, Pch);*/
-    /*tputs(smso, 1, Pch);*/
-    tputs(brace_p, 1, Pch);
+    if (match_error)
+/*      tputs("\033[41m", 1, Pch); */
+	tputs(font_red, 1, Pch);
+    else
+	tputs(brace_p, 1, Pch);
+
     fputc(end_ch, stdout);
     tputs(sgr0, 1, Pch);
 
@@ -1035,7 +1136,7 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
 	cp = (char *)image + w*line;
 	int wid = last_x - curwin->ltext + 1;   /* redraw upto the ending match char */
 	mvcur(-1, -1, last_y, curwin->ltext);
-	snprintf(buf, wid, "%s", cp+curwin->ltext);
+	snprintf(buf, (size_t)wid, "%s", cp+curwin->ltext);
 	tputs(buf,1,Pch);
     /** /
 	dbgpr("buf='%s'\n", buf);
@@ -1068,4 +1169,166 @@ col, lin, cursor_screenline, cursor_screencol);
 
 }
 
+
+/* returns 1 if matching end brace is found
+ * updates lnum and cnum ptrs
+ */
+int
+FindBraceBack(int beg_ch, int end_ch, int cnt, long *lnum, int *cnum)
+{
+
+    Nlines wlin = curwksp->wlin;
+    Nlines nextline;
+    Nlines lastline = 0;      /* first line in file is the lastline we examine */
+
+    nextline = wlin - 1;
+
+	/* limit search range? */
+    if (braceRange && (wlin - braceRange > 0)) {
+	lastline = wlin - braceRange;
+    }
+
+/** /
+dbgpr("FindBraceBack:  beg_ch=%c, end_ch=%c, cnt=%d, wlin=%d \
+ttext=%d nextline=%d braceRange=%d\n",
+    beg_ch, end_ch, cnt, wlin, curwin->ttext, nextline, braceRange);
+/ **/
+
+    Ncols i;
+    Nlines ln;
+
+#ifdef DBUG
+    char buf[1024];
+#endif
+
+    /* search backward in file */
+    for (ln = nextline; ln >= lastline; ln--) {
+	GetLine(ln);
+
+#ifdef DBUG
+	dbgpr("ln=%d lcline=%d, ncline=%d\n", ln, lcline, ncline);
+	strncpy(buf, cline, ncline);
+	buf[ncline] = '\0';
+	dbgpr("(%s)\n", buf);
+#endif
+
+	for (i=ncline+1; i >= 0; i--) {
+	    if (cline[i] == end_ch) {
+		if (cnt <= 0) {
+		    *lnum = ln; *cnum = i;
+		 /* dbgpr("--found %c at ln %d c %d\n", end_ch, ln, i); */
+		    return 1;
+		}
+		cnt--;
+	    /*  dbgpr("--got end_ch at %d, cnt=%d looking for %c\n", i, cnt, end_ch); */
+	    }
+	    else if (cline[i] == beg_ch) {
+		cnt++;
+	    /*  dbgpr("--got beg_ch at %d, cnt=%d looking for %c\n", i, cnt, end_ch); */
+	    }
+	}
+    }
+
+
+    return 0;
+}
+
+/* returns 1 if matching end brace is found
+ * updates lnum and cnum ptrs
+ */
+int
+FindBraceForw(int beg_ch, int end_ch, int cnt, long *lnum, int *cnum)
+{
+
+    Nlines wlin;    /* curwin topline */
+    Nlines ln;
+    Nlines nextline;
+    Nlines lastline = la_lsize(curlas);
+
+    wlin = curwksp->wlin;
+    nextline = wlin + curwin->btext + 1; /* nxt line not displayed in curwin */
+
+    if (braceRange) {  /* look only this far ahead */
+	if (nextline + braceRange < lastline)
+	    lastline = nextline + braceRange;
+    }
+
+/** /
+dbgpr("FindBraceForw:  beg_ch=%c end_ch=%c, cnt=%d, wlin=%d \
+btext=%d ttext=%d nextline=%d lastline=%d braceRange=%d\n",
+    beg_ch, end_ch, cnt, wlin, curwin->btext,
+curwin->ttext, nextline, lastline, braceRange);
+/ **/
+
+/* /lastline = nextline + 5;    / * debugging */
+
+#ifdef DBG
+    char buf[1024];
+#endif
+
+    Ncols i;
+
+    /* search forwward in file */
+    for (ln = nextline; ln <= lastline; ln++) {
+	GetLine(ln);
+
+#ifdef DBG
+	dbgpr("ln=%d lcline=%d, ncline=%d\n", ln, lcline, ncline);
+	strncpy(buf, cline, ncline);
+	buf[ncline] = '\0';
+	dbgpr("(%s)\n", buf);
+#endif
+
+	for (i=0; i <= ncline; i++) {
+
+	    if (cline[i] == end_ch) {
+
+/** /
+dbgpr("FindForw:  have end_ch %c at ln %d c %d braceCoding=%d\n",
+ end_ch, ln, i, bracematchCoding);
+/ **/
+
+		if (cnt <= 0) {
+		    *lnum = ln; *cnum = i;
+		/*  dbgpr("--found %c at ln %d c %d\n", end_ch, ln, i); */
+		    return 1;
+		}
+		/* stop at end of a function, which we assume
+		 * to be a } in column 0
+		 */
+		if (i == 0 && end_ch == '}' && bracematchCoding) {
+		    *lnum = ln; *cnum = i;
+		    return 2;
+		}
+
+		cnt--;
+	    /*  dbgpr("--got end_ch at %d, cnt=%d looking for %c\n", i, cnt, end_ch);*/
+	    }
+	    else if (cline[i] == beg_ch) {
+		cnt++;
+	    /*  dbgpr("--got beg_ch at %d, cnt=%d looking for %c\n", i, cnt, end_ch); */
+	    }
+	}
+    }
+    if (ln >= lastline)
+	return 3;
+
+    return 0;
+}
+
+
+int
+win_has_eof()
+{
+
+/** /
+dbgpr("win_has:  wlin=%d btext=%d ll=%d",
+    curwksp->wlin, curwin->btext, la_lsize(curlas));
+/ **/
+
+    if ((curwksp->wlin + curwin->btext) >= la_lsize(curlas))
+	return 1;
+
+    return 0;
+}
 

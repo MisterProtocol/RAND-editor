@@ -29,6 +29,9 @@ static int n_macros;
 struct macros *findname();
 char *index();
 
+Cmdret definemacro (char *);
+
+
 
 #ifdef COMMENT
 Cmdret
@@ -96,14 +99,14 @@ char buf[100];
 
 sprintf(buf, "definemacro: name=%s,body=%s\n",
   mp->name, mp->text);
-dbgpr(buf);
+/*dbgpr(buf);*/
 	return CROK;
 }
 
 
 struct macros *
 findname(name)
-Reg1 *name;
+Reg1 char *name;
 {
 	Reg2 int i;
 

@@ -28,18 +28,14 @@ Nlines srchline;
 Ncols srchcol;
 
 extern int DebugVal;
-
-extern void doreplace ();
+int rplopts (char *, char **, Small, Flag);
+extern void doreplace (Nlines, Small, Flag);
 extern void replkey ();
-extern void rplit ();
-extern void dosearch ();
-extern void GetLine ();
-extern void aborted ();
-extern char *re_comp (), *re_exec(), *re_replace();
-extern int re_len ();
-extern Nlines rangelimit ();
-extern Small patsearch ();
+extern void rplit (Nlines, Ncols, Flag);
+extern void dosearch (Small);
+extern void aborted (Nlines);
 Flag first_repl_line;
+extern void clrbul();
 
 #ifdef COMMENT
 int
@@ -99,7 +95,6 @@ Small delta;
     Ncols s1len;
     Ncols s2len;
     Flag moved;
-    int rplopts ();
 
     if (*(fcp = cmdopstr) == '\0')
 	return CRNEEDARG;
@@ -463,7 +458,7 @@ Flag puflg;
     if (patmode){
 	tmprpls2 = rpls2;                       /* save replacement pattern */
 	rpls2 = re_replace(tmprpls2);           /* instantiate it */
-	rpls2len = strlen(rpls2);               /* get the length */
+	rpls2len = (Ncols) strlen(rpls2);       /* get the length */
     }
 
     GetLine (slin); /* we DO need this */
@@ -665,9 +660,9 @@ Nlines  limit;
 Small   delta;
 Flag srch;      /* if NO, then only look at current position */
 {
-    register char  *at;
-    register char  *sk;
-    register char  *fk;
+    register char  *at=NULL;
+    register char  *sk=NULL;
+    register char  *fk=NULL;
     char   *atcol;
     Nlines  continln;
     Ncols   lkey;

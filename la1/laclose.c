@@ -1,6 +1,8 @@
 #include "lalocal.h"
 #include <stdlib.h>
 
+#include "la_prototypes.h"
+
 La_linepos
 la_close (plas)
 Reg1 La_stream *plas;

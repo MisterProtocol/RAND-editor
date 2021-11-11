@@ -10,8 +10,6 @@ file e.mouse.c
 #include "e.m.h"
 #include "e.cm.h"
 #include "e.tt.h"
-#include "ncurses.h"
-#include "term.h"
 #include "ctype.h"
 #include <string.h>
 
@@ -26,46 +24,57 @@ extern struct loopflags loopflags;
 extern char *highlight_info_str;
 extern Flag highlight_mode;
 int findWin(int y, int x);
-extern void HiLightLine(int line, Flag setmode);
+extern void HiLightLine(int, Flag);
 extern Scols inf_area;
 extern Small infoarealen;
 
-extern int savetty();
-extern int resetty();
+extern int savetty(void);
+extern int resetty(void);
 
 #define UCHAR(c)    ((unsigned char)(c))
 /*#define CTRL(x) ((x) & 0x1f)*/
 
-void debug_inputkey();
-void initCurses();
-void exitCurses();
-void testMouse();
-/*void dbg_showMarkInfo();*/
-int toggle_mouse();
+void debug_inputkey(int, char *);
+void initCurses(void);
+void initCursesColor(void);
+void exitCurses(void);
+void testMouse(void);
+int toggle_mouse(char *);
+void doMouseEvent(void);
 
-static const char *mouse_decode();
+static const char *mouse_decode(MEVENT const *);
 Flag initMouseDone = NO;
 Flag initCursesDone = NO;
 Flag bs_flag = NO;
 Flag mouse_enabled = YES;
 int mouseFuncKey;   /* set to an E key code for processing in e.m.c */
-void getMouseFuncKey(int x);
+void getMouseFuncKey(int, int);
 extern char *getEkeyname(int c);
-void doChgWin();
+void doChgWin(int, int, int);
 int from_topline, from_botline; /* previous start, end of highlighted lines */
-void calcRange2Clear(int from, int to, int *a, int *b);
+void calcRange2Clear(int, int, int *, int *);
+extern void doMouseReplay (int, int);
 
 #ifdef MOUSE_BUTTONS
+int inButtonRow (int);
+void HiLightButton (int, int);
+void getMouseButtonEvent (void);
+void buttoninit (void);
+
 #ifdef BUTTON_FONT
-void overlayButtons();
-void makeButtonOverlay();
+void initButtonRow (int);
+void overlayButtons (void);
+void makeButtonOverlayB (int, int, int);
+char *button_font;
+int btn_font_n = 0;     /* -buttonfont=N (1-255) */
 #endif /* BUTTON_FONT */
+
 #endif /* MOUSE_BUTTONS */
 
 #ifdef USE_MOUSE_POSITION
-int doMotion(MEVENT *ev, int y, int x);
-int endMotion(int y, int x);
-void doDragHiLite(int by, int ey, int bx, int ex);
+int doMotion (MEVENT *, int, int);
+int endMotion (int, int);
+void doDragHiLite (int, int, int, int);
 int miny, maxy;
 extern Uchar *image;
 
@@ -125,7 +134,8 @@ char *sgr0;       /* reset all modes */
 int  n_colors;    /* terminal colors */
 char *hilite_str; /* set to a standout mode, bold, bgcolor, rev vid */
 char *brace_p;    /* color for bracket matching */
-extern int Pch();
+char *font_red;   /* to highlight errors */
+
 
 #ifdef OUT
 char *XM;   /* terminfo entry to initialize mouse mode */
@@ -149,8 +159,13 @@ initCurses()
 
     init_mousemotion = 1;    /* yes, output mouse_init string */
 
+
+/** /
+dbgpr("initCurses:  optuseextnames=%d\n", optuseextnames);
+/ **/
+
     if (optuseextnames == NO) {  /* default is NO */
-	use_extended_names(0);   /* default is YES, don't examine non-std entries like XM */
+	use_extended_names(0);   /* default is 1, examine non-std entries like XM */
     }
 
 /*  savetty(); */
@@ -198,7 +213,7 @@ initCurses()
 	    if (*mouse_init == 'E') {
 		*mouse_init = '\033';
 	    }
-	/*  dbgpr("mouse_init = \\E%s\n", mouse_init + 1 ); */
+       /** /dbgpr("mouse_init = \\E%s\n", mouse_init + 1 );   / **/
 
 	    /*  if optmouse_stop is not supplied, assume it is a copy
 	     *  of optmouse_init but change 'h' to 'l'
@@ -220,9 +235,9 @@ initCurses()
 	/*  dbgpr("mouse_stop = \\E%s\n", &(mouse_stop[1])); */
 	}
 
-/*
+/** /
 dbgpr("init_mousemotion=%d, optuseext=%d\n", init_mousemotion, optuseextnames);
-*/
+/ **/
 	if (init_mousemotion) {
 	    printf("%s", mouse_init);
 	}
@@ -260,7 +275,7 @@ dbgpr("init_mousemotion=%d, optuseext=%d\n", init_mousemotion, optuseextnames);
 	clear_screen_esc = "\033[H\033[2J";
     }
 
-    from_topline = from_botline = 0;
+    from_topline = from_botline = 1;   /* was 0 */
 
     return;
 }
@@ -271,7 +286,7 @@ void
 initCursesColor()
 {
 
-/**
+/** /
     dbgpr("initColor(), initializing colors.\n");
 
     if (bg_rgb_options)
@@ -280,7 +295,7 @@ initCursesColor()
       dbgpr("user fg rgb=(%d,%d,%d)\n", opt_fg_r, opt_fg_g, opt_fg_b);
     if (opt_setaf || opt_setab)
       dbgpr("user fg setab=%d setaf=%d  \n", opt_setab, opt_setaf );
-**/
+/ **/
 
     /* test, todo, chk for errs */
     smso = tigetstr("smso");           /* rev video */
@@ -305,6 +320,11 @@ initCursesColor()
 	setaf= tigetstr("setaf");          /* fg color */
 	setab= tigetstr("setab");          /* bg color */
 	sgr0 = tigetstr("sgr0");           /* cancel graphics */
+
+/* the nxt line sometimes turned up blue */
+
+/*      font_red = "\033[41m"; */
+	font_red = strdup(tparm(setab,COLOR_RED));
 
 /* dbgpr("has colors true, n=%d\n", n_colors); */
 
@@ -344,13 +364,21 @@ initCursesColor()
 		fg_idx = opt_setaf;
 		/*setaf_p = strdup(tparm(setaf,opt_setaf));*/
 	    }
+
+
+	    if (btn_font_n == 0) {
+		if (n_colors > 16)  /* default color yellow/gold */
+		    btn_font_n = 222;
+		else
+		    btn_font_n = 3; /* light gray */
+	    }
 	}
 
 	setab_p = strdup(tparm(setab,bg_idx));
 	setaf_p = strdup(tparm(setaf,fg_idx));
 
-
-	brace_p= strdup(tparm(setab,6));  /* for bracket matching */
+/*      brace_p= strdup(tparm(setab,6));  */
+	brace_p= strdup(tparm(setab,COLOR_CYAN));  /* for bracket matching */
 
 	/* todo, best to learn how to use sgr to set both fg/bg colors in one 'call' */
 
@@ -370,7 +398,14 @@ initCursesColor()
 	n_colors = 0;
 	highlight_mode = NO;
 	brace_p = hilite_str;
+/*      btn_font_n = 7; / * gray */
+	btn_font_n = COLOR_WHITE; /* very light gray */
     }
+
+#ifdef BUTTON_FONT
+    /* use font idx if user specified, otherwise hilite_str */
+    button_font = btn_font_n ? strdup(tparm(setab,btn_font_n)) : hilite_str;
+#endif /* BUTTON_FONT */
 
 /**
 if (n_colors) {
@@ -586,6 +621,9 @@ doMouseEvent()
 {
     MEVENT event, *ev;
     ev = &event;
+    int oldcursorline = cursorline;
+    int oldcursorcol = cursorcol;
+
 
 #ifdef OUT
     int x_rel, y_rel;  /* button release values */
@@ -683,6 +721,9 @@ dbgpr("doMouseEv: curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp-
     int newwin_n = -1;
     int need2chgwin = 0;
 
+    from_topline = curwin->ttext;
+    from_botline = curwin->ttext;
+
     if (nwinlist > 1) {
 	newwin_n = findWin(ev->y, ev->x);
 	if (newwin_n >= 0 && curwin != winlist[newwin_n]) {
@@ -690,7 +731,10 @@ dbgpr("doMouseEv: curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp-
 	    /*  mvcur(-1, -1, curwin->ttext+cursorline-1, curwin->ltext+cursorcol); */
 		poscursor(cursorcol, cursorline);
 		d_put(0);
-		dbgpr("Can't chwin w/mark, mvcur(%d,%d)\n", curwin->ttext+cursorline-1, curwin->ltext+cursorcol);
+/** /
+dbgpr("Can't chwin w/mark, mvcur(%d,%d)\n",
+curwin->ttext+cursorline-1, curwin->ltext+cursorcol);
+/ **/
 		mesg (ERRALL+1, "Can't change windows while an area is marked.");
 		loopflags.hold = YES;
 		fresh();
@@ -698,8 +742,7 @@ dbgpr("doMouseEv: curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp-
 
 	    }
 	    need2chgwin = 1;
-	    dbgpr("--press occurred outside current window\n");
-
+	/*  dbgpr("--press occurred outside current window\n"); */
 	}
     }
 
@@ -734,13 +777,14 @@ dbgpr("doMouseEv: curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp-
 	/ **/
 
 #ifdef MOUSE_BUTTONS
-	if (optshowbuttons && event.y == buttonwin.bmarg) {
+    /*  if (optshowbuttons && event.y == buttonwin.bmarg) {  */
+	if (optshowbuttons && inButtonRow(event.y)) {
 	   /** /
 	   dbgpr("skip press-1 in buttonwin, wait for rel-1\n");
 	   / **/
 	   return;  /* wait for release-1 */
 	}
-#endif
+#endif /* MOUSE_BUTTONS */
 
 	Flag marking = 0;
 	int c;
@@ -825,6 +869,10 @@ dbgpr("doMouseEv: curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp-
 		    fprintf(keyfile, "%c%03d%03d", CCMOUSE, begy, begx);
 		    fprintf(keyfile, "%c", CCMARK);
 
+		    if (curmark) {
+			unmark();
+		    }
+
 		    mark();
 		    miny = maxy = evt.y;
 		    y_last = y0;
@@ -870,6 +918,15 @@ dbgpr("doMouseEv: curwksp->clin=%d, curwksp->ccol=%d, curwksp->wlin=%d, curwksp-
 		    /* Write {CCMOUSE}{y}{x} to keys file, and flushkeys */
 		    fprintf(keyfile, "%c%03d%03d", CCMOUSE, begy, begx);
 		    fprintf(keyfile, "%c", CCMARK);
+
+		    if (curmark) {
+/** /
+dbgpr("  curmark=1, from_topline=%d, from_botline=%d\n",
+from_topline, from_botline);
+/ **/
+			unmark();
+		    }
+
 		    mark();
 		    miny = maxy = evt.y;
 		    y_last = y0;
@@ -965,16 +1022,16 @@ dbgpr("---After release, press_yx(%d,%d) rel_yx(%d,%d)\n",
 	dbgpr("doMouseEvent:  ev->y=%d bwin->bmarg=%d bwin->btext=%d\n",
 	ev->y,  buttonwin.bmarg, buttonwin.btext);
 / **/
-	if( ev->y == buttonwin.bmarg ) {
+	if (inButtonRow(ev->y)) {
 	    if( ev->bstate & BUTTON1_RELEASED ) {
 		/** /
-		dbgpr("release in button window at ev(%d,%d) collin=(%d,%d) curwin=%o\n",
+		dbgpr("release in button window at ev(%d,%d) col,lin=(%d,%d) curwin=%o\n",
 		  ev->y, ev->x, cursorcol, cursorline, curwin);
 		/ **/
 DebugVal = 0;
 
 		savecurs();
-		getMouseFuncKey(ev->x);  /* sets global variable: mouseFuncKey */
+		getMouseFuncKey(ev->x, ev->y);  /* sets global variable: mouseFuncKey */
 		restcurs();
 
 		/** /
@@ -1011,20 +1068,21 @@ DebugVal = 0;
 
     /* if only one window... */
     if (nwinlist == 1) {
-#ifdef NOTYET
-	extern void doSetBraceMode();
-#endif
 
-	if( ev->x >= curwin->rmarg ) ev->x = curwin->rmarg - 1;
+	if( ev->x >= curwin->rmarg )
+	    ev->x = curwin->rmarg - 1;
+
 	if( ev->y >= curwin->bmarg ) {
+/** /
+dbgpr("click outside editwin,ev->y=%d, ttext=%d, tmarg=%d, \
+cursorline=%d, oldcursorline=%d\n",
+    ev->y, curwin->ttext, curwin->tmarg,cursorline, oldcursorline);
+/ **/
+	    /* ev->y = curwin->bmarg - 1; */
 
-#ifdef NOTYET
-	    if (ev->x >= 7 && ev->x <= 9) {
-		doSetBraceMode(NULL, 1);   /* toggles brace match mode; 1=restore cursor position  */
-    /* ???? */  return;
-	    }
-#endif
-	    ev->y = curwin->bmarg - 1;
+	    /* ignore click if outside window */
+	    ev->y = curwin->ttext + oldcursorline;
+	    ev->x = curwin->ltext + oldcursorcol;
 	}
     }
     else {
@@ -1131,40 +1189,6 @@ dbgpr("doMouseReplay calling poscursor(%d,%d)\n",
     return;
 }
 
-#ifdef OUT  /* currently not used, see debugging in e.mk.c */
-void
-dbg_showMarkInfo(char *source)
-{
-    int m_top;
-    int m_left;
-    int w_line;
-    int w_col;
-    int n_lines;
-    int n_cols;
-
-    if( curmark == NULL )
-	return;
-
-    m_top = topmark();
-    m_left = leftmark();
-    w_line = curmark->mrkwinlin;
-    w_col  = curmark->mrkwincol;
-    n_lines = curmark->mrklin;
-    n_cols = curmark->mrkcol;
-
-/** /
-    dbgpr("Mark info:  topmark()=%d, leftmark()=%d, curmark->: mrkwinlin=%d, mrkwincol=%d mrkln=%d, mrkcol=%d\n",
-      m_top, m_left, w_line, w_col, n_lines, n_cols);
-
-    dbgpr("Mark info (%s):  marklines=%d, markcols=%d, cursorline=%d, cursorcol=%d\n\n",
-	source, marklines, markcols, cursorline, cursorcol);
-/ **/
-
-    return;
-
-}
-#endif /* OUT */
-
 /*
  * opstr is either on/off, or a toggle if missing
  */
@@ -1218,63 +1242,126 @@ dbgpr("--toggle_mouse, opt=(%s), mouse is now %sabled\n", opstr, (mouse_enabled>
 
 #ifdef MOUSE_BUTTONS
 
-void HiLightButton();
+int
+inButtonRow (int y) {
+    if (y == buttonwin.bmarg || y == buttonwin.bmarg - 2)
+	return 1;
+    return 0;
+}
 
-mouse_button_table button_table[] = {
+
+mouse_button_table button_table_row1[] = {
 /*n   beg    end  ecmd       label */
 { 0,     1,   3,  CCCMD,         "cmd" },
+
 { 1,     5,   7,  CCINSMODE,     "ins" },
 
-{ 2,     9,  11,  CCPLPAGE,      "+Pg" },
-{ 3,    12,  15,  CCMIPAGE,      "/-Pg" },
+{ 2,     9,  12,  CCMARK,        "mark" },
+{ 3,    13,  18,  CCUNMARK,       "/unmrk" },
 
-{ 4,    17,  18,  CCPLLINE,      "+L"  },
-{ 5,    19,  21,  CCMILINE,      "/-L"  },
+{ 4,    20,  23,  CCPLSRCH,      "+sch" },
+{ 5,    24,  28,  CCMISRCH,      "/-sch" },
 
-{ 6,    23,  24,  CCRWINDOW,     "wR"  },
-{ 7,    25,  27,  CCLWINDOW,     "/wL"  },
+{ 6,    30,  33,  CCCAPS,        "caps"  },
 
-{ 8,    29,  32,  CCPLSRCH,      "+sch" },
-{ 9,    33,  37,  CCMISRCH,      "/-sch" },
+{ 7,    35,  39,  CCCCASE,       "ccase"  },
 
-{10,    39,  42,  CCMARK,        "mark" },
+{ 8,    41,  43,  CCSPLIT,       "spl" },
+{ 9,    44,  48,  CCJOIN,        "/join" },
 
-{11,    44,  47,  CCOPEN,        "open" },
-{12,    48,  53,  CCCLOSE,       "/close"},
+{10,    50,  53,  CCDELCH,       "delC" },
 
-{13,    55,  58,  CCPICK,        "pick" },
-{14,    59,  62,  CCPUT,         "/put"  },
+/*
+{11,    55,  56,  CCMOVEUP,      "up" },
+{12,    57,  59,  CCMOVEDOWN,    "/dn"},
+*/
 
-{15,    64,  67,  CCDELCH,       "delC" },
+{11,    55,  56,  CCPLWIN,       "+W" },
+{12,    57,  59,  CCMIWIN,       "/-W"},
 
-{16,    69,  72,  CCREDRAW,      "redr"},
+{14,    61,  62,  CCREGEX,        "re"},
 
-{17,    74,  76,  CCMOVEUP,      "up" },
-{18,    77,  79,  CCMOVEDOWN,    "/dn"},
+{13,    64,  67,  CCREDRAW,      "redr"},
 
-{19,    81,  82,  CCBRACE,       "{}"},
 
 };
 
 
+
+mouse_button_table button_table_row2[] = {
+/*n   beg    end  ecmd       label */
+{ 1,     1,   3,  CCPLPAGE,      "+Pg" },
+{ 2,     4,   7,  CCMIPAGE,      "/-Pg" },
+
+{ 3,     9,  10,  CCPLLINE,      "+L"  },
+{ 4,    11,  13,  CCMILINE,      "/-L"  },
+
+{ 5,    15,  17,  CCRWORD,       "+wd"  },
+{ 6,    18,  21,  CCLWORD,       "/-wd"  },
+
+{ 7,    23,  24,  CCRWINDOW,     "wR"  },
+{ 8,    25,  27,  CCLWINDOW,     "/wL"  },
+
+{ 9,    29,  32,  CCOPEN,        "open" },
+
+{10,    34,  37,  CCCLOSE,       "close"},
+{11,    38,  41,  CCMICLOSE,     "/-cl"},
+
+{12,    43,  46,  CCPICK,        "pick" },
+{13,    47,  50,  CCPUT,         "/put"  },
+
+{14,    52,  56,  CCERASE,       "erase" },
+{15,    57,  60,  CCMIERASE,     "/-er" },
+
+{16,    62,  64,  CCBRACE,       "{}"},
+
+{17,    66,  69,  CCEXIT,        "exit"},
+
+};
+
+
+
 void
-getMouseFuncKey(int x) {
+getMouseFuncKey(int x, int y)
+{
 
     int k = CCNULL;
-    unsigned int i, tablesize;
+    int i, row;
+    int tablesize;
+    mouse_button_table *tp;
 
     mouseFuncKey = -1;  /* means no function to handle in mainloop(), e.m.c */
-    tablesize = sizeof(button_table) / sizeof(button_table[0]);
+
+/** /
+dbgpr("getMouseFuncKey: (x,y)=(%d,%d), buttonwin.bmarg=%d\n",
+ x, y, buttonwin.bmarg);
+/ **/
+
+    if (y == buttonwin.bmarg-2) {
+	tp = &button_table_row1[0];
+	tablesize = (int) sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+/*      dbgpr(" checking for x=%d in button row 1\n", x); */
+	row = 1;
+    }
+    else {
+	tp = &button_table_row2[0];
+	tablesize = (int) sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	row = 2;
+/*      dbgpr(" checking for x=%d in button row 2\n", x); */
+    }
 
     for (i = 0; i < tablesize; i++) {
-	if ( x >= button_table[i].begx && x <= button_table[i].endx) {
-	   k = button_table[i].ecmd;
+   /**  dbgpr("check for x=%d between %d and %d\n", x, tp[i].begx, tp[i].endx);  / **/
+
+	if (x >= tp[i].begx && x <= tp[i].endx) {
+	   k = tp[i].ecmd;
+    /** /  dbgpr(" match, k=%o\n", k);  / **/
 	   break;
 	}
     }
     if (i < tablesize) {
 	mouseFuncKey = k;
-	HiLightButton(i);
+	HiLightButton(i, row);
     }
 
 /** /
@@ -1286,92 +1373,136 @@ i, tablesize, x, k, e_keyname);
     return;
 }
 
-/*
- * Set up the function buttons
- */
 
 void
 buttoninit ()
 {
-
     if (buttonwin.wksp == NULL) {
        dbgpr("buttonwin NULL\n");
        return;
     }
 
-    Reg4 S_window *oldwin;
-    Reg5 Scols  oldcol;
-    Reg6 Slines oldlin;
+    initButtonRow(1);
+    initButtonRow(2);
+
+#ifdef BUTTON_FONT
+    overlayButtons();
+#endif
+
+    return;
+}
+
+
+void
+initButtonRow (int row)
+{
+
+    S_window *oldwin;
+    Scols  oldcol;
+    Slines oldlin;
 
     oldwin = curwin;        /* save old window info   */
     oldcol = cursorcol;
     oldlin = cursorline;
 
-    struct button_table *bp;
+    struct button_table *tp;
     unsigned int i, tablesize;
     char *s;
-    tablesize = sizeof(button_table) / sizeof(button_table[0]);
+    int row_y;
+
+    if (row == 1) {
+	tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+	tp = &button_table_row1[0];
+	row_y = buttonwin.btext - 2;
+    }
+    else {
+	tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	tp = &button_table_row2[0];
+	row_y = buttonwin.btext;
+    }
+
 
     int x_next = 0;
     int label_widths = 0;
     int n_labels, w, totw;
     int nspaces = 1;  /* default space between labels */
+    int marg = 4;     /* 2 spaces before/after each row */
     int indent = 0;   /* center labels */
     int npairs = 0;
     int nslots = 0;   /* where spaces separate labels, excludes label pairs */
 
     for (i=0; i < tablesize; i++) {
-	label_widths += strlen(button_table[i].label);
-	if (button_table[i].label[0] == '/' )
+	label_widths += (int) strlen((tp+i)->label);
+	if ((tp+i)->label[0] == '/')
 	    npairs++;
     }
-    n_labels = i;
+    n_labels = (int) i;
     nslots = n_labels - npairs;
 
+
+    /* if there's room, separate labels with 4 spaces */
+    if (label_widths + (4 * (nslots-1)) + marg <= (int) term.tt_width) {
+	nspaces = 4;
+    }
+    /* if there's room, separate labels with 3 spaces */
+    else if (label_widths + (3 * (nslots-1)) + marg <= (int) term.tt_width) {
+	nspaces = 3;
+    }
     /* if there's room, separate labels with 2 spaces */
-    if (label_widths + (2 * (nslots-1)) <= (int) term.tt_width) {
+    else if (label_widths + (2 * (nslots-1)) <= (int) term.tt_width) {
 	nspaces = 2;
     }
     totw = label_widths + (nspaces * (nslots-1));
     indent = ((int)term.tt_width - totw) / 2;
 
-/*
-dbgpr("n_labels=%d nslots=%d label_widths=%d indent=%d\n",
-    n_labels, nslots, label_widths, indent);
-*/
+/** /
+dbgpr("row %d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
+    row, n_labels, nslots, label_widths, indent);
+/ **/
 
-    button_table[0].begx = indent;
+    tp->begx = indent;
 
     switchwindow (&buttonwin);
     for (i=0; i < tablesize; i++) {
-	bp = &button_table[i];
+	/*bp = &button_table_row1[i];*/
 
-	w = strlen(bp->label);
+	w = strlen((tp+i)->label);
 
-	if (bp->begx + w > (int)term.tt_width)
+	if ((tp+i)->begx + w > (int)term.tt_width)
 	    break;
 
-	poscursor(bp->begx, 1);
-	for (s = bp->label; *s; s++) {
-	    putch(*s, NO);
+	poscursor((tp+i)->begx, row_y);
+	for (s = (tp+i)->label; *s; s++) {
+	    putch((Uchar)*s, NO);
 	}
 
-	bp->endx = bp->begx + w;
-	x_next = bp->endx;
+	(tp+i)->endx = (tp+i)->begx + w;
+	x_next = (tp+i)->endx;
 
-	if (i+1 == tablesize)   /* just finished last entry */
+	if (i+1 == tablesize) { /* just finished last entry */
+/** /
+dbgpr("buttoninit: i=%d beg=%d end=%d label=%s\n",
+    i, (tp+i)->begx, (tp+i)->endx, (tp+i)->label);
+/ **/
 	    break;
+	}
 
-	if (button_table[i+1].label[0] != '/' ) {
+	if ((tp+i+1)->label[0] != '/' ) {
 	    x_next += nspaces;  /* no space between pairs, eg, +L/-L */
 	}
-	button_table[i+1].begx = x_next;
-/* /
+	(tp+i+1)->begx = x_next;
+/** /
 dbgpr("buttoninit: i=%d beg=%d end=%d label=%s\n",
-    i, bp->begx, bp->endx, bp->label);
-/ */
+    i, (tp+i)->begx, (tp+i)->endx, (tp+i)->label);
+/ **/
 
     }
+
+#ifdef OUT
+/* add . temp to end row */
+poscursor(cursorcol+1, cursorline);
+putch('.', NO);
+#endif /* OUT */
 
     fflush(stdout);
 
@@ -1379,122 +1510,60 @@ dbgpr("buttoninit: i=%d beg=%d end=%d label=%s\n",
     poscursor (oldcol, oldlin);
 
 #ifdef BUTTON_FONT
-    makeButtonOverlay();
-    overlayButtons();
+    makeButtonOverlayB(row, nspaces, indent);
 #endif /* BUTTON_FONT */
+
+
+
     fflush(stdout);
 
     return;
 }
 
 
-#ifdef OUT
-/*
- * Set up the function buttons
- */
-
-
-void
-y_buttoninit ()
-{
-
-    Reg4 S_window *oldwin;
-    Reg5 Scols  oldcol;
-    Reg6 Slines oldlin;
-
-    oldwin = curwin;        /* save old window info   */
-    oldcol = cursorcol;
-    oldlin = cursorline;
-
-    struct button_table *bp;
-    unsigned int i, tablesize;
-    char *s;
-    tablesize = sizeof(button_table) / sizeof(button_table[0]);
-
-  tputs(setaf_p, 1, Pch);
-    switchwindow (&buttonwin);
-    for (i=0; i < tablesize; i++) {
-	bp = &button_table[i];
-
-	if (bp->begx + strlen(bp->label) >= (int)term.tt_width)
-	    break;
-
-/*      poscursor(button_table[i].begx, 1);
-	for (s = button_table[i].label; *s; s++) {
-  */
-	poscursor(bp->begx, 1);
-	for (s = bp->label; *s; s++) {
-	    putch(*s, NO);
-	}
-    }
-  tputs(sgr0, 1, Pch);   /* end hilite mode */
-  fflush(stdout);
-
-
-    switchwindow (oldwin);  /* restore old window info */
-    poscursor (oldcol, oldlin);
-    return;
-}
-#endif /* OUT */
-
-
-void
-x_buttoninit ()
-{
-
-    Reg4 S_window *oldwin;
-    Reg5 Scols  oldcol;
-    Reg6 Slines oldlin;
-
-    oldwin = curwin;        /* save old window info   */
-    oldcol = cursorcol;
-    oldlin = cursorline;
-
-    switchwindow (&buttonwin);
-    poscursor (0, 1);
-
-    /* temp, for demo purposes, see e.mouse.c getMouseFuncKey  */
-	      /* 0123456789012345678901234567890123456789012345678901234567890123456789012345678901234 */
-    char *str = "  cmd  ins  +Pg -Pg  +L -L  wR wL  +sch -sch  mark  open close  pick  delC  redr";
-    char *s;
-
-
-    for (s = str;  cursorcol < buttonwin.rmarg && *s != '\0'; s++) {
-	putch (*s, NO);
-    }
-    switchwindow (oldwin);
-    poscursor (oldcol, oldlin);
-    return;
-}
-
-
-
 /*
  *   visually show a button press (try...)
  */
 
+
+/* i indexes a button_table_rowX[] entry, in the specified row */
 void
-HiLightButton(int i) {    /* i indexes button_table[] entry */
+HiLightButton(int i, int row) {
 
 
-    Reg4 S_window *oldwin;
-    Reg5 Scols  oldcol;
-    Reg6 Slines oldlin;
+    S_window *oldwin;
+    Scols  oldcol;
+    Slines oldlin;
+
+    struct button_table *tp;
+    int row_y;
 
     oldwin = curwin;        /* save old window info   */
     oldcol = cursorcol;
     oldlin = cursorline;
 
+    if (row == 1) {
+	tp = &button_table_row1[0];
+	row_y = buttonwin.bmarg - 2;
+    }
+    else {
+	tp = &button_table_row2[0];
+	row_y = buttonwin.bmarg;
+    }
 
+/** /
+dbgpr("HiLightButton: i=%d row=%d row_y=%d begx=%d\n",
+  i, row, row_y, tp[i].begx);
+/ **/
     /* try to simulate a button click */
     switchwindow (&buttonwin);
 
     curs_set(0);    /* cursor invisible */
 
-    mvcur(-1, -1, buttonwin.bmarg, button_table[i].begx);
+    mvcur(-1, -1, row_y, tp[i].begx);
 /*  tputs(hilite_str, 1, Pch); */   /* bg highlight */
     tputs(smso, 1, Pch);
-    fputs(button_table[i].label, stdout);
+    fputs(tp[i].label, stdout);
 /*  tputs(sgr0, 1, Pch); */   /* end hilite mode */
     tputs(rmso, 1, Pch);      /* end standout mode */
     fflush(stdout);
@@ -1502,8 +1571,8 @@ HiLightButton(int i) {    /* i indexes button_table[] entry */
     /*usleep(100000);*/   /* .1 seconds */
     napms(75);     /* .1 seconds */
 
-    mvcur(-1, -1, buttonwin.bmarg, button_table[i].begx);
-    fputs(button_table[i].label, stdout);
+    mvcur(-1, -1, row_y, tp[i].begx);
+    fputs(tp[i].label, stdout);
     fflush(stdout);
 
     curs_set(1);    /* cursor visible */
@@ -1517,15 +1586,34 @@ HiLightButton(int i) {    /* i indexes button_table[] entry */
     /*   When invoked this way, some commands need an assist to restore
      *   the cursor position
      */
-    switch (button_table[i].ecmd) {
+    switch (tp[i].ecmd) {
 	case CCDELCH:
+	case CCERASE:
 	case CCMARK:
+	case CCUNMARK:
 	case CCPICK:
 	case CCPUT:
-	case CCPLPAGE:      /* just in case */
+	case CCPLPAGE:
 	case CCMIPAGE:
 	case CCPLLINE:
 	case CCMILINE:
+	case CCRWORD:
+	case CCLWORD:
+	case CCRWINDOW:
+	case CCLWINDOW:
+	case CCMOVEUP:
+	case CCMOVEDOWN:
+	case CCCAPS:
+	case CCCCASE:
+	case CCSPLIT:
+	case CCJOIN:
+	case CCEXIT:
+	case CCREGEX:
+	case CCPLWIN:
+	case CCMIWIN:
+	case CCCLOSE:
+	case CCMICLOSE:
+	case CCMIERASE:
 	    mvcur(-1, -1, curwin->ttext+cursorline, curwin->ltext+cursorcol);
 	    cursorcol = cursorline = -1;
 	    fflush(stdout);
@@ -1554,6 +1642,12 @@ getMouseButtonEvent()
 	return;
     }
 
+/** /dbgpr("getMouseButtonEvent:  %s\n", mouse_decode(&event)); / **/
+
+    if (! (event.bstate & BUTTON1_PRESSED)) {
+	dbgpr("getMouseButtonEvent:  not button1 pressed\n");
+	return;
+    }
 
 /** /
     dbgpr("getMouseButtonEvent:  ev->y=%d ev->x=%d bwin->bmarg=%d bwin->btext=%d, cmdmode=%d\n",
@@ -1566,11 +1660,25 @@ getMouseButtonEvent()
 	return;
 
 #ifdef USE_MOUSE_POSITION
+    /* get the release event */
+    int c;
+    while(1) {
+	c = wgetch(stdscr);
+	if (c == ERR || c != KEY_MOUSE)
+	    return;
+	getmouse(&event);
+	if (event.bstate & BUTTON1_RELEASED || event.bstate & BUTTON4_RELEASED)
+	    break;
+    }
+
+#ifdef OUT
     if (!(event.bstate & BUTTON2_RELEASED)) {
-	dbgpr("getMouseButtonEvent, wait for rel-2\n");
+   /** /dbgpr("getMouseButtonEvent, wait for rel-2\n"); / **/
 	return;
     }
     /* else, we see clicks */
+#endif
+
 #endif
 
     /*
@@ -1582,11 +1690,9 @@ getMouseButtonEvent()
     fflush(keyfile);
 
     /* was a function button "key" pressed,  */
-    if( ev->y == buttonwin.bmarg ) {
-	dbgpr("clicked in button window at (%d, %d)\n", ev->y, ev->x);
-    /*  savecurs(); */
-	getMouseFuncKey(ev->x);  /* sets global mouseFuncKey */
-    /*  restcurs(); */
+    if( ev->y == buttonwin.bmarg || ev->y == buttonwin.bmarg - 2 ) {
+  /** / dbgpr("getMouseButtonEvent:  release in button window at (%d, %d)\n", ev->y, ev->x); / **/
+	getMouseFuncKey(ev->x, ev->y);  /* sets global mouseFuncKey */
     }
     return;
 }
@@ -1602,10 +1708,17 @@ doMotion(MEVENT *ev, int begy, int begx)
     char adj_cursor = 0;
 
 /** /
-dbgpr("doMotion:  beg=(%d,%d) end=(%d,%d) cursorline=%d cursorcol=%d \
-     tmarg=%d, ttext=%d, bmarg=%d, btext=%d\n",
+dbgpr("doMotion y:  beg=(%d,%d) end=(%d,%d) cursorline=%d cursorcol=%d \
+tmarg=%d, ttext=%d, bmarg=%d, btext=%d\n",
   begy, begx, ev->y, ev->x, cursorline, cursorcol,
   curwin->tmarg, curwin->ttext, curwin->bmarg, curwin->btext);
+/ **/
+
+/** /
+dbgpr("doMotion x:  beg=(%d,%d) end=(%d,%d) cursorline=%d cursorcol=%d \
+lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
+  begy, begx, ev->y, ev->x, cursorline, cursorcol,
+  curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext);
 / **/
 
     /* don't allow motion outside of curwin's boundaries */
@@ -1622,13 +1735,20 @@ dbgpr("doMotion:  beg=(%d,%d) end=(%d,%d) cursorline=%d cursorcol=%d \
 	ev->x = curwin->ltext;
 	adj_cursor = 1;
     }
+#ifdef OUT
+    /* this misses the last char on the line */
     if (ev->x >= curwin->rtext) {
 	ev->x = curwin->rtext;
 	adj_cursor = 1;
     }
+#endif /* OUT */
+    if (ev->x >= curwin->rmarg) {
+	ev->x = curwin->rmarg-1;
+	adj_cursor = 1;
+    }
     if (adj_cursor) {
 	mvcur(-1,-1, ev->y, ev->x);
-	dbgpr("  adj_cursor to (%d,%d)\n", ev->y, ev->x);
+    /*  dbgpr("  adj_cursor to (%d,%d)\n", ev->y, ev->x); */
     }
 
 
@@ -1656,16 +1776,17 @@ getyx(stdscr, y, x);
 	dbgpr(" ev->x < begx, calling poscursor(%d,%d) ttext=%d\n",
 	    ev->x - curwin->ltext -1 , ev->y - curwin->tmarg, curwin->ttext);
 	/ **/
-	poscursor(ev->x - curwin->ltext - 1, ev->y - curwin->ttext);
+/*      poscursor(ev->x - curwin->ltext - 1, ev->y - curwin->ttext); */
+	poscursor(ev->x - curwin->ltext, ev->y - curwin->ttext);
     }
 
     doDragHiLite(begy, ev->y, begx, ev->x);
 
-    char buf[10];
+
+    /* update info display of marked area:  eg, 1x2 */
+
+    char buf[32];
     int nlines;
-
-
-/**/
 
     nlines = abs(ev->y - begy) + 1;
 
@@ -1674,28 +1795,48 @@ getyx(stdscr, y, x);
 	sprintf(buf, "%d", nlines);
     }
     else {
-	ncols  = abs(ev->x - begx) - curwin->ltext;
+	int nc = (ev->x > begx) ? ev->x - begx : begx - ev->x;
+	ncols = 1 + nc - curwin->ltext;
 	sprintf(buf, "%dx%d", nlines, ncols);
     }
-    /* cursor rests 1 char past right edge of rect */
-    if (begx < ev->x)
-	ncols++;
-/**/
 
+    /* pad with spaces, length of inf_area is 9 */
+    char ibuf[10];
+    int i;
+
+    strncpy(ibuf, buf, 9);
+    int len = strlen(ibuf);
+
+    for (i=len; i<9; i++) {
+	ibuf[i] = ' ';
+    }
+    ibuf[9] = '\0';
+
+/*  snprintf(ibuf, 9, "%-9s", buf); */
+
+
+#ifdef OUT
+    info (inf_area, max(strlen(buf), (size_t)infoarealen), buf);
+    infoarealen = strlen(buf);  /* a global set by info() routine */
+    d_put(0);
+    fflush(stdout);
+#endif
+
+    curs_set(0);    /* cursor invisible */
+
+    mvcur(-1,-1, infowin.tmarg, inf_area);
+    tputs(ibuf, 1, Pch);
 
     /* mv cursor up 1 line, where E expects it to be */
     mvcur(-1, -1, ev->y, ev->x);
-
-    /* update marked area display */
-    info (inf_area, max(strlen(buf), (size_t)infoarealen), buf);
-    infoarealen = strlen(buf);
-    d_put(0);
+    fflush(stdout);
+    curs_set(1);    /* cursor visible */
 
 /** /
     dbgpr("  curmark:  mrkwincol=%d, mrkwinlin=%d, mrkcol=%d, mrklin=%d\n",
 	curmark->mrkwincol, curmark->mrkwinlin, curmark->mrkcol, curmark->mrklin);
-    dbgpr("doMotion,end: cursorline=%d cursorcol=%d, info_area=(%s)\n\n",
-	cursorline, cursorcol, buf);
+    dbgpr("doMotion,end: cursorline=%d cursorcol=%d, info_area=(%s) len=%d\n\n",
+	cursorline, cursorcol, buf, infoarealen);
 / **/
 
     return 0;
@@ -1729,7 +1870,8 @@ dbgpr("endMotion,end: cursorline=%d cursorcol=%d, ltext=%d ttext=%d\n\n",
  */
 
 void
-doDragHiLite(int begy, int endy, int begx, int endx) {
+doDragHiLite(int begy, int endy, int begx, int endx)
+{
 
     int w = term.tt_width;
     char buf[w+1];
@@ -1768,15 +1910,6 @@ doDragHiLite(int begy, int endy, int begx, int endx) {
 
     /* clear the previously marked area */
 
-#ifdef OUT
-    /* way overkill to erase everything, for now... */
-/** /
-    int i;
-    for (i = curwin->ttext; i < curwin->bmarg; i++)
-       HiLightLine(i, NO);
-/ **/
-#endif /* OUT */
-
     int y0, y1;
     y0 = y1 = 0;
 
@@ -1791,7 +1924,6 @@ y0, y1, from, to, from_topline, from_botline);
     int i;
     for (i = y0; i <= y1; i++)
        HiLightLine(i, NO);
-
 
 
     /*  use curwin->lmarg and curwin->rtext to account for any windows,
@@ -1818,8 +1950,8 @@ dbgpr("beg_mark=%d mark_len=%d cursorcol=%d,cursorline=%d from=%d to=%d miny=%d 
 beg_mark, mark_len, cursorcol, cursorline, from, to, miny, maxy);
 / **/
 
-from_topline = from;
-from_botline = to;
+    from_topline = from;
+    from_botline = to;
 
     /* clear previous marks */
 /** not working correctly
@@ -1827,7 +1959,7 @@ from_botline = to;
 	cp = (char *)image + w*line;
 
 	mvcur(-1,-1, line, curwin->ltext);
-	snprintf(buf, wid, "%s", cp+curwin->ltext);
+	snprintf(buf, (size_t) wid, "%s", cp+curwin->ltext);
 	puts(buf);
     }
 **/
@@ -1837,7 +1969,7 @@ from_botline = to;
 	for (line = from; line <= to; line++ ) {
 	    cp = (char *)image + w*line;
 	    mvcur(-1,-1, line, curwin->ltext);
-	    snprintf(buf, wid, "%s", cp+curwin->ltext);
+	    snprintf(buf, (size_t) wid, "%s", cp+curwin->ltext);
 	    tputs(hilite_str, 1, Pch);
 	    puts(buf);
 	    tputs(sgr0, 1, Pch);
@@ -1852,11 +1984,11 @@ from_botline = to;
 
 	/* clear any full line highlighting */
 	mvcur(-1,-1, line, curwin->ltext);
-	snprintf(buf, wid, "%s", cp+curwin->ltext);
+	snprintf(buf, (size_t) wid, "%s", cp+curwin->ltext);
 	puts(buf);
 
 	/* get a copy of the marked area */
-	snprintf(buf, mark_len+1, "%s", cp + beg_mark );
+	snprintf(buf, (size_t) mark_len+1, "%s", cp + beg_mark );
 	mvcur(-1,-1, line, beg_mark);
 	tputs(hilite_str, 1, Pch);      /* user selected mode, see cmd: set highlight */
 	puts(buf);
@@ -1880,6 +2012,11 @@ doChgWin(int wn, int y, int x)
     poscursor(x - winlist[wn]->ltext, y - winlist[wn]->ltext);
     d_put(0);
     chgwindow(wn);
+
+    /* used in calcRange2Clear() */
+    from_topline = curwin->ttext;
+    from_botline = from_topline;
+
     /* check these ... */
     fprintf(keyfile, "%c%c%c", CCCMD, wn,CCCHWINDOW);
     fflush(keyfile);
@@ -1890,11 +2027,16 @@ doChgWin(int wn, int y, int x)
 /* determine range of previously highlighted area to clear */
 
 void
-calcRange2Clear(int from, int to, int *Fr, int *To) {
+calcRange2Clear(int from, int to, int *Fr, int *To)
+{
 
+/** /
+dbgpr("calc:  from_topline=%d, from_botline=%d, w->ttext=%d, w->tmarg=%d\n",
+  from_topline, from_botline, curwin->ttext, curwin->tmarg);
+/ **/
     /*
      *  from = screen line of the start of the new highlight area
-     *  end = screen line of the end of the new highlight area
+     *  end  = screen line of the end of the new highlight area
      *  from_topline = previous top of old highlight area (global var)
      *  from_botline = previous bottom of old highlight area (global var)
      */
@@ -1903,7 +2045,8 @@ calcRange2Clear(int from, int to, int *Fr, int *To) {
     y0 = y1 = 0;
 
     if (from == to) {       /* 1 (or 2) line(s) to clear */
-	if (from > from_topline && from_topline > 0) {
+     /* if (from > from_topline && from_topline > 0) { */
+	if (from > from_topline) {
 	    y0 = from_topline;  /* 2 lines to clear */
 	}
 	else {
@@ -1941,71 +2084,22 @@ calcRange2Clear(int from, int to, int *Fr, int *To) {
 
 #ifdef BUTTON_FONT
 
-static char button_line[512];
-
-void makeButtonOverlay() {
-
-    int wid = term.tt_width;
-    char *cp, *s;
-
-    char *reset   = "\033[0m";
-/*  char *font_on = "\033[36m";  */     /* cyan */
-/**/char *font_on = "\033[1m";  /**/    /* bold */
-
-    int len_on = strlen(font_on);
-    int len_off = strlen(reset);
-
-
-/*  cp = (char *)image + wid * (term.tt_height - 1);  */
-    cp = (char *)image + wid * buttonwin.bmarg;
-
-    int i;
-    int done = 0;
-
-    for (i=0, s=button_line; cp && i < wid; i++) {
-	if (*cp == ' ') {
-	    *s++ = *cp++;
-	    /*dbgpr("adding ' ', len=%d\n", s-button_line); */
-	    continue;
-	}
-	/* start of non blanks */
-	strncpy(s, font_on, len_on);
-	s += len_on;
-	while (cp && *cp != ' ') {
-	  /*dbgpr("adding %c, len=%d i=%d wid=%d\n", *cp, s-button_line, i, wid); */
-	  *s++ = *cp++;
-	  if (*(s-1) == '}') {
-	     done++;
-	     break;
-	  }
-	}
-	strncpy(s, reset, len_off);
-	s += len_off;
-	if (done) break;
-    }
-    *s = '\0';
-
-#ifdef OUT
-    for (i=0; i<s-button_line; i++)
-	if (button_line[i] == '\0')
-	    button_line[i] = ' ';
-#endif
-
-/***/
-    dbgpr("colorButtons: button_line len=%d\n", s - button_line);
-    dbgpr("%s\n", button_line+2);
-/***/
-
-    return;
-}
+static char button_line1[512];
+static char button_line2[512];
 
 void
-overlayButtons() {
+overlayButtons()
+{
 
-/*  mvcur(-1, -1, term.tt_height-1, 0); */
+
+    /* row 1 buttons */
+    mvcur(-1, -1, buttonwin.bmarg - 2 , 0);
+    tputs(button_line1, 1, Pch);
+    fflush(stdout);
+
+    /* row 2 buttons */
     mvcur(-1, -1, buttonwin.bmarg, 0);
-    tputs(button_line, 1, Pch);
-/*  fprintf(stdout, "%s", button_line); */
+    tputs(button_line2, 1, Pch);
     fflush(stdout);
 
     int c = cursorcol;
@@ -2014,10 +2108,166 @@ overlayButtons() {
     poscursor(c, l);
     d_put(0);
 
-/*
-dbgpr("%s\n", button_line);
+/** /
+dbgpr("row1:%s\n", button_line1);
+dbgpr("row2:%s\n", button_line2);
 dbgpr("overlayButton, return\n");
-*/
+/ **/
+
+    return;
+}
+
+/* highlight button text, for overlay
+ */
+void
+makeButtonOverlayB (int row, int spaces, int indent)
+{
+
+    char *s;
+    char *font_on, *font_off;
+
+    /* add bold */
+    char fontbuf[128];
+    snprintf(fontbuf, sizeof(fontbuf), "%s\033[1m", button_font);
+
+    font_on = fontbuf;
+    font_off = sgr0;
+
+    size_t /*int*/ len_on  = strlen(font_on);
+    size_t /*int*/ len_off = strlen(font_off);
+
+    struct button_table *tp;
+    unsigned int i, tablesize;
+
+/*dbg*/
+/** /
+char *cp_orig, *b_line;
+int wid = term.tt_width;
+/ **/
+
+    if (row == 1) {
+	tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+	tp = &button_table_row1[0];
+	s = button_line1;
+/** /   cp_orig = (char *)image + wid * (buttonwin.bmarg-2);  / * dbg */
+    }
+    else {
+	tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	tp = &button_table_row2[0];
+	s = button_line2;
+/** /   cp_orig = (char *)image + wid * buttonwin.bmarg;  / * dbg */
+    }
+/* b_line = s; */
+    char *gap;
+    int ind=0;
+    size_t len_gap;
+
+    /* between each label:  <label><font_off><sp><sp><font_on><label>*/
+    if (spaces == 2) {
+	gap = "  ";
+	ind = indent;
+    }
+    /* between each label:  <label><sp><font_off><sp><font_on><sp><label> */
+    else if (spaces == 3) {
+	gap = " ";
+	ind = indent - 1;
+    }
+    /* between each label:  <label><sp><font_off><sp><sp><font_on><sp><label> */
+    else if (spaces == 4) {
+	gap = "  ";
+	ind = indent - 1;
+    }
+    len_gap = strlen(gap);
+
+    /* copy initial indent */
+    int a;
+    for (a=0; a<ind; a++) {
+	*s++ = ' ';
+    }
+
+/** /
+dbgpr("makeB:  row=%d indent=%d ind=%d spaces=%d gap=(%s) len_gap=%d\n",
+    row, indent, ind, spaces, gap, len_gap);
+/ **/
+
+    size_t /*int*/ len;
+    for (i=0; i < tablesize; i++) {
+
+	/* add font_on */
+	strncpy(s, font_on, len_on);
+	s += len_on;
+
+	if (spaces > 2) *s++ = ' ';
+
+	len = strlen((tp+i)->label);
+	strncpy(s, (tp+i)->label, len);
+	s += len;
+
+	if (i+1 < tablesize ) {
+	    /* eg, want +Pg/-Pg to appear together */
+	    if ((tp+i+1)->label[0] == '/' ) {
+		i++;
+		len = strlen((tp+i)->label);
+		strncpy(s, (tp+i)->label, len);
+		s += len;
+	    }
+	}
+
+	if (spaces > 2) *s++ = ' ';
+
+	/* add font_off */
+	strncpy(s, font_off, len_off);
+	s += len_off;
+
+	/* add gap if not last label */
+	if (i+1 < tablesize) {
+	    /*dbgpr("--adding gap=(%s) len=%d\n", gap, len_gap);*/
+	    strncpy (s, gap, len_gap);
+	    s += len_gap;
+	}
+
+/*#ifdef SAVE*/
+#ifdef OUT
+	if (spaces == 2) {
+	    sprintf(s, "%s  %s", font_off, font_on);
+	    s += 2 + len_off + len_on;
+	}
+	else {
+	    sprintf(s, " %s%s%s ", font_off, gap, font_on);
+	    s += 1 + len_off + len_gap + len_on;
+	}
+#endif
+/*#endif*/
+
+#ifdef OUT
+	if (spaces == 2) {
+	    sprintf(s, "%s", font_off);
+	    s += len_off;
+	    if (i+1 < tablesize) {  /* ie, not last label */
+		sprintf(s, "  %s", font_on);
+		s += 2 + len_on;
+	    }
+	}
+	else {
+	    sprintf(s, " %s", font_off);
+	    s += len_off;
+	    if (i+1 < tablesize ) {
+		sprintf(s, "%s%s ", gap, font_on);
+		s += 1 + len_gap + len_on; /* 1 cuz a sp is added above */
+	    }
+	}
+#endif /* OUT */
+    }
+
+/*  sprintf(s, "%s", font_off); */
+
+/** /
+dbgpr("makeB: indent=%d spaces=%d len_gap=%d\n",
+  indent, spaces, len_gap);
+cp_orig[wid-1] = '\0';
+dbgpr("row%d:(%s)\n",row, cp_orig);
+dbgpr("row%d:(%s)\n", row, b_line);
+/ **/
 
     return;
 }

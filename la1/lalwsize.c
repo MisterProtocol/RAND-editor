@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 La_linesize
 la_lwsize (plas)
 Reg2 La_stream *plas;

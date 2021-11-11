@@ -28,6 +28,12 @@ extern  char **argarray;        /* used in checkargs() in e.c */
 extern  Small numargs;          /*  "           "        "    */
 extern  struct loopflags loopflags;
 extern  Flag entering;
+extern void chk_profile (char *);
+extern int get_profilekey (Flag);
+
+int SafeCurDirProfile(void);
+void getopt_startup(void);
+
 
 S_looktbl keysyms[] = {
     {"+line",   CCPLLINE},
@@ -57,6 +63,7 @@ S_looktbl keysyms[] = {
     {"join",    CCJOIN},
     {"left",    CCMOVELEFT},
     {"mark",    CCMARK},
+    {"mouse",   CCMOUSEONOFF},
     {"open",    CCOPEN},
     {"pick",    CCPICK},
 #ifdef RECORDING
@@ -99,14 +106,16 @@ chk_profile( profilename )
 
 	if( profilename == (char *)NULL ) {
 	    /*
-	     *  if EPROFILE is set in the environment, use it.
+	     *  if EPROFILE20 or EPROFILE is set in the environment, use it.
 	     */
-	    if(( startupfile = getenv( "EPROFILE" )) == NULL ) {
-		if( SafeCurDirProfile())
-		    strcpy( tmp, PROFILENAME );
-		else
-		    sprintf( tmp, "%s/%s", getmypath(), PROFILENAME );
-		startupfile = tmp;
+	    if(( startupfile = getenv( "EPROFILE20" )) == NULL ) {
+		if(( startupfile = getenv( "EPROFILE" )) == NULL ) {
+		    if( SafeCurDirProfile())
+			strcpy( tmp, PROFILENAME );
+		    else
+			sprintf( tmp, "%s/%s", getmypath(), PROFILENAME );
+		    startupfile = tmp;
+		}
 	    }
 	}
 	else
@@ -162,8 +171,8 @@ getopt_startup()
 	register char *beg, *end;
 	char buf[500];
 	char *arg_opt[3];
-	int get_profilekey ();
-	void checkargs ();
+    /*  int get_profilekey (); */
+	/*void checkargs ();*/
 
 	do {
 	    fgets( buf, 200, fp_profile );
@@ -378,7 +387,7 @@ ret:    putc( skey, keyfile );
 
 #ifdef RECORDING
 	if( recording )
-	    RecordChar( skey );
+	    RecordChar( (Uint) skey );
 #endif /* RECORDING */
 
 	return( skey );

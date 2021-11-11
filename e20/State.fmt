@@ -41,6 +41,7 @@ Strings include trailing null byte.
     short	    ANSI foreground color
     char	    flag: ANSI background color set
     short	    ANSI background color
+    short           button font color number
     char	    flag: showbuttons
     char	    flag: skipmouse (no mouse init string sent)
     char	    flag: useextnames (init mouse using curses "extnames")

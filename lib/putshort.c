@@ -1,6 +1,8 @@
 #include	<stdio.h>
 #include	<sys/types.h>
 
+#include	"prototypes.h"
+
 void
 putshort (i, iop)
 short i;

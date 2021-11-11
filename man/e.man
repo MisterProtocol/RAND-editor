@@ -255,6 +255,15 @@ Turns off file locking if the editor was compiled with the
 option
 .SM FILELOCKING.
 .TP
+.B \-search=string
+.br
+Sets the initial search string.
+.PP
+.SH
+NEW OPTIONS IN E20
+.br
+.sp
+.TP
 .B \-nowinshift
 In previous editions of the editor, creating a new window on the current
 file by typing "CMD: window" would obscure one line of text in the file
@@ -265,15 +274,14 @@ The current version of the editor shifts the new window down by one line,
 to allow all of the text in the file to be visible in one window or the
 other.
 Option \-nowinshift causes the editor to revert to the old behavior.
-.TP
-.B \-search=string
-.br
-Sets the initial search string.
 .PP
 These next four options control the foreground and background colors
 used to highlight the areas selected by the
 .SM MARK
-command.
+command.  If you have 256 colors available, some values to try for the
+.B \-setab=N
+option are: 3, 7, 136, 151, 194, and 222.
+
 See
 .SM "MOUSE SUPPORT"
 for details.
@@ -284,10 +292,10 @@ for details.
 .B \-fgcolor=r,g,b
 .br
 .TP
-.B \-setab=N
+.B \-setab=N (0-255;  0=black, 255=white)
 .br
 .TP
-.B \-setaf=N
+.B \-setaf=N (0-255;  0=black, 255=white)
 
 .PP
 These next options apply to mouse support.
@@ -297,6 +305,22 @@ These next options apply to mouse support.
 Do not enable mouse support.  See
 .SM "MOUSE SUPPORT"
 below for more details.
+.TP
+.B \-showbuttons
+.br
+This option displays clickable buttons across the bottom
+of the screen that execute E functions by a mouse click.  The buttons
+appear as ascii text, eg: "... open/close  pick/put ...".
+A screensize greater than 90 chars is recommended.
+This feature should be considered
+.I experimental.
+.TP
+.B \-buttonfont=N (0-255;  0=black, 255=white)
+.br
+This option displays sets the background color of buttons if the
+\-showbuttons option is in effect.  The default is the same value
+used for highlighting text.
+Some values to try are: 3, 7, 136, 151, 194, and 222.
 .TP
 .B \-mouseinit="initstr"
 .br
@@ -310,22 +334,16 @@ Set a custom mouse reset string.  Example:  -mousestop="\\E[?1006;1002l".
 .br
 The default is "\\E[?1002l";
 .TP
-.B \-useextnames
+.B \-noextnames
 .br
-Enable the use of extended names for TERM entries in the terminfo library.
-For example, many terminfo entries include a XM entry which defines the
-mouse protocol mode.  By default, E sends the mouse initialzation
-string of "\\E[?1002h" which enables
+Disable the use of extended names for TERM entries in the terminfo
+capabilty database.
+Recent versions of the terminfo database contain several
+entries that include an XM entry that sets the mouse protocol to SGR mode.
+If you're using a very old terminal emulator and you find that mouse motion
+is not working, try using this option to disable use of XM entries.
+By default, E sends the mouse initialzation string of "\\E[?1002h" which enables
 mouse position reporting while a button is pressed and dragged.
-.TP
-.B \-showbuttons
-.br
-This option displays a row of pseudo buttons across the bottom
-of the screen that execute E functions by a mouse click.  The buttons
-appear as ascii text, eg: "... open/close  pick/put ...".
-This feature should be considered
-.I experimental.
-
 .SH ENVIRONMENT VARIABLES
 The
 .SM TERM
@@ -364,10 +382,14 @@ of the alternate file.  If an alternate filename is given on both
 the command line and with the
 .SM EDITALT
 variable, the command line file is used.
+.PP
 The
-.SM EPROFILE
+.SM EPROFILE (and/or EPROFILE20)
 environment variable will be used as the name of the "startup" file, in lieu
-of "./.e_profile" or "~/.e_profile".  The command line option
+of "./.e_profile" or "~/.e_profile".
+The \%EPROFILE20 "startup" file can contain options and commands unique to
+e20.  If both \%EPROFILE and \%EPROFILE20 are set, the latter is examined first.
+The command line option
 \-profile=file wins if both are used.
 .PP
 The
@@ -437,18 +459,29 @@ added color options to highlight marked areas.
 .bu
 added brace matching mode;
 when enabled, resting the cursor on a open/closing brace will highlight the
-corresponding closing/opening brace.  See the
+corresponding closing/opening brace.  If the matching brace is not in the
+current window, the column and row number of the location will be displayed
+in the info window.
+By default, the search range is \(+- 100 lines. The
+.B \-set brace range N
+option changes the range (a value of 0 removes the limit).
+If the range is 0, the search range is the beginning or end of file.
+See the
 .I set options
 section below.
 .bu
 added the
 .B -showbuttons
-option to display row of clickable function buttons
+option to display clickable function buttons
 .bu
 added keyboard file options to map F1-12 function keys to E commands,
-example:  KEY_F2:<redraw>, see etc/kb_ncurses for other examples.
+examples:  KEY_F2:<redraw>, SHIFT_F4:<+word>, CTRL_F4:<-word>;
+see etc/kb_ncurses for other examples.
 The environemnt variable EKBFILE_NCURSES may be set to a custom e20 kbfile
 for sites using both e19 and e20.
+Note that some terminal emulators use a few function keys for their
+own purposes, eg: gnome-terminal uses F1 for a Help menu, and F11 to
+toggle full screen mode.
 .PP
 E19+ changes include:
 .bu
@@ -539,7 +572,18 @@ support for the mouse.
 The cursor may be moved arbitrarily by clicking the left mouse button in any window.
 If multiple windows are active in E, clicking in a non-active window will change E's
 focus to that window.  Dragging with the left mouse button will mark rectangular areas
-of text.
+of text.  Setting the environment variable TERM=xterm-256color is recommended to make
+use of full color support.
+.PP
+If you find that dragging the mouse does not work, try setting TERM to one of these:
+xterm-color, xterm-1002, or xterm-x11mouse. Alternatively, the terminfo file
+e20/terminfo/xterm-256color-a.src can be compiled and installed with 'tic'
+creating the file ~/.terminfo/x/xterm-256color.
+(N.B. The "/x/" in this path may be
+replaced with an alternative directory name, .e.g. "/78/", depending on the
+version of "tic" you are using.)
+The xterm-256color-a.src file contain modified
+XM and kmous entries that work with older terminal emulators.
 .PP
 The
 .SM MARK
@@ -567,6 +611,8 @@ E, then reenable the mouse with the command
 See the
 .SM SET
 command section below.
+Another method is to define a function key in a keyboard file
+to toggle the mouse on/off.  Example:  KEY_F6:<mouse>.
 .SH HIGHLIGHTING
 By default, areas selected using the
 .SM MARK
@@ -672,37 +718,39 @@ Exit the editor.  The different exit options affect
 whether or not the editor updates the edited files
 or not, and whether the ".e" state files are changed.
 The following table give the complete exit story.
-.ta \w'exit nosave\ \ 'u +\w'Saves\ \ 'u +\w'Update\ \ 'u +\w'Keys\ file\ \ 'u
+.\".ta 1P+\w'exit nosave\ \ \ 'u +\w'Saves\ \ \ 'u +\w'Update\ \ \ 'u +\w'Keys\ file\ \ \ 'u
+.ta 1P+\w'exit nosave'u+1P +\w'Saves'u+1P +\w'Update'u+1P +\w'Keys\ file'u+1P
 .RS
 .sp
-	Saves   Update  Remove  Remove
+.ds t \t
+\*tSaves\*tUpdate\*tRemove\*tRemove
 .br
-	Files   State   Keys\ file      Change file
+\*tFiles\*tState\*tKeys\ file\*tChange file
 .br
 .sp
-exit     X       X       X       X
+exit\*tX\*tX\*tX\*tX
 .br
-exit nosave      -       X       X       X
+exit nosave\*t-\*tX\*tX\*tX
 .br
-exit quit        -       -       X       X
+exit quit\*t-\*t-\*tX\*tX
 .br
-exit abort       -       -       -       X
+exit abort\*t-\*t-\*t-\*tX
 .br
-exit dump        -       -       -       -
+exit dump\*t-\*t-\*t-\*t-
 .RE
 .ta \w'underlay\ \ \ \ 'u
 .sp
-blot    adjust | close | erase | pick | run | box
+blot	adjust | close | erase | pick | run | box
 .br
-\-blot  adjust | close | erase | pick | run | box
+\-blot	adjust | close | erase | pick | run | box
 .br
-cover   adjust | close | erase | pick | run | box
+cover	adjust | close | erase | pick | run | box
 .br
-insert  adjust | close | erase | pick | run | box
+insert	adjust | close | erase | pick | run | box
 .br
-overlay adjust | close | erase | pick | run | box
+overlay	adjust | close | erase | pick | run | box
 .br
-underlay        adjust | close | erase | pick | run | box
+underlay	adjust | close | erase | pick | run | box
 .RS
 .PP
 All of these commands take the named buffer (one of
@@ -960,6 +1008,8 @@ command-string.
 save <newfilename>
 .br
 Immediately write a copy of the file to newfilename.
+.\" new page to keep the following options together
+\.".bp
 .PP
 set \fIoption\fR
 .br
@@ -972,8 +1022,14 @@ used to set various options:
 .ta \n(,iu +1P
 .nf
 .sp 4p
-bracematch\*ton\^|\^off, toggles brace matching mode
 {}\*ton\^|\^off, toggles brace matching mode (shortcut)
+bracematch\*ton\^|\^off, toggles brace matching on/off
+brace range \fIn\fR\*tsets brace matching range to \fIn\fR lines (default: 100)
+brace ?\*tshows the brace range value (default: 100 lines)
+\*tsetting the limit to 0 (or "off") extends the search to the end of file.
+brace coding\*ton\^|\^off, sets brace matching to "coding" mode where a
+\*tsearch stops at the end of the current function(); assumes that
+\*ta curly brace in column one ends a function() definition.
 +line \fIn\fR\*tsets the <+line> key to \fIn\fR lines
 \-line \fIn\fR\*tsets the <\-line> key to \fIn\fR lines
 line \fIn\fR\*tsets the <+line> and <\-line> keys to \fIn\fR lines
@@ -1317,6 +1373,8 @@ As a means of individually tailoring various options on startup, E will
 run commands specified in a "profile" file.  The order in which E
 decides which "profile" file to run, is:  command line option
 \-profile=\fIfile\fR,
+environment variable
+.SM EPROFILE20, then
 environment variable
 .SM EPROFILE,
 a "safe" ./.\fIe_profile\fR,

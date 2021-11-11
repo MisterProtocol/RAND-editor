@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 #ifdef COMMENT
   Link the fsd chain into plas at the current position.  It is assumed
   that the current position points to the beginning of an fsd.

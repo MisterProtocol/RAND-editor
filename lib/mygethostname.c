@@ -10,6 +10,8 @@
 #include <sys/utsname.h>
 #endif
 
+#include	"prototypes.h"
+
 char my_hostname[MAXHOSTNAMELEN];
 
 char *

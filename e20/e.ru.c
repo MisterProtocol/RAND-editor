@@ -19,12 +19,9 @@ file e.ru.c
 extern pid_t wait();
 extern int kill();
 
-extern void setmarg ();
-extern void infoauto ();
-extern void GetLine ();
-void nopipemesg ();
-void noforkmesg ();
-void execabortmesg ();
+void nopipemesg (void);
+void noforkmesg (void);
+void execabortmesg (char *);
 
 #include SIG_INCL
 
@@ -39,10 +36,11 @@ S_looktbl filltable[] = {
     {0         , 0}
 };
 
-extern void doexec ();
-extern Flag islocked();
+extern void doexec (Fd, Fd, char *, char *args[]);
 
-void alarmproc ();
+void alarmproc (int);
+
+Cmdret fillopts (char *, char **, Small);
 
 
 #ifdef COMMENT
@@ -62,7 +60,6 @@ Flag    closeflg;
     register Cmdret tmp;
     register Cmdret retval = 0;
     char *cp;
-    Cmdret fillopts ();
 
     if (!okwrite ())
 	return NOWRITERR;
@@ -88,7 +85,7 @@ Flag    closeflg;
     switch (tmp) {
     case 0:
 #ifdef LMCMARG
-	setmarg (&linewidth, tmplinewidth);
+	setmarg ((Ncols *) &linewidth, (Ncols) tmplinewidth);
 #else /* LMCMARG */
 	linewidth = tmplinewidth;
 #endif /* LMCMARG */
@@ -111,7 +108,7 @@ Flag    closeflg;
 
     case 1:
 #ifdef LMCMARG
-	setmarg (&linewidth, tmplinewidth);
+	setmarg ((Ncols *) &linewidth, (Ncols) tmplinewidth);
 #else /* LMCMARG */
 	linewidth = tmplinewidth;
 #endif /* LMCMARG */
@@ -125,7 +122,7 @@ Flag    closeflg;
 	if (markcols)
 	    return NORECTERR;
 #ifdef LMCMARG
-	setmarg (&linewidth, tmplinewidth);
+	setmarg ((Ncols *)&linewidth, (Ncols) tmplinewidth);
 #else /* LMCMARG */
 	linewidth = tmplinewidth;
 #endif /* LMCMARG */
@@ -161,7 +158,7 @@ parsauto (cmdmod)
     if (*cp != '\0')
 	return CRBADARG;
 #ifdef LMCMARG
-    setmarg (&linewidth, tmplinewidth);
+    setmarg ((Ncols *)&linewidth, (Ncols) tmplinewidth);
 #endif /* LMCMARG */
     infoauto (cmdmod);
     return CROK;
@@ -799,12 +796,12 @@ Flag    puflg;          /* putup when done */
 
 #ifdef COMMENT
 void
-alarmproc ()
+alarmproc (int)
 .
     Called from SIGALRM interrupt.  Merely sets the global flag 'alarmed'.
 #endif
 void
-alarmproc ()
+alarmproc (const int i __attribute__((unused)))
 {
     alarmed = YES;
     return;

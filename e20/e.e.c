@@ -13,25 +13,26 @@ file e.e.c
 #include "e.cm.h"
 #include "e.e.h"
 
-extern Cmdret lacmderr ();
+extern Cmdret lacmderr (char *);
 
-extern void putbks ();
-extern void clean ();
+extern void putbks (Ncols, Ncols);
+extern void clean (Small);
 extern int la_error ();
-extern int islocked ();
-void domark ();
-void GetLine ();
-void domark ();
-void boxseg ();
+extern Flag putline ();
 
-Cmdret joinlines ();
-Cmdret dojoin ();
-Cmdret ed ();
-Cmdret edmark ();
-Cmdret edrect ();
-Cmdret edlines ();
+void domark (Flag);
+void boxseg (char *, int, Ncols);
 
-Char caseit ();
+Cmdret joinlines (Nlines, Ncols, Flag);
+Cmdret dojoin (Nlines, Ncols, Nlines, Ncols, Flag, Flag);
+Cmdret edrect (Small, Small, Nlines, Ncols, Nlines, Ncols, Flag);
+Cmdret edlines (Small, Small, Nlines, Nlines, Flag);
+Cmdret chgcase (Flag);
+
+Char caseit (Char, Flag);
+
+
+
 
 #ifdef COMMENT
 Cmdret
@@ -390,7 +391,7 @@ chgcase (xabs)
 		curcol = cursorcol + curwksp->wcol;
 		if (curcol < ncline - 1) {
 			cline [curcol] = caseit (cline [curcol], xabs);
-			putch (cline [curcol], YES);
+			putch ((Uchar) cline [curcol], YES);
 		} else
 			movecursor (RT, 1);
 	}
@@ -409,8 +410,8 @@ caseit (key, xabs)
 #endif
 Char
 caseit (key, xabs)
-	Flag xabs;
-	Char key;
+Char key;
+Flag xabs;
 {
 	if ( key >= 'a' && key <= 'z')
 		key = (key + 'A' - 'a') & 0177;

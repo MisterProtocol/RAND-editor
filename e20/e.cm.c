@@ -23,27 +23,16 @@ file e.cm.c
 
 extern Flag play_silent;
 extern Cmdret
-	rangecmd (),
-	DoMacro (),
-	SetRecording (),
-	PlayRecording(),
-	StoreMacro (),
-	UndefMacro (),
-	ShowMacros (),
-	join (),
-	split (),
-	edit (),
-	makewindow (),
-	parsauto (),
-	dodword (),
-	setoption (),
-	SaveMacros (),
-	setwordmode ();
+	edit (void),
+	setoption (int);
 
 
-extern int zaprpls (), fgetowner ();
-extern void setmarg ();
-extern Flag islocked();
+extern int zaprpls ();
+extern uid_t fgetowner ();
+
+extern Cmdret gotocmd (void);
+extern void fresh ();
+extern void dostop (void);
 
 #ifdef NCURSES
 extern int toggle_mouse();
@@ -51,16 +40,17 @@ extern Flag highlight_mode;
 extern Flag redrawflg;
 extern char *smso, *rmso, *bold_str, *setab, *setaf, *sgr0, *setab_p, *setaf_p, *hilite_str;
 extern char *fgbg_pair;
-int doSetHighlight();
+int doSetHighlight(char *arg);
 char *highlight_info_str;
 extern int n_colors;
 
 /* brace matching/hilighting */
+int braceRange = 100;           /* match to +/- braceRange lines */
+Flag bracematchCoding = YES;    /* stop srch at beg/end of a function */
 extern int bracematching;
-int doSetBraceMode();
-extern int Pch();
-
 #endif
+
+char *exitmessage;  /* for new 'unsafe' option to eexit() */
 
 #include SIG_INCL
 
@@ -204,7 +194,6 @@ S_looktbl cmdtable[] = {
 
 };
 
-extern void dostop ();
 
 #ifdef COMMENT
 Cmdret
@@ -356,14 +345,14 @@ command (forcecmd, forceopt)
     case CMD_PATTERN:
 	if (*cmdopstr)
 	    retval = CRTOOMANYARGS;
-	else if (patmode && cmdval == CMDPATTERN){
-	    mesg(ERRALL+1, "You are in RE mode");
-	    retval = CROK;
-	}
-	else if (!patmode && cmdval == CMD_PATTERN){
-	    mesg(ERRALL+1, "You are not in RE mode");
-	    retval = CROK;
-	}
+	    else if (patmode && cmdval == CMDPATTERN){
+		mesg(ERRALL+1, "You are in RE mode");
+		retval = CROK;
+	    }
+	    else if (!patmode && cmdval == CMD_PATTERN){
+		mesg(ERRALL+1, "You are not in RE mode");
+		retval = CROK;
+	    }
 	else{
 		tglpatmode();
 		clrcnt = 0;
@@ -527,6 +516,16 @@ command (forcecmd, forceopt)
 	    retval = NOWRITERR;
 	    break;
 	}
+
+#ifdef NORUNCMD_IN_PROFILE
+	/* Unsafe:  don't allow run cmd in a .e_profile */
+	if (dot_profile && cmdval == CMDRUN) {
+	    exitmessage = "The run cmd is UNSAFE in the .e_profile startup file!";
+	    opstr = "unsafe";
+	    eexit();
+	}
+#endif
+
 #ifdef  FILELOCKING
 	if (!islocked (YES)) {
 	    retval = NOLOCKERR;
@@ -664,9 +663,9 @@ command (forcecmd, forceopt)
 	sfree (opstr);
 
     if (retval >= CROK) {
-/*dbgpr("command() returning %d\n", retval);*/
+/** dbgpr("command() returning %d\n", retval); **/
 	return retval;
-}
+    }
     switch (retval) {
     case CRUNRECARG:
 	mesg (1, " unrecognized argument to ");
@@ -834,7 +833,7 @@ Flag on;
 		if (fileflags[curfile] & CANMODIFY)
 		    break;
 		if (fileflags[curfile] & FWRITEABLE ||
-			userid == (unsigned int)fgetowner (curfile))
+			userid == fgetowner (curfile))
 		    fileflags[curfile] |= CANMODIFY;
 		break;
 
@@ -922,7 +921,7 @@ setoption( showflag )
 	Reg1 char *arg;
 	Reg2 Small ind;
 	Reg3 Small value;
-	Cmdret retval;
+	Cmdret retval = 0;
 	extern Flag fill_hyphenate;
 	extern Flag fill_troffmode;
 	static S_looktbl setopttable[] = {    /* Must be in sort order!!! */
@@ -933,7 +932,9 @@ setoption( showflag )
 	   {"?",            SET_SHOW},     /* show options */
 	   {"[]",           SET_BRACEMATCH},   /* set brace matching mode, shortcut */
 	   {"bell",         SET_BELL},     /* echo \07 */
-	   {"bracematch",   SET_BRACEMATCH},   /* set brace matching mode */
+	   {"brace",        SET_BRACEMATCH}, /* set brace options */
+	   {"brace ?",      SET_BRACEMATCH}, /* show brace range */
+	   {"bracematch",   SET_BRACEMATCH},   /* set brace matching mode, options */
 	   {"debug",        SET_DEBUG},
 	   {"filldot",      SET_FILLDOT},  /* fill doesn't stops at ^. */
 	   {"highlight",    SET_HIGHLIGHT},/* marked areas are highlighted */
@@ -978,6 +979,7 @@ setoption( showflag )
 		return CRNEEDARG;
 
 	    ind = lookup (opstr, setopttable);
+/*dbgpr("ind=%d from lookup of (%s) in setopttable\n", ind, opstr);*/
 	    if (ind == -1 || ind == -2) {
 		mesg (ERRSTRT + 1, opstr);
 		return ind;
@@ -1100,7 +1102,7 @@ bell %s, vb %s, hy %s",
 #endif /* LMCAUTO */
 /*trw, 8.28.2010*/
 #ifdef LMCMARG
-		setmarg (&linewidth, value);
+		setmarg ((Ncols *)&linewidth, value);
 #endif
 		retval = CROK;
 		break;
@@ -1218,7 +1220,8 @@ BadVal:         retval = CRBADARG;
 
 
 int
-doSetHighlight(char *arg) {
+doSetHighlight(char *arg)
+{
 
 	extern char *highlight_info_str;
 
@@ -1266,55 +1269,142 @@ doSetHighlight(char *arg) {
 
 
 int
-doSetBraceMode(char *arg) {
+doSetBraceMode(char *arg)
+{
 
-	int off = 0;   /* arg was "off" */
+/** /
+dbgpr("doSetBraceMode: opstr=(%s) arg=(%s) cmdopstr=(%s)\n",
+opstr, arg, cmdopstr);
+/ **/
+	static int mode = 0; /*0=off, 1=function(), 2=range limit, lines */
+	char buf[128];
 
-	/* for now, we're only matching open/close pairs */
+	if (strncmp(arg, "toggle", 6) == 0) { /* from {} button */
+	    switch (mode) {
+		case 0: /* mode is off */
+		    bracematching = 1;
+		    bracematchCoding = 1;
+		    mode = 1;
+		    snprintf(buf, sizeof(buf), " brace mode: function()");
+		    mesg(TELALL + 1, buf);
+		    loopflags.hold = YES;
+		    break;
 
-	if (arg == NULL || *arg == '\0') {
+		case 1: /* mode is bracematchCoding mode */
+		    bracematchCoding = 0;
+		    bracematching = 1;
+		    mode = 2;
+		    char sbuf[64];
+		    if (braceRange)
+			snprintf(sbuf, sizeof(sbuf), "%d lines", braceRange);
+		    else
+			strcpy(sbuf, "EOF");
+
+		    snprintf(buf, sizeof(buf), " brace mode: range +/- %s", sbuf);
+		    mesg(TELALL + 1, buf);
+		    loopflags.hold = YES;
+		    break;
+
+		case 2: /* mode is range lines */
+		    bracematching = 0;
+		    mode = 0;
+		    break;
+	    }
+	}
+	else if (arg == NULL || *arg == '\0') {
 	    bracematching = bracematching == 1 ? 0 : 1;
 	}
 	else if (strncmp(arg, "on",2) == 0) {
 	    bracematching = YES;
 	}
-	else if (strncmp(arg, "pairs",2) == 0) {
-	    bracematching = YES;
-	}
 	else if (strncmp(arg, "off",3) == 0) {
 	    bracematching = 0;
-	    off++;
-	    info(7, 2, "  ");  /* clear instead of hilight */
+	}
+	else if (strncmp(arg, "coding",6) == 0) {
+	    /* eg, arg=(bracematch) cmdopstr=(coding) */
+	    char *s = cmdopstr + strlen(opstr) + strlen(arg) + 1;
+	    if (strstr(s, " on")) {
+		bracematchCoding = YES;
+	    }
+	    else if (strstr(s, " off")) {
+		bracematchCoding = NO;
+	    }
+	    else {
+		bracematchCoding = bracematchCoding ? NO : YES;
+	    }
+	    mode = bracematchCoding ? 1 : 0;
+/** /
+dbgpr("bracematchCoding=%d, arg=(%s) cmdopstr=(%s) s=(%s) mode=%d\n",
+bracematchCoding, arg, cmdopstr, s, mode);
+/ **/
+
+	}
+	else if (arg && *arg == '?') {
+	    snprintf(buf, sizeof(buf), " {} search range is ");
+	    if (braceRange == 0) {
+		strcat(buf, "off, +/- EOF");
+	    }
+	    else {
+		snprintf(buf + strlen(buf), sizeof(buf), " +/- %d lines.",
+		    braceRange);
+	    }
+
+	    mesg(TELALL + 1, buf);
+	    loopflags.hold = YES;
+	    *cmdopstr = '\0';   /* clear for next time */
+	    return (CROK);
+	}
+	else if (cmdopstr && strstr(cmdopstr, "range")) {
+	    mode = 2;
+	    /* allow:  off or 0 or N  */
+	    if (strstr(cmdopstr, " off")) {
+		braceRange = 0;
+		info(7, 3, "   ");
+		return CROK;
+	    }
+
+	    char *s = cmdopstr;
+
+	    while (*s && !isdigit(*s)) {
+		s++;
+		if ((s - cmdopstr) > 30) {
+		    mesg(ERRALL+1, "Can't locate value for brace range");
+		    return CROK;
+		}
+	    }
+	    braceRange = atoi (s);
+	    if (braceRange < 0 || braceRange > 2000) {
+		dbgpr("braceRange=%d negative or too large\n", braceRange);
+	    }
+
+	    /*dbgpr("braceRange=%d, s=(%s)\n", braceRange, s);*/
+	    bracematching = 1;
+	}
+	else {
+	    snprintf(buf, sizeof(buf), "Set brace option \"%s\" not recognized.", arg);
+	    mesg(ERRALL+1, buf);
+	    return CROK;
 	}
 
+
+
+/*#ifdef NOTYET*/
+#if 1
+	if (bracematching) {
+	    snprintf(buf, sizeof(buf), "%c{}", mode==1 ? 'f' : ' ');
+	}
+	else {
+	    strcpy(buf, "   ");
+	}
+
+	info(7, 3, buf);
+#endif
+
+#ifdef OUT
 	char *msg = bracematching ? "{}" : "  ";
 	info(7, 2, msg);
+#endif
 
 	return (CROK);
 }
 
-#ifdef NOTYET
-void
-toggleBracemode(int mode, int reset_cursor) {
-
-    char buf[64];
-    extern char *brace_p;
-
-    if (mode) {
-	snprintf(buf, 64, "%s{}%s", brace_p, sgr0);
-    }
-    else {
-	snprintf(buf, 64, "%s{}%s", hilite_str, sgr0);
-    }
-
-    mvcur(-1, -1, LINES, 7);
-    tputs(buf, 1, Pch);
-    if (reset_cursor) /* eg, mouse click toggled mode */
-       mvcur(-1, -1, curwin->ttext + cursorline, curwin->ltext + cursorcol);
-
-    fflush(stdout);
-
-    return;
-
-}
-#endif /* NOTYET */

@@ -8,6 +8,7 @@ file e.iit.c
 	Copyright abandoned, 1983, The Rand Corporation
 #endif
 
+/* #define DEBUG_KBFILE */
 
 #include "e.h"
 #ifdef  KBFILE
@@ -19,9 +20,10 @@ extern void addCursesFuncKey();
 #endif /* USER_FKEYS */
 #endif /* NCURSES */
 
-extern char *salloc();
 
-void itparse (), itadd(), itprint();
+void itadd (char *, int, struct itable **, char *, int, char *);
+void itparse (char *, char *, int *, char *, int *);
+void itprint(struct itable *, int);
 
 /* struct itable *ithead = NULLIT; */
 extern struct itable *ithead;
@@ -32,6 +34,7 @@ S_looktbl itsyms[] = {
     {"+sch",    CCPLSRCH},
     {"+tab",    CCTAB},
     {"+word",   CCRWORD},
+    {"-close",  CCMICLOSE},
     {"-line",   CCMILINE},
     {"-page",   CCMIPAGE},
     {"-sch",    CCMISRCH},
@@ -41,6 +44,7 @@ S_looktbl itsyms[] = {
     {"bksp",    CCBACKSPACE},
     {"blot",    CCBLOT},
     {"box",     CCBOX},
+    {"brace",   CCBRACE},
 #ifdef LMCCASE
     {"caps",    CCCAPS},
     {"ccase",   CCCCASE},
@@ -146,13 +150,14 @@ char *filename;
 	switch (string[0]) {
 	case KBINIT:
 	    kbinilen = val_len;
-	    kbinistr = salloc (kbinilen);
-	    my_move (value, kbinistr, kbinilen);
+	    kbinistr = salloc (kbinilen, NO);
+	    kbinistr = salloc (kbinilen, NO);
+	    my_move (value, kbinistr, (ulong) kbinilen);
 	    break;
 	case KBEND:
 	    kbendlen = val_len;
-	    kbendstr = salloc (kbendlen);
-	    my_move (value, kbendstr, kbendlen);
+	    kbendstr = salloc (kbendlen, NO);
+	    my_move (value, kbendstr, (ulong) kbendlen);
 	    break;
 	default:
 	    itadd (string, str_len, &ithead, value, val_len, line);
@@ -187,7 +192,7 @@ char *line;             /* For debugging */
 	    return;
 	}
     }
-    it = (struct itable *) salloc (sizeof *it);           /* Get new node */
+    it = (struct itable *) salloc (sizeof *it, NO);           /* Get new node */
     if (*headp == 0)                    /* Change head if tree was empty */
 	*headp = it;
     else
@@ -200,9 +205,9 @@ char *line;             /* For debugging */
 	itadd (str, str_len, &it->it_link, val, val_len, line);
     } else {
 	it->it_leaf = 1;
-	it->it_val = salloc (val_len);
+	it->it_val = salloc (val_len, NO);
 	it->it_len = val_len;
-	my_move (val, it->it_val, val_len);
+	my_move (val, it->it_val, (ulong) val_len);
     }
     return;
 }
@@ -235,7 +240,7 @@ int *str_lenp, *val_lenp; /* Where to put the respective lengths */
 		    for (n = 0; (c = *inp++) != '>'; ) {
 			if (c < '0' || c > '7')
 			    getout (YES, "kbfile bad digit in %s\n", line);
-			n = n*8 + (c-'0');
+			n = n*8 + (Uint) (c-'0');
 		    }
 		    if (n > 0377)
 			getout (YES, "Number %d too big in kbfile\n", n);
@@ -281,8 +286,9 @@ toolong:
 #ifdef DEBUG_KBFILE
 #include <ctype.h>
 
+#ifdef OUT
 void
-itprint (head, n)        /* n should be 0 the first time */
+x_itprint (head, n)        /* n should be 0 the first time */
 struct itable *head;
 int n;
 {
@@ -307,6 +313,53 @@ int n;
 	}
 	else {
 	    printf ("\n");
+	    itprint (it->it_link, n+2);
+	}
+    }
+    return;
+}
+#endif /* OUT */
+
+void
+itprint (head, n)        /* n should be 0 the first time */
+struct itable *head;
+int n;
+{
+    register struct itable *it;
+    int i;
+    char c;
+    char *cp;
+    unsigned int ch;
+
+    for (it = head; it != NULLIT; it = it->it_next) {
+	for (i = 0; i < n; i++)
+	//  putchar (' ');
+	    dbgpr(" ");
+	c = it->it_c;
+	if (isalnum (c))
+	//  printf ("%c  ", c);
+	    dbgpr("%c", c);
+	else
+	//  printf ("<%3o>", c);
+	    dbgpr ("<%3o>", (unsigned int)c);
+	if (it->it_leaf) {
+	//  printf ("=");
+	    dbgpr("=");
+	    for (cp = it->it_val, i = it->it_len; i-- > 0; ) {
+	    //  printf ("<%o>", *cp++);
+		ch = (unsigned int) *cp++;
+		ch = ch&0377;
+		if (isalnum (ch))
+		    dbgpr ("%c", ch);
+		else
+		    dbgpr ("<%o>", ch);
+	    }
+	    //printf (" (len %d)\n", it->it_len);
+	    dbgpr (" (len %d)\n", it->it_len);
+	}
+	else {
+	    //printf ("\n");
+	    dbgpr("\n");
 	    itprint (it->it_link, n+2);
 	}
     }

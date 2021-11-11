@@ -15,6 +15,8 @@ file e.pa.c
 #include "e.m.h"
 #include "e.cm.h"
 
+Small getopteq (char **, S_looktbl *, int (*)());
+
 #ifdef COMMENT
 Small
 getpartype (str, parflg, defparflg, parline)
@@ -353,7 +355,8 @@ int *value;
 {
     char *cp;
     char *cp1;
-    int tmp;
+    /*int tmp;*/
+    long tmp;
 
     cp = *cpp;
     if (*cp++ != '=')
@@ -365,7 +368,7 @@ int *value;
     if (*cp == ' ' || *cp == '\0') {
 	for (; *cp && *cp == ' '; cp++)
 	    continue;
-	*value = tmp;
+	*value = (int) tmp;
 	*cpp = cp;
 	return 0;
     }

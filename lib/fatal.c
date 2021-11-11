@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #endif /*GCC*/
 
+#include	"prototypes.h"
+
 void
 fatal ()
 {

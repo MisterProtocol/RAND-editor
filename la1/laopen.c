@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+#include "la_prototypes.h"
+
 /* these are the actual global definitions */
 #ifdef	SYSGETDTABLESIZE
 int         la_maxchans = 0;	 /* maximum system opens allowed to la */
@@ -39,8 +41,8 @@ La_stream *
 la_open (filename, modestr, plas, offset, pffs, chan, writeable)
 char *filename;
 char *modestr;
-long offset;
 La_stream *plas;
+long offset;
 Ff_stream *pffs;
 int chan;
 int /*char*/  writeable;
@@ -122,8 +124,8 @@ int /*char*/  writeable;
 
 La_stream *
 la_ffopen (pffs, plas, pos)
-La_stream *plas;
 Reg2 Ff_stream *pffs;
+La_stream *plas;
 long pos;
 {
     Reg4 La_stream  *nlas;     /* the new La_stream struct we are making */
@@ -432,7 +434,7 @@ char          *buf;
 		la_errno = LA_INT;
 		goto err;
 	    }
-	    if ((cfsd = (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + nfsb)))
+	    if ((cfsd = (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + (unsigned long)nfsb)))
 		== NULL) {
 		la_errno = LA_NOMEM;
 		goto err;

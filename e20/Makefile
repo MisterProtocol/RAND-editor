@@ -1,5 +1,5 @@
 #
-#	Copyright abandoned, 1983, The Rand Corporation
+#       Copyright abandoned, 1983, The Rand Corporation
 #
 
 # Rand Editor with LA package

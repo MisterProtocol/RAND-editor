@@ -11,7 +11,8 @@ file e.h.c
 # include "e.tt.h"
 # include "e.h.h"
 
-extern unsigned Short mGetkey ();
+Short morehelp(unsigned Short);
+Cmdret help_std(char *);
 
 #ifdef COMMENT
 Cmdret
@@ -28,7 +29,7 @@ help_std(filename)
 	FILE *helpin, *fopen();
 	int c;
 	char *fgets();
-	Short qq, morehelp();
+	unsigned Short qq;
 	static unsigned char boxtab[11] = {
 		BLCMCH, TLCMCH, TRCMCH, BRCMCH, BULCHAR,
 		LMCH, TMCH, MLMCH, MRMCH, BTMCH, TTMCH };
@@ -76,7 +77,7 @@ wait:   keyused = YES;
 #ifdef NCURSES
 	qq = mGetkey (WAIT_KEY, NULL);
 #else
-	qq = getkey (WAIT_KEY);
+	qq = getkey (WAIT_KEY, NULL);
 #endif
 	if (morehelp(qq) == YES) goto wait;
 	restcurs();
@@ -90,14 +91,14 @@ wait:   keyused = YES;
 #ifdef COMMENT
 Short
 morehelp (key)
-	unsigned short key;
+	unsigned Short key;
 .
     Displays a message describing the effects of the key whose lexed
     value is passed in "key".
 #endif
 Short
 morehelp (key)
-	unsigned short key;
+	unsigned Short key;
 {
 	FILE *helpin, *fopen();
 	int go, atoi(), n;
@@ -126,7 +127,7 @@ morehelp (key)
 				}
 				else
 					if (buf [0] == '~')
-						if ((n = atoi (buf + 1)) == key)
+						if ((n = atoi (buf + 1)) == (int) key)
 							go = YES;
 			}
 			fclose (helpin);

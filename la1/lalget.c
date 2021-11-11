@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 /*
  * la_lget (plas, buf, nchars)
  *
@@ -41,7 +43,8 @@ Reg5 int nchars;
 
 	ff_seek (ffn = cfsd->fsdfile->la_ffs,
 		 (long) (cfsd->fsdpos + plas->la_ffpos), 0);
-	if (ff_read (ffn, buf, j, 0) != j) {    /* yes, read directly */
+/*      if (ff_read (ffn, buf, j, 0) != j) {  */  /* yes, read directly */
+	if (ff_read (ffn, buf, j, 0, NULL) != j) {    /* yes, read directly */
 	    la_errno = LA_READERR;
 	    return (-1);
 	}

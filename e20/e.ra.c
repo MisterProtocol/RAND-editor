@@ -13,9 +13,8 @@ file e.ra.c
 #include "e.m.h"
 #include "e.cm.h"
 
+void showrange (void);
 
-extern Nlines rangelimit ();
-extern void showrange ();
 
 #ifdef COMMENT
 Nlines

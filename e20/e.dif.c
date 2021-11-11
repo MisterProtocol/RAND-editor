@@ -25,8 +25,6 @@ file e.dif.c
 Nlines srchline;
 Ncols srchcol;
 
-extern Nlines rangelimit ();
-extern void showrange ();
 extern void aborted ();
 
 #ifdef COMMENT

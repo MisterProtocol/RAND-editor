@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 #ifdef GCC
 extern void *malloc (size_t size);
 #else

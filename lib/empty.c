@@ -10,6 +10,8 @@
 #include <sys/ioctl.h>
 #endif
 
+#include	"prototypes.h"
+
 #ifdef FIONREAD
 int
 empty (int fd)

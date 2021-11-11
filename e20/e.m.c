@@ -16,47 +16,30 @@ file e.m.c
 #include "e.e.h"
 
 
-extern char *re_comp();         /* Added 10/18/82 MAB */
-Cmdret edkey ();
-Cmdret split ();
-Cmdret join ();
-extern Cmdret SetRecording ();
-extern Cmdret UnSetRecording ();
-extern Cmdret PlayRecording ();
-extern Cmdret chgcase ();
-extern Cmdret dodword ();
-extern Cmdret ed ();
-extern Cmdret edmark ();
+Cmdret edkey (Char, Flag);
+extern Cmdret chgcase (Flag);
 
-extern void infoauto ();
-extern void GetLine ();
-
-extern Small mword ();
 
 #ifdef NCURSES
-#include "ncurses.h"
 extern void debug_inputkey ();
-extern void initCurses ();
-extern void testart();
-extern unsigned Short mGetkey ();
+extern void testart();      /* what is this? */
 extern Flag entering;
 extern Flag debug_d_write;
 extern Flag optskipmouse;
 extern Flag finished_replay;
-extern char *getEkeyname(int i);
+extern char *getEkeyname(int);
 extern int toggle_mouse(char *);
 extern Flag redrawflg;
-extern void doMouseReplay();
-extern void highlightarea(Flag setmode, Flag redrawflg);
-extern int HiLightBracePairs();
+extern void doMouseReplay(void);
+extern void highlightarea(Flag, Flag);
+extern void HiLightBracePairs(Flag);
 extern int bracematching;
 extern int brace_marked;
-extern int doSetBraceMode();
 
 #ifdef MOUSE_BUTTONS
 extern int mouseFuncKey;
-extern void getMouseButtonEvent();
-extern void doMouseEvent();
+extern void getMouseButtonEvent(void);
+extern void doMouseEvent(void);
 #endif
 
 #endif /* NCURSES */
@@ -91,11 +74,16 @@ newnumber:
 	    nlines = curwksp->wlin + cursorline + 1;
 	    if (infoline != nlines) {
 #ifdef LA_LONGFILES
-		sprintf (ich, "%-5ld", nlines);
+	    /*  sprintf (ich, "%-6ld", nlines); */
+		sprintf (ich, "%ld", nlines);
 #else /* LA_LONGFILES */
-		sprintf (ich, "%-5d", nlines);
+		sprintf (ich, "%-6d", nlines);
 #endif /* LA_LONGFILES */
-		info (inf_line, 5, ich);
+/** /
+dbgpr("mainloop:  nlines=%d, cursorline=%d, curwksp->wlin=%d\n",
+nlines, cursorline, curwksp->wlin);
+/ **/
+		info (inf_line, 8, ich);
 		infoline = nlines;
 	    }
 	}
@@ -176,8 +164,12 @@ marklines, markcols, mklinstr, mkcolstr);
 
 	    /* display marked area */
 		/* don't hilite if playing a macro or replaying a crash */
-	    if (!playing && !replaying)
+	    if (!playing && !replaying) {
 		highlightarea(YES,redrawflg);
+		/* In some cases, we're off by 1 line somewhere in highligharea() */
+		mvcur(-1, -1, curwin->ttext+cursorline, curwin->ltext+cursorcol);
+	    }
+
 	}
 	else if (bracematching || brace_marked) {
 	    HiLightBracePairs(YES);
@@ -209,10 +201,10 @@ dbgpr("e.m.c, mainloop(), waiting for getkey\n");
 	/*  mGetkey uses the curses getch() for input.
 	 */
 	if( initCursesDone ) {
-	    mGetkey (WAIT_KEY);   /* returns value in global 'key' */
+	    mGetkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
 	}
 	else {
-	    getkey (WAIT_KEY);   /* returns value in global 'key' */
+	    getkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
 	}
 	/* /
 	if( key < ' ' || key >= 0177 ) {
@@ -232,7 +224,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 / */
 
 #else
-	getkey (WAIT_KEY);   /* returns value in global 'key' */
+	getkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
 #endif /* NCURSES */
 
 
@@ -250,18 +242,6 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 #endif /* MOUSE_BUTTONS */
 	    continue;
 	}
-#ifdef OUT
-	/* use F2 as an emergency exit while debugging,
-	 * beats having to kill the pid...
-	 */
-	else if( key == KEY_F(2)) {
-	    dbgpr("mainloop, got F2, exiting...\n");
-	    /*opstr[0] = '\0';*/
-	    opstr = "quit";
-	    nxtop = NULL;
-	    eexit();
-	}
-#endif /* OUT */
 	/* use F6 to enable/disable the mouse so one can use copy/paste
 	 * to insert text into E
 	 */
@@ -415,9 +395,34 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 		    goto funcdone;
 
 		case CCBRACE:
-		    doSetBraceMode(NULL);
+		    opstr = ""; /* for dbg in doSetBraceMode() */
+		    doSetBraceMode("toggle");
 		    if (brace_marked)
-			HiLightBracePairs(0);  /* to clear mark */
+			HiLightBracePairs(NO);  /* to clear mark */
+		    goto funcdone;
+
+		case CCREGEX:
+		    /* toggle patmode */
+		    if (patmode)
+			command(CMD_PATTERN, nix);
+		    else
+			command(CMDPATTERN, nix);
+		    goto funcdone;
+
+		case CCPLWIN:   /* +w button */
+		    command(CMDWINDOW, nix);
+		    goto funcdone;
+
+		case CCMIWIN:   /* -w button */
+		    command(CMD_WINDOW, nix);
+		    goto funcdone;
+
+		case CCMICLOSE: /* -clos button */
+		    command(CMD_CLOSE, nix);
+		    goto funcdone;
+
+		case CCMIERASE: /* -eras button */
+		    command(CMD_ERASE, nix);
 		    goto funcdone;
 
 		case CCLWINDOW:
@@ -462,6 +467,10 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 
 		case CCMARK:
 		    mark ();
+		    goto funcdone;
+
+		case CCUNMARK:
+		    unmark ();
 		    goto funcdone;
 
 		case CCREPLACE:
@@ -611,10 +620,10 @@ dbgpr("after param(): key=%o cmdmode=%d, paramv=(%s)\n", key, cmdmode, paramv);
 		if (mouseFuncKey != -1) {
 		    key = mouseFuncKey;
 		}
-/**/
+/** /
 dbgpr("after param(), mouse->button: key=(%04o)(%s) cmdmode=%d, paramv=(%s) paramtype=(%d)\n",
 key, getEkeyname(key), cmdmode, paramv, paramtype);
-/**/
+/ **/
 	    }
 #endif /* MOUSE_BUTTONS */
 
@@ -877,7 +886,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		case CCPLLINE:
 		    switch (paramtype) {
 		    case 0:
-			vertmvwin (cursorline - (key == CCPLLINE
+			vertmvwin ((Nlines) cursorline - (key == CCPLLINE
 				   ? 0 : curwin->btext));
 			break;
 

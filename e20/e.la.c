@@ -15,11 +15,12 @@ file e.la.c
 
 #include SIG_INCL
 
-extern void GetLine ();
+extern void excline (Ncols);
 extern void chkcline ();
-extern void excline ();
+extern void shortenline();
 extern void elasdump ();
 extern int la_error ();
+extern Flag putline ();
 
 #ifdef COMMENT
 void
@@ -459,7 +460,7 @@ Ncols length;
     tmp = salloc ((Ncols) (j + 1), YES);
     if (ncline > 0)
 	/*move (cline, tmp, (Uint) ncline);*/
-	my_move (cline, tmp, (Ncols) ncline);
+	my_move (cline, tmp, (ulong) ncline);
     icline += icline / 2; /* should we have a max here? */
     lcline = j;
     sfree (cline);

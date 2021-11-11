@@ -7,6 +7,9 @@
  **/
 #include <c_env.h>
 
+char *
+fill (char *, unsigned int, int);
+
 #ifdef MEMSET
 #include <memory.h>
 
@@ -16,7 +19,7 @@ char *dest;
 unsigned int count;
 char fillchar;
 {
-	memset (dest, fillchar, (int)count);
+	memset (dest, fillchar, (size_t)count);
 	return (dest+count);
 }
 

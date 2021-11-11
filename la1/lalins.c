@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 La_linepos
 la_linsert (plas, buf, nchars)
 Reg2 La_stream *plas;

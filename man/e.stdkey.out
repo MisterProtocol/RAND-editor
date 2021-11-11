@@ -1,2658 +1,1381 @@
-.if !\n(.g .ab GNU tbl requires GNU troff.
-.if !dTS .ds TS
-.if !dTE .ds TE
-.lf 1 e.stdkey.tbl
+.ds f. e.stdkey.tbl
 .ps 8
 .vs 10
 .if t \{\
 .TS
-.nr 3c \n(.C
-.cp 0
-.nr 3lps \n[.s]
-.de 3init
-.ft \n[.f]
-.ps \n[.s]
-.vs \n[.v]u
-.in \n[.i]u
-.ll \n[.l]u
-.ls \n[.L]
-.ad \n[.j]
-.ie \n[.u] .fi
-.el .nf
-.ce \n[.ce]
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
 ..
-.nr 3ind \n[.i]
-.nr 3fnt \n[.f]
-.nr 3sz \n[.s]
-.nr 3fll \n[.u]
-.nr T. 0
-.nr 3crow 0-1
-.nr 3passed 0-1
-.nr 3sflag 0
-.ds 3trans
-.ds 3quote
-.nr 3brule 1
-.nr 3supbot 0
-.eo
-.de 3rmk
-.mk \$1
-.if !'\n(.z'' \!.3rmk "\$1"
-..
-.de 3rvpt
-.vpt \$1
-.if !'\n(.z'' \!.3rvpt "\$1"
-..
-.de 3keep
-.if '\n[.z]'' \{.ds 3quote \\
-.ds 3trans \!
-.di 3section
-.nr 3sflag 1
-.in 0
-.\}
-..
-.de 3release
-.if \n[3sflag] \{.di
-.in \n[3ind]u
-.nr 3dn \n[dn]
-.ds 3quote
-.ds 3trans
-.nr 3sflag 0
-.if \n[.t]<=\n[dn] \{.nr T. 1
-.T#
-.nr 3supbot 1
-.sp \n[.t]u
-.nr 3supbot 0
-.mk #T
-.\}
-.if \n[.t]<=\n[3dn] .tm warning: page \n%: table text block will not fit on one page
 .nf
-.ls 1
-.3section
-.ls
-.rm 3section
-.\}
-..
-.nr 3tflag 0
-.de 3tkeep
-.if '\n[.z]'' \{.di 3table
-.nr 3tflag 1
-.\}
-..
-.de 3trelease
-.if \n[3tflag] \{.br
-.di
-.nr 3dn \n[dn]
-.ne \n[dn]u+\n[.V]u
-.ie \n[.t]<=\n[3dn] .tm error: page \n%: table will not fit on one page; use .TS H/.TH with a supporting macro package
-.el \{.in 0
-.ls 1
-.nf
-.3table
-.\}
-.rm 3table
-.\}
-..
-.ec
-.ce 0
-.nf
-.nr 3sep 1n
-.nr 3w0 \n(.H
-.nr 3aw0 0
-.nr 3lnw0 0
-.nr 3rnw0 0
-.nr 3w1 \n(.H
-.nr 3aw1 0
-.nr 3lnw1 0
-.nr 3rnw1 0
-.nr 3w2 \n(.H
-.nr 3aw2 0
-.nr 3lnw2 0
-.nr 3rnw2 0
-.nr 3w3 \n(.H
-.nr 3aw3 0
-.nr 3lnw3 0
-.nr 3rnw3 0
-.nr 3w0,3 \n(.H
-.nr 3aw0,3 0
-.nr 3lnw0,3 0
-.nr 3rnw0,3 0
-.lf 9 e.stdkey.tbl
-.nr 3w0,3 \n[3w0,3]>?\w\[tbl]\s+4\fBE STANDARD KEYBOARD\s0\fP\[tbl]
-.lf 12
-.nr 3w0 \n[3w0]>?\w\[tbl](extend)    \[tbl]
-.lf 12
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X                   \[tbl]
-.lf 12
-.nr 3w2 \n[3w2]>?\w\[tbl] DOWN        \[tbl]
-.lf 12
-.nr 3w3 \n[3w3]>?\w\[tbl] ^J\[tbl]
-.lf 13
-.nr 3w0 \n[3w0]>?\w\[tbl]+LINE       \[tbl]
-.lf 13
-.nr 3w1 \n[3w1]>?\w\[tbl] ^F                   \[tbl]
-.lf 13
-.nr 3w2 \n[3w2]>?\w\[tbl] ERASE       \[tbl]
-.lf 13
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^E or ^^\[tbl]
-.lf 14
-.nr 3w0 \n[3w0]>?\w\[tbl]+PAGE       \[tbl]
-.lf 14
-.nr 3w1 \n[3w1]>?\w\[tbl] ^R                   \[tbl]
-.lf 14
-.nr 3w2 \n[3w2]>?\w\[tbl] HOME        \[tbl]
-.lf 14
-.nr 3w3 \n[3w3]>?\w\[tbl] ^G\[tbl]
-.lf 15
-.nr 3w0 \n[3w0]>?\w\[tbl]+SRCH       \[tbl]
-.lf 15
-.nr 3w1 \n[3w1]>?\w\[tbl] ^Y                   \[tbl]
-.lf 15
-.nr 3w2 \n[3w2]>?\w\[tbl] INSERT      \[tbl]
-.lf 15
-.nr 3w3 \n[3w3]>?\w\[tbl] ^Z or ESC or ^[\[tbl]
-.lf 16
-.nr 3w0 \n[3w0]>?\w\[tbl]+TAB        \[tbl]
-.lf 16
-.nr 3w1 \n[3w1]>?\w\[tbl] ^I                   \[tbl]
-.lf 16
-.nr 3w2 \n[3w2]>?\w\[tbl] INT         \[tbl]
-.lf 16
-.nr 3w3 \n[3w3]>?\w\[tbl] ^\e\[tbl]
-.lf 17
-.nr 3w0 \n[3w0]>?\w\[tbl]+WORD       \[tbl]
-.lf 17
-.nr 3w1 \n[3w1]>?\w\[tbl] ^N                   \[tbl]
-.lf 17
-.nr 3w2 \n[3w2]>?\w\[tbl] JOIN        \[tbl]
-.lf 17
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^J\[tbl]
-.lf 18
-.nr 3w0 \n[3w0]>?\w\[tbl]-LINE       \[tbl]
-.lf 18
-.nr 3w1 \n[3w1]>?\w\[tbl] ^D                   \[tbl]
-.lf 18
-.nr 3w2 \n[3w2]>?\w\[tbl] LEFT        \[tbl]
-.lf 18
-.nr 3w3 \n[3w3]>?\w\[tbl] ^H\[tbl]
-.lf 19
-.nr 3w0 \n[3w0]>?\w\[tbl]-PAGE       \[tbl]
-.lf 19
-.nr 3w1 \n[3w1]>?\w\[tbl] ^E                   \[tbl]
-.lf 19
-.nr 3w2 \n[3w2]>?\w\[tbl] MARK        \[tbl]
-.lf 19
-.nr 3w3 \n[3w3]>?\w\[tbl] ^U\[tbl]
-.lf 20
-.nr 3w0 \n[3w0]>?\w\[tbl]-SRCH       \[tbl]
-.lf 20
-.nr 3w1 \n[3w1]>?\w\[tbl] ^T                   \[tbl]
-.lf 20
-.nr 3w2 \n[3w2]>?\w\[tbl] OPEN        \[tbl]
-.lf 20
-.nr 3w3 \n[3w3]>?\w\[tbl] ^O\[tbl]
-.lf 21
-.nr 3w0 \n[3w0]>?\w\[tbl]-TAB        \[tbl]
-.lf 21
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^U                \[tbl]
-.lf 21
-.nr 3w2 \n[3w2]>?\w\[tbl] PICK        \[tbl]
-.lf 21
-.nr 3w3 \n[3w3]>?\w\[tbl] ^P\[tbl]
-.lf 22
-.nr 3w0 \n[3w0]>?\w\[tbl]-WORD       \[tbl]
-.lf 22
-.nr 3w1 \n[3w1]>?\w\[tbl] ^B                   \[tbl]
-.lf 22
-.nr 3w2 \n[3w2]>?\w\[tbl] REPL        \[tbl]
-.lf 22
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^R or ^]\[tbl]
-.lf 23
-.nr 3w0 \n[3w0]>?\w\[tbl]ALT         \[tbl]
-.lf 23
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^A or ^_ or ^/    \[tbl]
-.lf 23
-.nr 3w2 \n[3w2]>?\w\[tbl] RETURN      \[tbl]
-.lf 23
-.nr 3w3 \n[3w3]>?\w\[tbl] ^M\[tbl]
-.lf 24
-.nr 3w0 \n[3w0]>?\w\[tbl]BSP         \[tbl]
-.lf 24
-.nr 3w1 \n[3w1]>?\w\[tbl] ^C                   \[tbl]
-.lf 24
-.nr 3w2 \n[3w2]>?\w\[tbl] RIGHT       \[tbl]
-.lf 24
-.nr 3w3 \n[3w3]>?\w\[tbl] ^L\[tbl]
-.lf 25
-.nr 3w0 \n[3w0]>?\w\[tbl]CHG WIN     \[tbl]
-.lf 25
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^W                \[tbl]
-.lf 25
-.nr 3w2 \n[3w2]>?\w\[tbl] SPLIT       \[tbl]
-.lf 25
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^B\[tbl]
-.lf 26
-.nr 3w0 \n[3w0]>?\w\[tbl]CLOSE       \[tbl]
-.lf 26
-.nr 3w1 \n[3w1]>?\w\[tbl] ^V                   \[tbl]
-.lf 26
-.nr 3w2 \n[3w2]>?\w\[tbl] TABS        \[tbl]
-.lf 26
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^T\[tbl]
-.lf 27
-.nr 3w0 \n[3w0]>?\w\[tbl]CMD         \[tbl]
-.lf 27
-.nr 3w1 \n[3w1]>?\w\[tbl] ^A or NULL or ^@     \[tbl]
-.lf 27
-.nr 3w2 \n[3w2]>?\w\[tbl] UP          \[tbl]
-.lf 27
-.nr 3w3 \n[3w3]>?\w\[tbl] ^K\[tbl]
-.lf 28
-.nr 3w0 \n[3w0]>?\w\[tbl]CTRLCHAR    \[tbl]
-.lf 28
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^C                \[tbl]
-.lf 28
-.nr 3w2 \n[3w2]>?\w\[tbl] WIN LEFT    \[tbl]
-.lf 28
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^H\[tbl]
-.lf 29
-.nr 3w0 \n[3w0]>?\w\[tbl]DELCHAR     \[tbl]
-.lf 29
-.nr 3w1 \n[3w1]>?\w\[tbl] ^W                   \[tbl]
-.lf 29
-.nr 3w2 \n[3w2]>?\w\[tbl] WIN RIGHT   \[tbl]
-.lf 29
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^L\[tbl]
-.nr 3w0 \n[3w0]>?(\n[3lnw0]+\n[3rnw0])
-.if \n[3aw0] .nr 3w0 \n[3w0]>?(\n[3aw0]+2n)
-.nr 3w1 \n[3w1]>?(\n[3lnw1]+\n[3rnw1])
-.if \n[3aw1] .nr 3w1 \n[3w1]>?(\n[3aw1]+2n)
-.nr 3w2 \n[3w2]>?(\n[3lnw2]+\n[3rnw2])
-.if \n[3aw2] .nr 3w2 \n[3w2]>?(\n[3aw2]+2n)
-.nr 3w3 \n[3w3]>?(\n[3lnw3]+\n[3rnw3])
-.if \n[3aw3] .nr 3w3 \n[3w3]>?(\n[3aw3]+2n)
-.nr 3w0,3 \n[3w0,3]>?(\n[3lnw0,3]+\n[3rnw0,3])
-.if \n[3aw0,3] .nr 3w0,3 \n[3w0,3]>?(\n[3aw0,3]+2n)
-.nr 3needed \n[3w0,3]-(\n[3w0]+3n+\n[3w1]+3n+\n[3w2]+3n+\n[3w3])
-.nr 3needed \n[3needed]/4
-.if \n[3needed] \{.nr 3w0 +\n[3needed]
-.nr 3w1 +\n[3needed]
-.nr 3w2 +\n[3needed]
-.nr 3w3 +\n[3needed]
-.\}
-.nr 3w0,3 \n[3w0]+(3*\n[3sep])+\n[3w1]+(3*\n[3sep])+\n[3w2]+(3*\n[3sep])+\n[3w3]
-.nr 3w0,3 \n[3w0]+(3*\n[3sep])+\n[3w1]+(3*\n[3sep])+\n[3w2]+(3*\n[3sep])+\n[3w3]
-.nr 3cd0 0
-.nr 3cl0 1*\n[3sep]
-.nr 3ce0 \n[3cl0]+\n[3w0]
-.nr 3cl1 \n[3ce0]+(3*\n[3sep])
-.nr 3cd1 \n[3ce0]+\n[3cl1]/2
-.nr 3ce1 \n[3cl1]+\n[3w1]
-.nr 3cl2 \n[3ce1]+(3*\n[3sep])
-.nr 3cd2 \n[3ce1]+\n[3cl2]/2
-.nr 3ce2 \n[3cl2]+\n[3w2]
-.nr 3cl3 \n[3ce2]+(3*\n[3sep])
-.nr 3cd3 \n[3ce2]+\n[3cl3]/2
-.nr 3ce3 \n[3cl3]+\n[3w3]
-.nr 3cd4 \n[3ce3]+(1*\n[3sep])
-.nr TW \n[3cd4]
-.in +(u;\n[.l]-\n[.i]-\n[TW]/2>?-\n[.i])
-.nr 3ind \n[.i]
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 50 51 52 53 54
+.nr 50 0
+.nr 38 \w(extend)    
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+LINE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+PAGE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+SRCH       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+TAB        
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w+WORD       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-LINE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-PAGE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-SRCH       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-TAB        
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \w-WORD       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wALT         
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wBSP         
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCHG WIN     
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCLOSE       
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCMD         
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wCTRLCHAR    
+.if \n(50<\n(38 .nr 50 \n(38
+.nr 38 \wDELCHAR     
+.if \n(50<\n(38 .nr 50 \n(38
+.50
+.rm 50
+.nr 51 0
+.nr 38 \w ^X                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^F                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^R                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^Y                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^I                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^N                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^D                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^E                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^T                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^U                
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^B                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^A or ^_ or ^/    
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^C                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^W                
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^V                   
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^A or NULL or ^@     
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^X-^C                
+.if \n(51<\n(38 .nr 51 \n(38
+.nr 38 \w ^W                   
+.if \n(51<\n(38 .nr 51 \n(38
+.51
+.rm 51
+.nr 52 0
+.nr 38 \w DOWN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w ERASE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w HOME        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w INSERT      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w INT         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w JOIN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w LEFT        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w MARK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w OPEN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w PICK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w REPL        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w RETURN      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w RIGHT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w SPLIT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w TABS        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w UP          
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w WIN LEFT    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w WIN RIGHT   
+.if \n(52<\n(38 .nr 52 \n(38
+.52
+.rm 52
+.nr 53 0
+.nr 38 \w ^J
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^E or ^^
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^G
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^Z or ESC or ^[
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^\e
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^J
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^H
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^U
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^O
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^P
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^R or ^]
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^M
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^L
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^B
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^T
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^K
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^H
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^L
+.if \n(53<\n(38 .nr 53 \n(38
+.53
+.rm 53
+.nr 38 \w\s+4\fBE STANDARD KEYBOARD\s0\fP-\n(50-2n-\n(51-2n-\n(52-2n-\n(53
+.if \n(38>0 .nr 38 \n(38/3
+.if \n(38<0 .nr 38 0
+.nr 51 +\n(38
+.nr 52 +\n(38
+.nr 53 +\n(38
+.nr 54 0
+.54
+.rm 54
+.nr 38 1n
+.nr 49 0
+.nr 40 \n(49+((2*\n(38)/2)
+.nr 50 +\n(40
+.nr 41 \n(50+((4*\n(38)/2)
+.nr 51 +\n(41
+.nr 42 \n(51+((4*\n(38)/2)
+.nr 52 +\n(42
+.nr 43 \n(52+((4*\n(38)/2)
+.nr 53 +\n(43
+.nr 44 \n(53+((4*\n(38)/2)
+.nr 54 +\n(44
+.nr 54 (\n(44+\n(53)/2
+.nr TW \n(54
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 32 file e.stdkey.tbl is too wide - \n(TW units
+.nr #I \n(.i
+.in +(\n(.lu-\n(TWu-\n(.iu)/2u
+.fc  
+.nr #T 0-1
+.nr #b 0-1
+.nr #a 0-1
 .eo
 .de T#
-.if !\n[3supbot] \{.3rvpt 0
-.mk 3vert
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
 .ls 1
-.if \n[3crow]>=1 \{.if 1<=\n[3passed] .nr 3rt1 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd4]u'\s[\n[3lps]]\D'l 0 |\n[3rt1]u-1v'\s0
-.\}
-.if \n[3crow]>=1 \{.if 1<=\n[3passed] .nr 3rt1 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd3]u'\s[\n[3lps]]\D'l 0 |\n[3rt1]u-1v'\s0
-.\}
-.if \n[3crow]>=1 \{.if 1<=\n[3passed] .nr 3rt1 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd2]u-1p'\s[\n[3lps]]\D'l 0 |\n[3rt1]u-1v'\s0
-.sp -1
-\v'.25m'\h'\n[3cd2]u+1p'\s[\n[3lps]]\D'l 0 |\n[3rt1]u-1v'\s0
-.\}
-.if \n[3crow]>=1 \{.if 1<=\n[3passed] .nr 3rt1 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd1]u'\s[\n[3lps]]\D'l 0 |\n[3rt1]u-1v'\s0
-.\}
-.if \n[3crow]>=1 \{.if 1<=\n[3passed] .nr 3rt1 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd0]u'\s[\n[3lps]]\D'l 0 |\n[3rt1]u-1v'\s0
-.\}
+.if \n(#T>=0 .nr #b \n(#T
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'|0'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(41u+|\n(50u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(42u+|\n(51u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(43u+|\n(52u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(44u+|\n(53u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
 .ls
-.nr 3passed \n[3crow]
-.sp |\n[3vert]u
-.3rvpt 1
-.\}
 ..
 .ec
-.fc 
-.3keep
-.3rmk 3rt0
-.cp \n(3c
-.lf 8
 .sp 2p
-.cp 0
-\*[3trans].nr 3crow 0
-.3keep
-.mk 3rs0
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce3]u
-.lf 9 e.stdkey.tbl
-\&\h'|\n[3cl0]u'\s+4\fBE STANDARD KEYBOARD\s0\fP
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs0]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.cp \n(3c
-.lf 10
+.ta \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\s+4\fBE STANDARD KEYBOARD\s0\fP
 .sp 4p
-.cp 0
-.vs 2p>?\n[.V]u
-.ls 1
-\v'.25m'\s[\n[3lps]]\h'|\n[3cd0]u'\D'l |\n[3cd4]u 0'\s0
-.ls
-.vs
-.3rmk 3rt1
-\*[3trans].nr 3crow 1
-.3keep
-.mk 3rs1
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 12 e.stdkey.tbl
-\&\h'|\n[3cl0]u'(extend)    \h'|\n[3cl1]u' ^X                   \h'|\n[3cl2]u' DOWN        \h'|\n[3cl3]u' ^J
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs1]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt2
-\*[3trans].nr 3crow 2
-.3keep
-.mk 3rs2
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 13
-\&\h'|\n[3cl0]u'+LINE       \h'|\n[3cl1]u' ^F                   \h'|\n[3cl2]u' ERASE       \h'|\n[3cl3]u' ^X-^E or ^^
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs2]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt3
-\*[3trans].nr 3crow 3
-.3keep
-.mk 3rs3
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 14
-\&\h'|\n[3cl0]u'+PAGE       \h'|\n[3cl1]u' ^R                   \h'|\n[3cl2]u' HOME        \h'|\n[3cl3]u' ^G
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs3]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt4
-\*[3trans].nr 3crow 4
-.3keep
-.mk 3rs4
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 15
-\&\h'|\n[3cl0]u'+SRCH       \h'|\n[3cl1]u' ^Y                   \h'|\n[3cl2]u' INSERT      \h'|\n[3cl3]u' ^Z or ESC or ^[
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs4]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt5
-\*[3trans].nr 3crow 5
-.3keep
-.mk 3rs5
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 16
-\&\h'|\n[3cl0]u'+TAB        \h'|\n[3cl1]u' ^I                   \h'|\n[3cl2]u' INT         \h'|\n[3cl3]u' ^\e
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs5]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt6
-\*[3trans].nr 3crow 6
-.3keep
-.mk 3rs6
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 17
-\&\h'|\n[3cl0]u'+WORD       \h'|\n[3cl1]u' ^N                   \h'|\n[3cl2]u' JOIN        \h'|\n[3cl3]u' ^X-^J
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs6]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt7
-\*[3trans].nr 3crow 7
-.3keep
-.mk 3rs7
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 18
-\&\h'|\n[3cl0]u'-LINE       \h'|\n[3cl1]u' ^D                   \h'|\n[3cl2]u' LEFT        \h'|\n[3cl3]u' ^H
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs7]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt8
-\*[3trans].nr 3crow 8
-.3keep
-.mk 3rs8
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 19
-\&\h'|\n[3cl0]u'-PAGE       \h'|\n[3cl1]u' ^E                   \h'|\n[3cl2]u' MARK        \h'|\n[3cl3]u' ^U
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs8]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt9
-\*[3trans].nr 3crow 9
-.3keep
-.mk 3rs9
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 20
-\&\h'|\n[3cl0]u'-SRCH       \h'|\n[3cl1]u' ^T                   \h'|\n[3cl2]u' OPEN        \h'|\n[3cl3]u' ^O
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs9]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt10
-\*[3trans].nr 3crow 10
-.3keep
-.mk 3rs10
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 21
-\&\h'|\n[3cl0]u'-TAB        \h'|\n[3cl1]u' ^X-^U                \h'|\n[3cl2]u' PICK        \h'|\n[3cl3]u' ^P
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs10]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt11
-\*[3trans].nr 3crow 11
-.3keep
-.mk 3rs11
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 22
-\&\h'|\n[3cl0]u'-WORD       \h'|\n[3cl1]u' ^B                   \h'|\n[3cl2]u' REPL        \h'|\n[3cl3]u' ^X-^R or ^]
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs11]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt12
-\*[3trans].nr 3crow 12
-.3keep
-.mk 3rs12
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 23
-\&\h'|\n[3cl0]u'ALT         \h'|\n[3cl1]u' ^X-^A or ^_ or ^/    \h'|\n[3cl2]u' RETURN      \h'|\n[3cl3]u' ^M
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs12]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt13
-\*[3trans].nr 3crow 13
-.3keep
-.mk 3rs13
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 24
-\&\h'|\n[3cl0]u'BSP         \h'|\n[3cl1]u' ^C                   \h'|\n[3cl2]u' RIGHT       \h'|\n[3cl3]u' ^L
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs13]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt14
-\*[3trans].nr 3crow 14
-.3keep
-.mk 3rs14
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 25
-\&\h'|\n[3cl0]u'CHG WIN     \h'|\n[3cl1]u' ^X-^W                \h'|\n[3cl2]u' SPLIT       \h'|\n[3cl3]u' ^X-^B
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs14]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt15
-\*[3trans].nr 3crow 15
-.3keep
-.mk 3rs15
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 26
-\&\h'|\n[3cl0]u'CLOSE       \h'|\n[3cl1]u' ^V                   \h'|\n[3cl2]u' TABS        \h'|\n[3cl3]u' ^X-^T
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs15]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt16
-\*[3trans].nr 3crow 16
-.3keep
-.mk 3rs16
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 27
-\&\h'|\n[3cl0]u'CMD         \h'|\n[3cl1]u' ^A or NULL or ^@     \h'|\n[3cl2]u' UP          \h'|\n[3cl3]u' ^K
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs16]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt17
-\*[3trans].nr 3crow 17
-.3keep
-.mk 3rs17
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 28
-\&\h'|\n[3cl0]u'CTRLCHAR    \h'|\n[3cl1]u' ^X-^C                \h'|\n[3cl2]u' WIN LEFT    \h'|\n[3cl3]u' ^X-^H
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs17]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt18
-\*[3trans].nr 3crow 18
-.3keep
-.mk 3rs18
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u
-.lf 29
-\&\h'|\n[3cl0]u'DELCHAR     \h'|\n[3cl1]u' ^W                   \h'|\n[3cl2]u' WIN RIGHT   \h'|\n[3cl3]u' ^X-^L
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs18]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.cp \n(3c
-.lf 30
+.mk #b
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'(extend)    \h'|\n(41u' ^X                   \h'|\n(42u' DOWN        \h'|\n(43u' ^J
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+LINE       \h'|\n(41u' ^F                   \h'|\n(42u' ERASE       \h'|\n(43u' ^X-^E or ^^
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+PAGE       \h'|\n(41u' ^R                   \h'|\n(42u' HOME        \h'|\n(43u' ^G
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+SRCH       \h'|\n(41u' ^Y                   \h'|\n(42u' INSERT      \h'|\n(43u' ^Z or ESC or ^[
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+TAB        \h'|\n(41u' ^I                   \h'|\n(42u' INT         \h'|\n(43u' ^\e
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+WORD       \h'|\n(41u' ^N                   \h'|\n(42u' JOIN        \h'|\n(43u' ^X-^J
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-LINE       \h'|\n(41u' ^D                   \h'|\n(42u' LEFT        \h'|\n(43u' ^H
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-PAGE       \h'|\n(41u' ^E                   \h'|\n(42u' MARK        \h'|\n(43u' ^U
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-SRCH       \h'|\n(41u' ^T                   \h'|\n(42u' OPEN        \h'|\n(43u' ^O
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-TAB        \h'|\n(41u' ^X-^U                \h'|\n(42u' PICK        \h'|\n(43u' ^P
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-WORD       \h'|\n(41u' ^B                   \h'|\n(42u' REPL        \h'|\n(43u' ^X-^R or ^]
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'ALT         \h'|\n(41u' ^X-^A or ^_ or ^/    \h'|\n(42u' RETURN      \h'|\n(43u' ^M
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'BSP         \h'|\n(41u' ^C                   \h'|\n(42u' RIGHT       \h'|\n(43u' ^L
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CHG WIN     \h'|\n(41u' ^X-^W                \h'|\n(42u' SPLIT       \h'|\n(43u' ^X-^B
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CLOSE       \h'|\n(41u' ^V                   \h'|\n(42u' TABS        \h'|\n(43u' ^X-^T
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CMD         \h'|\n(41u' ^A or NULL or ^@     \h'|\n(42u' UP          \h'|\n(43u' ^K
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CTRLCHAR    \h'|\n(41u' ^X-^C                \h'|\n(42u' WIN LEFT    \h'|\n(43u' ^X-^H
+.ta \n(50u \n(51u \n(52u \n(53u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DELCHAR     \h'|\n(41u' ^W                   \h'|\n(42u' WIN RIGHT   \h'|\n(43u' ^X-^L
 .sp 2p
-.cp 0
-.vs 2p>?\n[.V]u
-.ls 1
-\v'.25m'\s[\n[3lps]]\D'l |\n[TW]u 0'\s0
-.ls
-.vs
-.3release
-.mk 3rt19
-.nr 3brule 1
-.nr T. 1
-.T#
-.3init
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
 .fc
-.cp \n(3c
-.lf 32 e.stdkey.tbl
+.nr T. 1
+.T# 1
+.in \n(#Iu
+.35
+.nr #d 0
 .TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-28
 
 .TS
-.nr 3c \n(.C
-.cp 0
-.nr 3lps \n[.s]
-.de 3init
-.ft \n[.f]
-.ps \n[.s]
-.vs \n[.v]u
-.in \n[.i]u
-.ll \n[.l]u
-.ls \n[.L]
-.ad \n[.j]
-.ie \n[.u] .fi
-.el .nf
-.ce \n[.ce]
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
 ..
-.nr 3ind \n[.i]
-.nr 3fnt \n[.f]
-.nr 3sz \n[.s]
-.nr 3fll \n[.u]
-.nr T. 0
-.nr 3crow 0-1
-.nr 3passed 0-1
-.nr 3sflag 0
-.ds 3trans
-.ds 3quote
-.nr 3brule 1
-.nr 3supbot 0
-.eo
-.de 3rmk
-.mk \$1
-.if !'\n(.z'' \!.3rmk "\$1"
-..
-.de 3rvpt
-.vpt \$1
-.if !'\n(.z'' \!.3rvpt "\$1"
-..
-.de 3keep
-.if '\n[.z]'' \{.ds 3quote \\
-.ds 3trans \!
-.di 3section
-.nr 3sflag 1
-.in 0
-.\}
-..
-.de 3release
-.if \n[3sflag] \{.di
-.in \n[3ind]u
-.nr 3dn \n[dn]
-.ds 3quote
-.ds 3trans
-.nr 3sflag 0
-.if \n[.t]<=\n[dn] \{.nr T. 1
-.T#
-.nr 3supbot 1
-.sp \n[.t]u
-.nr 3supbot 0
-.mk #T
-.\}
-.if \n[.t]<=\n[3dn] .tm warning: page \n%: table text block will not fit on one page
 .nf
-.ls 1
-.3section
-.ls
-.rm 3section
-.\}
-..
-.nr 3tflag 0
-.de 3tkeep
-.if '\n[.z]'' \{.di 3table
-.nr 3tflag 1
-.\}
-..
-.de 3trelease
-.if \n[3tflag] \{.br
-.di
-.nr 3dn \n[dn]
-.ne \n[dn]u+\n[.V]u
-.ie \n[.t]<=\n[3dn] .tm error: page \n%: table will not fit on one page; use .TS H/.TH with a supporting macro package
-.el \{.in 0
-.ls 1
-.nf
-.3table
-.\}
-.rm 3table
-.\}
-..
-.ec
-.ce 0
-.nf
-.nr 3sep 1n
-.nr 3w0 \n(.H
-.nr 3aw0 0
-.nr 3lnw0 0
-.nr 3rnw0 0
-.nr 3w1 \n(.H
-.nr 3aw1 0
-.nr 3lnw1 0
-.nr 3rnw1 0
-.nr 3w2 \n(.H
-.nr 3aw2 0
-.nr 3lnw2 0
-.nr 3rnw2 0
-.nr 3w3 \n(.H
-.nr 3aw3 0
-.nr 3lnw3 0
-.nr 3rnw3 0
-.nr 3w4 \n(.H
-.nr 3aw4 0
-.nr 3lnw4 0
-.nr 3rnw4 0
-.nr 3w5 \n(.H
-.nr 3aw5 0
-.nr 3lnw5 0
-.nr 3rnw5 0
-.nr 3w6 \n(.H
-.nr 3aw6 0
-.nr 3lnw6 0
-.nr 3rnw6 0
-.nr 3w7 \n(.H
-.nr 3aw7 0
-.nr 3lnw7 0
-.nr 3rnw7 0
-.lf 39 e.stdkey.tbl
-.nr 3w0 \n[3w0]>?\w\[tbl]^@ \[tbl]
-.lf 39
-.nr 3w1 \n[3w1]>?\w\[tbl] CMD     \[tbl]
-.lf 39
-.nr 3w2 \n[3w2]>?\w\[tbl] ^L    \[tbl]
-.lf 39
-.nr 3w3 \n[3w3]>?\w\[tbl] RIGHT      \[tbl]
-.lf 39
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^X    \[tbl]
-.lf 39
-.nr 3w5 \n[3w5]>?\w\[tbl] (extend)  \[tbl]
-.lf 39
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^H \[tbl]
-.lf 39
-.nr 3w7 \n[3w7]>?\w\[tbl] WIN LEFT\[tbl]
-.lf 40
-.nr 3w0 \n[3w0]>?\w\[tbl]^A \[tbl]
-.lf 40
-.nr 3w1 \n[3w1]>?\w\[tbl] CMD     \[tbl]
-.lf 40
-.nr 3w2 \n[3w2]>?\w\[tbl] ^M    \[tbl]
-.lf 40
-.nr 3w3 \n[3w3]>?\w\[tbl] RETURN     \[tbl]
-.lf 40
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^Y    \[tbl]
-.lf 40
-.nr 3w5 \n[3w5]>?\w\[tbl] +SRCH     \[tbl]
-.lf 40
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^J \[tbl]
-.lf 40
-.nr 3w7 \n[3w7]>?\w\[tbl] JOIN\[tbl]
-.lf 41
-.nr 3w0 \n[3w0]>?\w\[tbl]^B \[tbl]
-.lf 41
-.nr 3w1 \n[3w1]>?\w\[tbl] -WORD   \[tbl]
-.lf 41
-.nr 3w2 \n[3w2]>?\w\[tbl] ^N    \[tbl]
-.lf 41
-.nr 3w3 \n[3w3]>?\w\[tbl] +WORD      \[tbl]
-.lf 41
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^Z    \[tbl]
-.lf 41
-.nr 3w5 \n[3w5]>?\w\[tbl] INSMODE   \[tbl]
-.lf 41
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^L \[tbl]
-.lf 41
-.nr 3w7 \n[3w7]>?\w\[tbl] WIN RIGHT\[tbl]
-.lf 42
-.nr 3w0 \n[3w0]>?\w\[tbl]^C \[tbl]
-.lf 42
-.nr 3w1 \n[3w1]>?\w\[tbl] LEFT    \[tbl]
-.lf 42
-.nr 3w2 \n[3w2]>?\w\[tbl] ^O    \[tbl]
-.lf 42
-.nr 3w3 \n[3w3]>?\w\[tbl] OPEN       \[tbl]
-.lf 42
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^[    \[tbl]
-.lf 42
-.nr 3w5 \n[3w5]>?\w\[tbl] INSERT    \[tbl]
-.lf 42
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^N \[tbl]
-.lf 42
-.nr 3w7 \n[3w7]>?\w\[tbl] DEL WORD\[tbl]
-.lf 43
-.nr 3w0 \n[3w0]>?\w\[tbl]^D \[tbl]
-.lf 43
-.nr 3w1 \n[3w1]>?\w\[tbl] -LINE   \[tbl]
-.lf 43
-.nr 3w2 \n[3w2]>?\w\[tbl] ^P    \[tbl]
-.lf 43
-.nr 3w3 \n[3w3]>?\w\[tbl] PICK       \[tbl]
-.lf 43
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^\e   \[tbl]
-.lf 43
-.nr 3w5 \n[3w5]>?\w\[tbl] INT       \[tbl]
-.lf 43
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^P \[tbl]
-.lf 43
-.nr 3w7 \n[3w7]>?\w\[tbl] PLAY\[tbl]
-.lf 44
-.nr 3w0 \n[3w0]>?\w\[tbl]^E \[tbl]
-.lf 44
-.nr 3w1 \n[3w1]>?\w\[tbl] -PAGE   \[tbl]
-.lf 44
-.nr 3w2 \n[3w2]>?\w\[tbl] ^Q    \[tbl]
-.lf 44
-.nr 3w3 \n[3w3]>?\w\[tbl] (not used) \[tbl]
-.lf 44
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^]    \[tbl]
-.lf 44
-.nr 3w5 \n[3w5]>?\w\[tbl] REPL      \[tbl]
-.lf 44
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^R \[tbl]
-.lf 44
-.nr 3w7 \n[3w7]>?\w\[tbl] RECORD\[tbl]
-.lf 45
-.nr 3w0 \n[3w0]>?\w\[tbl]^F \[tbl]
-.lf 45
-.nr 3w1 \n[3w1]>?\w\[tbl] +LINE   \[tbl]
-.lf 45
-.nr 3w2 \n[3w2]>?\w\[tbl] ^R    \[tbl]
-.lf 45
-.nr 3w3 \n[3w3]>?\w\[tbl] +PAGE      \[tbl]
-.lf 45
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^^    \[tbl]
-.lf 45
-.nr 3w5 \n[3w5]>?\w\[tbl] ERASE     \[tbl]
-.lf 45
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^B \[tbl]
-.lf 45
-.nr 3w7 \n[3w7]>?\w\[tbl] SPLIT\[tbl]
-.lf 46
-.nr 3w0 \n[3w0]>?\w\[tbl]^G \[tbl]
-.lf 46
-.nr 3w1 \n[3w1]>?\w\[tbl] HOME    \[tbl]
-.lf 46
-.nr 3w2 \n[3w2]>?\w\[tbl] ^S    \[tbl]
-.lf 46
-.nr 3w3 \n[3w3]>?\w\[tbl] (not used) \[tbl]
-.lf 46
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^_    \[tbl]
-.lf 46
-.nr 3w5 \n[3w5]>?\w\[tbl] ALT       \[tbl]
-.lf 46
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^T \[tbl]
-.lf 46
-.nr 3w7 \n[3w7]>?\w\[tbl] TABS\[tbl]
-.lf 47
-.nr 3w0 \n[3w0]>?\w\[tbl]^H \[tbl]
-.lf 47
-.nr 3w1 \n[3w1]>?\w\[tbl] BSP     \[tbl]
-.lf 47
-.nr 3w2 \n[3w2]>?\w\[tbl] ^T    \[tbl]
-.lf 47
-.nr 3w3 \n[3w3]>?\w\[tbl] -SRCH      \[tbl]
-.lf 47
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^/    \[tbl]
-.lf 47
-.nr 3w5 \n[3w5]>?\w\[tbl] ALT       \[tbl]
-.lf 47
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^U \[tbl]
-.lf 47
-.nr 3w7 \n[3w7]>?\w\[tbl] -TAB\[tbl]
-.lf 48
-.nr 3w0 \n[3w0]>?\w\[tbl]^I \[tbl]
-.lf 48
-.nr 3w1 \n[3w1]>?\w\[tbl] +TAB    \[tbl]
-.lf 48
-.nr 3w2 \n[3w2]>?\w\[tbl] ^U    \[tbl]
-.lf 48
-.nr 3w3 \n[3w3]>?\w\[tbl] MARK       \[tbl]
-.lf 48
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^X-^A \[tbl]
-.lf 48
-.nr 3w5 \n[3w5]>?\w\[tbl] ALT       \[tbl]
-.lf 48
-.nr 3w6 \n[3w6]>?\w\[tbl] ^X-^W \[tbl]
-.lf 48
-.nr 3w7 \n[3w7]>?\w\[tbl] CHG WIN\[tbl]
-.lf 49
-.nr 3w0 \n[3w0]>?\w\[tbl]^J \[tbl]
-.lf 49
-.nr 3w1 \n[3w1]>?\w\[tbl] DOWN    \[tbl]
-.lf 49
-.nr 3w2 \n[3w2]>?\w\[tbl] ^V    \[tbl]
-.lf 49
-.nr 3w3 \n[3w3]>?\w\[tbl] CLOSE      \[tbl]
-.lf 49
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^X-^C \[tbl]
-.lf 49
-.nr 3w5 \n[3w5]>?\w\[tbl] CTRLCHAR\[tbl]
-.lf 50
-.nr 3w0 \n[3w0]>?\w\[tbl]^K \[tbl]
-.lf 50
-.nr 3w1 \n[3w1]>?\w\[tbl] UP      \[tbl]
-.lf 50
-.nr 3w2 \n[3w2]>?\w\[tbl] ^W    \[tbl]
-.lf 50
-.nr 3w3 \n[3w3]>?\w\[tbl] DELCHAR    \[tbl]
-.lf 50
-.nr 3w4 \n[3w4]>?\w\[tbl]  ^X-^E \[tbl]
-.lf 50
-.nr 3w5 \n[3w5]>?\w\[tbl] ERASE\[tbl]
-.nr 3w0 \n[3w0]>?(\n[3lnw0]+\n[3rnw0])
-.if \n[3aw0] .nr 3w0 \n[3w0]>?(\n[3aw0]+2n)
-.nr 3w1 \n[3w1]>?(\n[3lnw1]+\n[3rnw1])
-.if \n[3aw1] .nr 3w1 \n[3w1]>?(\n[3aw1]+2n)
-.nr 3w2 \n[3w2]>?(\n[3lnw2]+\n[3rnw2])
-.if \n[3aw2] .nr 3w2 \n[3w2]>?(\n[3aw2]+2n)
-.nr 3w3 \n[3w3]>?(\n[3lnw3]+\n[3rnw3])
-.if \n[3aw3] .nr 3w3 \n[3w3]>?(\n[3aw3]+2n)
-.nr 3w4 \n[3w4]>?(\n[3lnw4]+\n[3rnw4])
-.if \n[3aw4] .nr 3w4 \n[3w4]>?(\n[3aw4]+2n)
-.nr 3w5 \n[3w5]>?(\n[3lnw5]+\n[3rnw5])
-.if \n[3aw5] .nr 3w5 \n[3w5]>?(\n[3aw5]+2n)
-.nr 3w6 \n[3w6]>?(\n[3lnw6]+\n[3rnw6])
-.if \n[3aw6] .nr 3w6 \n[3w6]>?(\n[3aw6]+2n)
-.nr 3w7 \n[3w7]>?(\n[3lnw7]+\n[3rnw7])
-.if \n[3aw7] .nr 3w7 \n[3w7]>?(\n[3aw7]+2n)
-.nr 3cd0 0
-.nr 3cl0 1*\n[3sep]
-.nr 3ce0 \n[3cl0]+\n[3w0]
-.nr 3cl1 \n[3ce0]+(3*\n[3sep])
-.nr 3cd1 \n[3ce0]+\n[3cl1]/2
-.nr 3ce1 \n[3cl1]+\n[3w1]
-.nr 3cl2 \n[3ce1]+(3*\n[3sep])
-.nr 3cd2 \n[3ce1]+\n[3cl2]/2
-.nr 3ce2 \n[3cl2]+\n[3w2]
-.nr 3cl3 \n[3ce2]+(3*\n[3sep])
-.nr 3cd3 \n[3ce2]+\n[3cl3]/2
-.nr 3ce3 \n[3cl3]+\n[3w3]
-.nr 3cl4 \n[3ce3]+(3*\n[3sep])
-.nr 3cd4 \n[3ce3]+\n[3cl4]/2
-.nr 3ce4 \n[3cl4]+\n[3w4]
-.nr 3cl5 \n[3ce4]+(3*\n[3sep])
-.nr 3cd5 \n[3ce4]+\n[3cl5]/2
-.nr 3ce5 \n[3cl5]+\n[3w5]
-.nr 3cl6 \n[3ce5]+(3*\n[3sep])
-.nr 3cd6 \n[3ce5]+\n[3cl6]/2
-.nr 3ce6 \n[3cl6]+\n[3w6]
-.nr 3cl7 \n[3ce6]+(3*\n[3sep])
-.nr 3cd7 \n[3ce6]+\n[3cl7]/2
-.nr 3ce7 \n[3cl7]+\n[3w7]
-.nr 3cd8 \n[3ce7]+(1*\n[3sep])
-.nr TW \n[3cd8]
-.in +(u;\n[.l]-\n[.i]-\n[TW]/2>?-\n[.i])
-.nr 3ind \n[.i]
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 58 59 60 61 62 63 64 65 66
+.nr 58 0
+.nr 38 \w^@ 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^A 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^B 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^C 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^D 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^E 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^F 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^G 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^H 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^I 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^J 
+.if \n(58<\n(38 .nr 58 \n(38
+.nr 38 \w^K 
+.if \n(58<\n(38 .nr 58 \n(38
+.58
+.rm 58
+.nr 59 0
+.nr 38 \w CMD     
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w CMD     
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w -WORD   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w BSP     
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w -LINE   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w -PAGE   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w +LINE   
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w HOME    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w LEFT    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w +TAB    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w DOWN    
+.if \n(59<\n(38 .nr 59 \n(38
+.nr 38 \w UP      
+.if \n(59<\n(38 .nr 59 \n(38
+.59
+.rm 59
+.nr 60 0
+.nr 38 \w ^L    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^M    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^N    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^O    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^P    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^Q    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^R    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^S    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^T    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^U    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^V    
+.if \n(60<\n(38 .nr 60 \n(38
+.nr 38 \w ^W    
+.if \n(60<\n(38 .nr 60 \n(38
+.60
+.rm 60
+.nr 61 0
+.nr 38 \w RIGHT      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w RETURN     
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w +WORD      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w OPEN       
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w PICK       
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w (not used) 
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w +PAGE      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w (not used) 
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w -SRCH      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w MARK       
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w CLOSE      
+.if \n(61<\n(38 .nr 61 \n(38
+.nr 38 \w DELCHAR    
+.if \n(61<\n(38 .nr 61 \n(38
+.61
+.rm 61
+.nr 62 0
+.nr 38 \w  ^X    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^Y    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^Z    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^[    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^\e   
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^]    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^^    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^_    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^/    
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^X-^A 
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^X-^C 
+.if \n(62<\n(38 .nr 62 \n(38
+.nr 38 \w  ^X-^E 
+.if \n(62<\n(38 .nr 62 \n(38
+.62
+.rm 62
+.nr 63 0
+.nr 38 \w (extend)  
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w +SRCH     
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w INSMODE   
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w INSERT    
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w INT       
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w REPL      
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ERASE     
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ALT       
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ALT       
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ALT
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w CTRLCHAR
+.if \n(63<\n(38 .nr 63 \n(38
+.nr 38 \w ERASE
+.if \n(63<\n(38 .nr 63 \n(38
+.63
+.rm 63
+.nr 64 0
+.nr 38 \w ^X-^H 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^J 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^L 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^N 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^R 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^B 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^T 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^U 
+.if \n(64<\n(38 .nr 64 \n(38
+.nr 38 \w ^X-^W 
+.if \n(64<\n(38 .nr 64 \n(38
+.64
+.rm 64
+.nr 65 0
+.nr 38 \w WIN LEFT
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w JOIN
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w WIN RIGHT
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w DEL WORD
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w REPL
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w SPLIT
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w TABS
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w -TAB
+.if \n(65<\n(38 .nr 65 \n(38
+.nr 38 \w CHG WIN
+.if \n(65<\n(38 .nr 65 \n(38
+.65
+.rm 65
+.nr 66 0
+.66
+.rm 66
+.nr 38 1n
+.nr 57 0
+.nr 40 \n(57+((2*\n(38)/2)
+.nr 58 +\n(40
+.nr 41 \n(58+((4*\n(38)/2)
+.nr 59 +\n(41
+.nr 42 \n(59+((4*\n(38)/2)
+.nr 60 +\n(42
+.nr 43 \n(60+((4*\n(38)/2)
+.nr 61 +\n(43
+.nr 44 \n(61+((4*\n(38)/2)
+.nr 62 +\n(44
+.nr 45 \n(62+((4*\n(38)/2)
+.nr 63 +\n(45
+.nr 46 \n(63+((4*\n(38)/2)
+.nr 64 +\n(46
+.nr 47 \n(64+((4*\n(38)/2)
+.nr 65 +\n(47
+.nr 48 \n(65+((4*\n(38)/2)
+.nr 66 +\n(48
+.nr 66 (\n(48+\n(65)/2
+.nr TW \n(66
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 53 file e.stdkey.tbl is too wide - \n(TW units
+.nr #I \n(.i
+.in +(\n(.lu-\n(TWu-\n(.iu)/2u
+.fc  
+.nr #T 0-1
+.nr #b 0-1
+.nr #a 0-1
 .eo
 .de T#
-.if !\n[3supbot] \{.3rvpt 0
-.mk 3vert
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
 .ls 1
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd8]u'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd7]u'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd6]u-1p'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.sp -1
-\v'.25m'\h'\n[3cd6]u+1p'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd5]u'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd4]u-1p'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.sp -1
-\v'.25m'\h'\n[3cd4]u+1p'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd3]u'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd2]u-1p'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.sp -1
-\v'.25m'\h'\n[3cd2]u+1p'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd1]u'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
-.if \n[3crow]>=0 \{.if 0<=\n[3passed] .nr 3rt0 \n[#T]
-.sp -1
-\v'.25m'\h'\n[3cd0]u'\s[\n[3lps]]\D'l 0 |\n[3rt0]u-1v'\s0
-.\}
+.if \n(#T>=0 .nr #b \n(#T
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'|0'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(41u+|\n(58u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(42u+|\n(59u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(43u+|\n(60u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(44u+|\n(61u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(45u+|\n(62u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(46u+|\n(63u)/2u'\h'-1p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'2p'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(47u+|\n(64u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
+.if \n(#b>=0 .sp -1
+.if \n(#b>=0 \h'(|\n(48u+|\n(65u)/2u'\s\n(33\h'-\n(#~u'\L'|\n(#bu-\n(35u'\s0\v'\n(\*(#du-\n(#bu+\n(35u'\h'|\n(TWu'
 .ls
-.nr 3passed \n[3crow]
-.sp |\n[3vert]u
-.3rvpt 1
-.\}
 ..
 .ec
-.fc 
-.3keep
-.vs 2p>?\n[.V]u
-.ls 1
-\v'.25m'\s[\n[3lps]]\h'|\n[3cd0]u'\D'l |\n[3cd8]u 0'\s0
-.ls
-.vs
-.3rmk 3rt0
-.cp \n(3c
-.lf 38
+.mk #b
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
 .sp 2p
-.cp 0
-\*[3trans].nr 3crow 0
-.3keep
-.mk 3rs0
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 39 e.stdkey.tbl
-\&\h'|\n[3cl0]u'^@ \h'|\n[3cl1]u' CMD     \h'|\n[3cl2]u' ^L    \h'|\n[3cl3]u' RIGHT      \h'|\n[3cl4]u'  ^X    \h'|\n[3cl5]u' (extend)  \h'|\n[3cl6]u' ^X-^H \h'|\n[3cl7]u' WIN LEFT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs0]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt1
-\*[3trans].nr 3crow 1
-.3keep
-.mk 3rs1
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 40
-\&\h'|\n[3cl0]u'^A \h'|\n[3cl1]u' CMD     \h'|\n[3cl2]u' ^M    \h'|\n[3cl3]u' RETURN     \h'|\n[3cl4]u'  ^Y    \h'|\n[3cl5]u' +SRCH     \h'|\n[3cl6]u' ^X-^J \h'|\n[3cl7]u' JOIN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs1]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt2
-\*[3trans].nr 3crow 2
-.3keep
-.mk 3rs2
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 41
-\&\h'|\n[3cl0]u'^B \h'|\n[3cl1]u' -WORD   \h'|\n[3cl2]u' ^N    \h'|\n[3cl3]u' +WORD      \h'|\n[3cl4]u'  ^Z    \h'|\n[3cl5]u' INSMODE   \h'|\n[3cl6]u' ^X-^L \h'|\n[3cl7]u' WIN RIGHT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs2]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt3
-\*[3trans].nr 3crow 3
-.3keep
-.mk 3rs3
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 42
-\&\h'|\n[3cl0]u'^C \h'|\n[3cl1]u' LEFT    \h'|\n[3cl2]u' ^O    \h'|\n[3cl3]u' OPEN       \h'|\n[3cl4]u'  ^[    \h'|\n[3cl5]u' INSERT    \h'|\n[3cl6]u' ^X-^N \h'|\n[3cl7]u' DEL WORD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs3]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt4
-\*[3trans].nr 3crow 4
-.3keep
-.mk 3rs4
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 43
-\&\h'|\n[3cl0]u'^D \h'|\n[3cl1]u' -LINE   \h'|\n[3cl2]u' ^P    \h'|\n[3cl3]u' PICK       \h'|\n[3cl4]u'  ^\e   \h'|\n[3cl5]u' INT       \h'|\n[3cl6]u' ^X-^P \h'|\n[3cl7]u' PLAY
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs4]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt5
-\*[3trans].nr 3crow 5
-.3keep
-.mk 3rs5
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 44
-\&\h'|\n[3cl0]u'^E \h'|\n[3cl1]u' -PAGE   \h'|\n[3cl2]u' ^Q    \h'|\n[3cl3]u' (not used) \h'|\n[3cl4]u'  ^]    \h'|\n[3cl5]u' REPL      \h'|\n[3cl6]u' ^X-^R \h'|\n[3cl7]u' RECORD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs5]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt6
-\*[3trans].nr 3crow 6
-.3keep
-.mk 3rs6
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 45
-\&\h'|\n[3cl0]u'^F \h'|\n[3cl1]u' +LINE   \h'|\n[3cl2]u' ^R    \h'|\n[3cl3]u' +PAGE      \h'|\n[3cl4]u'  ^^    \h'|\n[3cl5]u' ERASE     \h'|\n[3cl6]u' ^X-^B \h'|\n[3cl7]u' SPLIT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs6]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt7
-\*[3trans].nr 3crow 7
-.3keep
-.mk 3rs7
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 46
-\&\h'|\n[3cl0]u'^G \h'|\n[3cl1]u' HOME    \h'|\n[3cl2]u' ^S    \h'|\n[3cl3]u' (not used) \h'|\n[3cl4]u'  ^_    \h'|\n[3cl5]u' ALT       \h'|\n[3cl6]u' ^X-^T \h'|\n[3cl7]u' TABS
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs7]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt8
-\*[3trans].nr 3crow 8
-.3keep
-.mk 3rs8
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 47
-\&\h'|\n[3cl0]u'^H \h'|\n[3cl1]u' BSP     \h'|\n[3cl2]u' ^T    \h'|\n[3cl3]u' -SRCH      \h'|\n[3cl4]u'  ^/    \h'|\n[3cl5]u' ALT       \h'|\n[3cl6]u' ^X-^U \h'|\n[3cl7]u' -TAB
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs8]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt9
-\*[3trans].nr 3crow 9
-.3keep
-.mk 3rs9
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u \n[3ce6]u \n[3ce7]u
-.lf 48
-\&\h'|\n[3cl0]u'^I \h'|\n[3cl1]u' +TAB    \h'|\n[3cl2]u' ^U    \h'|\n[3cl3]u' MARK       \h'|\n[3cl4]u'  ^X-^A \h'|\n[3cl5]u' ALT       \h'|\n[3cl6]u' ^X-^W \h'|\n[3cl7]u' CHG WIN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs9]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt10
-\*[3trans].nr 3crow 10
-.3keep
-.mk 3rs10
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u
-.lf 49
-\&\h'|\n[3cl0]u'^J \h'|\n[3cl1]u' DOWN    \h'|\n[3cl2]u' ^V    \h'|\n[3cl3]u' CLOSE      \h'|\n[3cl4]u'  ^X-^C \h'|\n[3cl5]u' CTRLCHAR
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs10]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt11
-\*[3trans].nr 3crow 11
-.3keep
-.mk 3rs11
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u \n[3ce5]u
-.lf 50
-\&\h'|\n[3cl0]u'^K \h'|\n[3cl1]u' UP      \h'|\n[3cl2]u' ^W    \h'|\n[3cl3]u' DELCHAR    \h'|\n[3cl4]u'  ^X-^E \h'|\n[3cl5]u' ERASE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs11]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.cp \n(3c
-.lf 51
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^@ \h'|\n(41u' CMD     \h'|\n(42u' ^L    \h'|\n(43u' RIGHT      \h'|\n(44u'  ^X    \h'|\n(45u' (extend)  \h'|\n(46u' ^X-^H \h'|\n(47u' WIN LEFT
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^A \h'|\n(41u' CMD     \h'|\n(42u' ^M    \h'|\n(43u' RETURN     \h'|\n(44u'  ^Y    \h'|\n(45u' +SRCH     \h'|\n(46u' ^X-^J \h'|\n(47u' JOIN
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^B \h'|\n(41u' -WORD   \h'|\n(42u' ^N    \h'|\n(43u' +WORD      \h'|\n(44u'  ^Z    \h'|\n(45u' INSMODE   \h'|\n(46u' ^X-^L \h'|\n(47u' WIN RIGHT
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^C \h'|\n(41u' BSP     \h'|\n(42u' ^O    \h'|\n(43u' OPEN       \h'|\n(44u'  ^[    \h'|\n(45u' INSERT    \h'|\n(46u' ^X-^N \h'|\n(47u' DEL WORD
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^D \h'|\n(41u' -LINE   \h'|\n(42u' ^P    \h'|\n(43u' PICK       \h'|\n(44u'  ^\e   \h'|\n(45u' INT       \h'|\n(46u' ^X-^R \h'|\n(47u' REPL
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^E \h'|\n(41u' -PAGE   \h'|\n(42u' ^Q    \h'|\n(43u' (not used) \h'|\n(44u'  ^]    \h'|\n(45u' REPL      \h'|\n(46u' ^X-^B \h'|\n(47u' SPLIT
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^F \h'|\n(41u' +LINE   \h'|\n(42u' ^R    \h'|\n(43u' +PAGE      \h'|\n(44u'  ^^    \h'|\n(45u' ERASE     \h'|\n(46u' ^X-^T \h'|\n(47u' TABS
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^G \h'|\n(41u' HOME    \h'|\n(42u' ^S    \h'|\n(43u' (not used) \h'|\n(44u'  ^_    \h'|\n(45u' ALT       \h'|\n(46u' ^X-^U \h'|\n(47u' -TAB
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^H \h'|\n(41u' LEFT    \h'|\n(42u' ^T    \h'|\n(43u' -SRCH      \h'|\n(44u'  ^/    \h'|\n(45u' ALT       \h'|\n(46u' ^X-^W \h'|\n(47u' CHG WIN
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^I \h'|\n(41u' +TAB    \h'|\n(42u' ^U    \h'|\n(43u' MARK       \h'|\n(44u'  ^X-^A \h'|\n(45u' ALT\h'|\n(46u'\h'|\n(47u'
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^J \h'|\n(41u' DOWN    \h'|\n(42u' ^V    \h'|\n(43u' CLOSE      \h'|\n(44u'  ^X-^C \h'|\n(45u' CTRLCHAR\h'|\n(46u'\h'|\n(47u'
+.ta \n(58u \n(59u \n(60u \n(61u \n(62u \n(63u \n(64u \n(65u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'^K \h'|\n(41u' UP      \h'|\n(42u' ^W    \h'|\n(43u' DELCHAR    \h'|\n(44u'  ^X-^E \h'|\n(45u' ERASE\h'|\n(46u'\h'|\n(47u'
 .sp 2p
-.cp 0
-.vs 2p>?\n[.V]u
-.ls 1
-\v'.25m'\s[\n[3lps]]\D'l |\n[TW]u 0'\s0
-.ls
-.vs
-.3release
-.mk 3rt12
-.nr 3brule 1
-.nr T. 1
-.T#
-.3init
+.nr 36 \n(.v
+.vs \n(.vu-\n(.sp
+\h'|0'\s\n(33\l'|\n(TWu\(ru'\s0
+.vs \n(36u
 .fc
-.cp \n(3c
-.lf 53 e.stdkey.tbl
+.nr T. 1
+.T# 1
+.in \n(#Iu
+.35
+.nr #a 0
 .TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-19
 .\}
 .if n \{\
 .TS
-.nr 3c \n(.C
-.cp 0
-.nr 3lps \n[.s]
-.nr 3cent \n[.ce]
-.de 3init
-.ft \n[.f]
-.ps \n[.s]
-.vs \n[.v]u
-.in \n[.i]u
-.ll \n[.l]u
-.ls \n[.L]
-.ad \n[.j]
-.ie \n[.u] .fi
-.el .nf
-.ce \n[.ce]
+.if \n+(b.=1 .nr d. \n(.c-\n(c.-1
+.de 35
+.ps \n(.s
+.vs \n(.vu
+.in \n(.iu
+.if \n(.u .fi
+.if \n(.j .ad
+.if \n(.j=0 .na
 ..
-.nr 3ind \n[.i]
-.nr 3fnt \n[.f]
-.nr 3sz \n[.s]
-.nr 3fll \n[.u]
-.nr T. 0
-.nr 3crow 0-1
-.nr 3passed 0-1
-.nr 3sflag 0
-.ds 3trans
-.ds 3quote
-.nr 3brule 1
-.nr 3supbot 0
-.eo
-.de 3rmk
-.mk \$1
-.if !'\n(.z'' \!.3rmk "\$1"
-..
-.de 3rvpt
-.vpt \$1
-.if !'\n(.z'' \!.3rvpt "\$1"
-..
-.de 3keep
-.if '\n[.z]'' \{.ds 3quote \\
-.ds 3trans \!
-.di 3section
-.nr 3sflag 1
-.in 0
-.\}
-..
-.de 3release
-.if \n[3sflag] \{.di
-.in \n[3ind]u
-.nr 3dn \n[dn]
-.ds 3quote
-.ds 3trans
-.nr 3sflag 0
-.if \n[.t]<=\n[dn] \{.nr T. 1
-.T#
-.nr 3supbot 1
-.sp \n[.t]u
-.nr 3supbot 0
-.mk #T
-.\}
-.if \n[.t]<=\n[3dn] .tm warning: page \n%: table text block will not fit on one page
 .nf
-.ls 1
-.3section
-.ls
-.rm 3section
-.\}
-..
-.nr 3tflag 0
-.de 3tkeep
-.if '\n[.z]'' \{.di 3table
-.nr 3tflag 1
-.\}
-..
-.de 3trelease
-.if \n[3tflag] \{.br
-.di
-.nr 3dn \n[dn]
-.ne \n[dn]u+\n[.V]u
-.ie \n[.t]<=\n[3dn] .tm error: page \n%: table will not fit on one page; use .TS H/.TH with a supporting macro package
-.el \{.in 0
-.ls 1
-.nf
-.3table
-.\}
-.rm 3table
-.\}
-..
-.ec
-.ce 0
-.nf
-.nr 3sep 1n
-.nr 3w0 \n(.H
-.nr 3aw0 0
-.nr 3lnw0 0
-.nr 3rnw0 0
-.nr 3w1 \n(.H
-.nr 3aw1 0
-.nr 3lnw1 0
-.nr 3rnw1 0
-.nr 3w2 \n(.H
-.nr 3aw2 0
-.nr 3lnw2 0
-.nr 3rnw2 0
-.nr 3w3 \n(.H
-.nr 3aw3 0
-.nr 3lnw3 0
-.nr 3rnw3 0
-.nr 3w4 \n(.H
-.nr 3aw4 0
-.nr 3lnw4 0
-.nr 3rnw4 0
-.nr 3w0,4 \n(.H
-.nr 3aw0,4 0
-.nr 3lnw0,4 0
-.nr 3rnw0,4 0
-.lf 60 e.stdkey.tbl
-.nr 3w0,4 \n[3w0,4]>?\w\[tbl]E STANDARD KEYBOARD\[tbl]
-.lf 62
-.nr 3w0 \n[3w0]>?\w\[tbl](extend)    \[tbl]
-.lf 62
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X                    \[tbl]
-.lf 62
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 62
-.nr 3w3 \n[3w3]>?\w\[tbl] ^@    \[tbl]
-.lf 62
-.nr 3w4 \n[3w4]>?\w\[tbl] CMD\[tbl]
-.lf 63
-.nr 3w0 \n[3w0]>?\w\[tbl]+LINE       \[tbl]
-.lf 63
-.nr 3w1 \n[3w1]>?\w\[tbl] ^F                    \[tbl]
-.lf 63
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 63
-.nr 3w3 \n[3w3]>?\w\[tbl] ^A    \[tbl]
-.lf 63
-.nr 3w4 \n[3w4]>?\w\[tbl] CMD\[tbl]
-.lf 64
-.nr 3w0 \n[3w0]>?\w\[tbl]+PAGE       \[tbl]
-.lf 64
-.nr 3w1 \n[3w1]>?\w\[tbl] ^R                    \[tbl]
-.lf 64
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 64
-.nr 3w3 \n[3w3]>?\w\[tbl] ^B    \[tbl]
-.lf 64
-.nr 3w4 \n[3w4]>?\w\[tbl] -WORD\[tbl]
-.lf 65
-.nr 3w0 \n[3w0]>?\w\[tbl]+SRCH       \[tbl]
-.lf 65
-.nr 3w1 \n[3w1]>?\w\[tbl] ^Y                    \[tbl]
-.lf 65
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 65
-.nr 3w3 \n[3w3]>?\w\[tbl] ^C    \[tbl]
-.lf 65
-.nr 3w4 \n[3w4]>?\w\[tbl] BSP\[tbl]
-.lf 66
-.nr 3w0 \n[3w0]>?\w\[tbl]+TAB        \[tbl]
-.lf 66
-.nr 3w1 \n[3w1]>?\w\[tbl] ^I                    \[tbl]
-.lf 66
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 66
-.nr 3w3 \n[3w3]>?\w\[tbl] ^D    \[tbl]
-.lf 66
-.nr 3w4 \n[3w4]>?\w\[tbl] -LINE\[tbl]
-.lf 67
-.nr 3w0 \n[3w0]>?\w\[tbl]+WORD       \[tbl]
-.lf 67
-.nr 3w1 \n[3w1]>?\w\[tbl] ^N                    \[tbl]
-.lf 67
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 67
-.nr 3w3 \n[3w3]>?\w\[tbl] ^E    \[tbl]
-.lf 67
-.nr 3w4 \n[3w4]>?\w\[tbl] -PAGE\[tbl]
-.lf 68
-.nr 3w0 \n[3w0]>?\w\[tbl]-LINE       \[tbl]
-.lf 68
-.nr 3w1 \n[3w1]>?\w\[tbl] ^D                    \[tbl]
-.lf 68
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 68
-.nr 3w3 \n[3w3]>?\w\[tbl] ^F    \[tbl]
-.lf 68
-.nr 3w4 \n[3w4]>?\w\[tbl] +LINE\[tbl]
-.lf 69
-.nr 3w0 \n[3w0]>?\w\[tbl]-PAGE       \[tbl]
-.lf 69
-.nr 3w1 \n[3w1]>?\w\[tbl] ^E                    \[tbl]
-.lf 69
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 69
-.nr 3w3 \n[3w3]>?\w\[tbl] ^G    \[tbl]
-.lf 69
-.nr 3w4 \n[3w4]>?\w\[tbl] HOME\[tbl]
-.lf 70
-.nr 3w0 \n[3w0]>?\w\[tbl]-SRCH       \[tbl]
-.lf 70
-.nr 3w1 \n[3w1]>?\w\[tbl] ^T                    \[tbl]
-.lf 70
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 70
-.nr 3w3 \n[3w3]>?\w\[tbl] ^H    \[tbl]
-.lf 70
-.nr 3w4 \n[3w4]>?\w\[tbl] LEFT\[tbl]
-.lf 71
-.nr 3w0 \n[3w0]>?\w\[tbl]-TAB        \[tbl]
-.lf 71
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^U                 \[tbl]
-.lf 71
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 71
-.nr 3w3 \n[3w3]>?\w\[tbl] ^I    \[tbl]
-.lf 71
-.nr 3w4 \n[3w4]>?\w\[tbl] +TAB\[tbl]
-.lf 72
-.nr 3w0 \n[3w0]>?\w\[tbl]-WORD       \[tbl]
-.lf 72
-.nr 3w1 \n[3w1]>?\w\[tbl] ^B                    \[tbl]
-.lf 72
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 72
-.nr 3w3 \n[3w3]>?\w\[tbl] ^J    \[tbl]
-.lf 72
-.nr 3w4 \n[3w4]>?\w\[tbl] DOWN\[tbl]
-.lf 73
-.nr 3w0 \n[3w0]>?\w\[tbl]ALT         \[tbl]
-.lf 73
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^A or ^_ or ^/     \[tbl]
-.lf 73
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 73
-.nr 3w3 \n[3w3]>?\w\[tbl] ^K    \[tbl]
-.lf 73
-.nr 3w4 \n[3w4]>?\w\[tbl] UP\[tbl]
-.lf 74
-.nr 3w0 \n[3w0]>?\w\[tbl]BSP         \[tbl]
-.lf 74
-.nr 3w1 \n[3w1]>?\w\[tbl] ^C                    \[tbl]
-.lf 74
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 74
-.nr 3w3 \n[3w3]>?\w\[tbl] ^L    \[tbl]
-.lf 74
-.nr 3w4 \n[3w4]>?\w\[tbl] RIGHT\[tbl]
-.lf 75
-.nr 3w0 \n[3w0]>?\w\[tbl]CHG WIN     \[tbl]
-.lf 75
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^W                 \[tbl]
-.lf 75
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 75
-.nr 3w3 \n[3w3]>?\w\[tbl] ^M    \[tbl]
-.lf 75
-.nr 3w4 \n[3w4]>?\w\[tbl] RETURN\[tbl]
-.lf 76
-.nr 3w0 \n[3w0]>?\w\[tbl]CLOSE       \[tbl]
-.lf 76
-.nr 3w1 \n[3w1]>?\w\[tbl] ^V                    \[tbl]
-.lf 76
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 76
-.nr 3w3 \n[3w3]>?\w\[tbl] ^N    \[tbl]
-.lf 76
-.nr 3w4 \n[3w4]>?\w\[tbl] +WORD\[tbl]
-.lf 77
-.nr 3w0 \n[3w0]>?\w\[tbl]CMD         \[tbl]
-.lf 77
-.nr 3w1 \n[3w1]>?\w\[tbl] ^A or NULL or ^@      \[tbl]
-.lf 77
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 77
-.nr 3w3 \n[3w3]>?\w\[tbl] ^O    \[tbl]
-.lf 77
-.nr 3w4 \n[3w4]>?\w\[tbl] OPEN\[tbl]
-.lf 78
-.nr 3w0 \n[3w0]>?\w\[tbl]CTRLCHAR    \[tbl]
-.lf 78
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^C                 \[tbl]
-.lf 78
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 78
-.nr 3w3 \n[3w3]>?\w\[tbl] ^P    \[tbl]
-.lf 78
-.nr 3w4 \n[3w4]>?\w\[tbl] PICK\[tbl]
-.lf 79
-.nr 3w0 \n[3w0]>?\w\[tbl]DELCHAR     \[tbl]
-.lf 79
-.nr 3w1 \n[3w1]>?\w\[tbl] ^W                    \[tbl]
-.lf 79
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 79
-.nr 3w3 \n[3w3]>?\w\[tbl] ^Q    \[tbl]
-.lf 79
-.nr 3w4 \n[3w4]>?\w\[tbl] (not used)\[tbl]
-.lf 80
-.nr 3w0 \n[3w0]>?\w\[tbl]DOWN        \[tbl]
-.lf 80
-.nr 3w1 \n[3w1]>?\w\[tbl] ^J                    \[tbl]
-.lf 80
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 80
-.nr 3w3 \n[3w3]>?\w\[tbl] ^R    \[tbl]
-.lf 80
-.nr 3w4 \n[3w4]>?\w\[tbl] +PAGE\[tbl]
-.lf 81
-.nr 3w0 \n[3w0]>?\w\[tbl]ERASE       \[tbl]
-.lf 81
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^E or ^^           \[tbl]
-.lf 81
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 81
-.nr 3w3 \n[3w3]>?\w\[tbl] ^S    \[tbl]
-.lf 81
-.nr 3w4 \n[3w4]>?\w\[tbl] (not used)\[tbl]
-.lf 82
-.nr 3w0 \n[3w0]>?\w\[tbl]HOME        \[tbl]
-.lf 82
-.nr 3w1 \n[3w1]>?\w\[tbl] ^G                    \[tbl]
-.lf 82
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 82
-.nr 3w3 \n[3w3]>?\w\[tbl] ^T    \[tbl]
-.lf 82
-.nr 3w4 \n[3w4]>?\w\[tbl] -SRCH\[tbl]
-.lf 83
-.nr 3w0 \n[3w0]>?\w\[tbl]INSERT      \[tbl]
-.lf 83
-.nr 3w1 \n[3w1]>?\w\[tbl] ^Z or ESC or ^[       \[tbl]
-.lf 83
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 83
-.nr 3w3 \n[3w3]>?\w\[tbl] ^U    \[tbl]
-.lf 83
-.nr 3w4 \n[3w4]>?\w\[tbl] MARK\[tbl]
-.lf 84
-.nr 3w0 \n[3w0]>?\w\[tbl]INT         \[tbl]
-.lf 84
-.nr 3w1 \n[3w1]>?\w\[tbl] ^\e                   \[tbl]
-.lf 84
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 84
-.nr 3w3 \n[3w3]>?\w\[tbl] ^V    \[tbl]
-.lf 84
-.nr 3w4 \n[3w4]>?\w\[tbl] CLOSE\[tbl]
-.lf 85
-.nr 3w0 \n[3w0]>?\w\[tbl]JOIN        \[tbl]
-.lf 85
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^J                 \[tbl]
-.lf 85
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 85
-.nr 3w3 \n[3w3]>?\w\[tbl] ^W    \[tbl]
-.lf 85
-.nr 3w4 \n[3w4]>?\w\[tbl] DELCHAR\[tbl]
-.lf 86
-.nr 3w0 \n[3w0]>?\w\[tbl]LEFT        \[tbl]
-.lf 86
-.nr 3w1 \n[3w1]>?\w\[tbl] ^H                    \[tbl]
-.lf 86
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 86
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X    \[tbl]
-.lf 86
-.nr 3w4 \n[3w4]>?\w\[tbl] (extend)\[tbl]
-.lf 87
-.nr 3w0 \n[3w0]>?\w\[tbl]MARK        \[tbl]
-.lf 87
-.nr 3w1 \n[3w1]>?\w\[tbl] ^U                    \[tbl]
-.lf 87
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 87
-.nr 3w3 \n[3w3]>?\w\[tbl] ^Y    \[tbl]
-.lf 87
-.nr 3w4 \n[3w4]>?\w\[tbl] +SRCH\[tbl]
-.lf 88
-.nr 3w0 \n[3w0]>?\w\[tbl]OPEN        \[tbl]
-.lf 88
-.nr 3w1 \n[3w1]>?\w\[tbl] ^O                    \[tbl]
-.lf 88
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 88
-.nr 3w3 \n[3w3]>?\w\[tbl] ^Z    \[tbl]
-.lf 88
-.nr 3w4 \n[3w4]>?\w\[tbl] INSMODE\[tbl]
-.lf 89
-.nr 3w0 \n[3w0]>?\w\[tbl]PICK        \[tbl]
-.lf 89
-.nr 3w1 \n[3w1]>?\w\[tbl] ^P                    \[tbl]
-.lf 89
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 89
-.nr 3w3 \n[3w3]>?\w\[tbl] ^[    \[tbl]
-.lf 89
-.nr 3w4 \n[3w4]>?\w\[tbl] INSERT\[tbl]
-.lf 90
-.nr 3w0 \n[3w0]>?\w\[tbl]REPL        \[tbl]
-.lf 90
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^R or ^]           \[tbl]
-.lf 90
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 90
-.nr 3w3 \n[3w3]>?\w\[tbl] ^\e   \[tbl]
-.lf 90
-.nr 3w4 \n[3w4]>?\w\[tbl] INT\[tbl]
-.lf 91
-.nr 3w0 \n[3w0]>?\w\[tbl]RETURN      \[tbl]
-.lf 91
-.nr 3w1 \n[3w1]>?\w\[tbl] ^M                    \[tbl]
-.lf 91
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 91
-.nr 3w3 \n[3w3]>?\w\[tbl] ^]    \[tbl]
-.lf 91
-.nr 3w4 \n[3w4]>?\w\[tbl] REPL\[tbl]
-.lf 92
-.nr 3w0 \n[3w0]>?\w\[tbl]RIGHT       \[tbl]
-.lf 92
-.nr 3w1 \n[3w1]>?\w\[tbl] ^L                    \[tbl]
-.lf 92
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 92
-.nr 3w3 \n[3w3]>?\w\[tbl] ^^    \[tbl]
-.lf 92
-.nr 3w4 \n[3w4]>?\w\[tbl] ERASE\[tbl]
-.lf 93
-.nr 3w0 \n[3w0]>?\w\[tbl]SPLIT       \[tbl]
-.lf 93
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^B                 \[tbl]
-.lf 93
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 93
-.nr 3w3 \n[3w3]>?\w\[tbl] ^_    \[tbl]
-.lf 93
-.nr 3w4 \n[3w4]>?\w\[tbl] ALT\[tbl]
-.lf 94
-.nr 3w0 \n[3w0]>?\w\[tbl]TABS        \[tbl]
-.lf 94
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^T                 \[tbl]
-.lf 94
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 94
-.nr 3w3 \n[3w3]>?\w\[tbl] ^/    \[tbl]
-.lf 94
-.nr 3w4 \n[3w4]>?\w\[tbl] ALT\[tbl]
-.lf 95
-.nr 3w0 \n[3w0]>?\w\[tbl]UP          \[tbl]
-.lf 95
-.nr 3w1 \n[3w1]>?\w\[tbl] ^K                    \[tbl]
-.lf 95
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 95
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^A \[tbl]
-.lf 95
-.nr 3w4 \n[3w4]>?\w\[tbl] ALT\[tbl]
-.lf 96
-.nr 3w0 \n[3w0]>?\w\[tbl]WIN LEFT    \[tbl]
-.lf 96
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^H                 \[tbl]
-.lf 96
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 96
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^C \[tbl]
-.lf 96
-.nr 3w4 \n[3w4]>?\w\[tbl] CTRLCHAR\[tbl]
-.lf 97
-.nr 3w0 \n[3w0]>?\w\[tbl]WIN RIGHT   \[tbl]
-.lf 97
-.nr 3w1 \n[3w1]>?\w\[tbl] ^X-^L                 \[tbl]
-.lf 97
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 97
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^E \[tbl]
-.lf 97
-.nr 3w4 \n[3w4]>?\w\[tbl] ERASE\[tbl]
-.lf 98
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 98
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 98
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 98
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^H \[tbl]
-.lf 98
-.nr 3w4 \n[3w4]>?\w\[tbl] WIN LEFT\[tbl]
-.lf 99
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 99
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 99
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 99
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^J \[tbl]
-.lf 99
-.nr 3w4 \n[3w4]>?\w\[tbl] JOIN\[tbl]
-.lf 100
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 100
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 100
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 100
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^L \[tbl]
-.lf 100
-.nr 3w4 \n[3w4]>?\w\[tbl] WIN RIGHT\[tbl]
-.lf 101
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 101
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 101
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 101
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^R \[tbl]
-.lf 101
-.nr 3w4 \n[3w4]>?\w\[tbl] REPL\[tbl]
-.lf 102
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 102
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 102
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 102
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^B \[tbl]
-.lf 102
-.nr 3w4 \n[3w4]>?\w\[tbl] SPLIT\[tbl]
-.lf 103
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 103
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 103
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 103
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^T \[tbl]
-.lf 103
-.nr 3w4 \n[3w4]>?\w\[tbl] TABS\[tbl]
-.lf 104
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 104
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 104
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 104
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^U \[tbl]
-.lf 104
-.nr 3w4 \n[3w4]>?\w\[tbl] -TAB\[tbl]
-.lf 105
-.nr 3w0 \n[3w0]>?\w\[tbl]	    \[tbl]
-.lf 105
-.nr 3w1 \n[3w1]>?\w\[tbl]                       \[tbl]
-.lf 105
-.nr 3w2 \n[3w2]>?\w\[tbl]|\[tbl]
-.lf 105
-.nr 3w3 \n[3w3]>?\w\[tbl] ^X-^W \[tbl]
-.lf 105
-.nr 3w4 \n[3w4]>?\w\[tbl] CHG WIN\[tbl]
-.nr 3w0 \n[3w0]>?(\n[3lnw0]+\n[3rnw0])
-.if \n[3aw0] .nr 3w0 \n[3w0]>?(\n[3aw0]+2n)
-.nr 3w1 \n[3w1]>?(\n[3lnw1]+\n[3rnw1])
-.if \n[3aw1] .nr 3w1 \n[3w1]>?(\n[3aw1]+2n)
-.nr 3w2 \n[3w2]>?(\n[3lnw2]+\n[3rnw2])
-.if \n[3aw2] .nr 3w2 \n[3w2]>?(\n[3aw2]+2n)
-.nr 3w3 \n[3w3]>?(\n[3lnw3]+\n[3rnw3])
-.if \n[3aw3] .nr 3w3 \n[3w3]>?(\n[3aw3]+2n)
-.nr 3w4 \n[3w4]>?(\n[3lnw4]+\n[3rnw4])
-.if \n[3aw4] .nr 3w4 \n[3w4]>?(\n[3aw4]+2n)
-.nr 3w0,4 \n[3w0,4]>?(\n[3lnw0,4]+\n[3rnw0,4])
-.if \n[3aw0,4] .nr 3w0,4 \n[3w0,4]>?(\n[3aw0,4]+2n)
-.nr 3needed \n[3w0,4]-(\n[3w0]+3n+\n[3w1]+3n+\n[3w2]+3n+\n[3w3]+3n+\n[3w4])
-.nr 3needed \n[3needed]/5
-.if \n[3needed] \{.nr 3w0 +\n[3needed]
-.nr 3w1 +\n[3needed]
-.nr 3w2 +\n[3needed]
-.nr 3w3 +\n[3needed]
-.nr 3w4 +\n[3needed]
-.\}
-.nr 3w0,4 \n[3w0]+(3*\n[3sep])+\n[3w1]+(3*\n[3sep])+\n[3w2]+(3*\n[3sep])+\n[3w3]+(3*\n[3sep])+\n[3w4]
-.nr 3w0,4 \n[3w0]+(3*\n[3sep])+\n[3w1]+(3*\n[3sep])+\n[3w2]+(3*\n[3sep])+\n[3w3]+(3*\n[3sep])+\n[3w4]
-.nr 3cd0 0
-.nr 3cl0 0*\n[3sep]
-.nr 3ce0 \n[3cl0]+\n[3w0]
-.nr 3cl1 \n[3ce0]+(3*\n[3sep])
-.nr 3cd1 \n[3ce0]+\n[3cl1]/2
-.nr 3ce1 \n[3cl1]+\n[3w1]
-.nr 3cl2 \n[3ce1]+(3*\n[3sep])
-.nr 3cd2 \n[3ce1]+\n[3cl2]/2
-.nr 3ce2 \n[3cl2]+\n[3w2]
-.nr 3cl3 \n[3ce2]+(3*\n[3sep])
-.nr 3cd3 \n[3ce2]+\n[3cl3]/2
-.nr 3ce3 \n[3cl3]+\n[3w3]
-.nr 3cl4 \n[3ce3]+(3*\n[3sep])
-.nr 3cd4 \n[3ce3]+\n[3cl4]/2
-.nr 3ce4 \n[3cl4]+\n[3w4]
-.nr 3cd5 \n[3ce4]+(0*\n[3sep])
-.nr TW \n[3cd5]
-.if \n[3cent] \{.in +(u;\n[.l]-\n[.i]-\n[TW]/2>?-\n[.i])
-.nr 3ind \n[.i]
-.\}
+.nr #~ 0
+.if \n(.T .if n .nr #~ 0.6n
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.fc
+.nr 33 \n(.s
+.rm 52 53 54 55 56
+.nr 52 0
+.nr 38 \w(extend)    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+LINE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+PAGE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+SRCH       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+TAB        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w+WORD       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-LINE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-PAGE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-SRCH       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-TAB        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w-WORD       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wALT         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wBSP         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCHG WIN     
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCLOSE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCMD         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wCTRLCHAR    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wDELCHAR     
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wDOWN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wERASE       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wHOME        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wINSERT      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wINT         
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wJOIN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wLEFT        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wMARK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wOPEN        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wPICK        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wREPL        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wRETURN      
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wRIGHT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wSPLIT       
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wTABS        
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wUP          
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wWIN LEFT    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \wWIN RIGHT   
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.nr 38 \w	    
+.if \n(52<\n(38 .nr 52 \n(38
+.52
+.rm 52
+.nr 53 0
+.nr 38 \w ^X                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^F                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^R                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^Y                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^I                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^N                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^D                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^E                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^T                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^U                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^B                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^A or ^_ or ^/     
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^C                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^W                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^V                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^A or NULL or ^@      
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^C                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^W                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^J                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^E or ^^           
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^G                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^Z or ESC or ^[       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^\e                   
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^J                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^H                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^U                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^O                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^P                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^R or ^]           
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^M                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^L                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^B                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^T                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^K                    
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^H                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w ^X-^L                 
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.nr 38 \w                       
+.if \n(53<\n(38 .nr 53 \n(38
+.53
+.rm 53
+.nr 54 0
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.nr 38 \w|
+.if \n(54<\n(38 .nr 54 \n(38
+.54
+.rm 54
+.nr 55 0
+.nr 38 \w ^@    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^A    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^B    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^C    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^D    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^E    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^F    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^G    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^H    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^I    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^J    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^K    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^L    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^M    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^N    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^O    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^P    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^Q    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^R    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^S    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^T    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^U    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^V    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^W    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^Y    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^Z    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^[    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^\e   
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^]    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^^    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^_    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^/    
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^A 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^C 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^E 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^H 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^J 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^L 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^R 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^B 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^T 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^U 
+.if \n(55<\n(38 .nr 55 \n(38
+.nr 38 \w ^X-^W 
+.if \n(55<\n(38 .nr 55 \n(38
+.55
+.rm 55
+.nr 56 0
+.nr 38 \w CMD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CMD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -WORD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w BSP
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -LINE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -PAGE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +LINE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w HOME
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w LEFT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +TAB
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w DOWN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w UP
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w RIGHT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w RETURN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +WORD
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w OPEN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w PICK
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w (not used)
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +PAGE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w (not used)
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -SRCH
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w MARK
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CLOSE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w DELCHAR
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w (extend)
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w +SRCH
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w INSMODE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w INSERT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w INT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w REPL
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ERASE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ALT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ALT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ALT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CTRLCHAR
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w ERASE
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w WIN LEFT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w JOIN
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w WIN RIGHT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w REPL
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w SPLIT
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w TABS
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w -TAB
+.if \n(56<\n(38 .nr 56 \n(38
+.nr 38 \w CHG WIN
+.if \n(56<\n(38 .nr 56 \n(38
+.56
+.rm 56
+.nr 38 \wE STANDARD KEYBOARD-\n(52-2n-\n(53-2n-\n(54-2n-\n(55-2n-\n(56
+.if \n(38>0 .nr 38 \n(38/4
+.if \n(38<0 .nr 38 0
+.nr 53 +\n(38
+.nr 54 +\n(38
+.nr 55 +\n(38
+.nr 56 +\n(38
+.nr 38 1n
+.nr 51 0
+.nr 40 \n(51+((0*\n(38)/2)
+.nr 52 +\n(40
+.nr 41 \n(52+((4*\n(38)/2)
+.nr 53 +\n(41
+.nr 42 \n(53+((4*\n(38)/2)
+.nr 54 +\n(42
+.nr 43 \n(54+((4*\n(38)/2)
+.nr 55 +\n(43
+.nr 44 \n(55+((4*\n(38)/2)
+.nr 56 +\n(44
+.nr TW \n(56
+.if t .if (\n(TW+\n(.o)>7.65i .tm Table at line 106 file e.stdkey.tbl is too wide - \n(TW units
+.fc  
+.nr #T 0-1
+.nr #a 0-1
 .eo
 .de T#
-.if !\n[3supbot] \{.3rvpt 0
-.mk 3vert
+.nr 35 1m
+.ds #d .d
+.if \(ts\n(.z\(ts\(ts .ds #d nl
+.mk ##
+.nr ## -1v
 .ls 1
 .ls
-.nr 3passed \n[3crow]
-.sp |\n[3vert]u
-.3rvpt 1
-.\}
 ..
 .ec
-.fc 
-.3keep
-.3rmk 3rt0
-\*[3trans].nr 3crow 0
-.3keep
-.mk 3rs0
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce4]u
-.lf 60
-\&\h'|\n[3cl0]u'E STANDARD KEYBOARD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs0]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt1
-\*[3trans].nr 3crow 1
-.3keep
-.mk 3rs1
-.mk 3bot
-.3rvpt 0
-.ta
-.lf 61
-\&
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs1]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt2
-\*[3trans].nr 3crow 2
-.3keep
-.mk 3rs2
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 62
-\&\h'|\n[3cl0]u'(extend)    \h'|\n[3cl1]u' ^X                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^@    \h'|\n[3cl4]u' CMD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs2]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt3
-\*[3trans].nr 3crow 3
-.3keep
-.mk 3rs3
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 63
-\&\h'|\n[3cl0]u'+LINE       \h'|\n[3cl1]u' ^F                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^A    \h'|\n[3cl4]u' CMD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs3]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt4
-\*[3trans].nr 3crow 4
-.3keep
-.mk 3rs4
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 64
-\&\h'|\n[3cl0]u'+PAGE       \h'|\n[3cl1]u' ^R                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^B    \h'|\n[3cl4]u' -WORD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs4]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt5
-\*[3trans].nr 3crow 5
-.3keep
-.mk 3rs5
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 65
-\&\h'|\n[3cl0]u'+SRCH       \h'|\n[3cl1]u' ^Y                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^C    \h'|\n[3cl4]u' BSP
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs5]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt6
-\*[3trans].nr 3crow 6
-.3keep
-.mk 3rs6
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 66
-\&\h'|\n[3cl0]u'+TAB        \h'|\n[3cl1]u' ^I                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^D    \h'|\n[3cl4]u' -LINE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs6]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt7
-\*[3trans].nr 3crow 7
-.3keep
-.mk 3rs7
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 67
-\&\h'|\n[3cl0]u'+WORD       \h'|\n[3cl1]u' ^N                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^E    \h'|\n[3cl4]u' -PAGE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs7]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt8
-\*[3trans].nr 3crow 8
-.3keep
-.mk 3rs8
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 68
-\&\h'|\n[3cl0]u'-LINE       \h'|\n[3cl1]u' ^D                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^F    \h'|\n[3cl4]u' +LINE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs8]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt9
-\*[3trans].nr 3crow 9
-.3keep
-.mk 3rs9
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 69
-\&\h'|\n[3cl0]u'-PAGE       \h'|\n[3cl1]u' ^E                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^G    \h'|\n[3cl4]u' HOME
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs9]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt10
-\*[3trans].nr 3crow 10
-.3keep
-.mk 3rs10
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 70
-\&\h'|\n[3cl0]u'-SRCH       \h'|\n[3cl1]u' ^T                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^H    \h'|\n[3cl4]u' LEFT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs10]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt11
-\*[3trans].nr 3crow 11
-.3keep
-.mk 3rs11
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 71
-\&\h'|\n[3cl0]u'-TAB        \h'|\n[3cl1]u' ^X-^U                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^I    \h'|\n[3cl4]u' +TAB
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs11]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt12
-\*[3trans].nr 3crow 12
-.3keep
-.mk 3rs12
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 72
-\&\h'|\n[3cl0]u'-WORD       \h'|\n[3cl1]u' ^B                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^J    \h'|\n[3cl4]u' DOWN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs12]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt13
-\*[3trans].nr 3crow 13
-.3keep
-.mk 3rs13
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 73
-\&\h'|\n[3cl0]u'ALT         \h'|\n[3cl1]u' ^X-^A or ^_ or ^/     \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^K    \h'|\n[3cl4]u' UP
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs13]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt14
-\*[3trans].nr 3crow 14
-.3keep
-.mk 3rs14
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 74
-\&\h'|\n[3cl0]u'BSP         \h'|\n[3cl1]u' ^C                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^L    \h'|\n[3cl4]u' RIGHT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs14]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt15
-\*[3trans].nr 3crow 15
-.3keep
-.mk 3rs15
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 75
-\&\h'|\n[3cl0]u'CHG WIN     \h'|\n[3cl1]u' ^X-^W                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^M    \h'|\n[3cl4]u' RETURN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs15]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt16
-\*[3trans].nr 3crow 16
-.3keep
-.mk 3rs16
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 76
-\&\h'|\n[3cl0]u'CLOSE       \h'|\n[3cl1]u' ^V                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^N    \h'|\n[3cl4]u' +WORD
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs16]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt17
-\*[3trans].nr 3crow 17
-.3keep
-.mk 3rs17
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 77
-\&\h'|\n[3cl0]u'CMD         \h'|\n[3cl1]u' ^A or NULL or ^@      \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^O    \h'|\n[3cl4]u' OPEN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs17]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt18
-\*[3trans].nr 3crow 18
-.3keep
-.mk 3rs18
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 78
-\&\h'|\n[3cl0]u'CTRLCHAR    \h'|\n[3cl1]u' ^X-^C                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^P    \h'|\n[3cl4]u' PICK
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs18]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt19
-\*[3trans].nr 3crow 19
-.3keep
-.mk 3rs19
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 79
-\&\h'|\n[3cl0]u'DELCHAR     \h'|\n[3cl1]u' ^W                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^Q    \h'|\n[3cl4]u' (not used)
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs19]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt20
-\*[3trans].nr 3crow 20
-.3keep
-.mk 3rs20
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 80
-\&\h'|\n[3cl0]u'DOWN        \h'|\n[3cl1]u' ^J                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^R    \h'|\n[3cl4]u' +PAGE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs20]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt21
-\*[3trans].nr 3crow 21
-.3keep
-.mk 3rs21
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 81
-\&\h'|\n[3cl0]u'ERASE       \h'|\n[3cl1]u' ^X-^E or ^^           \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^S    \h'|\n[3cl4]u' (not used)
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs21]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt22
-\*[3trans].nr 3crow 22
-.3keep
-.mk 3rs22
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 82
-\&\h'|\n[3cl0]u'HOME        \h'|\n[3cl1]u' ^G                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^T    \h'|\n[3cl4]u' -SRCH
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs22]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt23
-\*[3trans].nr 3crow 23
-.3keep
-.mk 3rs23
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 83
-\&\h'|\n[3cl0]u'INSERT      \h'|\n[3cl1]u' ^Z or ESC or ^[       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^U    \h'|\n[3cl4]u' MARK
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs23]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt24
-\*[3trans].nr 3crow 24
-.3keep
-.mk 3rs24
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 84
-\&\h'|\n[3cl0]u'INT         \h'|\n[3cl1]u' ^\e                   \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^V    \h'|\n[3cl4]u' CLOSE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs24]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt25
-\*[3trans].nr 3crow 25
-.3keep
-.mk 3rs25
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 85
-\&\h'|\n[3cl0]u'JOIN        \h'|\n[3cl1]u' ^X-^J                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^W    \h'|\n[3cl4]u' DELCHAR
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs25]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt26
-\*[3trans].nr 3crow 26
-.3keep
-.mk 3rs26
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 86
-\&\h'|\n[3cl0]u'LEFT        \h'|\n[3cl1]u' ^H                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X    \h'|\n[3cl4]u' (extend)
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs26]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt27
-\*[3trans].nr 3crow 27
-.3keep
-.mk 3rs27
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 87
-\&\h'|\n[3cl0]u'MARK        \h'|\n[3cl1]u' ^U                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^Y    \h'|\n[3cl4]u' +SRCH
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs27]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt28
-\*[3trans].nr 3crow 28
-.3keep
-.mk 3rs28
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 88
-\&\h'|\n[3cl0]u'OPEN        \h'|\n[3cl1]u' ^O                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^Z    \h'|\n[3cl4]u' INSMODE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs28]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt29
-\*[3trans].nr 3crow 29
-.3keep
-.mk 3rs29
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 89
-\&\h'|\n[3cl0]u'PICK        \h'|\n[3cl1]u' ^P                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^[    \h'|\n[3cl4]u' INSERT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs29]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt30
-\*[3trans].nr 3crow 30
-.3keep
-.mk 3rs30
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 90
-\&\h'|\n[3cl0]u'REPL        \h'|\n[3cl1]u' ^X-^R or ^]           \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^\e   \h'|\n[3cl4]u' INT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs30]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt31
-\*[3trans].nr 3crow 31
-.3keep
-.mk 3rs31
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 91
-\&\h'|\n[3cl0]u'RETURN      \h'|\n[3cl1]u' ^M                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^]    \h'|\n[3cl4]u' REPL
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs31]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt32
-\*[3trans].nr 3crow 32
-.3keep
-.mk 3rs32
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 92
-\&\h'|\n[3cl0]u'RIGHT       \h'|\n[3cl1]u' ^L                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^^    \h'|\n[3cl4]u' ERASE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs32]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt33
-\*[3trans].nr 3crow 33
-.3keep
-.mk 3rs33
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 93
-\&\h'|\n[3cl0]u'SPLIT       \h'|\n[3cl1]u' ^X-^B                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^_    \h'|\n[3cl4]u' ALT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs33]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt34
-\*[3trans].nr 3crow 34
-.3keep
-.mk 3rs34
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 94
-\&\h'|\n[3cl0]u'TABS        \h'|\n[3cl1]u' ^X-^T                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^/    \h'|\n[3cl4]u' ALT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs34]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt35
-\*[3trans].nr 3crow 35
-.3keep
-.mk 3rs35
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 95
-\&\h'|\n[3cl0]u'UP          \h'|\n[3cl1]u' ^K                    \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^A \h'|\n[3cl4]u' ALT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs35]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt36
-\*[3trans].nr 3crow 36
-.3keep
-.mk 3rs36
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 96
-\&\h'|\n[3cl0]u'WIN LEFT    \h'|\n[3cl1]u' ^X-^H                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^C \h'|\n[3cl4]u' CTRLCHAR
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs36]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt37
-\*[3trans].nr 3crow 37
-.3keep
-.mk 3rs37
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 97
-\&\h'|\n[3cl0]u'WIN RIGHT   \h'|\n[3cl1]u' ^X-^L                 \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^E \h'|\n[3cl4]u' ERASE
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs37]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt38
-\*[3trans].nr 3crow 38
-.3keep
-.mk 3rs38
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 98
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^H \h'|\n[3cl4]u' WIN LEFT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs38]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt39
-\*[3trans].nr 3crow 39
-.3keep
-.mk 3rs39
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 99
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^J \h'|\n[3cl4]u' JOIN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs39]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt40
-\*[3trans].nr 3crow 40
-.3keep
-.mk 3rs40
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 100
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^L \h'|\n[3cl4]u' WIN RIGHT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs40]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt41
-\*[3trans].nr 3crow 41
-.3keep
-.mk 3rs41
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 101
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^R \h'|\n[3cl4]u' REPL
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs41]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt42
-\*[3trans].nr 3crow 42
-.3keep
-.mk 3rs42
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 102
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^B \h'|\n[3cl4]u' SPLIT
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs42]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt43
-\*[3trans].nr 3crow 43
-.3keep
-.mk 3rs43
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 103
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^T \h'|\n[3cl4]u' TABS
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs43]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt44
-\*[3trans].nr 3crow 44
-.3keep
-.mk 3rs44
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 104
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^U \h'|\n[3cl4]u' -TAB
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs44]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.3keep
-.3rmk 3rt45
-\*[3trans].nr 3crow 45
-.3keep
-.mk 3rs45
-.mk 3bot
-.3rvpt 0
-.ta \n[3ce0]u \n[3ce1]u \n[3ce2]u \n[3ce3]u \n[3ce4]u
-.lf 105
-\&\h'|\n[3cl0]u'	    \h'|\n[3cl1]u'                       \h'|\n[3cl2]u'|\h'|\n[3cl3]u' ^X-^W \h'|\n[3cl4]u' CHG WIN
-.nr 3bot \n[3bot]>?\n[.d]
-.sp |\n[3rs45]u
-.3rvpt 1
-.sp |\n[3bot]u
-\*[3trans].nr 3brule 1
-.3release
-.mk 3rt46
-.nr 3brule 1
-.nr T. 1
-.T#
-.3init
+.ta \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'E STANDARD KEYBOARD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'\h'|\n(41u'\h'|\n(42u'\h'|\n(43u'\h'|\n(44u'
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'(extend)    \h'|\n(41u' ^X                    \h'|\n(42u'|\h'|\n(43u' ^@    \h'|\n(44u' CMD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+LINE       \h'|\n(41u' ^F                    \h'|\n(42u'|\h'|\n(43u' ^A    \h'|\n(44u' CMD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+PAGE       \h'|\n(41u' ^R                    \h'|\n(42u'|\h'|\n(43u' ^B    \h'|\n(44u' -WORD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+SRCH       \h'|\n(41u' ^Y                    \h'|\n(42u'|\h'|\n(43u' ^C    \h'|\n(44u' BSP
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+TAB        \h'|\n(41u' ^I                    \h'|\n(42u'|\h'|\n(43u' ^D    \h'|\n(44u' -LINE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'+WORD       \h'|\n(41u' ^N                    \h'|\n(42u'|\h'|\n(43u' ^E    \h'|\n(44u' -PAGE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-LINE       \h'|\n(41u' ^D                    \h'|\n(42u'|\h'|\n(43u' ^F    \h'|\n(44u' +LINE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-PAGE       \h'|\n(41u' ^E                    \h'|\n(42u'|\h'|\n(43u' ^G    \h'|\n(44u' HOME
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-SRCH       \h'|\n(41u' ^T                    \h'|\n(42u'|\h'|\n(43u' ^H    \h'|\n(44u' LEFT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-TAB        \h'|\n(41u' ^X-^U                 \h'|\n(42u'|\h'|\n(43u' ^I    \h'|\n(44u' +TAB
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'-WORD       \h'|\n(41u' ^B                    \h'|\n(42u'|\h'|\n(43u' ^J    \h'|\n(44u' DOWN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'ALT         \h'|\n(41u' ^X-^A or ^_ or ^/     \h'|\n(42u'|\h'|\n(43u' ^K    \h'|\n(44u' UP
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'BSP         \h'|\n(41u' ^C                    \h'|\n(42u'|\h'|\n(43u' ^L    \h'|\n(44u' RIGHT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CHG WIN     \h'|\n(41u' ^X-^W                 \h'|\n(42u'|\h'|\n(43u' ^M    \h'|\n(44u' RETURN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CLOSE       \h'|\n(41u' ^V                    \h'|\n(42u'|\h'|\n(43u' ^N    \h'|\n(44u' +WORD
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CMD         \h'|\n(41u' ^A or NULL or ^@      \h'|\n(42u'|\h'|\n(43u' ^O    \h'|\n(44u' OPEN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'CTRLCHAR    \h'|\n(41u' ^X-^C                 \h'|\n(42u'|\h'|\n(43u' ^P    \h'|\n(44u' PICK
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DELCHAR     \h'|\n(41u' ^W                    \h'|\n(42u'|\h'|\n(43u' ^Q    \h'|\n(44u' (not used)
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'DOWN        \h'|\n(41u' ^J                    \h'|\n(42u'|\h'|\n(43u' ^R    \h'|\n(44u' +PAGE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'ERASE       \h'|\n(41u' ^X-^E or ^^           \h'|\n(42u'|\h'|\n(43u' ^S    \h'|\n(44u' (not used)
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'HOME        \h'|\n(41u' ^G                    \h'|\n(42u'|\h'|\n(43u' ^T    \h'|\n(44u' -SRCH
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'INSERT      \h'|\n(41u' ^Z or ESC or ^[       \h'|\n(42u'|\h'|\n(43u' ^U    \h'|\n(44u' MARK
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'INT         \h'|\n(41u' ^\e                   \h'|\n(42u'|\h'|\n(43u' ^V    \h'|\n(44u' CLOSE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'JOIN        \h'|\n(41u' ^X-^J                 \h'|\n(42u'|\h'|\n(43u' ^W    \h'|\n(44u' DELCHAR
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'LEFT        \h'|\n(41u' ^H                    \h'|\n(42u'|\h'|\n(43u' ^X    \h'|\n(44u' (extend)
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'MARK        \h'|\n(41u' ^U                    \h'|\n(42u'|\h'|\n(43u' ^Y    \h'|\n(44u' +SRCH
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'OPEN        \h'|\n(41u' ^O                    \h'|\n(42u'|\h'|\n(43u' ^Z    \h'|\n(44u' INSMODE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'PICK        \h'|\n(41u' ^P                    \h'|\n(42u'|\h'|\n(43u' ^[    \h'|\n(44u' INSERT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'REPL        \h'|\n(41u' ^X-^R or ^]           \h'|\n(42u'|\h'|\n(43u' ^\e   \h'|\n(44u' INT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'RETURN      \h'|\n(41u' ^M                    \h'|\n(42u'|\h'|\n(43u' ^]    \h'|\n(44u' REPL
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'RIGHT       \h'|\n(41u' ^L                    \h'|\n(42u'|\h'|\n(43u' ^^    \h'|\n(44u' ERASE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'SPLIT       \h'|\n(41u' ^X-^B                 \h'|\n(42u'|\h'|\n(43u' ^_    \h'|\n(44u' ALT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'TABS        \h'|\n(41u' ^X-^T                 \h'|\n(42u'|\h'|\n(43u' ^/    \h'|\n(44u' ALT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'UP          \h'|\n(41u' ^K                    \h'|\n(42u'|\h'|\n(43u' ^X-^A \h'|\n(44u' ALT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'WIN LEFT    \h'|\n(41u' ^X-^H                 \h'|\n(42u'|\h'|\n(43u' ^X-^C \h'|\n(44u' CTRLCHAR
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'WIN RIGHT   \h'|\n(41u' ^X-^L                 \h'|\n(42u'|\h'|\n(43u' ^X-^E \h'|\n(44u' ERASE
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^H \h'|\n(44u' WIN LEFT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^J \h'|\n(44u' JOIN
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^L \h'|\n(44u' WIN RIGHT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^R \h'|\n(44u' REPL
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^B \h'|\n(44u' SPLIT
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^T \h'|\n(44u' TABS
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^U \h'|\n(44u' -TAB
+.ta \n(52u \n(53u \n(54u \n(55u \n(56u 
+.nr 35 1m
+.nr 31 \n(.f
+\&\h'|\n(40u'	    \h'|\n(41u'                       \h'|\n(42u'|\h'|\n(43u' ^X-^W \h'|\n(44u' CHG WIN
 .fc
-.cp \n(3c
-.lf 106
+.nr T. 1
+.T# 1
+.35
 .TE
+.if \n-(b.=0 .nr c. \n(.c-\n(d.-50
 .\}
 .ps 10
 .vs 12

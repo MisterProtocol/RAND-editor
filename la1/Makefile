@@ -103,7 +103,7 @@ CFILES =\
 
 
 #all $(LIB) : $P $(OFILES) $(OVFILES)
-$(LIB): $(OFILES) $(OVFILES)
+$(LIB): $(O) $(OFILES) $(OVFILES)
 #       -$(SH) -c "if test -r $(LIB) ; then $(MV) $(LIB) ,$(LIB) ; fi"
 	ar r $(LIB) $(OFILES)
 	$(RANLIB) $(LIB)
@@ -111,8 +111,11 @@ $(LIB): $(OFILES) $(OVFILES)
 #init : Makefile
 #
 #Makefile : Makef
-#	-$(SH) -c "if test -r $@ ; then $(MV) $@ ,$@ ; fi"
-#	/bin/sh ../Make.make Makef > $@
+#       -$(SH) -c "if test -r $@ ; then $(MV) $@ ,$@ ; fi"
+#       /bin/sh ../Make.make Makef > $@
+
+$(O):
+	mkdir $(O)
 
 ranlib :
 	-$(RANLIB) $(LIB)

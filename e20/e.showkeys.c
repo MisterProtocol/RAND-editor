@@ -5,16 +5,17 @@ extern void exit();
 #define CCLAST         0236
 #define CMD 0
 
-#ifndef SHOWKEYS_INPLACE
+#ifndef INPLACE
 #define STANDALONE
-#endif /* SHOWKEYS_INPLACE */
+#endif /* INPLACE */
+
+void showkeys(FILE *, long);
 
 #ifdef STANDALONE
 #include <sys/types.h>
 #include <sys/stat.h>
-void exit();
+extern void exit(int);
 long ftell();
-void showkeys();
 int fstat();
 extern void dbgpr();
 
@@ -32,7 +33,7 @@ char **argv;
     }
 
     if ((fp = fopen(argv[1], "r")) == NULL) {
-	fprintf(stderr, "can't open $argv[1]\n");
+	fprintf(stderr, "can't pen $argv[1]\n");
 	exit(1);
     }
     if (fstat(fileno(fp), &statbuf) == -1) {

@@ -6,6 +6,12 @@
 #define CTRL(x) ((x) & 31)
 #endif
 
+int bad(void), nop(void), xlate0(int), xlate1(int), in_std(char *, int *);
+void kini_nocbreak(void);
+
+/* Next is not correct */
+/*Flag in_std_p(char **, char **, (int (*) ())); */
+
 #ifdef COMMENT
 --------
 file term/standard.c
@@ -136,8 +142,7 @@ kini_nocbreak()
 #endif  /* CBREAK */
 }
 
-
-Flag in_std_p ();
+Flag in_std_p (char **, char **, int *);
 
 int
 in_std (lexp, count)
@@ -175,7 +180,7 @@ Flag in_std_p (ic, oc, n)
 	    if (chr == 0177)            /* DEL KEY KLUDGE FOR NOW */
 		*(*oc)++ = CCBACKSPACE;
 	    else
-		*(*oc)++ = chr;
+		*(*oc)++ = (char) chr;
 	}
 	else if (chr == CTRL ('X')) {
 	    if (*n < 2) {
@@ -189,32 +194,32 @@ Flag in_std_p (ic, oc, n)
 		*(*oc)++ = CCSETFILE;
 		break;
 	    case CTRL ('b'):
-		*(*oc)++ = CCSPLIT;
+		*(*oc)++ = (char)CCSPLIT;
 		break;
 	    case CTRL ('c'):
 		*(*oc)++ = CCCTRLQUOTE;
 		break;
 	    case CTRL ('e'):
-		*(*oc)++ = CCERASE;
+		*(*oc)++ = (char)CCERASE;
 		break;
 	    case CTRL ('h'):
 		*(*oc)++ = CCLWINDOW;
 		break;
 	    case CTRL ('j'):
-		*(*oc)++ = CCJOIN;
+		*(*oc)++ = (char)CCJOIN;
 		break;
 	    case CTRL ('l'):
 		*(*oc)++ = CCRWINDOW;
 		break;
 	    case CTRL ('n'):
-		*(*oc)++ = CCDWORD;
+		*(*oc)++ = (char)CCDWORD;
 		break;
 #ifdef RECORDING
 	    case CTRL ('p'):
-		*(*oc)++ = CCPLAY;
+		*(*oc)++ = (char)CCPLAY;
 		break;
 	    case CTRL ('r'):
-		*(*oc)++ = CCRECORD;
+		*(*oc)++ = (char)CCRECORD;
 		break;
 #else
 	    case CTRL ('r'):
@@ -234,12 +239,12 @@ Flag in_std_p (ic, oc, n)
 		*(*oc)++ = CCCTRLQUOTE;
 		break;
 	    default:
-		*(*oc)++ = CCUNAS1;
+		*(*oc)++ = (char)CCUNAS1;
 		break;
 	    }
 	}
 	else
-	    *(*oc)++ = lexstd[chr];
+	    *(*oc)++ = (char) lexstd[chr];
 	return (NO);
 }
 

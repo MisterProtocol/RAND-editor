@@ -7,6 +7,8 @@
 #include <string.h>
 #endif /* GCC */
 
+#include	"prototypes.h"
+
 char *
 my_move (source, dest, count)
 char *source, *dest;
