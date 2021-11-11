@@ -121,7 +121,7 @@ all:
 $(O):
 	mkdir $(O)
 
-$(E):   $(O) $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
+$(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 #       $(LD) $(LDFLAGS) /lib/crt0.o
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 	   $(O)e.main.o $(O)e.o $(O)e.pa.o $(O)e.iit.o $(O)e.q.o \
@@ -185,7 +185,7 @@ pres: $(O)pres.o $(MISCLIB)
 
 clean:
 	$(RM) $(OFILES) $(O)pres.o
-	$(RM) $(E) $(E).old pres pres.old
+	$(RM) $(E) $(E).old pres pres.old e.r.c
 
 $(O)e.cm.o: e.cm.c
 	$(CC) $(CFLAGS) $(INCL) -DETC=\"$(ETC_D)\" -c e.cm.c
