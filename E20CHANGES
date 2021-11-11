@@ -112,3 +112,5 @@ E20 Changes:
 	<esc>"o":<open>
 	<esc>"p":<pick>
 
+    Using these entries, pressing "ALT-o" will send "<esc>o", which will
+    cause the editor to respond as if an "<open>" keypress had been sent.

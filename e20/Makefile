@@ -118,6 +118,8 @@ all:
 #       cd ..; make sys5
 	cd ..; make linux
 
+$(O):
+	mkdir $(O)
 
 $(E):   $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
 #       $(LD) $(LDFLAGS) /lib/crt0.o
