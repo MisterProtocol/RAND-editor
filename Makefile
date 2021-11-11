@@ -39,7 +39,7 @@ DOC = $(MAN)/man1/e.1
 LEARN = $(LIB)/learn
 NAME = e
 OWNER = root
-GROUP = wheel
+GROUP = bin
 
 # RAND CHANGES 88/89:
 #    Do all makes from this top level makefile.  Usually:
