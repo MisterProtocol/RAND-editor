@@ -25,6 +25,5 @@ hardcopy:  e.1
 install:
 	install -c e.1 $(MANPATH)
 
-# may not work on Mac
 pdf:
 	ps2pdf e.1.ps > e.1.pdf
