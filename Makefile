@@ -237,7 +237,7 @@ etc:
 	chmod 755 $(LIB)
 	cp help/Crashdoc $(LIB)
 	cp help/errmsg $(LIB)
-	cp help/recovermsg $(LIB)
+	cp help/recovermsg_e20 $(LIB)
 	chmod 444 $(LIB)/*
 	cd fill; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
 		"ETC=$(LIB)" \

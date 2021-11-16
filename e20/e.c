@@ -1569,7 +1569,7 @@ dorecov (type)
 #define RECOVERMSG  "recovershowkeys"
 #else
 #include "e.showkeys.c"
-#define RECOVERMSG  "recovermsg"
+#define RECOVERMSG  "recovermsg_e20"
 #endif /* SHOWKEYS_INPLACE */
 
 void
@@ -2749,8 +2749,8 @@ dbgpr("getout:  filclean=%d, crashed=%d, bkeytmp=%s keytmp=%s\n",
     printf ("\nThis is %s revision %d\n%s", progname, -revision, verstr);
     fflush(stdout);
 
-    ostyflg = istyflg = 0;
-    fixtty ();
+    /*ostyflg = istyflg = 0;*/
+/*  fixtty (); */
 
 #ifdef PROFILE
     monexit (-1);

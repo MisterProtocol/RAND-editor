@@ -315,7 +315,7 @@ below for more details.
 .br
 This option displays clickable buttons across the bottom
 of the screen that execute E functions by a mouse click.  The buttons
-appear as ascii text, eg: "... open/close  pick/put ...".
+appear as ascii text, eg: "... +Pg/-Pg open close/-cl  pick/put ...".
 A screensize greater than 90 chars is recommended.
 This feature should be considered
 .I experimental.
@@ -732,6 +732,7 @@ The following table give the complete exit story.
 .br
 \*tFiles\*tState\*tKeys\ file\*tChange file
 .br
+.ta 18p+\w'exit nosave'u+1P +\w'Saves'u+1P +\w'Update'u+18p +\w'Keys\ file'u+1P
 .sp
 exit\*tX\*tX\*tX\*tX
 .br
@@ -2705,7 +2706,7 @@ terminals. ("_" is correct ASCII.)
 .\}
 .ps 10
 .vs 12
-.lf 1328 ./e.man
+.lf 1329 ./e.man
 .\".bp
 .ps 10
 .vs 12
@@ -2948,7 +2949,7 @@ on an individual user basis.
 .T# 1
 .35
 .if \n-(b.=0 .nr c. \n(.c-\n(d.-27
-.lf 1349 ./e.man
+.lf 1350 ./e.man
 .SH PLATFORMS SUPPORTED
 .sp
 This version of the editor has been ported to, and tested on,

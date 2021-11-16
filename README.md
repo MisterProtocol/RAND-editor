@@ -18,6 +18,19 @@ The code can also be compiled and run under Windows using WSL, the Windows
 Subsystem for Linux, in which case it builds and runs just as it would
 on a native Linux system.
 
+### Note for Newcomers
+
+The editor has a command-line "-showbuttons" option which will put
+clickable buttons in an area at the bottom of the edit window.  You
+should make sure your terminal is at least 92 characters wide for this.
+Start typing into the edit window; your text will be entered directly.
+After you have some text entered, start clicking the buttons at the
+bottom of the screen with the mouse to see what various editor commands
+do.
+
+The files in the "man" directory will give you much more extensive
+documentation on how the editor works.
+
 ### Branches
 
 It is intended that there be two branches in this repository, which will

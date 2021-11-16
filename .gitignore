@@ -9,6 +9,7 @@
 .es1*
 e.r.c
 le
+le.old
 
 # Object files
 *.o

@@ -1257,26 +1257,26 @@ mouse_button_table button_table_row1[] = {
 { 1,     5,   7,  CCINSMODE,     "ins" },
 
 { 2,     9,  12,  CCMARK,        "mark" },
-{ 3,    13,  18,  CCUNMARK,       "/unmrk" },
+{ 3,    13,  16,  CCUNMARK,       "/-mk" },
 
-{ 4,    20,  23,  CCPLSRCH,      "+sch" },
-{ 5,    24,  28,  CCMISRCH,      "/-sch" },
+{ 4,    18,  21,  CCPLSRCH,      "+sch" },
+{ 5,    22,  26,  CCMISRCH,      "/-sch" },
 
-{ 6,    30,  33,  CCCAPS,        "caps"  },
+{ 6,    28,  31,  CCCAPS,        "caps"  },
 
-{ 7,    35,  39,  CCCCASE,       "ccase"  },
+{ 7,    33,  37,  CCCCASE,       "ccase"  },
 
-{ 8,    41,  43,  CCSPLIT,       "spl" },
-{ 9,    44,  48,  CCJOIN,        "/join" },
+{ 8,    39,  41,  CCSPLIT,       "spl" },
+{ 9,    42,  46,  CCJOIN,        "/join" },
 
-{10,    50,  53,  CCDELCH,       "delC" },
+{10,    48,  51,  CCDELCH,       "delC" },
 
 /*
 {11,    55,  56,  CCMOVEUP,      "up" },
 {12,    57,  59,  CCMOVEDOWN,    "/dn"},
 */
 
-{11,    55,  56,  CCPLWIN,       "+W" },
+{11,    53,  56,  CCPLWIN,       "+Win" },
 {12,    57,  59,  CCMIWIN,       "/-W"},
 
 {14,    61,  62,  CCREGEX,        "re"},

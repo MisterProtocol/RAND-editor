@@ -310,7 +310,7 @@ below for more details.
 .br
 This option displays clickable buttons across the bottom
 of the screen that execute E functions by a mouse click.  The buttons
-appear as ascii text, eg: "... open/close  pick/put ...".
+appear as ascii text, eg: "... +Pg/-Pg open close/-cl  pick/put ...".
 A screensize greater than 90 chars is recommended.
 This feature should be considered
 .I experimental.
@@ -727,6 +727,7 @@ The following table give the complete exit story.
 .br
 \*tFiles\*tState\*tKeys\ file\*tChange file
 .br
+.ta 18p+\w'exit nosave'u+1P +\w'Saves'u+1P +\w'Update'u+18p +\w'Keys\ file'u+1P
 .sp
 exit\*tX\*tX\*tX\*tX
 .br
