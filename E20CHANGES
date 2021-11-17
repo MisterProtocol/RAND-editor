@@ -16,6 +16,7 @@ E20 Changes:
     button can be used to begin a "mark" and to "unmark" an area.  The
     middle button will also scroll up/down if E20 is compiled with version 6.2
     or greater of the ncurses library.  The right button is not used in E.
+    (Tip:  to copy/paste text in and out of E, hold the <SHIFT>key.)
 
 -   Added the following color options for highlighting a marked area:
 
