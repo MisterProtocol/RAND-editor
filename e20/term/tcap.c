@@ -547,7 +547,7 @@ endbc:
 #ifdef LMCHELP
 /* standout mode, if you will */
 /* no standout if terminal has magic cookies... */
-    if (   (SO = tgetstr("so", &cp)) != NULL && tgetnum("sg") == 0)
+    if (   (SO = tgetstr("so", &cp)) != NULL /* && tgetnum("sg") == 0 */)
 	SE = tgetstr("se", &cp);
     else
 	t_tcap.tt_so = t_tcap.tt_soe = (int (*) ()) 0;
