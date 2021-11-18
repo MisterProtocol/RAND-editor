@@ -1,5 +1,9 @@
 ver=e.r.c
-mv -f $ver ,$ver
+#mv -f $ver ,$ver
+if [ -e $ver ]; then
+  mv -f $ver ,$ver
+fi
+
 whoami() {
 	who am i | sed 's/[ 	].*//'
 }
