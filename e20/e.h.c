@@ -44,10 +44,19 @@ help_std(filename)
 	savecurs();
 	MCLEAR;
 	MHOME;
+
+	/* Keep track of how many lines are read from the keyboard layout
+	 * and move the cursor past the last text.
+	 */
+
+	int nl = 0;
+
 	if ((helpin = fopen (filename, "r")) != NULL) {
 		while ((c = fgetc (helpin)) != EOF) {
+			if (c == '\n') nl++;  /* trw */
 			if (c == HELP_GS) {
 				while ((c = fgetc (helpin)) != HELP_GE) {
+					if (c == '\n') nl++;  /* trw */
 					if (c != EOF) {
 						if (c >= HELP_CH && c <= HELP_CX)
 							MXLATE (boxtab [c - HELP_CH]);
@@ -73,6 +82,13 @@ help_std(filename)
 	}
 	printf ("\n\rFor info on a particular key, press that combination;");
 	printf ("\n\rto continue edit, press RETURN. ");
+
+	nl += 3;
+	poscursor(0, nl);
+	fflush(stdout);
+
+/*dbgpr("--end of show keyboard, nl=%d\n", nl);*/
+
 wait:   keyused = YES;
 #ifdef NCURSES
 	qq = mGetkey (WAIT_KEY, NULL);
