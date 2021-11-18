@@ -14,6 +14,13 @@ file e.h.c
 Short morehelp(unsigned Short);
 Cmdret help_std(char *);
 
+/* Keep track of how many lines are read from the keyboard layout
+ * so we can move the cursor below the text before displaying
+ * the help text
+ */
+static int n_keylines = 0;
+static char *clr2eos = NULL;
+
 #ifdef COMMENT
 Cmdret
 help_std(filename)
@@ -23,9 +30,19 @@ help_std(filename)
 #endif
 Cmdret
 help_std(filename)
-
 	char *filename;
 {
+
+	/* get the clear to end of screen escape */
+	if (clr2eos == NULL) {
+	    clr2eos = tigetstr("ed");
+	    if (clr2eos == (char *) -1) {
+		clr2eos = "\033[J";
+		/*dbgpr("clr2eos not found, setting to \\E[J\n"); */
+	    }
+	    /* dbgpr("setting clr2eos=\\E%s\n", clr2eos+1); */
+	}
+
 	FILE *helpin, *fopen();
 	int c;
 	char *fgets();
@@ -45,18 +62,15 @@ help_std(filename)
 	MCLEAR;
 	MHOME;
 
-	/* Keep track of how many lines are read from the keyboard layout
-	 * and move the cursor past the last text.
-	 */
 
-	int nl = 0;
+	n_keylines = 0;
 
 	if ((helpin = fopen (filename, "r")) != NULL) {
 		while ((c = fgetc (helpin)) != EOF) {
-			if (c == '\n') nl++;  /* trw */
+			if (c == '\n') n_keylines++;
 			if (c == HELP_GS) {
 				while ((c = fgetc (helpin)) != HELP_GE) {
-					if (c == '\n') nl++;  /* trw */
+					if (c == '\n') n_keylines++;
 					if (c != EOF) {
 						if (c >= HELP_CH && c <= HELP_CX)
 							MXLATE (boxtab [c - HELP_CH]);
@@ -83,11 +97,13 @@ help_std(filename)
 	printf ("\n\rFor info on a particular key, press that combination;");
 	printf ("\n\rto continue edit, press RETURN. ");
 
-	nl += 3;
-	poscursor(0, nl);
+	n_keylines += 4;
+	poscursor(0, n_keylines);
 	fflush(stdout);
 
-/*dbgpr("--end of show keyboard, nl=%d\n", nl);*/
+/** /
+dbgpr("--end of show keyboard, n_keylines=%d\n", n_keylines);
+/ **/
 
 wait:   keyused = YES;
 #ifdef NCURSES
@@ -122,6 +138,7 @@ morehelp (key)
 
 	fputs ("\r\n", stdout);
 	sprintf (helpfile, "%s/helpkey", etcdir);
+
 	if ((helpin = fopen (helpfile, "r")) == NULL) {
 		printf ("Can't open %s\n\r", helpfile);
 #ifdef NCURSES
@@ -134,6 +151,16 @@ morehelp (key)
 	else {
 		go = NO;
 		if (key != CCRETURN) {
+
+		    /* move cursor to below ascii keyboard layout */
+		    mvcur(-1, -1, n_keylines, 0);
+		    fflush(stdout);
+
+		    /* clear to end of screen */
+		    /*fputs("\033[J", stdout);*/
+		    printf("%s", clr2eos);
+		    fflush(stdout);
+
 			while (fgets (buf, sizeof buf, helpin) != NULL) {
 				if (go == YES) {
 					if (buf [0] == '~')
