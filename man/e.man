@@ -894,13 +894,25 @@ A line-number goes to that line of the file; 'rb' and 're'
 move to the beginning or end of a marked range (see the
 range command).  A short-cut to goto line-number \fIn\fR
 is "CMD: \fIn\fR<RETURN>".
+.RE
+.TP
+help
+.br
+Help will clear the screen and (for some terminal types)
+show a map of the keyboard layout of the standard keyboard,
+showing the command tied to each keycap.
+The user may then type any control character, and a short
+paragraph documenting the associated command will be shown.
+Note that the keyboard shown does not reflect any optional
+keyboard file in use, for example by means of the EKBFILE
+environment variable.
 .PP
 join | \-split
 .br
 split | \-join
 .br
 .RS
-Join (or \-spilt) combines two lines, split (or \-join)
+Join (or \-split) combines two lines, split (or \-join)
 breaks a line in two.
 .RE
 .TP
