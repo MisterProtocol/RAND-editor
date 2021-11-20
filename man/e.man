@@ -396,7 +396,7 @@ The
 .SM E_ETCDIR
 environment variable overrides the editor's built-in notion of the "etc"
 directory (normally
-.I /etc/e\c
+.I /usr/local/lib/e\c
 ).  This is useful for installations where management will not allow
 the installation of a random user's files into the system's
 .I /etc
