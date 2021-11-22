@@ -217,7 +217,8 @@ Flag setclr;
 		    /*
 		     * Look for "filenam" in system ETC dir.
 		     */
-		copy (filenam, copy (ETC, nambuf));
+		/*copy (filenam, copy (ETC, nambuf)); */
+		copy (filenam, copy (etcdir, nambuf));
 		iob = fopen (nambuf, "r");
 	    }
 	}

@@ -2,13 +2,15 @@
 	Copyright abandoned, 1983, The Rand Corporation
 #endif
 
-
-
 #ifdef OUT
 #ifndef LIBTINFO  /* using old copy of termcap library */
 #define tparm tparam
 #endif
 #endif /* OUT */
+
+/* e20, use highlight color for SO capability instead of reverse video */
+#define CAP_SO_COLOR
+extern char *hilite_str, *sgr0;
 
 
 /****************************************/
@@ -324,11 +326,13 @@ S_term t_tcap = {
 #define NG  -2
 #define UNKNOWN -1
 /* #ifndef CURSES */
-/* #define OK  0	/ * Already defined in curses.h */
+/* #define OK  0        / * Already defined in curses.h */
 /* #endif / * CURSES */
 #ifdef SYSV
-#undef TIOCGWINSZ	/* For ISC -- heh */
+#undef TIOCGWINSZ       /* For ISC -- heh */
 #endif
+
+char sostr[1024];
 
 Small
 getcap(term)
@@ -551,6 +555,14 @@ endbc:
 	SE = tgetstr("se", &cp);
     else
 	t_tcap.tt_so = t_tcap.tt_soe = (int (*) ()) 0;
+
+#ifdef CAP_SO_COLOR
+    if (hilite_str != NULL) {
+	SO = hilite_str;
+	SE = sgr0;
+    }
+#endif
+
 #endif /* LMCHELP */
 #ifdef LMCVBELL
 /* visual bell */

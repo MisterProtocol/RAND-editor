@@ -480,11 +480,13 @@ command (forcecmd, forceopt)
 	    mesg (ERRALL + 1, "No help routine available for this crt.");
 	    return CROK;
 	} else {
-	    strcpy (helparg, ETC);
+	    /*strcpy (helparg, ETC);*/
+	    strcpy (helparg, etcdir);
 	    strcat (helparg, "/kr.");
 	    if (opstr [0] == 'l') {
 		/* helparg [8] = 'l'; */
-	    	strcpy (helparg, ETC);
+		/*strcpy (helparg, ETC);*/
+		strcpy (helparg, etcdir);
 		strcat (helparg, "/kl.");
 	    }
 	    strcat (helparg, kname);

@@ -188,7 +188,7 @@ clean:
 	$(RM) $(E) $(E).old pres pres.old e.r.c
 
 $(O)e.cm.o: e.cm.c
-	$(CC) $(CFLAGS) $(INCL) -DETC=\"$(ETC_D)\" -c e.cm.c
+	$(CC) $(CFLAGS) $(INCL) -c e.cm.c
 	mv e.cm.o $(O)e.cm.o
 
 $(O)e.d.o: e.d.c
@@ -312,7 +312,7 @@ $(O)e.tt.o: e.tt.c term
 	mv e.tt.o $(O)e.tt.o
 
 $(O)e.tb.o: e.tb.c
-	$(CC) $(CFLAGS) $(INCL) -DETC=\"$(ETC_D)\" -c e.tb.c
+	$(CC) $(CFLAGS) $(INCL) -c e.tb.c
 	mv e.tb.o $(O)e.tb.o
 
 $(O)e.u.o: e.u.c

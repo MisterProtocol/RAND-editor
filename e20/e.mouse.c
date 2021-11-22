@@ -329,8 +329,7 @@ initCursesColor()
 /* dbgpr("has colors true, n=%d\n", n_colors); */
 
 	/*if (n_colors >= 256) {*/
-	/*if (n_colors >= 16) {*/
-	if (n_colors >= 8) {
+	if (n_colors >= 16) {
 	    int r1;
 
 	    /* User can specify a bg color option either
@@ -391,9 +390,9 @@ initCursesColor()
 	   /* init these nxt 3 strings to prevent null ptr if we
 	    * reference a routine that uses one of them.
 	    */
-	fgbg_pair = bold_str;
-	hilite_str = bold_str;
-	highlight_info_str = "bold";
+	fgbg_pair = smso; /*bold_str;*/
+	hilite_str = smso; /*bold_str; */
+	highlight_info_str = "color"; /*"bold";*/
 	sgr0 = rmso;
 	n_colors = 0;
 	highlight_mode = NO;
@@ -407,12 +406,13 @@ initCursesColor()
     button_font = btn_font_n ? strdup(tparm(setab,btn_font_n)) : hilite_str;
 #endif /* BUTTON_FONT */
 
-/**
+/** /
 if (n_colors) {
-  dbgpr("screen modes: smso=(\\E%s), rmso=(\\E%s) bold=(\\E%s) kbs=%s colors=%d\nsetab_p=(\\E%s)\nsetaf_p=(\\E%s)\n",
-  smso+1, rmso+1, bold_str+1, kbs_str, n_colors, setab_p+1, setaf_p+1);
+  dbgpr("screen modes: smso=(\\E%s), rmso=(\\E%s) bold=(\\E%s) colors=%d\nsetab_p=(\\E%s)\nsetaf_p=(\\E%s)\n",
+  smso+1, rmso+1, bold_str+1, n_colors, setab_p+1, setaf_p+1);
+  dbgpr("hilite_str=%s brace_p=%s\n", hilite_str+1, brace_p+1);
 }
- **/
+/ **/
     return;
 }
 
