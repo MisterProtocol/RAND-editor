@@ -1,0 +1,4 @@
+#comment
+options:  -regex -inplace
+<cmd>tabs 4<ret>
+<cmd>set window 10<ret>

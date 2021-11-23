@@ -89,8 +89,20 @@ E20 Changes:
 -   Added #define NORUNCMD_IN_PROFILE to disallow <cmd>run xxx</ret>
     in the .e_profile
 
--   Added environment variable EPROFILE20 to enable use of a separate .e_profile
-    file for e20.  Useful when both e20 and e19 are in use.
+-   Since e19 doesn't support the new options and features of e20, it's useful
+    for sites using both versions to have a separate startup file for e20.
+    The order in which e20 determines which startup file to use is:
+
+	1.  command line option: -profile=filename
+	2.  environment variable EPROFILE20
+	3.  environment variable EPROFILE
+	4.  ./.e_profile (if safe)
+	5.  ~/.e_profile20
+	6.  ~/.e_profile
+
+    Neither the EPROFILE20 nor EPROFILE environment variables are needed,
+    but they will be used, if present.
+
 
 -   New keyboard file options to map F1-12 to E commands.
     Examples:
@@ -127,3 +139,7 @@ E20 Changes:
 
     Using these entries, pressing "ALT-o" will send "<esc>o", which will
     cause the editor to respond as if an "<open>" keypress had been sent.
+
+-   See the examples/ directory for samples of keyboard files and
+    .e_profile files.  E20 is compatable with E19 startup and
+    keyboard files, but not vice versa.

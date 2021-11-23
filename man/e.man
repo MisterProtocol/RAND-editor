@@ -384,7 +384,7 @@ the command line and with the
 variable, the command line file is used.
 .PP
 The
-.SM EPROFILE (and/or EPROFILE20)
+.SM EPROFILE (or EPROFILE20)
 environment variable will be used as the name of the "startup" file, in lieu
 of "./.e_profile" or "~/.e_profile".
 The \%EPROFILE20 "startup" file can contain options and commands unique to
@@ -1391,9 +1391,16 @@ environment variable
 environment variable
 .SM EPROFILE,
 a "safe" ./.\fIe_profile\fR,
-and if none of these exist, ~/.\fIe_profile\fR.
-("./.e_profile" is deemed to be safe if you are not the super-user, you own
+~/.\fIe_profile20\fR, and finally, ~/.\fIe_profile\fR.
+("./\fI.e_profile\fR" is deemed to be safe if you are not the super-user, you own
 the file, and it's not writable by everyone else.)
+The EPROFILE20 environment variable and ~/.\fIe_profile20\fR file are
+searched first in case the original RAND editor branch is also in use.
+The original editor does not support the new features of the current version.
+These new features, if present in a profile file, would cause the old version
+of the editor to exit with an error.
+Therefore, for convenience, these new features may be placed in a profile
+file that the old version of the editor will not search for.
 If the first line of the profile file begins with the keyword "options:",
 then the rest of the line is treated as if typed as initial arguments
 to E.  The options must currently all be on one line.
@@ -1449,6 +1456,9 @@ options: \-regex \-stick
 <cmd>tabs 4<ret>
 <cmd>set window 40<ret>
 .RE
+
+There is an "examples/" directory at the top level of the distribution
+which contains sample \fI.e_profile\fR and \fI.e_profile20\fR files.
 .fi
 .SH BUGS
 .sp

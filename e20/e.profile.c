@@ -17,6 +17,7 @@ file e._profile.c
 #ifdef  STARTUPFILE
 
 #define PROFILENAME     ".e_profile"
+#define PROFILENAME_E20 ".e_profile20"  /* e20 */
 
 Flag    dot_profile;            /* set when .e_profile file exists */
 FILE    *fp_profile;
@@ -99,10 +100,11 @@ void
 chk_profile( profilename )
   char *profilename;
 {
-	char tmp[200];
+	char tmp[512];
 	char *startupfile;
 	int SafeCurDirProfile ();
 	void getopt_startup ();
+	struct stat stbuf;
 
 	if( profilename == (char *)NULL ) {
 	    /*
@@ -111,9 +113,13 @@ chk_profile( profilename )
 	    if(( startupfile = getenv( "EPROFILE20" )) == NULL ) {
 		if(( startupfile = getenv( "EPROFILE" )) == NULL ) {
 		    if( SafeCurDirProfile())
-			strcpy( tmp, PROFILENAME );
-		    else
-			sprintf( tmp, "%s/%s", getmypath(), PROFILENAME );
+			strcpy( tmp, PROFILENAME ); /* eg, in current dir */
+		    else {
+			/* use ~/.e_profile20 if it exists, ~/.e_profile otherwise */
+			sprintf( tmp, "%s/%s", getmypath(), PROFILENAME_E20 );
+			if (stat(tmp, &stbuf) == -1)
+			    sprintf( tmp, "%s/%s", getmypath(), PROFILENAME );
+		    }
 		    startupfile = tmp;
 		}
 	    }

@@ -1,0 +1,5 @@
+#comment
+options:  -regex -inplace -setab=222 -showbuttons
+<cmd>tabs 4<ret>
+<cmd>set window 15<ret>
+<cmd>set bracematch on<ret>
