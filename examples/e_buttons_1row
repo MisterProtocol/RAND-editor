@@ -1,0 +1,59 @@
+#  Usage:  le -buttonfile=xxx or install as ~/.e_buttons
+#
+#  FORMAT:   "label":<efunction>  (akin to keyboard files)
+#
+#  If a label (column 1) begins with a '/', it is appended to the preceeding
+#  entry and displayed as one button.  Each side of the '/' is a different
+#  e command.  Eg, displayed as:   [+src/-sch]
+#
+#  -ROW1 and -ROW2 identify the start of a button row.  Two rows are required.
+#
+#  blank lines and those starting with # are skipped
+#
+
+-ROW1   # start
+"cmd":<cmd>
+
+"ins":<insmd>    # toggle insert mode
+
+#"mark":<mark>
+#"/-mk":<-mark>
+
+"+sch":<+sch>
+"/-sch":<-sch>
+
+"caps":<caps>      # change marked rect to caps
+
+"ccase":<ccase>    # change case of marked rect
+
+"spl":<split>
+"/join":<join>
+
+"delC":<dchar>
+
+"+Win":<+win>     # create new window
+"/-W":<-win>      # close window
+
+"re":<regex>      # toggle regular expression mode
+
+"redr":<redraw>
+
+"exit":<exit>
+
+#
+# unused but available
+#
+#"rec":<record>   # enter/toggle record mode
+
+#"play":<play>
+
+#"up":<up>
+#"/dn":<down>
+
+#"repl":<replace>   # replace key, used with CMD: replace interactive
+#"mouse":<mouse>    # toggle mouse on/off, used for copy/paste in/out of E
+#"dword":<dword>    # delete word
+#"^C":<cchar>       # insert a ctrl character
+
+#"+tab":<tab>
+#"/-tab":<-tab>

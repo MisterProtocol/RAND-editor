@@ -35,7 +35,9 @@ S_looktbl itsyms[] = {
     {"+tab",    CCTAB},
     {"+word",   CCRWORD},
     {"-close",  CCMICLOSE},
+    {"-erase",  CCMIERASE},
     {"-line",   CCMILINE},
+    {"-mark",   CCUNMARK},
     {"-page",   CCMIPAGE},
     {"-sch",    CCMISRCH},
     {"-tab",    CCBACKTAB},
@@ -95,6 +97,7 @@ S_looktbl itsyms[] = {
     {"record",  CCRECORD},
 #endif
     {"redraw",  CCREDRAW},
+    {"regex",   CCREGEX},
     {"replace", CCREPLACE},
     {"ret",     CCRETURN},
     {"right",   CCMOVERIGHT},

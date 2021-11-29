@@ -2675,11 +2675,19 @@ Reg2 char *msg;
     oldlin = cursorline;
 /** /
 if (DebugVal)
-dbgpr("info(), col=(%d) ncols=(%d) msg=(%s) infowin.{tmarg ttext}=%d %d\n",
-column, ncols, msg, infowin.tmarg, infowin.ttext);
+dbgpr("info(), col=(%d) ncols=(%d) COLS=(%d) msg=(%s) infowin.{tmarg ttext}=%d %d\n",
+column, ncols, COLS, msg, infowin.tmarg, infowin.ttext);
 / **/
     switchwindow (&infowin);
     poscursor (column, 0);
+
+    /* Truncate a long path/filename if it won't fit,
+     * and display "..." in front of the shortened name
+     */
+    if (column == inf_file && (column + (int)strlen(msg) > COLS)) {
+	msg += ((column + (int)strlen(msg)) - COLS) + 4;
+	putch('.', NO); putch('.', NO); putch('.', NO);
+    }
 
     for (; cursorcol < infowin.redit && (chr = *msg++); ncols--)
 	if (040 <= chr && chr < 0177)

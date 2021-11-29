@@ -41,13 +41,22 @@ S_looktbl keysyms[] = {
     {"+page",   CCPLPAGE},
     {"+sch",    CCPLSRCH},
     {"+tab",    CCTAB},
+    {"+win",    CCPLWIN},
     {"+word",   CCRWORD},
+    {"-close",  CCMICLOSE},
+    {"-erase",  CCMIERASE},
     {"-line",   CCMILINE},
+    {"-mark",   CCUNMARK},
     {"-page",   CCMIPAGE},
+    {"-record", CCMIRECORD},
     {"-sch",    CCMISRCH},
     {"-tab",    CCBACKTAB},
+    {"-win",    CCMIWIN},
     {"-word",   CCLWORD},
     {"bksp",    CCBACKSPACE},
+    {"brace",   CCBRACE},
+    {"caps",    CCCAPS},
+    {"ccase",   CCCCASE},
     {"cchar",   CCCTRLQUOTE},
     {"chwin",   CCCHWINDOW},
     {"close",   CCCLOSE},
@@ -58,6 +67,7 @@ S_looktbl keysyms[] = {
     {"edit",    CCSETFILE},
     {"erase",   CCERASE},
     {"esc",     CCINSMODE},
+    {"exit",    CCEXIT},
     {"home",    CCHOME},
     {"insmd",   CCINSMODE},
     {"int",     CCINT},
@@ -70,10 +80,12 @@ S_looktbl keysyms[] = {
 #ifdef RECORDING
     {"play",    CCPLAY},
 #endif
+    {"put",     CCPUT},
 #ifdef RECORDING
     {"record",  CCRECORD},
 #endif
     {"redraw",  CCREDRAW},      /* added for KEY_F ekbfile support */
+    {"regex",   CCREGEX},
     {"replace", CCREPLACE},
     {"ret",     CCRETURN},
     {"right",   CCMOVERIGHT},
@@ -83,6 +95,7 @@ S_looktbl keysyms[] = {
     {"undef",   CCUNAS1},
     {"up",      CCMOVEUP},
     {"wleft",   CCLWINDOW},
+    {"wp",      CCAUTOFILL},
     {"wright",  CCRWINDOW},
     {0,         0}
  };
@@ -94,6 +107,14 @@ S_looktbl keysyms[] = {
 /*
  *  chk_profile - check if a .e_profile file exists: use environment
  *      EPROFILE, or "./.e_profile" (if safe), otherwise "~/.e_profile".
+ *
+ *  Order to determine which .e_profile to use:
+ *      1.  command line option: -profile=filename
+ *      2.  environment variable EPROFILE20
+ *      3.  environment variable EPROFILE
+ *      4.  ./.e_profile (if safe)
+ *      5.  ~/.e_profile20
+ *      6.  ~/.e_profile
  */
 
 void

@@ -121,6 +121,11 @@ extern char *ttyname ();
 
 #ifdef MOUSE_BUTTONS
 extern int btn_font_n;          /* set via -buttonfont=N */
+extern int get_mybuttons (char *);
+
+/* use this buffer to more easily pass error messages to getout()
+ */
+char error_buf[256];
 #define OPTSHOWBUTTONS 40
 /* start w/o showing buttons */
 int nButtonLines = 0;           /* number of BUTTON lines on screen      */
@@ -137,6 +142,7 @@ int nButtonLines = 4;
 #define OPTMOUSEINIT 42   /* eg, -mouseinit="E[?1006;1002h" */
 #define OPTMOUSESTOP 43   /* eg, -mousestop="E[?1006;1002l" */
 #define OPTBTNFONT    45  /* eg, -buttonfont=N (1-255) */
+#define OPTBTNFILE    46  /* eg, -buttonfile=filename */
 
 char *optmouse_init;
 char *optmouse_stop;
@@ -145,7 +151,7 @@ char *optmouse_stop;
 #endif /* NCURSES */
 
 /*************************/
-/* next OPT number is 46 */
+/* next OPT number is 47 */
 
 /* Don't read the profile if E is entered w/o a filename to edit, but reenable it
  * if E is entered w/o a filename and no state file exists.
@@ -159,7 +165,8 @@ S_looktbl opttable[] = {
    {"bgcolor"  , OPTBGRGB    },  /* -bgcolor=r,g,b */
    {"blanks"   , OPTBLANKS   },  /* expand tabs to blanks */
    {"bullets"  , OPTBULLETS  },
-   {"buttonfont" , OPTBTNFONT  },  /* -buttonfont=N (1-255) */
+   {"buttonfile", OPTBTNFILE  },  /* -buttonfont=N (1-255) */
+   {"buttonfont", OPTBTNFONT  },  /* -buttonfont=N (1-255) */
    {"create"   , OPTCREATE   },
    {"debug"    , OPTDEBUG    },
    {"dkeyboard", OPTSTDKBD   },
@@ -238,8 +245,9 @@ S_looktbl opttable[] = {
 Flag optuseextnames = YES;  /* YES 8/4/21: sets ncurses use_extended_names(TRUE) */
 Flag optskipmouse = NO;  /* YES 3/19/21: added to skip ncurses mouse initialization */
 #ifdef MOUSE_BUTTONS
-/*Flag optskipbuttons = YES;*/  /* 6/19/21: added to skip function button initialization */
-Flag optshowbuttons = NO;   /* 6/19/21: added to skip function button initialization */
+Flag optshowbuttons = NO;      /* 6/19/21: added to skip function button initialization */
+char *buttonfile = NULL;   /* argument to -buttonfile=xxx option */
+Flag mybuttons = NO;
 #endif /* MOUSE_BUTTONS */
 extern void initCurses(void);
 extern void initCursesColor(void);
@@ -346,6 +354,14 @@ extern void showkeys();
 #ifdef MOUSE_BUTTONS
 extern void buttoninit();
 #endif /* MOUSE_BUTTONS */
+
+/* For button init errors, set to YES so getout()
+ * will call cleanup() with the flag to remove the keys file
+ * so we don't see the 'crash message' on the next
+ * run of e.
+ */
+Flag rm_keysfile = NO;
+
 
 #ifdef COMMENT
 void
@@ -624,8 +640,33 @@ dbgpr("main1, after infoinit, replaying=%d, recovering=%d\n",
     }
 
 #ifdef MOUSE_BUTTONS
-    if (optshowbuttons == YES)
+    if (optshowbuttons == YES) {
+	int rc;
+
+	if (mybuttons) {
+	    rc = get_mybuttons(buttonfile);
+	    if (rc == -1) {
+		rm_keysfile = YES;
+		getout(YES, "%s", error_buf);
+	    }
+	}
+	else {
+	    /* init from ~/.e_buttons if present */
+	    struct stat stbuf;
+	    char tmp[256];
+
+	    sprintf( tmp, "%s/%s", getmypath(), ".e_buttons"); /* add #define BUTTONSFILE ".e_profile" */
+	    if (stat(tmp, &stbuf) != -1) {
+		rc = get_mybuttons(tmp);
+		if (rc == -1) {
+		    rm_keysfile = YES;
+		    getout(YES, "error in button file: %s\n", tmp);
+		}
+		mybuttons = YES;
+	    }
+	}
 	buttoninit ();
+    }
 
 #endif /* MOUSE_BUTTONS */
 
@@ -924,6 +965,15 @@ checkargs ()
 	    if (btn_font_n < 1 || btn_font_n > 255)
 		getout (YES, "buttonfont value must be 1-255");
 	    break;
+
+	case OPTBTNFILE:
+	    /* file to initialise custom buttons with -showbuttons option  */
+	    if (!opteqflg || *cp == 0)
+		getout (YES, "Missing button filename");
+	    buttonfile = cp;
+	    mybuttons = YES;
+	    break;
+
 #endif /* MOUSE_BUTTONS */
 #endif /* NCURSES_MOUSE */
 
@@ -1544,6 +1594,10 @@ setaf_set ? '*' : ' ');
 
     printf ("\
 %c -fgcolor=r,g,b (foreground color)\n", ' ');
+
+    printf ("\
+%c -buttonfile=filename\n",
+buttonfile ? '*' :  ' ');
 
     printf ("\
 %c -buttonfont=N [1-255] set button font when -showbuttons is in effect.\n\n",
@@ -2737,8 +2791,12 @@ dbgpr("getout:  filclean=%d, crashed=%d, bkeytmp=%s keytmp=%s\n",
 
     if (windowsup)
 	screenexit (YES);
-    if (filclean && !crashed)
-	cleanup (YES, NO);
+    if (filclean && !crashed) {
+	if (rm_keysfile) /* set by button init errors */
+	    cleanup (YES, YES);
+	else
+	    cleanup (YES, NO);
+    }
     if (keysmoved)
 	mv (bkeytmp, keytmp);
     d_put (0);

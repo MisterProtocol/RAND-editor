@@ -237,6 +237,8 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 #ifdef MOUSE_BUTTONS
 	    if (mouseFuncKey != -1) {
 		key = mouseFuncKey;
+		if (recording)  /* testing */
+		    RecordChar((unsigned Short) key);
 	    }
 	    else
 #endif /* MOUSE_BUTTONS */
@@ -589,6 +591,10 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 		    goto doneswitch;
 #endif /* LMCDWORD */
 
+		case CCMOUSEONOFF:
+		    toggle_mouse("");
+		    goto doneswitch;
+
 		case CCUNAS1:
 		case CCDEL:
 		    goto notimperr;
@@ -848,6 +854,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 #endif /* LMCHELP */
 #ifdef RECORDING
 		case CCRECORD:
+dbgpr("e.m.c:  case CCRECORD calling UnSetRecording\n");
 		    donetype = UnSetRecording();
 		    goto doneswitch;
 

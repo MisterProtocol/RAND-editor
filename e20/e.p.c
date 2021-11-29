@@ -202,20 +202,21 @@ dbgpr("printchar(), key=(%d)(%3o)('%c), curwksp->clin=%d, curwksp->ccol=%d, curw
 #ifdef LMCAUTO
 #ifdef COMMENT
 void
-infoauto (cmdmod);
-    Flag cmdmod;
+infoauto (Flag cmdmod __attribute__((unused)));
 .
 	This function sets/resets the autofill capability.
 	Changed to not toggle:  wp sets (cmdmod=NO), -wp resets (cmdmod=YES).
 #endif
 void
-infoauto (cmdmod)
-    Flag cmdmod;
+infoauto (Flag cmdmod __attribute__((unused)))
 {
     Flag moved;
 
+/* Nah, lets' make it a toggle again */
+#ifdef OUT
     if ((!cmdmod && autofill) || (cmdmod && !autofill))  /* already set/reset */
 	return;
+#endif
 
     autofill = autofill ? NO : YES;
     if (autofill) {

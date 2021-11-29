@@ -597,8 +597,9 @@ typedef struct savebuf {
 #define CCMIWIN        0245     /* -w (for button function) */
 #define CCMICLOSE      0246     /* -close (for button function) */
 #define CCMIERASE      0247     /* -close (for button function) */
+#define CCMIRECORD     0250     /* -record (for button function) */
 
-#define CCHIGHEST      0247 /* nxt is 0250 */
+#define CCHIGHEST      0250 /* nxt is 0251 */
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */

@@ -315,9 +315,28 @@ A screensize greater than 90 chars is recommended.
 This feature should be considered
 .I experimental.
 .TP
+.B \-buttonfile=filename
+.br
+This option allows one
+to customize which buttons to include, the order, and the
+text label of a button.
+The
+.B \-showbuttons
+option needs to be in effect.
+The format of an entry closely matchs that of a keyboard file entry.
+Example:
+.sp 6p
+.in +2P
+"ins":<insmd>\*t# toggle insert mode
+.br
+"+Window":<+win>\*t# toggle insert mode
+.br
+.in -2P
+See examples/e_button{1,2,3} for further examples.
+.TP
 .B \-buttonfont=N (0-255;  0=black, 255=white)
 .br
-This option displays sets the background color of buttons if the
+This option sets the background color of buttons if the
 \-showbuttons option is in effect.  The default is the same value
 used for highlighting text.
 Some values to try are: 3, 7, 87, 136, 151, 194, and 222.
@@ -434,6 +453,28 @@ name.  If the user has no write permission in the current
 directory, these files are created in the directory /tmp/etmp.
 .PP
 There are also a few utility files in the directory /etc/e.
+.SH PSEUDO-FILES
+.I E
+maintains two pseudo-files,
+.B #o
+and
+.B #p.
+Neither of these represent actual files in the filesystem.
+.B #o
+contains all the text which has been <CLOSE>d from the file
+currently being edited.
+.B #p
+contains all the text which has been <PICK>ed from the file
+currently being edited.
+To make use of these pseudo-files, type
+.B <CMD>e #o
+or
+.B <CMD>e #p
+as if these were normal files.
+The edit window will switch to the corresponding pseudo-file,
+where you may examine or <PICK> text at will.
+Typing <ALT> (^X\-A on the standard keyboard) will switch back
+to the file being edited.
 .SH RECENT CHANGES
 .nr x \n(.i
 .nr y \w'\(bu\0\0'
@@ -964,6 +1005,10 @@ record
 .RS
 Begin (or end) saving keystrokes for later playback using
 the \fIplay\fR command.
+In recording mode, the only mouse clicks saved in a recording
+are button clicks while in
+.B \-showbuttons
+mode.  A mouse click in a window area is ignored while recording.
 .RE
 .TP
 redraw | red
@@ -1416,16 +1461,19 @@ keywords:
 .nf
 .ta .5i 1.5i 2.5i 3.5i
 .ds t \t
-\*t<+line> \*t<bksp>  \*t<home>     \*t<right>*
-\*t<+page> \*t<cchar> \*t<insmd>    \*t<split>
-\*t<+sch>  \*t<chwin> \*t<int>      \*t<srtab>
-\*t<+tab>  \*t<close> \*t<join>     \*t<tab>
-\*t<+word> \*t<cmd>   \*t<left>*    \*t<up>*
-\*t<\-line>\*t<dchar> \*t<mark>     \*t<wleft>
-\*t<\-page>\*t<down>* \*t<open>     \*t<wright>
-\*t<\-sch> \*t<dword> \*t<pick>     \*t<null>
-\*t<\-tab> \*t<edit>  \*t<replace>  \*t<undef>
-\*t<\-word>\*t<erase> \*t<ret>
+\*t<+line>  \*t<caps>   \*t<int>     \*t<right>*
+\*t<+page>  \*t<ccase>  \*t<join>    \*t<split>
+\*t<+sch>   \*t<cchar>  \*t<left>*   \*t<srtab>
+\*t<+tab>   \*t<chwin>  \*t<mark>    \*t<tab>
+\*t<+word>  \*t<close>  \*t<mouse>   \*t<up>*
+\*t<\-line> \*t<cmd>    \*t<open>    \*t<wleft>
+\*t<\-mark> \*t<dchar>  \*t<pick>    \*t<wp>
+\*t<\-page> \*t<down>*  \*t<play>    \*t<wright>
+\*t<\-sch>  \*t<dword>  \*t<record>  \*t<null>
+\*t<\-tab>  \*t<edit>   \*t<redraw>  \*t<undef>
+\*t<\-word> \*t<erase>  \*t<regex>
+\*t<bksp>   \*t<home>   \*t<replace>
+\*t<brace>  \*t<insmd>  \*t<ret>
 .sp 2p
 \*t(*=cursor motion)
 .fi

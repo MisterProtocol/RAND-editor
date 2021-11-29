@@ -60,9 +60,22 @@ int inButtonRow (int);
 void HiLightButton (int, int);
 void getMouseButtonEvent (void);
 void buttoninit (void);
+Flag have_record_button = NO;
+
+/* custom button definitions */
+#define MAX_BUTTONS 20      /* per row */
+mouse_button_table my_button_row1[MAX_BUTTONS];
+mouse_button_table my_button_row2[MAX_BUTTONS];
+int my_row1_cnt, my_row2_cnt;
+
+void add_mybutton(int, char *, int, int, mouse_button_table *);
+int my_lookup (char *, S_looktbl *);
+int get_mybuttons (char *);
+extern S_looktbl keysyms[];
+Flag useMyButtons = 0;  /* set when using custom buttons */
 
 #ifdef BUTTON_FONT
-void initButtonRow (int);
+void initButtonRow (int, int, mouse_button_table *);
 void overlayButtons (void);
 void makeButtonOverlayB (int, int, int);
 char *button_font;
@@ -1281,8 +1294,16 @@ mouse_button_table button_table_row1[] = {
 
 {14,    61,  62,  CCREGEX,        "re"},
 
-{13,    64,  67,  CCREDRAW,      "redr"},
+{13,    64,  67,  CCREDRAW,       "redr"},
 
+#ifdef OUT
+{-1,    0,   0,   0,             ""},   /* dummy entries up to 20 */
+{-1,    0,   0,   0,             ""},   /* dummy entries up to 20 */
+{-1,    0,   0,   0,             ""},   /* dummy entries up to 20 */
+{-1,    0,   0,   0,             ""},   /* dummy entries up to 20 */
+{-1,    0,   0,   0,             ""},   /* dummy entries up to 20 */
+{-1,    0,   0,   0,             ""},   /* dummy entries up to 20 */
+#endif
 
 };
 
@@ -1317,6 +1338,11 @@ mouse_button_table button_table_row2[] = {
 
 {17,    66,  69,  CCEXIT,        "exit"},
 
+#ifdef OUT
+{-1,    0,   0,   0,             ""},
+{-1,    0,   0,   0,             ""},
+{-1,    0,   0,   0,             ""},
+#endif
 };
 
 
@@ -1337,17 +1363,29 @@ dbgpr("getMouseFuncKey: (x,y)=(%d,%d), buttonwin.bmarg=%d\n",
  x, y, buttonwin.bmarg);
 / **/
 
-    if (y == buttonwin.bmarg-2) {
-	tp = &button_table_row1[0];
-	tablesize = (int) sizeof(button_table_row1) / sizeof(button_table_row1[0]);
-/*      dbgpr(" checking for x=%d in button row 1\n", x); */
+    if (y == buttonwin.bmarg-2) {   /* x is in row 1 */
+	if (useMyButtons) {
+	    tp = &my_button_row1[0];
+	    tablesize = my_row1_cnt;
+	}
+	else {
+	    tp = &button_table_row1[0];
+	    tablesize = (int) sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+	}
+/** /   dbgpr(" checking for x=%d in button row 1 (useMyButtons=%d)\n", x, useMyButtons); / **/
 	row = 1;
     }
     else {
-	tp = &button_table_row2[0];
-	tablesize = (int) sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	if (useMyButtons) {
+	    tp = &my_button_row2[0];
+	    tablesize = my_row2_cnt;
+	}
+	else {
+	    tp = &button_table_row2[0];
+	    tablesize = (int) sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	}
 	row = 2;
-/*      dbgpr(" checking for x=%d in button row 2\n", x); */
+/** /   dbgpr(" checking for x=%d in button row 2 (useMyButtons=%d)\n", x, useMyButtons); / **/
     }
 
     for (i = 0; i < tablesize; i++) {
@@ -1382,8 +1420,20 @@ buttoninit ()
        return;
     }
 
-    initButtonRow(1);
-    initButtonRow(2);
+    if (useMyButtons) { /* custom buttons */
+	initButtonRow(1, my_row1_cnt, my_button_row1);
+	initButtonRow(2, my_row2_cnt, my_button_row2);
+    }
+    else {      /* default buttons */
+	int n;
+	n = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+	initButtonRow(1, n, button_table_row1);
+
+	n = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	initButtonRow(2, n, button_table_row2);
+    }
+
+
 
 #ifdef BUTTON_FONT
     overlayButtons();
@@ -1394,7 +1444,7 @@ buttoninit ()
 
 
 void
-initButtonRow (int row)
+initButtonRow (int row, int tablesize, mouse_button_table *tp)
 {
 
     S_window *oldwin;
@@ -1405,19 +1455,20 @@ initButtonRow (int row)
     oldcol = cursorcol;
     oldlin = cursorline;
 
-    struct button_table *tp;
-    unsigned int i, tablesize;
+//  struct button_table *tp;
+//  unsigned int i, tablesize;
+    int i;
     char *s;
     int row_y;
 
     if (row == 1) {
-	tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
-	tp = &button_table_row1[0];
+//      tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+//      tp = &button_table_row1[0];
 	row_y = buttonwin.btext - 2;
     }
     else {
-	tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
-	tp = &button_table_row2[0];
+//      tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+//      tp = &button_table_row2[0];
 	row_y = buttonwin.btext;
     }
 
@@ -1435,6 +1486,12 @@ initButtonRow (int row)
 	label_widths += (int) strlen((tp+i)->label);
 	if ((tp+i)->label[0] == '/')
 	    npairs++;
+	/* Make note if we have the [record] button so we don't
+	 * treat a mouse click as an error in RecordChar(),
+	 * allowing [record] to be used as a toggle
+	 */
+	if ((tp+i)->ecmd == CCRECORD)
+	    have_record_button = 1;
     }
     n_labels = (int) i;
     nslots = n_labels - npairs;
@@ -1464,7 +1521,6 @@ dbgpr("row %d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
 
     switchwindow (&buttonwin);
     for (i=0; i < tablesize; i++) {
-	/*bp = &button_table_row1[i];*/
 
 	w = strlen((tp+i)->label);
 
@@ -1543,11 +1599,21 @@ HiLightButton(int i, int row) {
     oldlin = cursorline;
 
     if (row == 1) {
-	tp = &button_table_row1[0];
+	if (useMyButtons) {
+	    tp = &my_button_row1[0];
+	}
+	else {  /* default buttons */
+	    tp = &button_table_row1[0];
+	}
 	row_y = buttonwin.bmarg - 2;
     }
     else {
-	tp = &button_table_row2[0];
+	if (useMyButtons) {
+	    tp = &my_button_row2[0];
+	}
+	else {
+	    tp = &button_table_row2[0];
+	}
 	row_y = buttonwin.bmarg;
     }
 
@@ -1614,6 +1680,13 @@ dbgpr("HiLightButton: i=%d row=%d row_y=%d begx=%d\n",
 	case CCCLOSE:
 	case CCMICLOSE:
 	case CCMIERASE:
+	case CCREPLACE:
+	case CCRECORD:
+	case CCPLAY:
+	case CCDWORD:
+	case CCCTRLQUOTE:
+	case CCMOUSEONOFF:
+	case CCAUTOFILL:
 	    mvcur(-1, -1, curwin->ttext+cursorline, curwin->ltext+cursorcol);
 	    cursorcol = cursorline = -1;
 	    fflush(stdout);
@@ -2137,7 +2210,7 @@ makeButtonOverlayB (int row, int spaces, int indent)
     size_t /*int*/ len_off = strlen(font_off);
 
     struct button_table *tp;
-    unsigned int i, tablesize;
+    int i, tablesize;
 
 /*dbg*/
 /** /
@@ -2146,14 +2219,26 @@ int wid = term.tt_width;
 / **/
 
     if (row == 1) {
-	tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
-	tp = &button_table_row1[0];
+	if (useMyButtons) {
+	    tablesize = my_row1_cnt;
+	    tp = &my_button_row1[0];
+	}
+	else {
+	    tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
+	    tp = &button_table_row1[0];
+	}
 	s = button_line1;
 /** /   cp_orig = (char *)image + wid * (buttonwin.bmarg-2);  / * dbg */
     }
     else {
-	tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
-	tp = &button_table_row2[0];
+	if (useMyButtons) {
+	    tablesize = my_row2_cnt;
+	    tp = &my_button_row2[0];
+	}
+	else {
+	    tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
+	    tp = &button_table_row2[0];
+	}
 	s = button_line2;
 /** /   cp_orig = (char *)image + wid * buttonwin.bmarg;  / * dbg */
     }
@@ -2226,37 +2311,6 @@ dbgpr("makeB:  row=%d indent=%d ind=%d spaces=%d gap=(%s) len_gap=%d\n",
 	    s += len_gap;
 	}
 
-/*#ifdef SAVE*/
-#ifdef OUT
-	if (spaces == 2) {
-	    sprintf(s, "%s  %s", font_off, font_on);
-	    s += 2 + len_off + len_on;
-	}
-	else {
-	    sprintf(s, " %s%s%s ", font_off, gap, font_on);
-	    s += 1 + len_off + len_gap + len_on;
-	}
-#endif
-/*#endif*/
-
-#ifdef OUT
-	if (spaces == 2) {
-	    sprintf(s, "%s", font_off);
-	    s += len_off;
-	    if (i+1 < tablesize) {  /* ie, not last label */
-		sprintf(s, "  %s", font_on);
-		s += 2 + len_on;
-	    }
-	}
-	else {
-	    sprintf(s, " %s", font_off);
-	    s += len_off;
-	    if (i+1 < tablesize ) {
-		sprintf(s, "%s%s ", gap, font_on);
-		s += 1 + len_gap + len_on; /* 1 cuz a sp is added above */
-	    }
-	}
-#endif /* OUT */
     }
 
 /*  sprintf(s, "%s", font_off); */
@@ -2274,5 +2328,190 @@ dbgpr("row%d:(%s)\n", row, b_line);
 
 #endif /* BUTTON_FONT */
 
-#endif /* NCURSES */
 
+/*  my_lookup differs from lookup() (in e.pa.c)
+ *  in that we don't care if the S_lookup table
+ *  is sorted or not (it's not that long), and case is lower.
+ *  return -1 on error, ecmd if found
+ */
+
+int
+my_lookup( char *label, S_looktbl *table)
+{
+    S_looktbl *ptr;
+
+    for (ptr = table; ptr->str != 0; ptr++) {
+	if (strcmp(label, ptr->str) == 0) {
+	    return ptr->val;
+	}
+    }
+    return -1;
+}
+
+
+/* use this buffer to more easily pass error messages to getout()
+ */
+extern char error_buf[];
+
+/* populate a mouse_button_table row */
+
+void
+add_mybutton(int cnt, char *label, int fcode, int row, mouse_button_table *table)
+{
+    mouse_button_table *row_ptr;
+
+    if (cnt >= MAX_BUTTONS) {
+	sprintf(error_buf, "%d is too many buttons for row %d\n",
+	     cnt, row);
+	return;
+    }
+
+    row_ptr = table;
+
+    row_ptr[cnt].ecmd = fcode;
+    row_ptr[cnt].label = strdup(label);
+    row_ptr[cnt].bnum = cnt;    /* field not used */
+    row_ptr[cnt].begx = 0;
+    row_ptr[cnt].endx = 0;
+
+    return;
+}
+
+/* read the specified -buttonfile=filename and
+ * populate the button labels and corresponding e function
+ * codes.  See ../examples/ for e_button samples.
+ *
+ */
+
+int
+get_mybuttons(char *filename)
+{
+    FILE *fp;
+    char label[32], ecmd[32];
+
+//  dbgpr("get_mybuttons:  filename=%s\n", filename);
+
+    if ((fp = fopen(filename, "r")) == NULL) {
+	sprintf(error_buf, "can't open the button file:  %s\n", filename);
+	dbgpr("get_mybuttons:  can't open %s\n", filename);
+	return -1;
+    }
+
+    char buf[256];
+    int row;
+    int cmdcode;
+    int lineno = 0;
+    int row1_width = 0; /* sum of button labels */
+    int row2_width = 0;
+    int row1_slashes = 0;   /* sum of labels that start with '/' */
+    int row2_slashes = 0;
+
+    my_row1_cnt = my_row2_cnt = 0;
+
+    while (fgets(buf, sizeof(buf), fp)) {
+
+	if (feof(fp)) break;
+
+	lineno++;
+
+	if (*buf == '\n' || *buf == '\0') continue;
+	if (*buf == '#' || *buf == ' ') continue;
+
+	if (sscanf(buf, "-ROW%d", &row) == 1) {
+	    //dbgpr("ROW is %d\n", row);
+	    if (row < 1 || row > 2) {
+		sprintf(error_buf, "buttonfile error: -ROW%d must be 1 or 2: %s\n", row, buf);
+		dbgpr("row must be 1 or 2\n", row);
+		return -1;
+	    }
+	    continue;
+	}
+
+	/* eg:  "insert":<insmd>     # toggle insert mode */
+	if (sscanf(buf, "\"%[^:\"]\":<%[^>]", label, ecmd) != 2) {
+	    sprintf(error_buf, "buttonfile  error: line %d format error: %s\n", lineno, buf);
+	    dbgpr("line %d format error: %s\n", lineno, buf);
+	    return -1;
+	}
+
+	cmdcode = my_lookup(ecmd, keysyms);
+	if (cmdcode < 0) {
+	    sprintf(error_buf, "buttonfile error:  <%s> not recognized as an e command\n", ecmd);
+	    dbgpr("<%s> not recognized as an e command\n", ecmd);
+	    return -1;
+	}
+
+	/** /
+	dbgpr("get_mybuttons: label=%s ecmd=%s cmdcode=(%d, %04o)\n",
+	  label, ecmd, cmdcode, cmdcode);
+	/ **/
+
+	if (row == 1) {
+	    add_mybutton(my_row1_cnt, label, cmdcode, row, my_button_row1);
+	    my_row1_cnt++;
+	    row1_width += (int) strlen(label);
+	    if( *label == '/' ) {
+		row1_slashes++;
+	    }
+	}
+	else {
+	    add_mybutton(my_row2_cnt, label, cmdcode, row, my_button_row2);
+	    my_row2_cnt++;
+	    row2_width += (int) strlen(label);
+	    if( *label == '/' ) {
+		row2_slashes++;
+	    }
+	}
+    }
+
+/** /
+dbgpr("row1_width=%d r1_slashes=%d r1_cnt=%d COLS=%d\n",
+    row1_width, row1_slashes, my_row1_cnt, COLS);
+dbgpr("row2_width=%d r2_slashes=%d r2_cnt=%d COLS=%d\n",
+    row2_width, row2_slashes, my_row2_cnt, COLS);
+/ **/
+
+    /* width of button rows must fit on screen */
+    int w;
+    w = row1_width - (row1_slashes*2) + (my_row1_cnt*2);
+    if (w > COLS) {
+	sprintf(error_buf, "buttonfile error:  row1 width (%d) exceeds screen width (%d).\n",
+	    w, COLS);
+	dbgpr("row1 width (%d) exceeds screen width (%d)\n", w, COLS);
+	return -1;
+    }
+    w = row2_width - (row2_slashes*2) + (my_row2_cnt*2);
+    if (w > COLS) {
+	sprintf(error_buf, "buttonfile error:  row2 width (%d) exceeds screen width (%d).\n",
+	    w, COLS);
+	dbgpr("row2 width (%d) exceeds screen width (%d)\n", w, COLS);
+	return -1;
+    }
+
+
+#ifdef OUT  /* debug */
+    int i;
+    for (i=0; i < my_row1_cnt; i++) {
+	dbgpr("Row1: button %d label=%s func=%04o\n",
+	    i, my_button_row1[i].label, my_button_row1[i].ecmd);
+
+    }
+    for (i=0; i < my_row2_cnt; i++) {
+	dbgpr("Row2: button %d label=%s func=%04o\n",
+	    i, my_button_row2[i].label, my_button_row2[i].ecmd);
+
+    }
+#endif /* OUT */
+
+    if (my_row1_cnt == 0 || my_row2_cnt == 0) {
+	sprintf(error_buf, "buttonfile error: both ROW1 and ROW2 must be defined.\n");
+	dbgpr("Row2: button %d label=%s func=%04o\n");
+	return -1;
+    }
+
+    useMyButtons = YES;
+
+    return 1;
+}
+
+#endif /* NCURSES */

@@ -19,6 +19,8 @@ file e.record.c
 
 extern int fileno();
 extern char *optmacrofile;      /* TODO:  move to e.h */
+extern Flag optshowbuttons;
+extern Flag have_record_button;
 
 Flag recording, playing, recording_defined, macroing;
 Flag play_silent;
@@ -49,6 +51,11 @@ Cmdret
 SetRecording(cmd)
 Short cmd;
 {
+
+/**/
+dbgpr("SetRecording, cmd=%d %04o\n", cmd, cmd);
+/**/
+
     if (recording) {        /* a toggle */
 	recording = NO;
 	info (inf_record, 3, "");
@@ -61,6 +68,7 @@ Short cmd;
 	    rec_len = lastcmd_len;
 	lastcmd_len = 0;
 	rec_p = rec_text;
+dbgpr("  -- set recording to NO, rec_len=%d\n", rec_len);
 	return CROK;
     }
     if (!macroing && rec_size)
@@ -82,6 +90,8 @@ void
 RecordChar(c)
 unsigned Short c;
 {
+dbgpr("RecordChar, top, c=%d %04o\n", c,c);
+
     if (c == CCRECORD)  /* silently, we're about to cancel a recording */
 	return;
 
@@ -95,19 +105,39 @@ unsigned Short c;
 
 #ifdef NCURSES
     if (c == CCMOUSE) {
+	static int msg_shown = 0;
+
+	    /* to allow [record] button to be a toggle */
+    /*  if (optshowbuttons && have_record_button) { */
+	if (optshowbuttons) {
+	    if (!msg_shown) {
+		mesg (ERRALL+1, "Button clicks are the only mouse events saved while recording.");
+		fflush(stdout);
+		sleep(3);   /* otherwise the mesg is unseen by the mouse up event */
+		msg_shown = 1;
+	    }
+	    return;
+	}
+
 	/*  Saving/replaying a click could be done (like we do replaying
 	 *  a crashed session), but do we need to track the window the click
 	 *  occurred in and make sure it was replayed in the same window...???
 	 *
 	 *  Punt for now....
 	 */
-	mesg (ERRALL+1, "Mouse clicks not allowed while recording.");
-	fflush(stdout);
-	sleep(2);   /* otherwise the mesg is unseen by the mouse up event */
+
+	if (!msg_shown) {
+	    mesg (ERRALL+1, "Mouse clicks not saved while recording.");
+	    fflush(stdout);
+	    sleep(2);   /* otherwise the mesg is unseen by the mouse up event */
+	    msg_shown = 1;
+	}
 	return;
     }
-/*dbgpr("RecordChar: add c=(%o)(%c)\n", c, c);*/
 #endif
+/**/
+dbgpr("RecordChar: add c=(%04o)(%c)\n", c, c);
+/**/
 
     *rec_p++ = c;
     rec_len++;
@@ -128,6 +158,8 @@ unsigned Short c;
 Cmdret
 UnSetRecording()
 {
+dbgpr("UnSetRecording\n");
+
     recording = NO;
     info (inf_record, 3, "");
     if (!macroing)
