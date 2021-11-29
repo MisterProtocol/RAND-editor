@@ -58,8 +58,8 @@ E20 Changes:
 
 -   Added the option "-showbuttons" to display clickable buttons
     to run E commands.  For example, clicking on the "redr" button will
-    redraw the screen.  The following functions can be executed with a
-    mouse click:
+    redraw the screen.  By default, this options displays the following
+    labeled buttons at the bottom of the screen in two rows:
 
 	cmd, ins, mark/-mk, +sch/-sch, caps, ccase, spl/join, delC,
 	+Win/-W, re, redr, +Pg/-Pg, +L/-L, +wd/-wd, open, close/-cl, pick/put,
@@ -69,6 +69,25 @@ E20 Changes:
     of at least 92 chars.  The option -buttonfont=N [1-255] specifies a
     button background color (the default area highlighting color is used
     if not specified).
+
+-   The option -buttonfile=filename (or ~/.e_buttons) allows one to customize
+    which buttons to include, the order, and the label text of a button.
+    See the e_buttonX files in examples/ for examples.  The format for an entry
+    closely matchs that of a keyboard file entry.  Example:
+
+	"ins":<insmd>    # toggle insert mode
+
+    The following functions can appear in a button file:
+
+        <+line>, <+page>, <+sch>, <+win>, <+word>, <-close>, <-erase>,
+        <-line>, <-mark>, <-page>, <-sch>, <-tab>, <-win>, <-word>,
+        <brace>, <caps>, <cchar>, <chwin>, <close>, <cmd>, <dchar>,
+        <down>, <dword>, <erase>, <exit>, <insmd>, <join>, <mark>,
+        <mouse>, <open>, <pick>, <play>, <put>, <record>, <redraw>,
+	<regex>, <replace>, <split>, <tab>, <up>, <wleft>, <wp>, <wright>
+
+    Refer to the section FUNCTION KEYS in the man page for a description
+    of each function.
 
     IF YOU ARE NEW TO THE RAND EDITOR, we suggest that you start the editor
     with the "-showbuttons" command-line option, type in some text (you can
