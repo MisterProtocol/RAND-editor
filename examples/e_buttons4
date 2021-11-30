@@ -14,7 +14,7 @@
 -ROW1   # start
 "cmd":<cmd>
 
-"My insert button":<insmd>    # toggle insert mode
+"ins":<insmd>    # toggle insert mode
 
 "WP":<wp>        # toggle autofill mode
 
@@ -28,17 +28,17 @@
 
 #"ccase":<ccase>    # change case of marked rect
 
-#"spl":<split>
-#"/join":<join>
+"spl":<split>
+"/join":<join>
 
 "delC":<dchar>
 
 "+Win":<+win>     # create new window
 "/-W":<-win>      # close window
 
-"Chwin":<chwin>   # Move to next window
+"Chwin":<chwin>	  # Move to next window
 
-"re":<regex>      # toggle regular expression mode
+#"re":<regex>      # toggle regular expression mode
 
 #"redr":<redraw>
 

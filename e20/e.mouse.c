@@ -2398,7 +2398,7 @@ get_mybuttons(char *filename)
     }
 
     char buf[256];
-    int row;
+    int row = 1;
     int cmdcode;
     int lineno = 0;
     int row1_width = 0; /* sum of button labels */
@@ -2418,10 +2418,10 @@ get_mybuttons(char *filename)
 	if (*buf == '#' || *buf == ' ') continue;
 
 	if (sscanf(buf, "-ROW%d", &row) == 1) {
-	    //dbgpr("ROW is %d\n", row);
+	    /* dbgpr("ROW is %d\n", row); */
 	    if (row < 1 || row > 2) {
-		sprintf(error_buf, "buttonfile error: -ROW%d must be 1 or 2: %s\n", row, buf);
-		dbgpr("row must be 1 or 2\n", row);
+		sprintf(error_buf, "buttonfile error: -ROW%d must be -ROW1 or -ROW2: %s\n", row, buf);
+	    /*  dbgpr("row must be 1 or 2\n", row); */
 		return -1;
 	    }
 	    continue;
@@ -2430,14 +2430,14 @@ get_mybuttons(char *filename)
 	/* eg:  "insert":<insmd>     # toggle insert mode */
 	if (sscanf(buf, "\"%[^:\"]\":<%[^>]", label, ecmd) != 2) {
 	    sprintf(error_buf, "buttonfile  error: line %d format error: %s\n", lineno, buf);
-	    dbgpr("line %d format error: %s\n", lineno, buf);
+	/*  dbgpr("line %d format error: %s\n", lineno, buf); */
 	    return -1;
 	}
 
 	cmdcode = my_lookup(ecmd, keysyms);
 	if (cmdcode < 0) {
 	    sprintf(error_buf, "buttonfile error:  <%s> not recognized as an e command\n", ecmd);
-	    dbgpr("<%s> not recognized as an e command\n", ecmd);
+	/*  dbgpr("<%s> not recognized as an e command\n", ecmd); */
 	    return -1;
 	}
 
@@ -2464,6 +2464,12 @@ get_mybuttons(char *filename)
 	}
     }
 
+    if (my_row1_cnt == 0 || my_row2_cnt == 0) {
+	sprintf(error_buf, "buttonfile error: \"-ROW2\" keyword not found.\n");
+    /*  dbgpr("Row2: button %d label=%s func=%04o\n"); */
+	return -1;
+    }
+
 /** /
 dbgpr("row1_width=%d r1_slashes=%d r1_cnt=%d COLS=%d\n",
     row1_width, row1_slashes, my_row1_cnt, COLS);
@@ -2477,14 +2483,14 @@ dbgpr("row2_width=%d r2_slashes=%d r2_cnt=%d COLS=%d\n",
     if (w > COLS) {
 	sprintf(error_buf, "buttonfile error:  row1 width (%d) exceeds screen width (%d).\n",
 	    w, COLS);
-	dbgpr("row1 width (%d) exceeds screen width (%d)\n", w, COLS);
+    /*  dbgpr("row1 width (%d) exceeds screen width (%d)\n", w, COLS); */
 	return -1;
     }
     w = row2_width - (row2_slashes*2) + (my_row2_cnt*2);
     if (w > COLS) {
 	sprintf(error_buf, "buttonfile error:  row2 width (%d) exceeds screen width (%d).\n",
 	    w, COLS);
-	dbgpr("row2 width (%d) exceeds screen width (%d)\n", w, COLS);
+    /*  dbgpr("row2 width (%d) exceeds screen width (%d)\n", w, COLS); */
 	return -1;
     }
 
@@ -2502,12 +2508,6 @@ dbgpr("row2_width=%d r2_slashes=%d r2_cnt=%d COLS=%d\n",
 
     }
 #endif /* OUT */
-
-    if (my_row1_cnt == 0 || my_row2_cnt == 0) {
-	sprintf(error_buf, "buttonfile error: both ROW1 and ROW2 must be defined.\n");
-	dbgpr("Row2: button %d label=%s func=%04o\n");
-	return -1;
-    }
 
     useMyButtons = YES;
 
