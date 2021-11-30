@@ -58,7 +58,7 @@ E20 Changes:
 
 -   Added the option "-showbuttons" to display clickable buttons
     to run E commands.  For example, clicking on the "redr" button will
-    redraw the screen.  By default, this options displays the following
+    redraw the screen.  By default, this option displays the following
     labeled buttons at the bottom of the screen in two rows:
 
 	cmd, ins, mark/-mk, +sch/-sch, caps, ccase, spl/join, delC,
