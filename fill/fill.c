@@ -272,7 +272,7 @@ register char *s1, *s2;
 
 
 void
-getoptions (check_only)
+getoptions (int check_only)
 {
     register char *p;
 
@@ -309,7 +309,7 @@ getoptions (check_only)
 
 
 void
-filterfiles(check_only)
+filterfiles(int check_only)
 {
     register FILE *f = (FILE *)-1;
 
@@ -607,21 +607,21 @@ getword()
 
 
 int
-next(wordindex)
+next(int wordindex)
 {
     return( wordindex < NWORDS - 1? wordindex + 1: 0);
 }
 
 
 int
-prev(wordindex)
+prev(int wordindex)
 {
     return( wordindex > 0 ? wordindex - 1: NWORDS - 1);
 }
 
 
 void
-addword(wordindex)
+addword(int wordindex)
 {
     register int i;
     register struct wrd *wp;
@@ -689,7 +689,7 @@ register int n;
 
 
 void
-putwords(endparflg)
+putwords(int endparflg)
 {
     struct wrd *wp;
     register char *cp;
