@@ -648,6 +648,7 @@ Reg2 int child2;
 #endif
     int retstat;
     Reg4 void (*alarmsig) ();
+    void resize_handler (int sig);
 
     alarm (0);
     /* wait for the program(s) to terminate */

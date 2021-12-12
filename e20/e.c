@@ -1112,13 +1112,6 @@ startup ()
 	    case SIGTSTP:
 	    case SIGCONT:
 #endif
-#ifdef SIGWINCH
-	    case SIGWINCH:
-/* begin reszie test */
-		signal(i, resize_handler);
-		break;
-/* end resize test */
-#endif /* SIGWINCH */
 #define XWINDOWS    /*fornow*/
 #ifdef XWINDOWS
 #ifdef SIGIO
@@ -1127,6 +1120,13 @@ startup ()
 #endif /* XWINDOWS */
 		/* leave at SIG_DFL */
 		break;
+#ifdef SIGWINCH
+	    case SIGWINCH:
+/* begin reszie test */
+		signal(i, resize_handler);
+		break;
+/* end resize test */
+#endif /* SIGWINCH */
 
 	    default:
 		if (signal (i, SIG_DFL) != SIG_IGN)
@@ -2903,6 +2903,9 @@ buttonwin.tmarg, buttonwin.bmarg, buttonwin.ttext, buttonwin.btext, term.tt_heig
 void
 resize_handler (int sig)
 {
+
+    if (sig != SIGWINCH)
+	return;
 
     signal(SIGWINCH, SIG_IGN);
 
