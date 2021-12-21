@@ -127,11 +127,9 @@ extern int get_mybuttons (char *);
  */
 char error_buf[256];
 #define OPTSHOWBUTTONS 40
-/* start w/o showing buttons */
-int nButtonLines = 0;           /* number of BUTTON lines on screen      */
-#else
-int nButtonLines = 4;
 #endif
+
+int nButtonLines = 0;  /* number of BUTTON lines on screen      */
 
 #define OPTNOWINSHIFT 44
 
@@ -439,7 +437,10 @@ Reg2 char *argv[];
 
 #endif /* STARTUPFILE */
 
-
+    if (optskipmouse) {     /* override a possible .e_profile option of -showbuttons */
+	optshowbuttons = NO;
+	nButtonLines = 0;
+    }
 
 #ifdef  RECORDING
     if( !optnomacros )
