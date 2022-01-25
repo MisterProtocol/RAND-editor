@@ -678,7 +678,7 @@ command (forcecmd, forceopt)
 	break;
 
     case CRTOOMANYARGS:
-	mesg (ERRSTRT + 1, "Too many of arguments to ");
+	mesg (ERRSTRT + 1, "Too many arguments to ");
 	break;
 
     case CRNEEDARG:

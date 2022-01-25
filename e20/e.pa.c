@@ -189,6 +189,11 @@ getword (str)
     was NOT alloced.
     Returns a pointer to the new string and makes *str to point to the
     next 'word'.
+
+    2/2022:  modified to treat abd\ def as a single 'word'
+    to allow editing of filenames with embedded spaces:
+    eg, CMD: e my\ file.
+
 #endif
 char *
 getword (str)
@@ -200,21 +205,47 @@ char **str;
     char *newstr;
     static char nullstr[] = "";
 
+    char word[128], *wp;
+    wp = word;
+
     if (*str == 0)
 	return nullstr;
     for (cp1 = *str; *cp1 == ' '; cp1++)
 	continue;
-    for (cp2 = cp1; *cp2 && *cp2 != ' '; cp2++)
+/*  for (cp2 = cp1; *cp2 && *cp2 != ' '; cp2++) */
+    for (cp2 = cp1; *cp2; cp2++) {
+	if (*cp2 == '\\' && cp2[1] == ' ') {
+	    *wp++ = ' ';
+	    cp2++;
+	    continue;
+	}
+	if (*cp2 == ' ')
+	    break;
+	*wp++ = *cp2;
 	continue;
+    }
+    *wp = '\0';
+
     for (cp3 = cp2; *cp3 == ' '; cp3++)
 	continue;
     *str = cp3;
     if (cp2 == cp1)
 	return nullstr;
+
+#ifdef OUT
     newstr = salloc (cp2 - cp1 + 1, YES);
     for (cp3 = newstr; cp1 < cp2; )
 	*cp3++ = *cp1++;
     *cp3 = '\0';
+#endif /* OUT */
+
+    newstr = salloc ((Ncols) strlen(word) + 1, YES);
+    strncpy(newstr, word, strlen(word));
+
+/**/
+dbgpr("getword: word=(%s) str=(%s) newstr=(%s)\n", word, *str, newstr);
+/**/
+
     return newstr;
 }
 
