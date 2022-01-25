@@ -205,13 +205,31 @@ char **str;
     char *newstr;
     static char nullstr[] = "";
 
+/**
+dbgpr("getword: input str=(%s)\n", *str);
+ **/
     char word[128], *wp;
     wp = word;
 
+    int wordQuoted = 0;  /* word begins and ends with a " */
+
     if (*str == 0)
 	return nullstr;
+
+    /* remove leading spaces */
     for (cp1 = *str; *cp1 == ' '; cp1++)
 	continue;
+
+    /* remove trailing spaces */
+    cp2 = *str + strlen(*str) - 1;
+    while (*cp2 == ' ') cp2--;
+    cp2[1] = '\0';
+
+    if (*str[0] == '"' && *cp2 == '"') {
+	wordQuoted = 1;
+   /** /dbgpr("  word quoted, str=(%s)\n", *str); / **/
+    }
+
 /*  for (cp2 = cp1; *cp2 && *cp2 != ' '; cp2++) */
     for (cp2 = cp1; *cp2; cp2++) {
 	if (*cp2 == '\\' && cp2[1] == ' ') {
@@ -219,8 +237,13 @@ char **str;
 	    cp2++;
 	    continue;
 	}
-	if (*cp2 == ' ')
+	if (*cp2 == ' ' && !wordQuoted)
 	    break;
+
+	/* omit beg/end " chars */
+	if (*cp2 == '"' && wordQuoted)
+	    continue;
+
 	*wp++ = *cp2;
 	continue;
     }
@@ -242,9 +265,9 @@ char **str;
     newstr = salloc ((Ncols) strlen(word) + 1, YES);
     strncpy(newstr, word, strlen(word));
 
-/**/
-dbgpr("getword: word=(%s) str=(%s) newstr=(%s)\n", word, *str, newstr);
-/**/
+/** /
+dbgpr("getword: word=(%s) newstr=(%s) str=(%s) \n", word, newstr, *str);
+/ **/
 
     return newstr;
 }
