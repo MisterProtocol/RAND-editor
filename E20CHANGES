@@ -6,6 +6,9 @@ E20 Changes:
 
 -   New crash recover options, allowing playback to stop early.
 
+-   Now allows editing of a filename that contains embedded spaces.
+    Example:  CMD: e "my file" or CMD: e my\ file.
+
 -   Revised the state file to include the options to restore an E
     session (eg: "% e <return>") to the same state as when one exited.
     Traditionally, "e" has incremented its version number when the
@@ -72,7 +75,7 @@ E20 Changes:
 
 -   The option -buttonfile=filename (or ~/.e_buttons) allows one to customize
     which buttons to include, the order, and the label text of a button.
-    See the e_buttonX files in examples/ for examples.  The format for an entry
+    See the e_buttonX files in examples/ for samples.  The format for an entry
     closely matchs that of a keyboard file entry.  Example:
 
 	"ins":<insmd>    # toggle insert mode

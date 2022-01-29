@@ -487,6 +487,11 @@ E20 changes include:
 .bu
 code cleanup eliminating compiler warnings; bug fixes
 .bu
+now allows
+editing of a filename that contains embedded spaces.
+.br
+Example:  CMD: e "my file" or CMD: e my\\ file.
+.bu
 new crash recover options, allowing playback to stop early
 .bu
 revised state file (.es1.userid.host) to restore the settings

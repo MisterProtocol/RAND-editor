@@ -190,9 +190,9 @@ getword (str)
     Returns a pointer to the new string and makes *str to point to the
     next 'word'.
 
-    2/2022:  modified to treat abd\ def as a single 'word'
+    2/2022:  modified to treat abc\ def or "abc def" as a single 'word'
     to allow editing of filenames with embedded spaces:
-    eg, CMD: e my\ file.
+    eg, CMD: e my\ file, or CMD: e "my file".
 
 #endif
 char *
