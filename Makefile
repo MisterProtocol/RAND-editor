@@ -287,7 +287,7 @@ bsd.man:
 	cd man; $(MAKE) "MANPATH=$(MANPATH)" e.1 install
 
 s5.man:
-	cd man; $(MAKE) "MANPATH=$(MANPATH)" install
+	cd man; $(MAKE) "MANPATH=$(MANPATH)" e.1 install
 
 s5.clean: clean
 
