@@ -243,10 +243,13 @@ etc:
 		"ETC=$(LIB)" \
 		"DFS=$(LIBDFS)" \
 		"CCF=$(LIBCCF)"
+	-rm $(LIB)/fill
 	cp fill/fill $(LIB)
 	-rm $(LIB)/just
 	ln $(LIB)/fill $(LIB)/just
+	-rm $(LIB)/center
 	cp fill/center $(LIB)
+	-rm $(LIB)/run
 	cp fill/run $(LIB)
 	chmod 755 $(LIB)/fill $(LIB)/just $(LIB)/center $(LIB)/run
 
