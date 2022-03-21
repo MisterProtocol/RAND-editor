@@ -960,7 +960,7 @@ dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d\n",
     if (nl > (la_lsize(curlas) + 32767)) {
 	char buf[128];
 	dbgpr("nl=%ld > filesize=%ld\n", nl, la_lsize(curlas));
-	sprintf(buf, "data error, can't move to line %ld\n", nl);
+	sprintf(buf, "data error, can't move to line %ld", nl);
 	mesg(ERRALL+1, buf);
 	return -1;
     }
