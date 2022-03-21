@@ -957,10 +957,10 @@ dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d\n",
      * of the file.  Make 32767 extra lines available as a
      * compromise.
      */
-    if (nl > (la_lsize(curlas) + 32767)) {
+    if (nl > MAXINT) {	/* 2147483647 */
 	char buf[128];
-	dbgpr("nl=%ld > filesize=%ld\n", nl, la_lsize(curlas));
-	sprintf(buf, "data error, can't move to line %ld", nl);
+	dbgpr("nl=%ld > filesize=%ld\n", nl, MAXINT);
+	sprintf(buf, "data error, can't move to line %ld, max is %d", nl, MAXINT);
 	mesg(ERRALL+1, buf);
 	return -1;
     }
