@@ -953,8 +953,11 @@ dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d\n",
      * number (MAXLONG) as a result of an expression with
      * ints and longs.  We believe it is fixed but just in
      * case.  It is not fun to move to line 9223372036854775807L!
+     * However, we SHOULD be able to go some ways past the end
+     * of the file.  Make 32767 extra lines available as a
+     * compromise.
      */
-    if (nl > la_lsize(curlas)) {
+    if (nl > (la_lsize(curlas) + 32767)) {
 	char buf[128];
 	dbgpr("nl=%ld > filesize=%ld\n", nl, la_lsize(curlas));
 	sprintf(buf, "data error, can't move to line %ld\n", nl);
