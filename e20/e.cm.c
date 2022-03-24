@@ -717,6 +717,7 @@ gotocmd ()
 {
     if (opstr[0] == '\0') {
 	gotomvwin (0);
+/***/ dbgpr ("gotocmd: Returned from first gotomvwin()\n"); /***/
 	return CROK;
     }
     if (*nxtop)
@@ -734,6 +735,7 @@ gotocmd ()
 		continue;
 	    if (*cp == 0) {
 		gotomvwin (parmlines - 1);
+/***/ dbgpr ("gotocmd: Returned from second gotomvwin()\n"); /***/
 		return CROK;
 	    }
 	}

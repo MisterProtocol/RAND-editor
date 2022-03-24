@@ -70,7 +70,7 @@ newnumber:
 	}
 	Block {
 	    Reg1 Nlines nlines;
-	    char ich[8];
+	    char ich[32];
 	    nlines = curwksp->wlin + cursorline + 1;
 	    if (infoline != nlines) {
 #ifdef LA_LONGFILES

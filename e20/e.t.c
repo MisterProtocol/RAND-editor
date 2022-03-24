@@ -926,6 +926,7 @@ Reg1 Nlines number;
     else
 	cc = cursorcol;
     cl = min (number, defpl);
+    dbgpr("gotomvwin: About to call movewin\n");
     movewin (number - defpl, wincol, cl, cc, 1);
     return;
 }
@@ -944,10 +945,10 @@ Reg2 Nlines nl;
     Reg3 Nlines winlin;
     Reg1 Slines cl;
 
-/** /
+/***/
 dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d\n",
  nl, curwksp->wlin, cursorline, curwin->btext);
-/ **/
+/***/
 
     /* We have seen the value of nl arrive as a very large
      * number (MAXLONG) as a result of an expression with
@@ -981,6 +982,7 @@ dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d\n",
     else if (cl > curwin->btext)
 	cl = curwin->btext;
 
+    dbgpr("About to call movewin\n");
     return movewin (winlin, curwksp->wcol, cl, cursorcol, 1);
 }
 
@@ -1041,12 +1043,12 @@ cursorcol=%d, curwksp->wlin=%d, puflg=%d\n",
 / **/
 
 
-/** /
+/***/
 dbgpr("movewin:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
     curwin, &wholescreen, &enterwin, &infowin);
 dbgpr("movewin:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.wksp=(%o)\n",
     curwksp, wholescreen.wksp, enterwin.wksp, infowin.wksp);
-/ **/
+/***/
 
 if( 1 && curwin == &enterwin ) {
 /** / dbgpr("movewin: curwin == &enterwin, chgwindow\n"); / **/
@@ -1071,6 +1073,7 @@ if( 1 && curwin == &enterwin ) {
     curscol = min (curscol, curwin->rtext);
     newdisplay = Z;
 
+/***/ dbgpr("movewin: Entering first Block\n"); /***/
     Block {
 	Reg1 S_wksp *awksp;
 	awksp = curwin->altwksp;
@@ -1105,14 +1108,16 @@ if( 1 && curwin == &enterwin ) {
 	    awksp->ccol = curscol;
 	}
     }
+/***/ dbgpr("movewin: Left first Block\n"); /***/
 
     if (newdisplay || needputup) {
 	newcurline = curslin;
 	newcurcol  = curscol;
 	if (puflg) {
-	    if (needputup)
+	    if (needputup) {
 		putupwin ();
-	    else {
+		/***/ dbgpr("movewin: Did first putupwin()\n"); /***/
+	    } else {
 		if (   hdist == 0
 		    && abs(vdist) <= curwin->btext
 		    && curwksp->wlin < la_lsize (curlas)
@@ -1134,6 +1139,7 @@ if( 1 && curwin == &enterwin ) {
 #endif /* LMCMARG */
 
     poscursor (curscol, curslin);
+/***/ dbgpr("movewin: Did poscursor(), returning\n"); /***/
     return newdisplay;
 }
 
