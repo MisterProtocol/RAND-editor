@@ -58,13 +58,13 @@ newnumber:
 	}
 	Block {
 	    Reg1 Nlines nlines;
-	    char ich[8];
+	    char ich[32];
 	    nlines = curwksp->wlin + cursorline + 1;
 	    if (infoline != nlines) {
 #ifdef LA_LONGFILES
-		sprintf (ich, "%-5ld", nlines);
+		snprintf (ich, 32, "%-5ld", nlines);
 #else /* LA_LONGFILES */
-		sprintf (ich, "%-5d", nlines);
+		snprintf (ich, "32, %-5d", nlines);
 #endif /* LA_LONGFILES */
 		info (inf_line, 5, ich);
 		infoline = nlines;
