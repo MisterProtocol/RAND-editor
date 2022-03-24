@@ -75,9 +75,9 @@ newnumber:
 	    if (infoline != nlines) {
 #ifdef LA_LONGFILES
 	    /*  sprintf (ich, "%-6ld", nlines); */
-		sprintf (ich, "%ld", nlines);
+		snprintf (ich, 32, "%ld", nlines);
 #else /* LA_LONGFILES */
-		sprintf (ich, "%-6d", nlines);
+		snprintf (ich, 32, "%-6d", nlines);
 #endif /* LA_LONGFILES */
 /** /
 dbgpr("mainloop:  nlines=%d, cursorline=%d, curwksp->wlin=%d\n",
