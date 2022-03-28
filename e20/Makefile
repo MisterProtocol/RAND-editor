@@ -34,7 +34,17 @@ SIG_INCL =signal.h
 # forward will require changing to whatever whims Apple is fronting
 # that year.  Or, you can change Mojave to use the SDK for 10.14, but
 # I haven't tried that.    -- Mike O'Brien, 3/7/21, mid-COVID
+#
+# One thing to try, which works at least under Mojave, is:
+# % sudo cp -r /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/ \
+# /usr/include
+#
+# This puts the entire tree where a naive compiler expects to find it.  If
+# there's a /usr/include directory out there already, you may want to save
+# it and create a new one.   -- Mike O'Brien, 3/28/22, still with the COVID
+
 STD     = /usr/include/
+#STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/
 
 # --begin 2/21/2020 comments, amended MOB 3/8/2021

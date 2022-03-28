@@ -239,10 +239,10 @@ etc:
 	cp help/errmsg $(LIB)
 	cp help/recovermsg_e20 $(LIB)
 	chmod 444 $(LIB)/*
-	cd fill; $(MAKE) "LOCALINCL=$(LOCALINCL)" \
-		"ETC=$(LIB)" \
-		"DFS=$(LIBDFS)" \
-		"CCF=$(LIBCCF)"
+	cd fill; $(MAKE) # "LOCALINCL=$(LOCALINCL)" \
+#		"ETC=$(LIB)" \
+#		"DFS=$(LIBDFS)" \
+#		"CCF=$(LIBCCF)"
 	-rm $(LIB)/fill
 	cp fill/fill $(LIB)
 	-rm $(LIB)/just
