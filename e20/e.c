@@ -1873,7 +1873,7 @@ setitty ()
     return;
 #endif
 
-#define BITS(start,yes,no) start  = ( (start| (yes) )&( ~(no) )  )
+#define BITS(start,yes,no) start  = (unsigned short) ( (start| (yes) )&( ~(no) )  )
 #ifdef SYSIII
     struct termio temp_termio;
 
@@ -1893,7 +1893,7 @@ setitty ()
 	 IGNBRK|BRKINT|PARMRK|INPCK|INLCR|IGNCR|ICRNL|IUCLC|IXOFF
 	);
     if(ixon) temp_termio.c_iflag  |= IXON;
-    else     temp_termio.c_iflag  &= ~IXON;
+    else     temp_termio.c_iflag  &= (unsigned short) ~IXON;
     BITS(temp_termio.c_lflag,NOFLSH,ISIG|ICANON|ECHO);
     if(ioctl(STDOUT,TCSETAW,&temp_termio) >= 0) istyflg=YES;
     fcntlsave = fcntl(STDOUT,F_GETFL,0);
@@ -1993,9 +1993,9 @@ In fact the system 3 Bs are identical to the version 7 Bs.
 #endif /* COMMENT */
 #define SPEED ((out_termio.c_cflag)&CBAUD)
 	i = out_termio.c_oflag;
-	out_termio.c_oflag &= ~(OLCUC|ONLCR|OCRNL|ONOCR|ONLRET);
+	out_termio.c_oflag &= (unsigned short) ~(OLCUC|ONLCR|OCRNL|ONOCR|ONLRET);
 	if( (out_termio.c_oflag & TABDLY) == TAB3)
-	    out_termio.c_oflag &= ~TABDLY;
+	    out_termio.c_oflag &= (unsigned short) ~TABDLY;
 	if(ioctl(STDOUT,TCSETA,&out_termio) >= 0) {
 	    ostyflg = YES;
 	    out_termio.c_oflag = i;  /* all set up for cleanup */
