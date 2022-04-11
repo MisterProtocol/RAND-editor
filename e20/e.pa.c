@@ -223,7 +223,8 @@ dbgpr("getword: input str=(%s)\n", *str);
     /* remove trailing spaces */
     cp2 = *str + strlen(*str) - 1;
     while (*cp2 == ' ') cp2--;
-    cp2[1] = '\0';
+    if (strlen(cp2) > 1)
+	cp2[1] = '\0';
 
     if (*str[0] == '"' && *cp2 == '"') {
 	wordQuoted = 1;
