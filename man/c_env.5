@@ -1,0 +1,113 @@
+.TH C_ENV 5
+.SH NAME
+c_env \- C compiler environment include file
+.SH SYNOPSIS
+.B #include <c_env.h>
+.SH DESCRIPTION
+This header file contains C definitions
+covering properties of the local compiler and CPU.
+Most of these definitions are either self-evident or are
+explained in their associated comments.
+Some of them are used solely for conditional compilation.
+Here is how the file looks on the VAX under 4bsd VMUNIX:
+.PP
+.nf
+#ifndef vax
+# define vax
+#endif  vax
+
+#define CHARMASK   0xFF
+#define CHARNBITS  8
+#define MAXCHAR    0x7F
+
+#define SHORTMASK  0xFFFF
+#define SHORTNBITS 16
+#define MAXSHORT   0x7FFF
+
+#define LONGMASK  0xFFFFFFFF
+#define LONGNBITS 32
+#define MAXLONG   0x7FFFFFFF
+
+#define INTMASK  0xFFFFFFFF
+#define INTNBITS 32
+#define MAXINT   0x7FFFFFFF
+
+#define BIGADDR         /* text address space > 64K */
+/* #define ADDR64K      /* text and data share 64K of memory */
+			/*  (no split I&D) */
+
+#define INT4            /* sizeof (int) == 4 */
+/* #define INT2         /* sizeof (int) == 2 */
+
+#define PTR4            /* sizeof (char *) == 4 */
+/* #define PTR2         /* sizeof (char *) == 2 */
+
+			/* unsigned types supported by the compiler: */
+#define UNSINT          /* unsigned int   */
+#define UNSCHAR         /* unsigned char  */
+#define UNSSHORT        /* unsigned short */
+#define UNSLONG         /* unsigned long  */
+
+/* #define NOSIGNEDCHAR /* there is no signed char type */
+
+/* #define void int     /* Fake new `void' type to an int */
+
+#define STRUCTASSIGN	/* Compiler does struct assignments */
+
+#define Reg1  register
+#define Reg2  register
+#define Reg3  register
+#define Reg4  register
+#define Reg5  register
+#define Reg6  register
+#define Reg7
+#define Reg8
+#define Reg9
+#define Reg10
+#define Reg11
+#define Reg12
+.fi
+.PP
+The purpose of the register definitions is to make it possible to
+effectively use the number of available registers,
+which varies from machine to machine.
+Compilers exist which offer 1, 3, 4, 6, and 8 registers.
+The VAX allows 6.
+Because the first implementation of C was
+the PDP-11, which allows only three registers, a lot of
+code is written with just three register declarations.
+One should feel free to make use of the greater number of
+registers available on larger machines.
+.PP,
+However, because C syntax states that register
+declarations are honored sequentially within each
+function until all the registers are used, some code
+written to take advantage of 6 registers would not use 3
+registers well.
+For instance, say you have a function
+with three arguments and three locals, and you declare
+them all to be registers.
+And say if you had to pick
+only three, you would choose the locals.
+On the 11, the
+three arguments, since they are encountered first by the compiler,
+will be in registers and the three locals won't.
+You lose.
+.PP
+What is needed is a way to prioritize the register
+declarations in order of desirability rather than the order of occurance.
+The solution to this problem which is presented here is to
+define a set of numbered macros, Reg1, Reg2, ..., and
+define the first n to `register' for each target
+machine.
+Now you use these new forms, and never use `register'.
+Of course, you will have to always explicitly declare
+the type, e.g. ``Reg1 int tmp;'' not ``Reg1 tmp;'', but that
+is good style anyway.
+If you also use block structure
+whenever possible, you will often use the low-numbered
+registers in blocks, so they can be reused several
+times in the same function, even for different types.
+.PP
+.SH AUTHOR
+Dave Yost, The Rand Corporation

@@ -1,14 +1,17 @@
 #
 #	Copyright abandoned, 1983, The Rand Corporation
 #
+CC	= gcc
 DFS     = -DUNIXV7
 LOCALINCL = ../include/
+#LOCALINCL = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
 #CCF     = -g -traditional -traditional-cpp #
 CCF     = -g
 LDF     =  #
 
 #CFLAGS = $(CCF) $(DFS) -Bstatic
-CFLAGS = $(CCF) $(DFS) -static
+#CFLAGS = $(CCF) $(DFS) -I$(LOCALINCL) -Wno-nullability-completeness -static
+CFLAGS = $(CCF) $(DFS) -I$(LOCALINCL) -static
 
 all: fill just center run
 

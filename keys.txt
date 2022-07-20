@@ -1,0 +1,1805 @@
+
+
+Computer: ABAIA
+
+
+
+Deep scan
+
+
+===========================================================
+Name  : .Globalpreferences
+Type  : Western Digital My Passport 083C
+Value  : 1
+
+===========================================================
+Name  : .Globalpreferences
+Type  : Western Digital My Passport Wireless
+Value  : 1
+
+===========================================================
+Name  : .Globalpreferences
+Type  : Western Digital My Passport 070A
+Value  : 1
+
+===========================================================
+Name  : .Iclip Registration
+Type  : Registration Code
+Value  : KCTH-QXCR-KSZX
+
+===========================================================
+Name  : 4C6364Acxt.Com.Parallels.Toolbox.License
+Type  : LicenseInfo/Signature
+Value  : c6xdui0OuKyCcgeYxc3LWUQOGv9177x2WuOz3VXPQCIncADBBOIeZYLrUfMOLywIcbWLscUdA+oWEsgbxYr0ItD8bvrkvGEPkf4BAdWdWIc3Xa3oNdv88o+Vmo+4grlPTMBgo1MPUUu7pZtYcYPqYURbB6aphPDEeiCOS+0782jjqbxWC8hz5T1rJcpD8JEjm1PE9SSivJqST6ZQVBITLbUEOgk9aPF9vejlXOjmFBQZ5muvsVrx22eQfCXpq5u3OxHxtAD3wBjkFH/Lmx+rkW8Ule(5886,0x1029f4580) malloc: Heap corruption detected, free list is damaged at 0x60000323c070
+*** Incorrect guard value: 251135333351524
+le(5886,0x1029f4580) malloc: *** set a breakpoint in malloc_error_break to debug
+g
+-BEGIN CERTIFICATE-----
+MIIGcDCCBFigAwIBAgICEAEwDQYJKoZIhvcNAQELBQAwdDELMAkGA1UEBhMCUlUx
+DzANBgNVBAcMBk1vc2NvdzEjMCEGA1UECgwaUGFyYWxsZWxzIElQIEhvbGRpbmdz
+IEdtYkgxEDAOBgNVBAsMB1Rvb2xib3gxHTAbBgNVBAMMFFBhcmFsbGVscyBUb29s
+Ym94IENBMB4XDTE2MTAyNDEyMzkzNFoXDTI4MDcxMjEyMzkzNFowdTELMAkGA1UE
+BhMCUlUxDzANBgNVBAcTBk1vc2NvdzEjMCEGA1UEChMaUGFyYWxsZWxzIElQIEhv
+bGRpbmdzIEdtYkgxEDAOBgNVBAsTB1Rvb2xib3gxHjAcBgNVBAMTFXRvb2xib3gu
+cGFyYWxsZWxzLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALwV
+pfcTOS69IbeE9BqN1tH05D4toFAFqno61meS9e2jO5q93EvaeFzJMSIo5GsF136f
+5qKQ8cWkzwV7kn5wkKsY7XZRexM+E8wT4Sn+HlHZmoaTlrGDIqsPREaMCL5HK+fm
+07N/WY5jb4WrJOGWY7gOiQPMH4Zz910XrSIcEEwBQ3iU4XxodWd00z0MgZJ/scVZ
+Og4rwnyd92/TlDn1sDJa8QhIU0tjDFN2BLnDQrZPO7LcTGdwfeuq9rUzUr0Yjpmg
+kH25KxyISvhkg93cDDXChrNZSvZsqYDugVcphZswy57nfWKX5ZBX0/oPR7iOZBgO
+V2qAimvhW+goajj//z0CAwEAAaOCAgkwggIFMAwGA1UdEwEB/wQCMAAwDgYDVR0P
+AQH/BAQDAgeAMB0GA1UdDgQWBBQt/5L3UDmeAYsFF+vazRW50xjBzjAfBgNVHSME
+GDAWgBSFKh2hprjlk8c7pOkEyVVtEsev3TBCBggrBgEFBQcBAQQ2MDQwMgYIKwYB
+BQUHMAKGJmh0dHA6Ly93d3cucGFyYWxsZWxzLmNvbS9jYS9wYXhfY2EucGVtMDcG
+A1UdHwQwMC4wLKAqoCiGJmh0dHA6Ly93d3cucGFyYWxsZWxzLmNvbS9jYS9wYXhf
+Y2EuY3JsMIIBJgYDVR0gBIIBHTCCARkwga0GDisGAQQBgcw7g30CAgEBMIGaMDkG
+CCsGAQUFBwIBFi1odHRwOi8vY2EucGFyYWxsZWxzLm5ldC9jYS9wYXJhbGxlbHNf
+Y3BzLmh0bWwwXQYIKwYBBQUHAgIwUTAfGhhQYXJhbGxlbHMgSG9sZGluZ3MsIGx0
+ZC4wAwIBARouRXh0ZXJuYWwgQmFzaWMgQ2VydGlmaWNhdG9uIFByYWN0aWNlIFN0
+YXRlbWVudDBnBg4rBgEEAYHMO4N9AgJmATBVMFMGCCsGAQUFBwICMEcwHxoYUGFy
+YWxsZWxzIEhvbGRpbmdzLCBsdGQuMAMCAQEaJFBhcmFsbGVscyBUb29sYm94IENl
+cnRpZmljYXRlIFBvbGljeTANBgkqhkiG9w0BAQsFAAOCAgEAKcHOOjYhnndlMiBn
+UABtWFAiVUZZYcnJbYWKCfw55UwSjnd0dF6DQeTxwPY0UNZ/DG8PMnl+A+CkdiHj
+TbFjPX28CZUINw8fToOCSTT7Q89lBtLAFbJrfva5o5zr1KciYJCjRBetWQZhuv1L
+m8iwPeojlccEsLxMe8J2oonyzQDylQgFVmxH9+VPjr5XadftXar7NVg0Gx6pKhSG
+Mhjp8vnW0IkJlc6h9xb7XGmfibbX77TW442xqEfoVkzXL0zGLP/XkMhiyITy1ZZV
+myXOBUmzdRttlXpBnXEmu1HRo/Q9p7cxr6AV7IlRIQ/qwhiyLCcOxfl7Q2xT6G2i
+nS4hI56BtxI18VrYnB9SFjXyxZjGLX5TleGe9+jFCqkw/wA8kxKuVI1zWE0vIDZM
+tHkLLiu+xMGP2sJO9sIC2VDuoO965kXyO+mOFi8lUKGdJfRanWABHiSMnxBdadjy
+XcQyEB4ltIZbgFMkxLRPDJFFMKQcOp3Yr3hk2WtS0TBd+XNTEYR0p/ZqTRttEiXQ
+ffOPogUdK94HuG1+Ml25Gotq4gWzyX3Zjxjp0bMUCvDIDokZy7nDVmSSU9fRPVT4
+9Xud022ZMrpaIwI5jUkGQczy36ZOs1Imx7RMWCnLVXgIQRljC45MTrRInCLFS7M3
+mrLytneI+pdNs/5EUCX9n15jrSo=
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIH8jCCBdqgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwdDELMAkGA1UEBhMCUlUx
+DzANBgNVBAcMBk1vd2NvdzEjMCEGA1UECgwaUGFyYWxsZWxzIElQIEhvbGRpbmdz
+IEdtYkgxDjAMBgNVBAsMBUNsb3VkMR8wHQYDVQQDDBZQYXJhbGVscyBJc3N1aW5n
+IENBICMxMB4XDTE2MTAwNzE0MTYxMloXDTI4MTEwNjE0MTYxMlowdDELMAkGA1UE
+BhMCUlUxDzANBgNVBAcMBk1vc2NvdzEjMCEGA1UECgwaUGFyYWxsZWxzIElQIEhv
+bGRpbmdzIEdtYkgxEDAOBgNVBAsMB1Rvb2xib3gxHTAbBgNVBAMMFFBhcmFsbGVs
+cyBUb29sYm94IENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArgBP
+UKN5g5csDSBApzMgMJrrrxxrh6BActpNEZdZpcUn5amo+YijgQP6UYjkQfrDAqRL
+AGd/axi4cFGHBYdHspBAdKjSOYMhldU9y5wwDlMFlZdTJFvo17nF3VfkN7EOFSvQ
+j7vwQAdwxvi3ykbIdAcvP+JB/aA3K6ZIBmN+JWM0U1bdDq4qwmBKFzHyWiaICyvF
+yXCSlPy/wZJMuQ9MI+QGtP7ablk/DzvP313SRjWmWD5XP1r2iImG9bOEr45IMC6i
+iVoVyGsasF0b4E+NvHGcMcBsXlt6GDQgH9bxQ9QGELT6yTJK24RxfXSL3UttHcgK
+lN1pF/wwxb4PWaKjzszOSdAHLdz3t49NI1qQKMRQE3uzew1hA6s4smzK/c8TE+B+
+4JuK38JDptwTU8GLCLu5N3s9BPIBoDh2LQJNwQ42eboky/M6+lHbR/a3prvShCMK
+yE7pSPKQdg9O35cOCWj56KFZaaZaCQ21xBdXW5Cu39+kqHs53ng7C7otFtyZDvcd
+iUIdSL7EsB3azbBcryZIGcf8x1xGCnntJz72+A+JJ+MkUaCcJ0bdvE3dQDETlP1c
+o57nCwwYoNv7ndme3+PR8INeCXTtLG/dYwz60sDPECZZW2nJDZ7X0asaKuQnbAP5
+u4kAZ5BAybyv+AeijZtNcfgWD8gZZoDdGfTV7Y8CAwEAAaOCAowwggKIMA8GA1Ud
+EwEB/wQFMAMBAf8wDwYDVR0kAQH/BAUwA4ABADAKBgNVHTYEAwIBADAOBgNVHQ8B
+Af8EBAMCAQYwHQYDVR0OBBYEFIUqHaGmuOWTxzuk6QTJVW0Sx6/dMB8GA1UdIwQY
+MBaAFDuTEfsf59F+SCw7mxQ9KqVPg/1KMD8GCCsGAQUFBwEBBDMwMTAvBggrBgEF
+BQcwAoYjaHR0cDovL2NhLnBhcmFsbGVscy5uZXQvY2Evcm9vdC5wZW0wNwYDVR0f
+BDAwLjAsoCqgKIYmaHR0cDovL2NhLnBhcmFsbGVscy5uZXQvY2Evcm9vdF9jYS5j
+cmwwggGMBgNVHSAEggGDMIIBfzCBrQYOKwYBBAGBzDuDfQICAQEwgZowOQYIKwYB
+BQUHAgEWLWh0dHA6Ly9jYS5wYXJhbGxlbHMubmV0L2NhL3BhcmFsbGVsc19jcHMu
+aHRtbDBdBggrBgEFBQcCAjBRMB8aGFBhcmFsbGVscyBIb2xkaW5ncywgbHRkLjAD
+AgEBGi5FeHRlcm5hbCBCYXNpYyBDZXJ0aWZpY2F0b24gUHJhY3RpY2UgU3RhdGVt
+ZW50MGQGDisGAQQBgcw7g30CAgECMFIwUAYIKwYBBQUHAgIwRDAfGhhQYXJhbGxl
+bHMgSG9sZGluZ3MsIGx0ZC4wAwIBARohRXh0ZXJuYWwgQmFzaWMgQ2VydGlmaWNh
+dGUgUG9saWN5MGcGDisGAQQBgcw7g30CAmYBMFUwUwYIKwYBBQUHAgIwRzAfGhhQ
+YXJhbGxlbHMgSG9sZGluZ3MsIGx0ZC4wAwIBARokUGFyYWxsZWxzIFRvb2xib3gg
+Q2VydGlmaWNhdGUgUG9saWN5MA0GCSqGSIb3DQEBCwUAA4ICAQCHU56AKeXG+SeC
+1oFjVzRiAx2rBthU2iuj2HwPFyj4DONTEIdZA7DhEoJCe3SIeI5vafMNuXX6wATq
+wKXzzuzsH1cdBUlEr1NrHogh5jp2NzkagkQrvV/VJ9nvSXoMS16Xjn0xWupukRE8
+dHJPSNMOa3W7IZfCXbUjxEoEskL+Jppylf7ZR9r/w2pmMfsnVTh+GJzVrpB5hclT
+Qk8Vi6GgXLWssi5PM0Ia6ZrQcDtL1zJPuZABJak+kbqjmJQFOa9ah4CO9HDSdhft
+9WiGnZz7v6urdvdwF4zWw0v7zZgkX6NXtKe+qLMNSOlHbkIKuBzAyN5hTb68w9Rq
+sQk0njq9cBgJq7Bp69X88aEPJG1bVk2i84ElooEu+zMpB0HjEOekBqtSSP6A16bz
+J3HTb/QaIENSDeTGf6dbGgcV8uT+/4p8DlV2qdAM+lb2zP5cTGHtm1Po6IBTHrhA
+CyaXSdOL4oKEivOkzNRROtdXIU7lt3ddDMHnoXU8nTeLYbH2vrNfchJdoBi4PlFT
+B4cv1mCa8NqRsuNEH634OOyW2ENSX0+/Cn9CnK65QDPuZQpyri/SeaH0b5g6dAyX
+O+lx6G1plYAwJC02thp7qcC4HGpwUy17qGsaWkQ8tF40qdsPF058giYvkNO4uRl1
+/E8IPEauB1yXO5jZs02FJIejsxIdNQ==
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIHvTCCBaWgAwIBAgIJAKfE9q7ikq7mMA0GCSqGSIb3DQEBCwUAMIGgMQswCQYD
+VQQGEwJDSDEVMBMGA1UEBwwMU2NoYWZmaGF1c2VuMSMwIQYDVQQKDBpQQVJBTExF
+TFMgSVAgSG9sZGluZ3MgR21iSDELMAkGA1UECwwCSVQxIzAhBgNVBAMMGlBhcmFs
+bGVscyBFeHRlcm5hbCByb290IENBMSMwIQYJKoZIhvcNAQkBFhRhZG1pbnNAcGFy
+YWxsZWxzLmNvbTAeFw0xNjEwMDcxNDEyMjVaFw0yODExMDYxNDEyMjVaMHQxCzAJ
+BgNVBAYTAlJVMQ8wDQYDVQQHDAZNb3djb3cxIzAhBgNVBAoMGlBhcmFsbGVscyBJ
+UCBIb2xkaW5ncyBHbWJIMQ4wDAYDVQQLDAVDbG91ZDEfMB0GA1UEAwwWUGFyYWxl
+bHMgSXNzdWluZyBDQSAjMTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIB
+ALnxIcGsh9ozhUVby8mlCc5XQxKNfW6dGW/SnKbxpqrXfpQ0gNO6WoLI/EOSwk7C
+Zbo/Kc/0abmu26YexiiHEf0FdjS+9ySHqJOgf6kKclC9JC4Dr+FGZISG9G2fkzTn
+NcsrHk9btii4wDZ9Kjz+398C3ysxK21xjkk+Re1OXl8E+Uhc67jbz0/0Tjd0d7Js
+jVjtKZxQts9SV3KzruwfTyhgkW/4VxmP4RCJqa1TgDLVL98fZjTQBG9cOj3tGRKd
+Zt3EV3QdDXFP08S62CkMOxWn+Fda9BPg6z83ne+TzmREJ4hlafj2kRg+1dKsCNUz
+ZN+nHYVkxNLl9jN/415CdXAPNfWYoibweG0QjI4Ld3/ue0DUEmOY4tu7ofQODnME
+2ThWrKF8HSnxh8oFNTBm8J5Jh3pTvKw+tJdqbAUi9ykAN7/M+NwxnY5b1wgddHaQ
+kxaedarnwQfRIFaVvNCRcoZVD9qt6v/jnI8xETxfOjd6WOfg34ZqdyXLX4ttqK0M
+EgI2HxwRhWAvHl5oR7HS9gCxMY5JvPQ8S+au1XS/xw/L4OJVYTrOVWuvzH50NsrH
+mcR4N6D5+EYSryuLhL+Nuj/FU37+zbKcZKD1qIHMn3fbfoyspF37KBkbgf8K+1Cq
+Lc2UUsSmZLDnR+jD0T8zEyBTR1a9iCAAy8v50Ok+IJHZAgMBAAGjggIjMIICHzAP
+BgNVHRMBAf8EBTADAQH/MA8GA1UdJAEB/wQFMAOAAQAwCgYDVR02BAMCAQAwDgYD
+VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQ7kxH7H+fRfkgsO5sUPSqlT4P9SjAfBgNV
+HSMEGDAWgBQ5POcdiTty5/ba6yyF1LYMRqlAETA/BggrBgEFBQcBAQQzMDEwLwYI
+KwYBBQUHMAKGI2h0dHA6Ly9jYS5wYXJhbGxlbHMubmV0L2NhL3Jvb3QucGVtMDcG
+A1UdHwQwMC4wLKAqoCiGJmh0dHA6Ly9jYS5wYXJhbGxlbHMubmV0L2NhL3Jvb3Rf
+Y2EuY3JsMIIBIwYDVR0gBIIBGjCCARYwga0GDisGAQQBgcw7g30CAgEBMIGaMDkG
+CCsGAQUFBwIBFi1odHRwOi8vY2EucGFyYWxsZWxzLm5ldC9jYS9wYXJhbGxlbHNf
+Y3BzLmh0bWwwXQYIKwYBBQUHAgIwUTAfGhhQYXJhbGxlbHMgSG9sZGluZ3MsIGx0
+ZC4wAwIBARouRXh0ZXJuYWwgQmFzaWMgQ2VydGlmaWNhdG9uIFByYWN0aWNlIFN0
+YXRlbWVudDBkBg4rBgEEAYHMO4N9AgIBAjBSMFAGCCsGAQUFBwICMEQwHxoYUGFy
+YWxsZWxzIEhvbGRpbmdzLCBsdGQuMAMCAQEaIUV4dGVybmFsIEJhc2ljIENlcnRp
+ZmljYXRlIFBvbGljeTANBgkqhkiG9w0BAQsFAAOCAgEAjCdFbWndzGnuwp8mry/y
+kOSO15NyUfuhSqZ4iSR6tmyWro8RHar949xzWzuFd+kx91LIH0JAo6j7BZJa9Za/
+FFD09mWL4w7Jd3cdpIArHS+xaHVvHHxc9Kz+d3yAnxMnOZcncqjPXAxzb2hAP64w
+wPGYBro6gYdvgTNIs3HZEkabN2eBbFGfuM23CCNICEb1YjZGVv4LRwBwgsSi4ou5
+VRd7zNJ0oQnSSxl3VdMYbl/A48HS9dAjSkginQjsf7geCqK4uDvVsZfbUt6A3OTy
+melK8QAVk3XDAGomCDDZjSOmzlwjGjwuBNXUMp6BpyDv6oTT+okAmQga1gHcrMne
+Uo34yK5f9Io+p2aPLZWT1HHijHHPV6rUedF9RVkunLDGOcMQlOCcXAkWDUakV9yS
+CcvVhbhAegbZxVGUxiuFYPAhdSJwMc4jwPJ2P6javfCfSL4NffuK9L/iirZgng1C
+/Kuj6E8EyAO7k1NSMODG5LB1Vg5QMtTcpySPWjY0xus9hbURV9KrddMnIVnmr6Xo
+A48flx3SYqX/BIkh5ts+G2O0ufRhm2XIrk8U++c+XLwBpPIONob98exYKF0Ikjrt
+qtIMjNExEQ9RJetkkmY+ZT2bZLroDfGiXIztxQvcuz2Ofh4nL06MOWHSf/AVgWcK
+CmpWqdGXjywzMTLpNzhpn/M=
+-----END CERTIFICATE-----
+
+
+===========================================================
+Name  : 4C6364Acxt.Com.Parallels.Toolbox.License
+Type  : LicenseInfo/License
+Value  : {"name": "", "uuid": "2c7fdf534b4541d4bc80a03b9aee5500", "lic_key": "5FDFRZ-******-******-******-TFJ7HM", "activated_at": "2018-08-29 04:23:47", "edition": "full", "main_period_ends_at": "2022-08-29 02:41:25", "grace_period_ends_at": "2022-09-05 02:41:25", "is_auto_renewable": true, "is_nfr": false, "is_beta": false, "is_suspended": false, "is_expired": false, "is_grace_period": false, "limit": 1, "usage": 1, "hosts": [{"name": "GDPR_HIDDEN", "hw_id": "fdfb319908f2571aaa72b2cdc6ce941a", "product_version": "5.1.0-4185", "activated_at": "2018-08-29 04:23:47"}], "products": [{"id": 1, "os_type": 0, "edition": "full", "versions": {"mac": {"*": "full"}, "win": {"*": "full"}}}], "cep_option": false}
+
+===========================================================
+Name  : 4C6364Acxt.Com.Parallels.Toolbox.License
+Type  : LicenseInfo/MoreInfo
+Value  : {"products_size":0,"result":-104,"products":[]}
+
+===========================================================
+Name  : Adobe Amecommand 12 1 4
+Type  : RegistrationFlags Guid
+Value  : 12479d09-e7a1-2969-54e3-db480000001d
+
+===========================================================
+Name  : Adobe Amecommand 13 0 0
+Type  : RegistrationFlags Guid
+Value  : a7626996-f082-5657-f567-beef00000025
+
+===========================================================
+Name  : Adobe Dynamiclinkmediaserver -1 0
+Type  : RegistrationFlags Guid
+Value  : 90fc1993-31c8-64ae-5c0f-7fb000000025
+
+===========================================================
+Name  : Adobe Dynamiclinkmediaserver 10 0
+Type  : RegistrationFlags Guid
+Value  : 7e195281-22c3-db83-5e46-df2100000021
+
+===========================================================
+Name  : Adobe Dynamiclinkmediaserver 12 1 4
+Type  : RegistrationFlags Guid
+Value  : 663bfaae-2f03-56e5-8208-bfed00000022
+
+===========================================================
+Name  : Adobe Dynamiclinkmediaserver 13 0 0
+Type  : RegistrationFlags Guid
+Value  : 90fc1993-31c8-64ae-5c0f-7fb000000025
+
+===========================================================
+Name  : Adobe Lightroom2
+Type  : AgFTP_passive
+Value  : normal
+
+===========================================================
+Name  : Adobe Lightroom3
+Type  : AgFTP_passive
+Value  : normal
+
+===========================================================
+Name  : Adobe Lightroom3Beta
+Type  : AgFTP_passive
+Value  : normal
+
+===========================================================
+Name  : Adobe Lightroom4
+Type  : AgFTP_passive
+Value  : normal
+
+===========================================================
+Name  : Adobe Lightroom5
+Type  : RegistrationField_CountryRegion
+Value  : 1
+
+===========================================================
+Name  : Adobe Lightroom5
+Type  : AgFTP_passive
+Value  : normal
+
+===========================================================
+Name  : Adobe Lightroom5
+Type  : ElectronicRegistration
+Value  : registered
+
+===========================================================
+Name  : Adobe Lightroomclassiccc7
+Type  : AgFTP_passive
+Value  : normal
+
+===========================================================
+Name  : Adobe Lightroomclassiccc7
+Type  : RegistrationField_CountryRegion
+Value  : 1
+
+===========================================================
+Name  : Adobe Lightroomclassiccc7
+Type  : ElectronicRegistration
+Value  : registered
+
+===========================================================
+Name  : Adobe Premiere Rush 1 5
+Type  : RegistrationFlags Guid
+Value  : 12479d09-e7a1-2969-54e3-db480000001d
+
+===========================================================
+Name  : Apple Backup
+Type  : SerialNumber
+Value  : PIONEER DVD-RW  DVR-106DCFDC023778WL    
+
+===========================================================
+Name  : Apple Identityservicesd
+Type  : ReRegisteredForDevicesHash
+Value  : 6AFC02EE62640065FB6A958CECBF4E4F653D500204D145733D19CCF71195ED5A
+
+===========================================================
+Name  : Apple Imtranscoding Imtranscoderagent
+Type  : com.apple.pkpass
+Value  : CKPassPreviewMediaObject
+
+===========================================================
+Name  : Apple Iphoto
+Type  : SerialNumber
+Value  : PIONEER DVD-RW  DVR-106DCFDC023778WL    
+
+===========================================================
+Name  : Apple Iwork
+Type  : ProductivitySFLLicense
+Value  : ndqf-g3f3-l993-696d-bf9a
+
+===========================================================
+Name  : Apple Iwork08
+Type  : ProductivitySFLLicense
+Value  : XWNA-XU9P-EACW-XCNM-HXX3-WVG
+
+===========================================================
+Name  : Apple Mobilesms
+Type  : com.apple.pkpass
+Value  : CKPassPreviewMediaObject
+
+===========================================================
+Name  : Apple Mobilesms
+Type  : com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.PassbookUIService.PeerPaymentMessagesExtension
+Value  : 1.0
+
+===========================================================
+Name  : Apple Mobilesms
+Type  : com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.PassbookUIService.PeerPaymentMessagesExtension
+Value  : 0,0
+
+===========================================================
+Name  : Apple Quicktime
+Type  : Registration Key
+Value  : AZKM-XB7A-FM2N-CS6B-FC58
+
+===========================================================
+Name  : Apple Remotedesktop
+Type  : DOCSerialNumberHash
+Value  : 0017F20278F60x1F49C83D4464C6599FA7903AE6044282ECDB2A52
+
+===========================================================
+Name  : Apple Remotedesktop
+Type  : SerialNumberOrganizationString
+Value  : The Aerospace Corporation
+
+===========================================================
+Name  : Apple Remotedesktop
+Type  : SerialNumberNameString
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Apple Remotedesktop
+Type  : SerialNumberString
+Value  : 6B29B9ABF674CB4101FF673B7EA41899AD776AFFDE02B1DE44DF2AE2464DDFF77288558AB5DD1CA52F1D7539ECFD24FF
+
+===========================================================
+Name  : Appzapper Appzapper
+Type  : Registration Code
+Value  : APZP-101-109-206-110
+
+===========================================================
+Name  : Appzapper Appzapper
+Type  : Registration Name
+Value  : Michael O\'Brien
+
+===========================================================
+Name  : Appzapper Appzapper2
+Type  : Registration Code
+Value  : APZP-101-109-206-116
+
+===========================================================
+Name  : Appzapper Appzapper2
+Type  : Registration Name
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Barebones Bbedit
+Type  : BBEditSerialNumber:10.0
+Value  : BEE100-4VC5G-PU52M-6KQZD
+
+===========================================================
+Name  : Barebones Bbedit
+Type  : BBEditSerialNumber:9.0
+Value  : BEE900-XLBUK-836DC-7J389
+
+===========================================================
+Name  : Barebones Bbedit
+Type  : BBEditSerialNumber:7.1
+Value  : BEC700-LDJZA-T8KG5-J38HA
+
+===========================================================
+Name  : Barebones Yojimbo
+Type  : SerialNumberOwner
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Barebones Yojimbo
+Type  : SerialNumber:Version_1
+Value  : YJE100-SBEMG-FN7Y3-9HEFW
+
+===========================================================
+Name  : Barebones Yojimbo
+Type  : SerialNumber:Version_3
+Value  : YJE300-5JV63-EP8XA-WY96C
+
+===========================================================
+Name  : Bombich Ccc
+Type  : RegistrationEmail
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Bombich Ccc
+Type  : RegistrationProductName
+Value  : Carbon Copy Cloner 5
+
+===========================================================
+Name  : Bombich Ccc
+Type  : RegistrationCode
+Value  : GAWAE-FBPX7-GD95D-4T5EZ-4CMM7-4WUE6-PQD8Y-LF6YC-CQ52Y-T2XUZ-E6BHA-HBC75-GNUZQ-KYVQH-B7P9
+
+===========================================================
+Name  : Bombich Ccc
+Type  : RegistrationName
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Captureone Coopenwithpluginpluginhost
+Type  : /Users/obrien/Documents/Parallels Backup/Microsoft Windows XP (Backup)/Windows Applications/Activation.exe.app
+Value  : Activation.exe.app
+
+===========================================================
+Name  : Captureone Coopenwithpluginpluginhost
+Type  : /Users/obrien/Applications (Parallels)/{1a98b1a5-81a3-44a7-8cd9-68cb0231205b} Applications.localized/Windows Activation Client.app
+Value  : Windows Activation Client.app
+
+===========================================================
+Name  : Captureone Coopenwithpluginpluginhost
+Type  : /Users/obrien/Applications (Parallels)/{1a98b1a5-81a3-44a7-8cd9-68cb0231205b} Applications.localized/Register.app
+Value  : Register.app
+
+===========================================================
+Name  : Captureone Coopenwithpluginpluginhost
+Type  : /Users/obrien/Documents/Parallels Backup/Microsoft Windows XP (Backup)/Windows Applications/Microsoft(C) Register Server.app
+Value  : Microsoft(C) Register Server.app
+
+===========================================================
+Name  : Cleverfiles Disk_Drill
+Type  : ActivationKey
+Value  : 421C8-6BF45-1916A-9060E-D860F
+
+===========================================================
+Name  : Cleverfiles Diskdrill
+Type  : ActivationKey
+Value  : 421C8-6BF45-1916A-9060E-D860F
+
+===========================================================
+Name  : Cocoatech Pathfinder
+Type  : SerialNumber
+Value  : PIONEER DVD-RW  DVR-111DFGDL001448WL    
+
+===========================================================
+Name  : Datarobotics Drobodashboard
+Type  : Software_Drobo_Dashboard_Licenses_TDC081201563_LicenseWarning2Alert
+Value  : 1243500253.89
+
+===========================================================
+Name  : Datarobotics Drobodashboard
+Type  : Software_Drobo_Dashboard_Licenses_TDC081201563_LicenseWarning1Alert
+Value  : 1240558732.54
+
+===========================================================
+Name  : Datarobotics Drobodashboard
+Type  : Software_Drobo_Dashboard_Licenses_TDC081201563_LicenseData
+Value  : TDC0812015630524090365
+
+===========================================================
+Name  : Datarobotics Drobodashboard
+Type  : Software_Drobo_Dashboard_Licenses_TDC081201563_LicenseExpired1Alert
+Value  : 1243500253.89
+
+===========================================================
+Name  : Datarobotics Drobodashboard
+Type  : Software_Drobo_Dashboard_Licenses_TDC081201563_LicenseSignature
+Value  : SV01Yzo2Zjc9aEFrcG1AQ3NDQ0ZKSnlFRnp8fVFLUVNRT1lRVlVZVVldXVpaXV1lXnJ0woU0NDI1M2MxMGJjOTYwODllNDQ0YzNiZWQ0NzI4YjE1MWMzZmY0Y2Q0YjljMmY2NTAzNDc1M2E3Yzg5MGVlZTMxNzY3ZjhjMzNlU1YwMQ==
+
+===========================================================
+Name  : Datarobotics Drobodashboard
+Type  : Software_Drobo_Dashboard_Licenses_TDC081201563_LicenseWarning3Alert
+Value  : 1243500253.89
+
+===========================================================
+Name  : Digidna Diskaid
+Type  : regKey
+Value  : 60d3-42f0-2cd9-e34f-9b85-cfbf-c8ef-f21d
+
+===========================================================
+Name  : Digidna Imazing2Mac
+Type  : registrationEmail
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Discoapp Disco
+Type  : Registration Code
+Value  : DSCO-110-116-186-101
+
+===========================================================
+Name  : Discoapp Disco
+Type  : Registration Name
+Value  : Michael O\\\'Brien
+
+===========================================================
+Name  : Eltima Airy
+Type  : ActivationKey
+Value  : 10390-09664-FC981-714DB-26AEA
+
+===========================================================
+Name  : Emmgunn Mkvtools
+Type  : enteredRegistrationCode
+Value  : Not Registered
+
+===========================================================
+Name  : Emmgunn Mkvtools
+Type  : enteredRegCode
+Value  : Not Registered
+
+===========================================================
+Name  : Emmgunn Mp4Tools
+Type  : enteredRegistrationCode
+Value  : 3157988
+
+===========================================================
+Name  : Emmgunn Mp4Tools
+Type  : enteredRegCode
+Value  : 3157988
+
+===========================================================
+Name  : Emmgunn Mp4Tools3
+Type  : enteredRegistrationCode
+Value  : Not Registered
+
+===========================================================
+Name  : Equinux Isale5
+Type  : licenseKey
+Value  : VSDAQ-XUGVF-VVVVV-V4S2K-C3FVV-RVVVV-VVVVV-VVVWM-YJRWK-J6QM7-726BW-O2T2V-4X76C-IOEHP-FHG45-SGTKR-3X32C-6NK5N-RBOCZ-MZJKS-ZBMVA-CMCIP-HJIS3-V34AF-VKK27-SIEZK-GA6Z4-L6JKF-P7RYC-3ATI5-3AGT5-RQ3MH-YAOIC-V7ICO-UNFK6-JCYQF-DRIZD-O4INF-RUD2T-Y4UQL-EPMNS-YAOOO-QHBKX-UWW5H-MOKKT-L6XJV-E2IGF-R3UKH-O7CU3-P6UNU-KLIB5-L3AOP-OGVSN-ZV3VN-COZM7-AZFAH-WEVJ3-ZHEZT-5N6JW-26DMO-74BKD-5QBWD-QED6H-5HMBQ-A2ZAJ-YWQI4-5I5FI-356N4-4JLFP-FPKWY-7ZIQW-75JRY-PWSBJ-XQWQK-3TFSV-QVM7E-KF2GE-IORJ2-EIXA6-WHXOC-6NSRW-NH4CJ-T5RAZ-EHUD6-QLQ23-BBQCL-ALSLH-D2BP5-SCEZN-7HYVU-TDHPO-QRUSH-3FGHY-QHDJVV
+
+===========================================================
+Name  : Equinux Isale5
+Type  : licenseHolder
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Fadingred Senuti
+Type  : FRRegistrationKey
+Value  : LGFO6JF3-FKLW5DVO-MHL6I6K3-TAK2K65N-DO3GPZLN
+
+===========================================================
+Name  : Fadingred Senuti
+Type  : FRRegistrationOwner
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Flyingmeat Acorn4
+Type  : registrationNumber
+Value  : FMAC40-GWMSPI77JUP6NCNZHIGJ3O2JHVYHFW4BBEM63BJYVA6LXNWDMA-ECBE545E
+
+===========================================================
+Name  : Flyingmeat Acorn4
+Type  : registrationName
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Flyingmeat Acorn5
+Type  : registrationName
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Flyingmeat Acorn5
+Type  : registrationNumber
+Value  : FMAC50-LYDNHRCNK4IXBLYBKIOCYY4G26Y7YJMLTDBIJVIESZEXCIGBIE-BA6E993E
+
+===========================================================
+Name  : Flyingmeat Acorn6
+Type  : registrationName
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Flyingmeat Acorn6
+Type  : registrationNumber
+Value  : FMAC60-WIQ4VWF52PGG5SEOXWJ3PIOWHAQVFACHTPU56OEC2RODXBU54Q-F46B4325
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·snunique·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·datum·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·urlbase·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·snwhite·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·snlen·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·snwhite·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·urlbase·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·snupper·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·snlen·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·datum·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·prefer_shortnames·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·urlbase·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·datum·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·snwhite·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·snunique·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·prefer_shortnames·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·snupper·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·prefer_shortnames·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·snlen·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·snunique·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·snunique·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·datum·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·output·snlen·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·snwhite·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·prefer_shortnames·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·input·snupper·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_wp·input·urlbase·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Gpsbabel Gpsbabel
+Type  : kompass_tk·output·snupper·value
+Value  : @Invalid()
+
+===========================================================
+Name  : Hexbeerium Remotegateway
+Type  : password
+Value  : 16410783
+
+===========================================================
+Name  : Kedisoft Appshelf
+Type  : ASRegistrationSerialKey
+Value  : APPSHLF-XRNO-SOUV-UV5X-CFES-IBCF
+
+===========================================================
+Name  : Keyfinder Macproductkeyfinder
+Type  : SerialNumber
+Value  : FB5DA3F0-2E2C-49B9-976C
+
+===========================================================
+Name  : Lemkesoft Graphicconverter9
+Type  : serialV9
+Value  : GCH9-GQQGFX-CCW
+
+===========================================================
+Name  : Lemkesoft Graphicconverter9
+Type  : GCUserRegistrationEMail
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Lemkesoft Graphicconverter9
+Type  : GCUserRegistrationLastName
+Value  : O'Brien
+
+===========================================================
+Name  : Lemkesoft Graphicconverter9
+Type  : GCUserRegistrationFirstName
+Value  : Michael
+
+===========================================================
+Name  : Literatureandlatte Scrivener2
+Type  : SCRSerialNumber
+Value  : SCRVNR001-6318-23NS-KY9J-NGCB-XAS1
+
+===========================================================
+Name  : Macitbetter Betterzip
+Type  : MIBRegCode
+Value  : aoSTDrqYCBO6eGClOF8RQe/JiU1ln0qcEnOu1gijwgt0
+HRgqQ/GJfHzw/tGENHwDmUC7wKM/83C/yWdyxgkjTQub
+gzw3ejgePSPUxgjfga4lkn4topJ7TzRBQ0mXgQ+NipwN
+Xfz2tEgNJ1LP35K1U5maJBWXyzjHt34X6aK7evY=
+
+===========================================================
+Name  : Macphun Aurorahdrpro
+Type  : RegistrationEmailKey
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Macphun Aurorahdrpro
+Type  : RegistrationActivationKey
+Value  : BBD4-AF95-46A9-8110-19F5
+
+===========================================================
+Name  : Macphun Aurorahdrpro
+Type  : RegistrationIndexKey
+Value  : 17726522658559082388
+
+===========================================================
+Name  : Macphun Aurorahdrpro Photoextension
+Type  : RegistrationActivationKey
+Value  : BBD4-AF95-46A9-8110-19F5
+
+===========================================================
+Name  : Macphun Aurorahdrpro Photoextension
+Type  : RegistrationEmailKey
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Macphun Aurorahdrpro Photoextension
+Type  : RegistrationIndexKey
+Value  : 17726522658559082388
+
+===========================================================
+Name  : Macphun Luminar3
+Type  : RegistrationIndexKey
+Value  : 13119795264046102735
+
+===========================================================
+Name  : Macphun Luminar3
+Type  : RegistrationActivationKey
+Value  : UQ6X-4THG-N6YZ-FSMB-E4QK
+
+===========================================================
+Name  : Macphun Luminarna
+Type  : RegistrationEmailKey
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Macphun Luminarna
+Type  : RegistrationActivationKey
+Value  : E212-2924-456C-AC41-A9CF
+
+===========================================================
+Name  : Macphun Luminarna
+Type  : RegistrationIndexKey
+Value  : 12892227980624191625
+
+===========================================================
+Name  : Macphun Noiselesspro
+Type  : RegistrationEmailKey
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Macphun Noiselesspro
+Type  : RegistrationActivationKey
+Value  : F00F-90AA-49D2-9067-2040
+
+===========================================================
+Name  : Macphun Noiselesspro
+Type  : RegistrationIndexKey
+Value  : 9040923968663398758
+
+===========================================================
+Name  : Macphun Noiselesspro Photoextension
+Type  : RegistrationActivationKey
+Value  : F00F-90AA-49D2-9067-2040
+
+===========================================================
+Name  : Macphun Noiselesspro Photoextension
+Type  : RegistrationEmailKey
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Macphun Noiselesspro Photoextension
+Type  : RegistrationIndexKey
+Value  : 9040923968663398758
+
+===========================================================
+Name  : Macphun Snaphealpro
+Type  : FXPhotoStudioActivationKey
+Value  : F45D-8BDE-42AD-BFE6-F153
+
+===========================================================
+Name  : Marinersoftware Persona
+Type  : SerialUserName
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Markspace Missingsync Windowsmobile
+Type  : Handheld Type for Registration
+Value  : T-Mobile SDA
+
+===========================================================
+Name  : Markspace Missingsync Windowsmobile
+Type  : Registration Code
+Value  : 143015876001
+
+===========================================================
+Name  : Micromat Drive10
+Type  : Serial Number
+Value  : 105355271333153
+
+===========================================================
+Name  : Newton Connection
+Type  : SerialPort
+Value  : /dev/cu.usbserial-AC00JCNY
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : License.Params.4
+Value  : {
+    "cpu_limit": 32,
+    "edition": 3,
+    "grace_period_ends_at": "2022-09-05 02:41:25",
+    "hosts": [
+        {
+            "activated_at": "2021-11-24 05:59:26",
+            "hw_id": "FDFB319908F2571AAA72B2CDC6CE941A",
+            "name": "GDPR_HIDDEN",
+            "product_version": "15.1.5-47309"
+        }
+    ],
+    "is_auto_renewable": true,
+    "is_beta": false,
+    "is_bytebot": false,
+    "is_china": false,
+    "is_expired": false,
+    "is_grace_period": false,
+    "is_nfr": false,
+    "is_purchased_online": true,
+    "is_sublicense": false,
+    "is_suspended": false,
+    "is_trial": false,
+    "is_upgrade": true,
+    "lic_key": "5FDFRZ-******-******-******-TFJ7HM",
+    "limit": 1,
+    "main_period_ends_at": "2022-08-29 02:41:25",
+    "name": "",
+    "offline": false,
+    "parent_key": null,
+    "parent_uuid": null,
+    "platform": 3,
+    "product": 7,
+    "product_version": "*",
+    "ram_limit": 131072,
+    "usage": 1,
+    "uuid": "2c7fdf534b4541d4bc80a03b9aee5500"
+}
+
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : License.Params.13
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : License.Params.1
+Value  : 5FDFRZ-******-******-******-TFJ7HM
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : ActivationExperience
+Value  : enter_key
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : Register.Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : License.Params.2
+Value  : 5FDFRZ-******-******-******-TFJ7HM
+
+===========================================================
+Name  : Parallels Parallels Desktop
+Type  : License.Params.11
+Value  : 2c7fdf534b4541d4bc80a03b9aee5500
+
+===========================================================
+Name  : Popchar License
+Type  : license key
+Value  : POP-HEI-112015-S-1-435628-689495-1
+
+===========================================================
+Name  : Prosofteng Drregistration
+Type  : DRRegisterSerial
+Value  : 6100-7512-0092-9311-2
+
+===========================================================
+Name  : Prosofteng Drregistration
+Type  : DRRegisterName
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Realnetworks Realone Player
+Type  : RealPlayer\AuthKeychainAllowed
+Value  : 0
+
+===========================================================
+Name  : Realnetworks Realone Player
+Type  : RealPlayer\ClientLicenseKey
+Value  : 00000000000090000129000000007FF7FF00
+
+===========================================================
+Name  : Roxio Toast
+Type  : FirstName registration information
+Value  : Mike
+
+===========================================================
+Name  : Roxio Toast
+Type  : LastName registration information
+Value  : O'Brien
+
+===========================================================
+Name  : Roxio Toast
+Type  : Email registration information
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Settings Shareclientinfo
+Type  : HPPassword
+Value  : 1D627575ABF3CBE5B280E59F6EDBA031
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditRegisteredOwner:12.0
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditSerialNumber:7.1
+Value  : BEC700-LDJZA-T8KG5-J38HA
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditSerialNumber:11.0
+Value  : BEE110-96PQV-U5YPW-WLDSW
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditSerialNumber:13.0
+Value  : BEE130-KQ3NB-CFUFG-NNPCW
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditRegisteredOwner:13.0
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditRegisteredOwner:11.0
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditSerialNumber:9.0
+Value  : BEE900-XLBUK-836DC-7J389
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditSerialNumber:10.0
+Value  : BEE100-4VC5G-PU52M-6KQZD
+
+===========================================================
+Name  : Setup Bbedit Preferences Backup
+Type  : BBEditSerialNumber:12.0
+Value  : BEE120-38KLB-GX87Y-767UV
+
+===========================================================
+Name  : Stuffit Dropstuff
+Type  : registrationNumber
+Value  : DRPG-HAMEYPR-02032003
+
+===========================================================
+Name  : Stuffit Engine
+Type  : registrationUserName
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Stuffit Engine
+Type  : registrationNumber_16
+Value  : SDXB-2ZB4GQP-00129790
+
+===========================================================
+Name  : Systemconfiguration Preferences
+Type  : AuthPasswordEncryption
+Value  : Keychain
+
+===========================================================
+Name  : Systemconfiguration Preferences
+Type  : AuthPassword
+Value  : 0E33342F-BA0A-4796-BFED-477905E64495
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Migration-Source
+Type  : AuthPassword
+Value  : 471AF589-731F-43DC-A313-AA9E31E7EA95
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Migration-Source
+Type  : AuthPasswordEncryption
+Value  : Keychain
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Migration-Source
+Type  : AuthPassword
+Value  : FF77AE1E-5068-40BF-88C2-8FED3668D7E3
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Migration-Source
+Type  : AuthPassword
+Value  : 0E33342F-BA0A-4796-BFED-477905E64495
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Migration-Source
+Type  : AuthPassword
+Value  : 41C53F07-4CFD-4332-A5ED-2EA477BB5A13
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Repair
+Type  : AuthPasswordEncryption
+Value  : Keychain
+
+===========================================================
+Name  : Systemconfiguration Preferences-Pre-Repair
+Type  : AuthPassword
+Value  : 0E33342F-BA0A-4796-BFED-477905E64495
+
+===========================================================
+Name  : Techtool Protection Techtoolprotection
+Type  : driveSerial
+Value  : 0ba016ea820ca20b
+
+===========================================================
+Name  : Tigry Rpp
+Type  : keyValue
+Value  : CDPlX3XQ0vJ6iKkU93YWEVVFwSc0pCAgAAAAFQ
+
+===========================================================
+Name  : Tvjab
+Type  : SavePassword
+Value  : no
+
+===========================================================
+Name  : Tvjab
+Type  : Password
+Value  : Pr0t0
+
+===========================================================
+Name  : Twistedmelon Mira
+Type  : Licenses
+Value  : 1
+
+===========================================================
+Name  : Uk.Co.Canimaansoftware.Clamxav
+Type  : Registration Key
+Value  : GAWQE-F9ASB-BTZAZ-RGT7A-Z8ZDA-53D95-PKK6A-Z5DTH-A9KBS-AEY8J-EQY4H-4P9CY-RZA5G-55CLA-GPFJ6-A
+
+===========================================================
+Name  : Uk.Co.Canimaansoftware.Clamxav
+Type  : Registered Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Uk.Co.Canimaansoftware.Clamxav
+Type  : Registered User
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Uk.Co.Canimaansoftware.Clamxav Clamxav
+Type  : Registration Key
+Value  : GAWQE-F9ASB-BTZAZ-RGT7A-Z8ZDA-53D95-PKK6A-Z5DTH-A9KBS-AEY8J-EQY4H-4P9CY-RZA5G-55CLA-GPFJ6-A
+
+===========================================================
+Name  : Uk.Co.Canimaansoftware.Clamxav Clamxav
+Type  : Registered Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Uk.Co.Canimaansoftware.Clamxav Clamxav
+Type  : Registered User
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Xrite Cameracalibration
+Type  : LinkAppRegister
+Value  : https://www.xritephoto.com/getCOLORCHECKER
+
+
+Computer scan
+
+
+===========================================================
+Name  : Acorn
+Type  : Serial number
+Value  : FMAC50-LYDNHRCNK4IXBLYBKIOCYY4G26Y7YJMLTDBIJVIESZEXCIGBIE-BA6E993E
+
+===========================================================
+Name  : Acorn
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Adobe Acrobat 8 Professional
+Type  : Serial number
+Value  : 1118-0022-5499-1167-2117-8049
+
+===========================================================
+Name  : Adobe Acrobat Pro
+Type  : Serial number
+Value  : 1118-0008-5803-9728-0087-2931
+
+===========================================================
+Name  : Adobe Acrobat Pro Extended
+Type  : Serial number
+Value  : 1118-0008-5803-9728-0087-2931
+
+===========================================================
+Name  : Adobe Acrobat Pro Extended trial serial
+Type  : Serial number
+Value  : 1118-0008-8378-0939-0035-6234
+
+===========================================================
+Name  : Adobe Acrobat Pro trial serial
+Type  : Serial number
+Value  : 1118-0008-8378-0939-0035-6234
+
+===========================================================
+Name  : Adobe Acrobat Standard
+Type  : Serial number
+Value  : 1118-0008-5803-9728-0087-2931
+
+===========================================================
+Name  : Adobe Acrobat Standard trial serial
+Type  : Serial number
+Value  : 1118-0008-8378-0939-0035-6234
+
+===========================================================
+Name  : Adobe Creative Suite 3 Master Collection
+Type  : Serial number
+Value  : 1325-0360-3486-1938-9752-5455
+
+===========================================================
+Name  : Adobe Design Suite Premium CS3
+Type  : Serial number
+Value  : 1326-0519-1935-0115-5078-5159
+
+===========================================================
+Name  : Adobe Lightroom
+Type  : Serial number
+Value  : 1160-4001-4196-2844-1389-1454
+
+===========================================================
+Name  : Adobe Lightroom
+Type  : Serial number
+Value  : 1160-4007-5785-9417-0015-6870
+
+===========================================================
+Name  : Adobe Lightroom
+Type  : Serial number
+Value  : 1160-4003-8737-2183-3559-7175
+
+===========================================================
+Name  : Adobe Lightroom
+Type  : Serial number
+Value  : 1160-4007-4250-5034-9767-1510
+
+===========================================================
+Name  : Adobe Lightroom
+Type  : Serial number
+Value  : 1160-4309-9004-6434-6892-7279
+
+===========================================================
+Name  : Adobe Photoshop CS6 Extended
+Type  : Serial number
+Value  : 1330-0004-4241-7808-1598-5209
+
+===========================================================
+Name  : Adobe WebSuitePremium CS4 Mac GM en_US
+Type  : Serial number
+Value  : 1329-0029-2806-0442-7385-5592
+
+===========================================================
+Name  : AppZapper
+Type  : Serial number
+Value  : APZP-101-109-206-110
+
+===========================================================
+Name  : AppZapper
+Type  : Username
+Value  : Michael O\'Brien
+
+===========================================================
+Name  : Barebones Yojimbo
+Type  : Serial number
+Value  : YJE100-SBEMG-FN7Y3-9HEFW
+
+===========================================================
+Name  : Barebones Yojimbo
+Type  : Username
+Value  : Mike O'Brien
+
+===========================================================
+Name  : BBEdit
+Type  : Serial number
+Value  : BEE100-4VC5G-PU52M-6KQZD
+
+===========================================================
+Name  : BetterZIP
+Type  : Serial number
+Value  : aoSTDrqYCBO6eGClOF8RQe/JiU1ln0qcEnOu1gijwgt0
+HRgqQ/GJfHzw/tGENHwDmUC7wKM/83C/yWdyxgkjTQub
+gzw3ejgePSPUxgjfga4lkn4topJ7TzRBQ0mXgQ+NipwN
+Xfz2tEgNJ1LP35K1U5maJBWXyzjHt34X6aK7evY=
+
+===========================================================
+Name  : Carbon Copy Cloner 5
+Type  : Serial number
+Value  : GAWAE-FBPX7-GD95D-4T5EZ-4CMM7-4WUE6-PQD8Y-LF6YC-CQ52Y-T2XUZ-E6BHA-HBC75-GNUZQ-KYVQH-B7P9
+
+===========================================================
+Name  : Carbon Copy Cloner 5
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Carbon Copy Cloner 5
+Type  : Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : ClamXav
+Type  : Serial number
+Value  : GAWQE-F9ASB-BTZAZ-RGT7A-Z8ZDA-53D95-PKK6A-Z5DTH-A9KBS-AEY8J-EQY4H-4P9CY-RZA5G-55CLA-GPFJ6-A
+
+===========================================================
+Name  : ClamXav
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : ClamXav
+Type  : Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : Comic Life
+Type  : Serial number
+Value  : comcstd001-0026-D4N3-1HER-36A0-BFCR
+
+===========================================================
+Name  : Comic Life
+Type  : Username
+Value  : Apple Bundle
+
+===========================================================
+Name  : Creative Suite 4 Web Premium
+Type  : Serial number
+Value  : 1329-0029-2806-0442-7385-5592
+
+===========================================================
+Name  : Delicious Monster
+Type  : Serial number
+Value  : mike-o'brien-fledgy-ribless-bocking
+
+===========================================================
+Name  : Disco
+Type  : Serial number
+Value  : DSCO-110-116-186-101
+
+===========================================================
+Name  : Disco
+Type  : Username
+Value  : Michael O\\\'Brien
+
+===========================================================
+Name  : DiskAid
+Type  : Serial number
+Value  : 60d3-42f0-2cd9-e34f-9b85-cfbf-c8ef-f21d
+
+===========================================================
+Name  : DiskDrill
+Type  : Serial number
+Value  : 421C8-6BF45-1916A-9060E-D860F
+
+===========================================================
+Name  : Eltima Airy
+Type  : Serial number
+Value  : 10390-09664-FC981-714DB-26AEA
+
+===========================================================
+Name  : EmmGunn MKVtools
+Type  : Serial number
+Value  : Not Registered
+
+===========================================================
+Name  : Equinux iSale
+Type  : Serial number
+Value  : VSDAQ-XUGVF-VVVVV-V4S2K-C3FVV-RVVVV-VVVVV-VVVWM-YJRWK-J6QM7-726BW-O2T2V-4X76C-IOEHP-FHG45-SGTKR-3X32C-6NK5N-RBOCZ-MZJKS-ZBMVA-CMCIP-HJIS3-V34AF-VKK27-SIEZK-GA6Z4-L6JKF-P7RYC-3ATI5-3AGT5-RQ3MH-YAOIC-V7ICO-UNFK6-JCYQF-DRIZD-O4INF-RUD2T-Y4UQL-EPMNS-YAOOO-QHBKX-UWW5H-MOKKT-L6XJV-E2IGF-R3UKH-O7CU3-P6UNU-KLIB5-L3AOP-OGVSN-ZV3VN-COZM7-AZFAH-WEVJ3-ZHEZT-5N6JW-26DMO-74BKD-5QBWD-QED6H-5HMBQ-A2ZAJ-YWQI4-5I5FI-356N4-4JLFP-FPKWY-7ZIQW-75JRY-PWSBJ-XQWQK-3TFSV-QVM7E-KF2GE-IORJ2-EIXA6-WHXOC-6NSRW-NH4CJ-T5RAZ-EHUD6-QLQ23-BBQCL-ALSLH-D2BP5-SCEZN-7HYVU-TDHPO-QRUSH-3FGHY-QHDJVV
+
+===========================================================
+Name  : Equinux iSale
+Type  : Username
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Fadingred Senuti
+Type  : Serial number
+Value  : LGFO6JF3-FKLW5DVO-MHL6I6K3-TAK2K65N-DO3GPZLN
+
+===========================================================
+Name  : Fadingred Senuti
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : GraphicConverter
+Type  : Serial number
+Value  : GCH9-GQQGFX-CCW
+
+===========================================================
+Name  : GraphicConverter
+Type  : First name
+Value  : Michael
+
+===========================================================
+Name  : GraphicConverter
+Type  : Last name
+Value  : O'Brien
+
+===========================================================
+Name  : GraphicConverter
+Type  : Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : iClip
+Type  : Serial number
+Value  : KCTH-QXCR-KSZX
+
+===========================================================
+Name  : iWork
+Type  : Serial number
+Value  : ndqf-g3f3-l993-696d-bf9a
+
+===========================================================
+Name  : iWork
+Type  : Username
+Value  : Mike O'Brien
+
+===========================================================
+Name  : KediSoft AppShelf
+Type  : Serial number
+Value  : APPSHLF-XRNO-SOUV-UV5X-CFES-IBCF
+
+===========================================================
+Name  : Mac Product Key Finder Pro
+Type  : Serial number
+Value  : FB5DA3F0-2E2C-49B9-976C
+
+===========================================================
+Name  : MacPhun Aurora HDR Pro
+Type  : Serial number
+Value  : BBD4-AF95-46A9-8110-19F5
+
+===========================================================
+Name  : MacPhun Aurora HDR Pro
+Type  : Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : MacPhun Luminar
+Type  : Serial number
+Value  : E212-2924-456C-AC41-A9CF
+
+===========================================================
+Name  : MacPhun Luminar
+Type  : Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : MacPhun Luminar
+Type  : Auth. code
+Value  : 12892227980624191625
+
+===========================================================
+Name  : MacPhun Noiseless Pro
+Type  : Serial number
+Value  : F00F-90AA-49D2-9067-2040
+
+===========================================================
+Name  : MacPhun Noiseless Pro
+Type  : Email
+Value  : mikeobrien@spamcop.net
+
+===========================================================
+Name  : MacPhun Snaphealpro
+Type  : Serial number
+Value  : F45D-8BDE-42AD-BFE6-F153
+
+===========================================================
+Name  : MarkSpace MissingSync Windows Mobile
+Type  : Serial number
+Value  : 143015876001
+
+===========================================================
+Name  : Microsoft Office 2008
+Type  : Serial number
+Value  : G7JB7-D3H7W-G8RRG-J4426-FJFTQ
+
+===========================================================
+Name  : Microsoft Office 2008
+Type  : Username
+Value  : Michael O'Brien 
+
+===========================================================
+Name  : Microsoft Office 2008
+Type  : Product ID
+Value  : 01105-204-0294292-12118
+
+===========================================================
+Name  : OmniFocus
+Type  : Serial number
+Value  : ADAD-RMRN-GBOG-ENIG-EMWX-YEM
+
+===========================================================
+Name  : OmniFocus
+Type  : Username
+Value  : Macintosh Software Bundle
+
+===========================================================
+Name  : OmniFocus
+Type  : Serial number
+Value  : DRVX-LGEH-IFXQ-BRIN-DQHB-NDX
+
+===========================================================
+Name  : OmniFocus
+Type  : Username
+Value  : Mike O'Brien
+
+===========================================================
+Name  : Parallel's Desktop
+Type  : Serial number
+Value  : ND4X81-DGAWHS-10J9WD-V1HV2V-R2R7TR
+
+===========================================================
+Name  : PopChar
+Type  : Serial number
+Value  : POP-HEI-112015-S-1-435628-689495-1
+
+===========================================================
+Name  : ProSoftEng Data Rescue
+Type  : Serial number
+Value  : 6100-7512-0092-9311-2
+
+===========================================================
+Name  : ProSoftEng Data Rescue
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : QuickTime Pro
+Type  : Serial number
+Value  : AZKM-XB7A-FM2N-CS6B-FC58
+
+===========================================================
+Name  : QuickTime Pro
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : RealNetworks RealOne Player
+Type  : Serial number
+Value  : 00000000000090000129000000007FF7FF00
+
+===========================================================
+Name  : Scrivener
+Type  : Serial number
+Value  : SCRVNR001-6318-23NS-KY9J-NGCB-XAS1
+
+===========================================================
+Name  : Scrivener
+Type  : Username
+Value  : Michael O'Brien
+
+===========================================================
+Name  : Smith Micro StuffIt
+Type  : Serial number
+Value  : SDXB-2ZB4GQP-00129790
+
+===========================================================
+Name  : Smith Micro StuffIt
+Type  : Username
+Value  : Mike O'Brien
+
+===========================================================
+Name  : StuffIt DropStuff
+Type  : Serial number
+Value  : DRPG-HAMEYPR-02032003
+
+===========================================================
+Name  : TechTool Pro
+Type  : Serial number
+Value  : 117994999169999
+
+===========================================================
+Name  : VMware Fusion for Mac OS
+Type  : Serial number
+Value  : N4405-4ULEM-J8F33-03A8H-AMLM6
+
+===========================================================
+Name  : VMware Fusion for Mac OS
+Type  : Serial number
+Value  : 054C4-6XH11-N89DA-0C0AK-9410H
+
+
+Devices and Mac info
+
+
+===========================================================
+Name  : (null) (last connected: 2005-06-26)
+Type  : Serial number
+Value  : U2145J7XLG6
+
+===========================================================
+Name  : Abaia
+Type  : Serial number
+Value  : NFN0QMJX07
+
+===========================================================
+Name  : Abaia
+Type  : Product ID
+Value  : UUID: BE6326B2-8007-5E44-808E-847BBB3306D4
+
+===========================================================
+Name  : Abaia
+Type  : Extra info
+Value  : OSX v10.16.0, model identifier: Mac13,2
+
+===========================================================
+Name  : iPad (last connected: 2011-07-15)
+Type  : Serial number
+Value  : V50368S1ETU
+
+===========================================================
+Name  : iPad (last connected: 2011-07-15)
+Type  : IMEI
+Value  : 012328005464434
+
+===========================================================
+Name  : iPad (last connected: 2012-03-18)
+Type  : Serial number
+Value  : V50368S1ETU
+
+===========================================================
+Name  : iPad (last connected: 2012-03-18)
+Type  : IMEI
+Value  : 012328005464434
+
+===========================================================
+Name  : iPad (last connected: 2016-02-28)
+Type  : Serial number
+Value  : DMPNKG8LG5YQ
+
+===========================================================
+Name  : iPad (last connected: 2016-02-28)
+Type  : IMEI
+Value  : 355889060441299
+
+===========================================================
+Name  : iPad (last connected: 2017-03-27)
+Type  : Serial number
+Value  : DLXHCDZ6DVGJ
+
+===========================================================
+Name  : iPad (last connected: 2017-03-27)
+Type  : IMEI
+Value  : 013116005852289
+
+===========================================================
+Name  : iPad (last connected: 2018-04-02)
+Type  : Serial number
+Value  : DMPVD2VSHPT4
+
+===========================================================
+Name  : iPad (last connected: 2018-04-02)
+Type  : IMEI
+Value  : 355818082966363
+
+===========================================================
+Name  : iPad (last connected: 2019-09-27)
+Type  : Serial number
+Value  : DMPRG9JEGXQ7
+
+===========================================================
+Name  : iPad (last connected: 2019-09-27)
+Type  : IMEI
+Value  : 355450071710733
+
+===========================================================
+Name  : iPhone (last connected: 2011-05-03)
+Type  : Serial number
+Value  : 878286941R4
+
+===========================================================
+Name  : iPhone (last connected: 2011-05-03)
+Type  : IMEI
+Value  : 011613002168703
+
+===========================================================
+Name  : iPhone (last connected: 2011-07-19)
+Type  : Serial number
+Value  : 80112HLRA4T
+
+===========================================================
+Name  : iPhone (last connected: 2011-07-19)
+Type  : IMEI
+Value  : 012658000624180
+
+===========================================================
+Name  : iPhone (last connected: 2012-04-24)
+Type  : Serial number
+Value  : 878525N6Y7H
+
+===========================================================
+Name  : iPhone (last connected: 2012-04-24)
+Type  : IMEI
+Value  : 011772007972491
+
+===========================================================
+Name  : iPhone (last connected: 2012-05-04)
+Type  : Serial number
+Value  : 878286941R4
+
+===========================================================
+Name  : iPhone (last connected: 2012-05-04)
+Type  : IMEI
+Value  : 011613002168703
+
+===========================================================
+Name  : iPhone (last connected: 2013-10-01)
+Type  : Serial number
+Value  : 80112HLRA4T
+
+===========================================================
+Name  : iPhone (last connected: 2013-10-01)
+Type  : IMEI
+Value  : 012658000624180
+
+===========================================================
+Name  : iPhone (last connected: 2017-12-20)
+Type  : Serial number
+Value  : F2LQD1CKGRXC
+
+===========================================================
+Name  : iPhone (last connected: 2017-12-20)
+Type  : IMEI
+Value  : 353293070222710
+
+===========================================================
+Name  : iPhone (last connected: 2019-10-12)
+Type  : Serial number
+Value  : F71WN0ZNHG6X
+
+===========================================================
+Name  : iPhone (last connected: 2019-10-12)
+Type  : IMEI
+Value  : 354912090473115
+
+===========================================================
+Name  : iPhone (last connected: 2019-12-29)
+Type  : Serial number
+Value  : DNPLFQ8UFFDP
+
+===========================================================
+Name  : iPhone (last connected: 2019-12-29)
+Type  : IMEI
+Value  : 013789000412588
+
+===========================================================
+Name  : iPhone (last connected: 2020-01-28)
+Type  : Serial number
+Value  : C6KSV0SQHG6X
+
+===========================================================
+Name  : iPhone (last connected: 2020-01-28)
+Type  : IMEI
+Value  : 355310088973411
+
+===========================================================
+Name  : iPhone (last connected: 2021-04-26)
+Type  : Serial number
+Value  : G6TVNUTYJCL8
+
+===========================================================
+Name  : iPhone (last connected: 2021-04-26)
+Type  : IMEI
+Value  : 359410085106332
+
+===========================================================
+Name  : iPhone (last connected: 2021-11-11)
+Type  : Serial number
+Value  : HY64C72W7M
+
+===========================================================
+Name  : iPhone (last connected: 2021-11-11)
+Type  : IMEI
+Value  : 351228764529287
+
+===========================================================
+Name  : iPod (last connected: 2008-03-06)
+Type  : Serial number
+Value  : JQ5261R6TDU
+
+===========================================================
+Name  : iPod (last connected: 2012-05-21)
+Type  : Serial number
+Value  : JQ5261R6TDU
+
+===========================================================
+Name  : iPod (last connected: 2013-04-10)
+Type  : Serial number
+Value  : 2CD5230XNW
+
+===========================================================
+Name  : iPod (last connected: 2013-04-10)
+Type  : Serial number
+Value  : JQ4433EWQKL
+
+===========================================================
+Name  : iPod (last connected: 2018-12-31)
+Type  : Serial number
+Value  : 8K752G2QYMX
+
+===========================================================
+Name  : iPod (last connected: 2021-07-25)
+Type  : Serial number
+Value  : 8L737A64YMV
+
+===========================================================
+Name  : iPod (last connected: 2022-03-14)
+Type  : Serial number
+Value  : 8N746GCQYMV

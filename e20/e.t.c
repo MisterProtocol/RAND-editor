@@ -944,10 +944,10 @@ Reg2 Nlines nl;
     Reg3 Nlines winlin;
     Reg1 Slines cl;
 
-/**/
+/**
 dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d curlas=%d\n",
  nl, curwksp->wlin, cursorline, curwin->btext, curlas);
-/**/
+**/
 
     /* We have seen the value of nl arrive as a very large
      * number (MAXLONG) as a result of an expression with

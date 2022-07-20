@@ -62,13 +62,13 @@
 #endif
 
 /**/
-#include <stdio.h>
 #include <ctype.h>  /* uptovax WG */
 /* #include <sys/types.h> */
 /* #include <sgtty.h> */
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #define BELL 07
 

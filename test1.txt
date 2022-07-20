@@ -17,3 +17,8 @@ Here (is) a {brace matching} test including [brackets and such].
 
 
 	       A line for fun.
+
+I sure wish this thing would quit corrupting the heap.
+
+Well, MOSTLY it seems to work...
+

@@ -10,11 +10,11 @@
 
 #endif
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define NBUF (BUFSIZ * 8)
 

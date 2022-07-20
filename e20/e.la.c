@@ -112,7 +112,7 @@ Nlines  ln;
 	    Reg2 Char ch;
 	    /* dbg */
 	    /*Ncols endcl_clp = (Ncols)(endcl-clp);*/
-	    /*dbgpr("GetLine, --nleft bef excline, ncline=(%ld) nleft=(%ld) endcl_clp=(%d)\n", ncline,nleft,endcl_clp);*/
+	    /**dbgpr("GetLine, --nleft bef excline, ncline=(%ld) nleft=(%ld) endcl=(%d)\n", ncline,nleft,endcl);**/
 	    if (clp > endcl) Block {    /* check if room in cline */
 		Reg1 Ncols i1;
 		/*ncline = (i1 = clp - cline) + 1;*/
@@ -122,7 +122,7 @@ Nlines  ln;
 		endcl = &cline[lcline - 9];
 		/*dbg*/
 		/*endcl_clp = (Ncols)(endcl-clp);*/
-		/*dbgpr("GetLine, clp > endcl--nleft bef excline, ncline=(%ld) nleft=(%ld) endcl_clp=(%d)\n", ncline,nleft,endcl_clp);*/
+		/**dbgpr("GetLine, clp > endcl--nleft bef excline, ncline=(%ld) nleft=(%ld) endcl=(%d)\n", ncline,nleft,endcl);**/
 
 	    }
     /** dbgpr("GetLine, --nleft aft excline, ncline=(%ld) nleft=(%ld)\n", ncline,nleft); **/
@@ -453,14 +453,24 @@ Ncols length;
 
     if ((j = lcline + icline) < length)
 	j = length;
+    if (j < ncline) {
+    /**/ dbgpr("excline FIX: j=%ld ncline=%ld\n", j, ncline); /**/
+	j = ncline + 1;
+    }
 
     /*tmp = salloc ((int) (j + 1), YES);*/
-/**   dbgpr("xcline: calling salloc, n=(%ld) ncline=(%ld) lcline=(%ld) icline=(%ld)\n",
+/**   dbgpr("excline: calling salloc, j=(%ld) ncline=(%ld) lcline=(%ld) icline=(%ld)\n",
       j, ncline, lcline, icline);  **/
     tmp = salloc ((Ncols) (j + 1), YES);
-    if (ncline > 0)
+    if (tmp == NULL) {
+	dbgpr("excline: null return!\n");
+	fatal (LAFATALBUG, "NULL return from salloc()\n");
+    }
+    if (ncline > 0) {
 	/*move (cline, tmp, (Uint) ncline);*/
+/**	dbgpr("excline: my_move(%x, %x, %d);\n", cline, tmp, ncline); **/
 	my_move (cline, tmp, (ulong) ncline);
+    }
     icline += icline / 2; /* should we have a max here? */
     lcline = j;
     sfree (cline);

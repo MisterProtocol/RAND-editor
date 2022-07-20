@@ -116,7 +116,7 @@ target sys5: E_TCLIB = -lncurses
 # point to wherever you have ncurses-6.2 installed.
 # mob 10/17/2021
 BSDCFLAGS  = -g -Wall -Wextra -Wno-implicit-fallthrough -Wsign-conversion \
-    -Wmissing-prototypes # -O
+    -Wmissing-prototypes -Wno-nullability-completeness # -O
 #BSDCFLAGS  = -g -I/Users/obrien/Projects/ncurses/include -I/Users/obrien/Projects/ncurses/include/ncurses # -O
 S5LDFLAGS  = -g
 BSDLDFLAGS = -g

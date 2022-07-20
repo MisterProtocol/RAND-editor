@@ -242,6 +242,7 @@ typedef unsigned long ulong;	/* God knows why this is needed */
 /* #define CLEARONEXIT          / * if defined, clears screen on exit    */
 /* #define DEBUGDEF             / * misc debugging stuff                 */
 # define sfree(c) free (c)
+/* # define sfree(c) */
 
 #define CATCHSIGS               /* ignore signals */
 #define DUMPONFATAL             /* dump always on call to fatal (..)    */

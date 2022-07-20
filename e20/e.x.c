@@ -137,21 +137,21 @@ Small   paramtype;
 
 
 /* initialize cline to be empty */
-char   *cline;			/* array holding current line		*/
+char   *cline = NULL;			/* array holding current line		*/
 
 /* nxt 3 were Short */
-Ncols   ncline;                 /* number of chars in current line      */
-Ncols   lcline;                 /* length of cline buffer               */
-Ncols   icline = 100;           /* initial increment for expansion */
+Ncols   ncline = 0;                 /* number of chars in current line      */
+Ncols   lcline = 0;                 /* length of cline buffer               */
+Ncols   icline = 128;           /* initial increment for expansion */
 
-Flag    fcline,                 /* flag - has line been changed ?       */
-	ecline,                 /* line contains DEL escapes            */
-	cline8,                 /* line may contain chars with 8th bit set */
-	xcline;                 /* cline was beyond end of file         */
+Flag    fcline = 0,                 /* flag - has line been changed ?       */
+	ecline = 0,                 /* line contains DEL escapes            */
+	cline8 = 0,                 /* line may contain chars with 8th bit set */
+	xcline = 0;                 /* cline was beyond end of file         */
 
 Fn      clinefn;                /* Fn of cline                          */
-Nlines  clineno;                /* line number in workspace of cline    */
-La_stream *clinelas;            /* La_stream of current line */
+Nlines  clineno = 0;                /* line number in workspace of cline    */
+La_stream *clinelas = (La_stream *)NULL;            /* La_stream of current line */
 
 /* One of the following strings must be non-null.
  * That is to say you can NOT disable the backups feature

@@ -61,6 +61,7 @@ mainloop ()
 	char *s2, *tmpb, b[BUFSIZ]; /* added 10/18/82 MAB */
 
     for (;;) {
+	key = (Char) 0;
 funcdone:
 	loopflags.clear = YES;
 newnumber:
