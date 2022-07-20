@@ -7,9 +7,15 @@
 
 # RAND editor files
 .es1*
+.ek1*
+.ec1*
 e.r.c
 le
 le.old
+t
+t.c
+t1.c
+t2.c
 
 # Object files
 *.o
