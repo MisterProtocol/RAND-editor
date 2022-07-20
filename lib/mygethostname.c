@@ -2,6 +2,7 @@
 #ifdef HOSTTMPNAMES
 
 #include <stdio.h>
+#undef BSD		    /* MacOS defines BSD in param.h -- we don't otherwise use it in this file, so... */
 #include <sys/param.h>      /* for MAXHOSTNAMELEN */
 #include <unistd.h>
 

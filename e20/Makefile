@@ -46,7 +46,8 @@ SIG_INCL =signal.h
 #STD     = /usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/
-STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
+#STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
+STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX13.sdk/usr/include/
 
 # --begin 2/21/2020 comments, amended MOB 3/8/2021
 # if libtinfo is available (provided by ncurses package)

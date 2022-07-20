@@ -10,6 +10,7 @@
 #ifdef SYSIII
 #include <termio.h>
 #else
+#include "undefs.h"
 #include <sgtty.h>
 #include <sys/ioctl.h>
 extern struct sgttyb instty, outstty;
