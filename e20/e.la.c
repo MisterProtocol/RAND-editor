@@ -451,11 +451,11 @@ Ncols length;
     Reg1 Ncols  j;
     Reg2 char  *tmp;
 
-    if ((j = lcline + icline) < length)
+    if ((j = lcline + icline + 2) < length)
 	j = length;
     if (j < ncline) {
-    /**/ dbgpr("excline FIX: j=%ld ncline=%ld\n", j, ncline); /**/
-	j = ncline + 1;
+    /**/ dbgpr("excline FIX: j=%ld, length=%ld, lcline=%ld, icline=%ld, ncline=%ld\n", j, length, lcline, icline, ncline); /**/
+	/* j = ncline + 1; */
     }
 
     /*tmp = salloc ((int) (j + 1), YES);*/

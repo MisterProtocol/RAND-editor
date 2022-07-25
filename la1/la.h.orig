@@ -49,7 +49,7 @@ typedef struct lafsd {
     struct lafile *fsdfile;     /* lafile pointer of file containing lines.*/
 				/*  0 if this is the last fsd in chain.    */
     long fsdpos;                /* location of first character             */
-    long  fsdnbytes;            /* num of bytes in this fsd if regular fsd */
+    short fsdnbytes;            /* num of bytes in this fsd if regular fsd */
     char fsdnlines;             /* number of lines in this fsd.            */
 				/*  0 if this is the last fsd in chain.    */
     char fsdbytes[1];           /* bytes describing the linelengths.       */
@@ -77,10 +77,10 @@ typedef struct lafile {
 #define LA_MODIFIED   04        /* file has been modified */
 
 struct la_fpos {                /* used by la_ldelete */
-    long            xla_fsline;/* which line of current fsd starting at 0 */
-    long            xla_fsbyte;/* index into fsdbytes in current fsd */
-    long            xla_lbyte; /* offset from beginning of current line */
-    long            xla_ffpos; /* fsd fsdpos + this = offset in la_ffs */
+    short            xla_fsline;/* which line of current fsd starting at 0 */
+    short            xla_fsbyte;/* index into fsdbytes in current fsd */
+    short            xla_lbyte; /* offset from beginning of current line */
+    short            xla_ffpos; /* fsd fsdpos + this = offset in la_ffs */
  };
 struct la_spos {                /* used by la_align */
     struct la_fpos   la_fpos;

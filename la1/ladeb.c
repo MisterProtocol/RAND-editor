@@ -72,9 +72,9 @@ char *txt;
 {
     printf ("La_stream dump:                  %0lx", (unsigned long)&txt);
     putchar ('\n');
-    printf ("  file= 0x%lx, cfsd= 0x%lx, fsline= %d, ",
+    printf ("  file= 0x%lx, cfsd= 0x%lx, fsline= %ld, ",
 	    (unsigned long)plas->la_file, (unsigned long)plas->la_cfsd, plas->la_fsline);
-    printf ("fsbyte= %d, lbyte= %d, ffpos= %d\n",
+    printf ("fsbyte= %ld, lbyte= %ld, ffpos= %ld\n",
 	    plas->la_fsbyte, plas->la_lbyte, plas->la_ffpos);
     printf ("  lpos= %ld, bpos= %d, back= 0x%lx, forw= 0x%lx, sflags= %d\n",
 	    plas->la_lpos,

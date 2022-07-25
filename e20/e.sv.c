@@ -230,6 +230,17 @@ Flag rmbak;
 	char tmp_template[200];
 #endif
 	Nlines ltmp;
+	/*
+	 * Leaving this in here in case we need it again.
+	 * If the editor goes into a loop writing the save file
+	 * and fills the file system, the following code will
+	 * stop it short and give a core dump.
+	 */
+	/*
+	struct rlimit rlp;
+	getrlimit (RLIMIT_FSIZE, &rlp);
+	rlp.rlim_cur = 50*1024*1024;
+	setrlimit (RLIMIT_FSIZE, &rlp); */
 	mesg (TELALL + 3, "SAVE: ", origfile,
 	      hasmultlinks ? " (breaking link)" : "");
 	d_put (0);
@@ -251,6 +262,8 @@ Flag rmbak;
 	    return NO;               /* error */
 	}
 #endif
+	dbgpr ("fn = %d, size = %d, tempfd = %d\n", fn, la_lsize (&fnlas[fn]), tempfd);
+	/* fatal (FATALBUG, "BYE!"); */
 	if ((ltmp = la_lflush (&fnlas[fn], (La_linepos) 0,
 		       la_lsize (&fnlas[fn]), tempfd, NO))
 	    != la_lsize (&fnlas[fn])

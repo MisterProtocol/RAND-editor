@@ -1,4 +1,14 @@
 #--------------------------------------------------------------------------
+# 7/25/2022: Significant changes to the Makefile and to e20/Makefile.
+# The current version of the editor is "e20" and all code is contained in
+# the e20/ subdirectory.  e19/ is kept for historical reference.
+#
+# Building e20 on current versions of MacOS (Catalina and beyond) requires
+# some fiddling with e20/Makefile.  See that Makefile for details. Basically,
+# Apple has gotten rid of /usr/include and moved all the header files to
+# a blizzard of different SDK directories.  You have to pick the right one
+# for your system. e20/Makefile tells you how.
+#--------------------------------------------------------------------------
 # 2/11/2020:  if -ltinfo is not installed (provided by the ncurses package)
 #  a local copy of termcap can now be linked with the le binary.
 #
@@ -150,7 +160,8 @@ sys5:   $(S5LIBS)
 
 
 bsd:    $(BSDLIBS)
-	cd e20; $(MAKE) E_TCLIB=$(E_TCLIB) \
+	cd e20; $(MAKE) MacOSX=1 \
+		E_TCLIB=$(E_TCLIB) \
 		LOCALINCL="$(LOCALINCL)" \
 		CC="$(CC)" \
 		CFLAGS="$(BSDDEFINES) $(BSDCFLAGS)" \

@@ -42,12 +42,20 @@ SIG_INCL =signal.h
 # This puts the entire tree where a naive compiler expects to find it.  If
 # there's a /usr/include directory out there already, you may want to save
 # it and create a new one.   -- Mike O'Brien, 3/28/22, still with the COVID
+#
+# Newer instructions: run "xcrun --show-sdk-path" to find out where your
+# CommandLineTools keep their header files; then add "/usr/include/" to
+# the end of that path and use it to define "STD" below.
+# -- Mike O'Brien, 7/25/22, can you believe COVID is still a thing?
 
-#STD     = /usr/include/
+STD     = /usr/include/
+
+ifdef MacOSX
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/
-#STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
-STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX13.sdk/usr/include/
+STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
+#STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX13.sdk/usr/include/
+endif
 
 # --begin 2/21/2020 comments, amended MOB 3/8/2021
 # if libtinfo is available (provided by ncurses package)
