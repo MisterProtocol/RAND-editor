@@ -12,7 +12,8 @@ repository can build binaries of the editor for both Linux and MacOS.
 Small tweaks to the Makefiles are necessary to compile the
 code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
-of the `#include` files.  These changes are discussed below.
+of the `#include` files.  These changes are discussed in the
+Makefiles.
 
 The code can also be compiled and run under Windows using WSL, the Windows
 Subsystem for Linux, in which case it builds and runs just as it would
@@ -37,6 +38,10 @@ It is intended that there be two branches in this repository, which will
 not be merged.  One branch (`original`) contains the code for
 the RAND editor as forward-ported to Linux and MacOS, but with no further
 additions made, except for bug fixes.  This version is called e19.
+It should be noted that the 'original' branch, e19, will have problems
+editing files with extremely long lines, due to some problems with
+"short" integers in the underlying Line Access library.  This has
+been fixed in the newer branch.
 
 The second branch (`main`) contains code developed from the first branch,
 which supports use of the mouse, and colored text highlighting on terminal
@@ -148,6 +153,17 @@ prior to 6.2.  Unsetting the TERMINFO_DIRS environment variable, which
 is set by iTerm2, causes the system definition to be used.  Unsetting
 this environment variable in .cshrc or .profile is feasible because
 the shell executes these after iTerm2 has set up the environment.)
+
+It should be noted that the 'main' branch, e19, doesn't use any of this,
+and in fact uses the older <sgtty.h> terminal interface.  The newer
+interface, <term.h>, is used by the mouse support code in branch 'main'.
+However, the code still includes <sgtty.h> for some of its code.  These
+two include files are not supposed to be used together, but our
+mandate was not to rewrite the entire editor.  Therefore, there is
+a collection of '#undef' directives in the code to allow these
+two include files to coexist without causing multiple definition
+errors.  Yes, this is ugly.  No, we're not fixing it.  If you want
+to see ugly, take a look at the code in "GetLine()".
 
 
 ### Filter Programs
