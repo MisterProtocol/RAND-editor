@@ -262,7 +262,7 @@ Flag rmbak;
 	    return NO;               /* error */
 	}
 #endif
-	dbgpr ("fn = %d, size = %d, tempfd = %d\n", fn, la_lsize (&fnlas[fn]), tempfd);
+	/* dbgpr ("fn = %d, size = %d, tempfd = %d\n", fn, la_lsize (&fnlas[fn]), tempfd); */
 	/* fatal (FATALBUG, "BYE!"); */
 	if ((ltmp = la_lflush (&fnlas[fn], (La_linepos) 0,
 		       la_lsize (&fnlas[fn]), tempfd, NO))
