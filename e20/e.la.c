@@ -453,10 +453,12 @@ Ncols length;
 
     if ((j = lcline + icline + 2) < length)
 	j = length;
+#ifdef NODEF
     if (j < ncline) {
     /**/ dbgpr("excline FIX: j=%ld, length=%ld, lcline=%ld, icline=%ld, ncline=%ld\n", j, length, lcline, icline, ncline); /**/
 	/* j = ncline + 1; */
     }
+#endif /* NODEF */
 
     /*tmp = salloc ((int) (j + 1), YES);*/
 /**   dbgpr("excline: calling salloc, j=(%ld) ncline=(%ld) lcline=(%ld) icline=(%ld)\n",

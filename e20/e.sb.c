@@ -595,12 +595,14 @@ Flag fatalflg;
 * 3/2014:  e64 bug, until the cause of the core dump is fixed, let's punt
 * with a useful message to the user.
 */
+#ifdef NODEF    
 if( n > 2 * 32768L ) {
   /**dbgpr("salloc, > 40K, n=%ld\n", n); **/
   getout(NO, "e64 bug, line length too long (>32K), ncline=(%ld); try using e32 for now.", n, ncline);
   /*fatal(FATALMEM, "e bug, line too long, n=(%ld) ncline=(%ld)", n, ncline);*/
   exit (-1);
 }
+#endif /* NODEF */
     /*if ((cp = calloc ((unsigned) n, 1)) == NULL) {*/
     if ((cp = calloc ((size_t) n, 1)) == NULL) {
 	if (fatalflg)

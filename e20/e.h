@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+/* #include <sys/resource.h> */
 #define USE_MKSTEMP     /* instead of mktemp which is unsafe */
 #endif /* GCC */
 

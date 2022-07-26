@@ -378,6 +378,19 @@ Reg2 char *argv[];
     char    ichar;      /* must be a char and can't be a register */
     char    *cp;
 
+/*
+ * Leaving this in here in case we need it again.
+ * If the editor goes into a loop writing the save file
+ * and fills the file system, the following code will
+ * stop it short and give a core dump.
+ */
+/*
+#include <sys/resource.h>
+	struct rlimit rlp;
+	getrlimit (RLIMIT_FSIZE, &rlp);
+	rlp.rlim_cur = 50*1024*1024;
+	setrlimit (RLIMIT_FSIZE, &rlp);
+*/
 #ifdef BSD
 #ifndef VBSTDIO
     setbuf (stdout, (char *)_sobuf);
