@@ -253,6 +253,25 @@ out on the whole `config` thing by quite a few decades.  (Personal note:
 Frankly, I'm surprised it even uses `make`.  It didn't used to.  In the
 old days it was compiled by a shell script. --MOB)
 
+### Shell files for Macs
+
+Modern MacOS version hate like crazy to leave core dump files.  To get
+an "e" core dump file for debugging purposes, you have to
+issue "limit core unl" to the top-level shell, then run a couple of
+shell files in the top-level distribution directory.  The file
+"entitlements.sh" creates the file "tmp.entitlements", which contains
+magic code to allow a core dump to happen.  Then, the shell
+file "coredump.sh" uses this to sign a freshly-created "e20/le"
+binary executable.  "tmp.entitlements" only has to be created once.
+"coredump.sh" has to be re-run on every newly-compiled editor binary
+that you want to be able to dump core.  Typically you want a core
+dump so you can examine what went wrong using the "lldb" debugger.
+Unlike the early days of UNIX, core dump files are not left in the
+current directory; they're left in "/cores" in a file named with the
+process ID they represent.  Cleaning out "/cores" is therefore not
+only to reclaim space (MacOS core dumps are unbelievably huge) but
+to avoid confusion.
+
 ### What to Do First
 
 Read the `README` file.  Read the top level `Makefile`, and `e20/Makefile`.
