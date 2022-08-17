@@ -1826,6 +1826,7 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
    statef_mrk.mrkwinlin, statef_mrk.mrkwincol, statef_mrk.mrklin, (short) statef_mrk.mrkcol);
  **/
 	curmark = &statef_mrk;
+	info (inf_mark, 4, "MARK");
 
 #ifdef OUT
     if (getc (gbuf)) {  /* curmark */
