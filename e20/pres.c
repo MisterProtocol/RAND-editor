@@ -43,47 +43,45 @@ char _sobuf[BUFSIZ];
 
 FILE *tfopen ();
 
-void getoptions();
-void filterfiles();
-void my_local_filter();
-void my_getout();
-void my_getprogname();
-void getoptions();
-void stop();
-void setraw();
-void badstart();
-void doit();
-int  intss();
-void badstart();
-void doscrsize();
-void dotime();
-void dofill();
-void dosrch();
-void doinmode();
-void dooldmark();
-char dowindow();
-void sepwindows();
-void domargins();
-void dooldalt();
-void dooldfile();
-void dotermtype();
-void dorexp();
-void domodes();
-void domark();
-void doauto();
-void dotrack();
-void dosets();
-void doalt();
-void dofile();
-void my_dotabs();
-void doinplace();
-void dokbfile();
-void dotermname();
-void docolors();
-void domouse();
-void dobrace();
-void dohighlight();
-void doinplace();
+void getoptions(int);
+void filterfiles(int);
+void my_local_filter(void);
+void my_getout(int);
+void my_getprogname(void);
+void stop(void);
+void setraw(void);
+void badstart(void);
+void doit(void);
+int  intss(void);
+void badstart(void);
+void doscrsize(void);
+void dotime(void);
+void dofill(void);
+void dosrch(void);
+void doinmode(void);
+void dooldmark(void);
+char dowindow(void);
+void sepwindows(void);
+void domargins(int);
+void dooldalt(void);
+void dooldfile(void);
+void dotermtype(void);
+void dorexp(void);
+void domodes(void);
+void domark(void);
+void doauto(void);
+void dotrack(void);
+void dosets(void);
+void doalt(void);
+void dofile(void);
+void my_dotabs(void);
+void doinplace(void);
+void dokbfile(void);
+void dotermname(void);
+void docolors(void);
+void domouse(void);
+void dobrace(void);
+void dohighlight(void);
 
 #define STATSIZE 100     /* max num of characters returned by stat call */
 #define BELL 07
@@ -183,7 +181,7 @@ char **argv;
 
 
 void
-my_getprogname()
+my_getprogname(void)
 {
     register char *cp;
     register char lastc = '\0';
@@ -313,7 +311,7 @@ filterfiles(int check_only)
 }
 
 void
-my_local_filter ()
+my_local_filter (void)
 {
     if ( input == stdin && intss() )
 	fprintf(stderr,"%c%s: start typing.\n",BELL,progname);
@@ -334,10 +332,11 @@ my_local_filter ()
 
 
 void
-doit()
+doit(void)
 {
     int n, revision, nwinlist;
-    Char chr, majdev, mindev;
+    __attribute__((unused)) Char chr;	/* We just want to make sure getc() returns EOF */
+    Char majdev, mindev;
 
     printf ("Revision %d\n", revision = - getshort (input));
     output_done = 1;
@@ -369,7 +368,7 @@ contcase:
 	nwinlist = dowindow();
 	for (n = 0; n < nwinlist; n++) {
 	    sepwindows();
-	    domargins();
+	    domargins(0);
 	    dooldalt();
 	    dooldfile();
 	}
@@ -427,7 +426,7 @@ contcase:
 }
 
 void
-badstart()
+badstart(void)
 {
     int nerr;
 
@@ -441,7 +440,7 @@ badstart()
 
 
 void
-setraw ()
+setraw (void)
 {
 #ifdef RAWMODE
     if (gtty (INSTREAM, &instty) != -1) {
@@ -457,7 +456,7 @@ setraw ()
 }
 
 void
-stop ()
+stop (void)
 {
     fprintf(stderr,"%s: stopped.\n",progname);
     my_getout(-1 - output_done);
@@ -471,7 +470,7 @@ my_getout (int status)
 }
 
 void
-fixtty ()
+fixtty (void)
 {
 #ifdef RAWMODE
     if (rawflg)
@@ -492,7 +491,7 @@ xintss()
 */
 
 void
-dotermtype ()
+dotermtype (void)
 {
 	short nletters;
 
@@ -507,17 +506,17 @@ dotermtype ()
 }
 
 void
-doscrsize()
+doscrsize(void)
 {
-	char nlin, ncol;
+	unsigned char nlin, ncol;
 
-	nlin = getc (input) & 0377;
-	ncol = getc (input) & 0377;
+	nlin = (unsigned char) (getc (input) & 0377);
+	ncol = (unsigned char) (getc (input) & 0377);
 	printf ("Screen size: %d x %d\n", nlin, ncol);
 }
 
 void
-dotime()
+dotime(void)
 {
 	long tmpl;
 
@@ -526,7 +525,7 @@ dotime()
 }
 
 void
-my_dotabs()
+my_dotabs(void)
 {
 	short n;
 
@@ -544,13 +543,13 @@ my_dotabs()
 }
 
 void
-dofill()
+dofill(void)
 {
 	printf ("Width for fill, etc. = %d\n", getshort (input));
 }
 
 void
-dosrch()
+dosrch(void)
 {
 	short nletters;
 
@@ -567,7 +566,7 @@ dosrch()
 }
 
 void
-doinmode()
+doinmode(void)
 {
 	printf ("INSERT mode ");
 	if (getc (input))
@@ -577,7 +576,7 @@ doinmode()
 }
 
 void
-dorexp ()
+dorexp (void)
 {
 	printf ("RE mode ");
 	if (getc (input))
@@ -587,14 +586,14 @@ dorexp ()
 }
 
 void
-doinplace()
+doinplace(void)
 {
 	
 	printf ("INPLACE %s.\n",  getc(input) ? "on" : "off" );
 }
 
 void
-dokbfile()
+dokbfile(void)
 {
 	short nletters;
 
@@ -611,7 +610,7 @@ dokbfile()
 }
 
 void
-dotermname()
+dotermname(void)
 {
 	short nletters;
 
@@ -628,7 +627,7 @@ dotermname()
 }
 
 void
-docolors()
+docolors(void)
 {
 	char fg_rgb_options;
 	char bg_rgb_options;
@@ -639,11 +638,11 @@ docolors()
 	short setaf, setab;
 	short btn_font_n;
 
-	fg_rgb_options = getc (input);
+	fg_rgb_options = (char) getc (input);
 	fg_r = getshort (input);
 	fg_g = getshort (input);
 	fg_b = getshort (input);
-	bg_rgb_options = getc (input);
+	bg_rgb_options = (char) getc (input);
 	bg_r = getshort (input);
 	bg_g = getshort (input);
 	bg_b = getshort (input);
@@ -677,7 +676,7 @@ docolors()
 }
 
 void
-domouse()
+domouse(void)
 {
 	printf ("SHOWBUTTONS %s.\n",   getc(input) ? "on" : "off" );
 	printf ("SKIPMOUSE %s.\n",   getc(input) ? "on" : "off" );
@@ -685,13 +684,13 @@ domouse()
 }
 
 void
-dobrace()
+dobrace(void)
 {
 	printf ("BRACEMATCH %s.\n",   getc(input) ? "on" : "off" );
 }
 
 void
-dohighlight()
+dohighlight(void)
 {
 	int nletters;
 
@@ -709,19 +708,20 @@ dohighlight()
 }
 
 void
-domark()
+domark(void)
 {
-	long winlin;
-	short col, wincol;
+	long winlin, wincol;
+	short col;
 	char lin;
 
 	if (getc (input)) {
 	    printf ("MARK in effect:\n");
 	    winlin = getlong  (input);
-	    wincol = getshort (input);
+	/*  wincol = getshort (input); */
+	    wincol = getlong (input);
 	    lin    = getc     (input);
 	    col    = getshort (input);
-	    printf ("  window at (%ld, %d); cursor at (%d, %d)\n",
+	    printf ("  window at (%ld, %ld); cursor at (%d, %d)\n",
 		     winlin, wincol, lin, col);
 	}
 	else
@@ -729,7 +729,7 @@ domark()
 }
 
 void
-dooldmark()
+dooldmark(void)
 {
 	short col, wincol, winlin;
 	char lin;
@@ -748,7 +748,7 @@ dooldmark()
 }
 
 void
-doauto()
+doauto(void)
 {
 	if (getc (input))
 		printf ("AUTOfill is on.\n");
@@ -758,7 +758,7 @@ doauto()
 }
 
 char
-dowindow()
+dowindow(void)
 {
 	char nwinlist, winnum;
 
@@ -780,16 +780,16 @@ domargins(n)
 
 	printf ("Window %d:\n", n);
 	printf ("  Previous window: %d\n", getc (input));
-	tmarg = getc     (input);
+	tmarg = (char) getc     (input);
 	lmarg = getshort (input);
-	bmarg = getc     (input);
+	bmarg = (char) getc     (input);
 	rmarg = getshort (input);
 	printf ("  (%d, %d, %d, %d) = (t, l, b, r) window margins\n",
 	    tmarg, lmarg, bmarg, rmarg);
 }
 
 void
-dotrack ()
+dotrack (void)
 {
 	if (getc (input))
 	    printf ("  TRACK set.\n");
@@ -798,7 +798,7 @@ dotrack ()
 }
 
 void
-dosets ()
+dosets (void)
 {
 	short plline, miline, plpage;
 	short mipage, lwin, rwin;
@@ -814,23 +814,26 @@ dosets ()
 }
 
 void
-doalt()
+doalt(void)
 {
-	short nletters, wincol;
+	short nletters;
+	long wincol;
 	long winlin;
 
 	if ((nletters = getshort (input))) {
 	    if (feoferr (input))
 		badstart();
 	    fputs ("  Alternate file: ", stdout);
+printf ("doalt:  nletters=%d\n", nletters);
 	    while (--nletters > 0)
 		fputc (getc (input), stdout);
 	    if (getc (input))
 		badstart();
 	    fputc ('\n', stdout);
 	    winlin = getlong (input);
-	    wincol = getshort (input);
-	    printf ("    (%ld, %d) = (lin, col) window upper left\n",
+	/*  wincol = getshort (input); */
+	    wincol = getlong (input);
+	    printf ("    (%ld, %ld) = (lin, col) window upper left\n",
 		winlin, wincol);
 	    printf ("    (%d, ", getc (input));
 	    printf ("%d) = (lin, col) cursor position\n", getshort (input));
@@ -841,7 +844,7 @@ doalt()
 }
 
 void
-dooldalt()
+dooldalt(void)
 {
 	short nletters, wincol, winlin;
 
@@ -868,9 +871,10 @@ dooldalt()
 }
 
 void
-dofile()
+dofile(void)
 {
-	short nletters, wincol;
+	short nletters;
+	long wincol;
 	long winlin;
 
 	fputs ("  File: ", stdout);
@@ -881,15 +885,16 @@ dofile()
 	    badstart();
 	fputc ('\n', stdout);
 	winlin = getlong (input);
-	wincol = getshort (input);
-	printf ("    (%ld, %d) = (lin, col) window upper left\n",
+	/*wincol = getshort (input); */
+	wincol = getlong (input);
+	printf ("    (%ld, %ld) = (lin, col) window upper left\n",
 	    winlin, wincol);
 	printf ("    (%d, ", getc     (input));
 	printf ("%d) = (lin, col) cursor position\n", getshort (input));
 }
 
 void
-dooldfile()
+dooldfile(void)
 {
 	short nletters, wincol, winlin;
 
@@ -909,14 +914,14 @@ dooldfile()
 }
 
 void
-sepwindows ()
+sepwindows (void)
 {
 	fputs ("============================================\n", stdout);
 }
 
 
 void
-domodes ()
+domodes (void)
 {
 	printf ("LITMODE %s.\n",  getc(input) ? "on" : "off" );
 	printf ("UPTABS %s.\n",   getc(input) ? "on" : "off" );

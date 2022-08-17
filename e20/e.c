@@ -2332,14 +2332,15 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 
     if (getc (gbuf)) {  /* curmark */
 	statef_mrk.mrkwinlin = getlong(gbuf);
-	statef_mrk.mrkwincol = getshort(gbuf);
+    /*  statef_mrk.mrkwincol = getshort(gbuf);  */
+	statef_mrk.mrkwincol = getlong(gbuf);
 	statef_mrk.mrklin = getc(gbuf);
 	statef_mrk.mrkcol = getshort(gbuf);
 
-/** /
-dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%d, mrklin=%d mrkcol=%d\n",
+/**/
+dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
    statef_mrk.mrkwinlin, statef_mrk.mrkwincol, statef_mrk.mrklin, (short) statef_mrk.mrkcol);
-/ **/
+/**/
 	curmark = &statef_mrk;
 
 #ifdef OUT
@@ -2454,9 +2455,11 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%d, mrklin=%d mrkcol=%d\n",
 			Slines tmplin;
 			Scols tmpcol;
 			lin = getlong  (gbuf);
-			col = getshort (gbuf);
+		     /* col = getshort (gbuf); */
+			col = getlong (gbuf);
 			tmplin = getc (gbuf);
 			tmpcol = getshort (gbuf);
+/*dbgpr("getstate:  col=%ld, lin=%ld, tmpcol=%d, fname=%s\n", col, lin, tmpcol, fname);*/
 			if (ichar != ONE_FILE) {
 			    if (editfile (fname, col, lin, 0, NO) == 1)
 				gf = 1;
@@ -2491,9 +2494,11 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%d, mrklin=%d mrkcol=%d\n",
 		    Slines tmplin;
 		    Scols tmpcol;
 		    lin = getlong  (gbuf);
-		    col = getshort (gbuf);
+		 /* col = getshort (gbuf); */
+		    col = getlong (gbuf);
 		    tmplin = getc (gbuf);
 		    tmpcol = getshort (gbuf);
+/*dbgpr("getstate:  col=%ld, tmpcol=%d\n", col, tmpcol); */
 		    if (feoferr (gbuf))
 			goto badstart;
 		    if (n != winnum)

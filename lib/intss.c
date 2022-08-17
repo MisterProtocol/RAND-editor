@@ -3,7 +3,7 @@
 #include	"prototypes.h"
 
 int
-intss()
+intss(void)
 {
     return isatty(0);
 }

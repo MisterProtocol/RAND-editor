@@ -418,7 +418,6 @@ saveall ()
 	    goto err;
     }
 
-    putchar ('\r');
     putchar ('\n');
     fflush (stdout);
     return YES;
@@ -443,8 +442,8 @@ savestate ()
     extern Flag HaveBkeytmp;
 #endif
 
-    curwksp->ccol = cursorcol;
-    curwksp->clin = cursorline;
+    curwksp->ccol = (AScols) cursorcol;
+    curwksp->clin = (ASlines) cursorline;
 
 #ifdef SAVETMPFILES
     if (HaveBkeytmp) {
@@ -572,14 +571,16 @@ savestate ()
     putc (curmark != 0, stfile);
     if (curmark) {
 	putlong  ((long) curmark->mrkwinlin, stfile);
-	putshort ((short) curmark->mrkwincol, stfile);
+    /*  putshort ((short) curmark->mrkwincol, stfile); */
+	putlong  (curmark->mrkwincol, stfile);
 	putc     (curmark->mrklin, stfile);
 	putshort ((short) curmark->mrkcol, stfile);
+dbgpr("savestate, mrkwincol=%ld mrkcol=%d\n", curmark->mrkwincol, curmark->mrkcol);
     }
 
 #ifdef LMCAUTO
     putc (autofill, stfile);
-    putshort (autolmarg, stfile);
+    putshort ((short)autolmarg, stfile);
 #else /* LMCAUTO */
     putc ((char) 0, stfile);
     putshort (0, stfile);
@@ -609,9 +610,14 @@ savestate ()
 	    fputs (fname, stfile);
 	    putc ('\0', stfile);
 	    putlong  ((long) window->altwksp->wlin, stfile);
-	    putshort ((short) window->altwksp->wcol, stfile);
+	    /*putshort ((short) window->altwksp->wcol, stfile);*/
+	    putlong (window->altwksp->wcol, stfile);
 	    putc     (window->altwksp->clin, stfile);
 	    putshort ((short) window->altwksp->ccol, stfile);
+/*
+dbgpr("savestate:  win=%d,alt fname=%s altwksp->ccol=%d, altwksp->wcol=%ld\n",
+i, fname, window->altwksp->ccol, window->altwksp->wcol);
+*/
 	}
 	else
 	    putshort ((short) 0, stfile);
@@ -620,9 +626,14 @@ savestate ()
 	fputs (fname, stfile);
 	putc ('\0', stfile);
 	putlong  ((long) window->wksp->wlin, stfile);
-	putshort ((short) window->wksp->wcol, stfile);
+	/*putshort ((short) window->wksp->wcol, stfile);*/
+	putlong (window->wksp->wcol, stfile);
 	putc     (window->wksp->clin, stfile);
 	putshort ((short) window->wksp->ccol, stfile);
+/*
+dbgpr("savestate:  win=%d, fname=%s wksp->ccol=%d, wksp->wcol=%ld\n",
+i, fname, window->wksp->ccol, window->wksp->wcol);
+*/
     }
     if (ferror (stfile)) {
 	fclose (stfile);
