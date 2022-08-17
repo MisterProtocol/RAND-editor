@@ -25,7 +25,7 @@ int type;
 {
     Reg2 char *cp;
     Reg3 La_fsd *cfsd;
-    unsigned short fsoff;
+    La_bytepos /*unsigned short*/ fsoff;
 #ifdef LA_BP
     La_linesize lbyte;
     Reg5 La_bytepos bp;
@@ -51,6 +51,8 @@ int type;
 	la_errno = LA_INVMODE;
 	return -1;
     }
+
+/*dbgpr("la_lseek: nlines=%ld, type=%d\n", nlines, type);*/
 
     /* bound nlines to be within the file */
     {
@@ -111,13 +113,15 @@ int type;
     }
 
     rlas->la_lbyte = 0;
-    if (nlines == 0)
+    if (nlines == 0) {
+/*dbgpr("la_lseek: returning %ld\n", rlas->la_lpos);*/
 	return rlas->la_lpos;
+    }
 
     rlas->la_lpos += nlines;
     cfsd = rlas->la_cfsd;
     if (nlines > 0) {
-	Reg1 short j;
+	Reg1 long /*short*/ j;
 
 	j = cfsd->fsdnlines - rlas->la_fsline;
 	cp = &cfsd->fsdbytes[rlas->la_fsbyte];
@@ -141,7 +145,7 @@ int type;
 			    bp += *cp++;
 			}
 		} else {
-		    La_linesize speclength;
+		    La_linelength speclength = 0;
 
 		    cp++;
 		    if (*cp++)
@@ -159,11 +163,11 @@ int type;
 	    plas->la_cfsd = cfsd;
 	    fsoff = 0;
 	} else
-	    fsoff = (unsigned short)plas->la_ffpos;
+	    fsoff = /*(unsigned short)*/plas->la_ffpos;
 	/* If the fsd at this point is a special fsd, then nlines == 0 */
 	plas->la_fsline += j = nlines;
 	{
-	    Reg4 unsigned short ffpos;
+	    Reg4 La_bytepos /*unsigned short*/ ffpos;
 
 	    ffpos = 0;
 	    for (;j--;) {
@@ -183,7 +187,7 @@ int type;
 	}
 	plas->la_fsbyte = cp - cfsd->fsdbytes;
     } else { /* (nlines < 0) */
-	Reg1 short j;
+	Reg1 long /*short*/ j;
 
 	nlines = -nlines;
 	j = rlas->la_fsline;
@@ -209,7 +213,7 @@ int type;
 			    bp -= *cp++;
 			}
 		} else if (j > 0) {
-		    La_linesize speclength;
+		    La_linelength speclength = 0;
 
 		    cp++;
 		    if (*cp++)
@@ -226,7 +230,7 @@ int type;
 	    plas->la_cfsd = cfsd;
 	    plas->la_fsline = j -= nlines;
 	    {
-		Reg4 short ffpos;
+		Reg4 La_bytepos /*short*/ ffpos;
 
 		ffpos = 0;
 		for (;j--;) {
@@ -239,7 +243,7 @@ int type;
 #endif
 		    ffpos += *cp++;
 		}
-		fsoff = (unsigned short)ffpos;
+		fsoff = /*(unsigned short)*/ffpos;
 	    }
 	    plas->la_fsbyte = cp - cfsd->fsdbytes;
 #ifdef LA_BP
@@ -255,7 +259,7 @@ int type;
 		    bp -= *cp++;
 		}
 	    else {
-		La_linesize speclength;
+		La_linelength speclength = 0;
 
 		cp++;
 		if (*cp++)
@@ -267,8 +271,8 @@ int type;
 	} else {
 	    /*printf ("within %D\n", nlines);*/
 	    /* walk back within this fsd */
-	    /* can't be a spceial fsd */
-	    Reg4 short ffpos;
+	    /* can't be a special fsd */
+	    Reg4 La_bytepos /*short*/ ffpos;
 
 	    cp = &cfsd->fsdbytes[rlas->la_fsbyte - 1];
 	    plas->la_fsline -= j = nlines;
@@ -294,6 +298,8 @@ int type;
 #ifdef LA_BP
     plas->la_bpos = bp;
 #endif
+
+/*dbgpr("la_lseek: returning %ld\n", plas->la_lpos); */
 
     return plas->la_lpos;
 }

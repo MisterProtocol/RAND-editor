@@ -16,6 +16,14 @@ t
 t.c
 t1.c
 t2.c
+t1
+t2
+x
+x1
+x2
+mk.out
+make.out
+mk1.out
 
 # Object files
 *.o

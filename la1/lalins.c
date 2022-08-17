@@ -33,6 +33,7 @@ Reg1 int nchars;
 	ffs = la_chglas->la_file->la_ffs;
 	fsdpos = ff_size (ffs);
 	/*printf ("about to parse: fsdpos=%d, nchars=%d\n", fsdpos, nchars);*/
+/* dbgpr("la_insert:  calling la_parse\n"); */
 	if ((nl = la_parse ((Ff_stream *) 0, fsdpos, &ffsd, &lfsd,
 			    la_chglas->la_file, (La_bytepos) nchars, buf))
 	    < 0)

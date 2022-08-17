@@ -47,3 +47,12 @@ La_linesize la_lwsize (La_stream *);
 int la_int(void);
 La_stream * la_other (La_stream *);
 void la_lflalarm(int);
+
+
+#ifdef DBG_DEBUG
+void dbgpr_la_fsddump (La_fsd*, La_fsd*, La_flag, char *);
+void dbgpr_la_sdump (La_stream *, char *);
+void dbgpr_la_fdump (La_file *, char *);
+void dbgpr_la_schaindump (char *);
+void dbgpr_la_fschaindump (La_stream *, char *);
+#endif

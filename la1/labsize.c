@@ -30,7 +30,7 @@ La_stream *plas;
 		nbytes += *cp++;
 	    }
 	} else {
-	    La_linesize speclength;
+	    La_linelength speclength;
 
 	    if (*++cp)
 		nbytes++;

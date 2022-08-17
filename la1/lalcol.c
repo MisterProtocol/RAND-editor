@@ -14,7 +14,7 @@ int        state;     /* 1=start, 0=continue */
 Reg3 char *buf;
 Reg1 int   nchars;
 {
-    Reg2 La_linepos errval;
+    Reg2 int /*La_linepos*/ errval;
 
     if (state)  
 	nxchgpos = chgpos = ff_grow (la_chgffs);
@@ -68,7 +68,7 @@ Reg6 La_linepos *nlines;
 La_stream  *dlas;
 {
     Reg3 La_linepos nl;
-    Reg4 La_linepos errval;
+    Reg4 int /*La_linepos*/ errval;
     Reg5 La_bytepos totchars;
     La_fsd *ffsd;               /* first fsd to be made for buf */
     La_fsd *lfsd;               /* last  fsd to be made for buf */

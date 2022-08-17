@@ -57,14 +57,28 @@ Reg6 unsigned int timeout;
 	    Reg1 int nget;
 	    int ngot;
 
-	    if ((nget = la_lrsize (tlas)) <= BUFSIZ - cnt)
+    /*      if ((nget = la_lrsize (tlas)) <= BUFSIZ - cnt) */
+	    nget = (int) la_lrsize(tlas);
+
+/*
+dbgpr("lalflush1: nget=%ld cnt=%d lcnt=%d\n", nget, cnt, lcnt);
+*/
+	    if (nget <= BUFSIZ - cnt)
 		lcnt++;
 	    else
 		nget = BUFSIZ - cnt;
-	    if ((ngot = la_lget (tlas, &buf[cnt], nget)) != nget) {
+    /*      if ((ngot = la_lget (tlas, &buf[cnt], nget)) != nget) { */
+	    ngot = (int) la_lget (tlas, &buf[cnt], nget);
+/*
+dbgpr("lalflush2: ngot=%d, nget=%ld cnt=%d lcnt=%d\n", ngot, nget, cnt, lcnt);
+*/
+	    if (ngot != nget) {
 		if (ngot != -1)
 		    la_errno = LA_GETERR;
 		totlines = -1;
+/*
+dbgpr("lalflush: la_lget error, returning -1, ngot=%d, nget=%d\n", ngot, nget);
+*/
 		goto ret;
 	    }
 	    if ((cnt += nget) >= BUFSIZ)
@@ -80,7 +94,7 @@ Reg6 unsigned int timeout;
 	    }
 	    if (timeout)
 		alarm (timeout);
-	    nwr = write (chan, wcp, (size_t)cnt);
+	    nwr = (int) write (chan, wcp, (size_t)cnt);
 	    if (timeout)
 		alarm (0);
 	    if (nwr == cnt)

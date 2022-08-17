@@ -69,7 +69,7 @@ La_linepos nlines;
 
 	if (tlines >= (j = cfsd->fsdnlines)) {
 	    Reg1 char *cp;
-	    unsigned int fsdsize;
+	    long /*unsigned int*/ fsdsize;
 
 	    tlines -= j;
 	    /* copy the fsd */
@@ -83,8 +83,9 @@ La_linepos nlines;
 			cp++;
 #endif
 		fsdsize = LA_FSDSIZE + cp - cfsd->fsdbytes;
-	    } else
-		fsdsize = LA_FSDSIZE + 6;
+	    } else  /* have a length > 32767 */
+	    /*  fsdsize = LA_FSDSIZE + 6; */
+		fsdsize = (unsigned int) (LA_FSDSIZE + 2 + sizeof (La_linelength));   /* ??? see la_parse */
 	    if ((t2fsd = (La_fsd *) malloc ((size_t) fsdsize)) == NULL) {
 		la_errno = LA_NOMEM;
 		la_freefsd (nffsd);

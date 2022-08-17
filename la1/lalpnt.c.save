@@ -21,7 +21,7 @@ char **buf;
 
     if ((nchars = la_lrsize (plas)) <= 0)
     {
-    /*  dbgpr("la_pnt:  la_lrsize returning <=0, nchars=%ld\n", nchars); */
+	dbgpr("la_pnt:  la_lrsize returning <=0, nchars=%ld\n", nchars);
 	return (0);
     }
 
@@ -37,10 +37,10 @@ char **buf;
     }
 
     if ((nchars = (La_linesize) ff_point (cfsd->fsdfile->la_ffs,
-			    cfsd->fsdpos + plas->la_ffpos, buf, (int)nchars))
+			    cfsd->fsdpos + plas->la_ffpos, buf, (long)nchars))
 	< 0) {
 	la_errno = LA_READERR;
-    /*  dbgpr("la_pnt:  ff_point  returning -1, nchars=%ld\n", nchars); */
+	dbgpr("la_pnt:  ff_point  returning -1, nchars=%ld\n", nchars);
 	return (-1);
     }
 

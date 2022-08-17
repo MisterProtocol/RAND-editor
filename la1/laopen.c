@@ -347,21 +347,21 @@ char          *buf;
     union fsb {
 	struct {
 	    char        _bchr[6];
-	    char        b[LA_FSDBMAX];
+	    char        b[LA_FSDBMAX];  /* lalocal.h:  255 */
 	} bytes;
 	struct {
 	    char        _schr[8];
-	    La_linesize len; /* len must be on a long boundary AND be */
+	    La_linelength len; /* len must be on a long boundary AND be */
 	} spcl;
     };
     union fsb       fsb;        /* a tmp array for fsdbytes */
     Reg1 char      *cp;
-    Reg2 short      nlft;       /* number of chars left in current block */
+    Reg2 int /*short*/ nlft;       /* number of chars left in current block */
     Reg3 La_fsd    *cfsd;       /* current fsd */
     Reg5 La_bytepos totlft;     /* total characters left to parse */
     La_bytepos      ototlft;    /* old totlft */
     Reg6 La_flag    nonewline;
-    short           nfsb;       /* number of fsdbytes */
+    int /*short*/   nfsb;       /* number of fsdbytes */
     La_bytepos      totchcnt;   /* total character count */
     long            fsdchcnt;   /* fsd character count (long is correct) */
     short           lcnt;       /* fsd line count */
@@ -413,15 +413,15 @@ char          *buf;
     /* do this loop once per line */
     for (lcnt = 0; ;lcnt++) {
 	Reg4 long lnchcnt;     /* character count in current line */
-	La_linesize savelength;
+	La_linesize savelength = 0;
 
 #ifdef lint
 	savelength = 0;
 #endif
 	/* if it's time to make an fsd, do so */
-	if (   lcnt >= LA_FSDLMAX
+	if (   lcnt >= LA_FSDLMAX       /* lalocal.h: 127 */
 	    || totchcnt >= nchars
-	    || nfsb >= LA_FSDBMAX - 2
+	    || nfsb >= LA_FSDBMAX - 2   /* lalocal.h:  255 */
 	   ) {
  makefsd:
 #ifndef LA_LONGFILES
@@ -434,7 +434,8 @@ char          *buf;
 		la_errno = LA_INT;
 		goto err;
 	    }
-	    if ((cfsd = (La_fsd *) malloc ((unsigned int) (LA_FSDSIZE + (unsigned long)nfsb)))
+	/*  if ((cfsd = (La_fsd *) malloc ((size_t) ((unsigned int)(LA_FSDSIZE + nfsb)))) */
+	    if ((cfsd = (La_fsd *) malloc ((size_t) ((LA_FSDSIZE + (unsigned int) nfsb))))
 		== NULL) {
 		la_errno = LA_NOMEM;
 		goto err;
@@ -445,9 +446,21 @@ char          *buf;
 	    seekpos += fsdchcnt;
 	    cfsd->fsdfile = plaf;
 	    cfsd->fsdnbytes = fsdchcnt;
+	    /*
 	    if ((cfsd->fsdnlines = lcnt))
 		plaf->la_fsrefs++;
+	    */
+	    cfsd->fsdnlines = (char) lcnt;
+	    if (cfsd->fsdnlines)
+		plaf->la_fsrefs++;
 	    my_move (fsb.bytes.b, cfsd->fsdbytes, (unsigned int) nfsb);
+
+/*
+dbgpr("la_parse, new fsd:  lcnt=%d, nfsb=%d totchcnt=%ld nchars=%ld fsdchcnt=%ld seek=%ld refs=%d\n",
+ lcnt, nfsb, totchcnt, nchars, fsdchcnt, seekpos, plaf->la_fsrefs);
+dbgpr("  cfsd=(%p) cfsd->fsdbytes[0]=(%d), cfsd->fsdbytes[1]=(%d), cfsd->fsdbytes+1=(%ld)\n",
+  cfsd, cfsd->fsdbytes[0], cfsd->fsdbytes[1], cfsd->fsdbytes+1);
+*/
 	    if (*ffsd)
 		(*lfsd)->fsdforw = cfsd;
 	    else
@@ -460,16 +473,19 @@ char          *buf;
 #ifdef LA_LONGLINES
 	    if (nonewline || longline) {
 #else
-	    if (nonewline) {
+	    if (nonewline) {    /* 1st fsd, \n not yet seen, have a line > 32767 */
 #endif
 		lcnt = 1;
 		fsb.bytes.b[0] = 0;
-		fsb.bytes.b[1] = nonewline;
-		fsb.spcl.len = savelength;
+		fsb.bytes.b[1] = (char) nonewline;
+		fsb.spcl.len = (La_linelength) savelength;
 		fsdchcnt = savelength;
 		totchcnt += savelength + nonewline;
-		nfsb = 6;
+		nfsb = 6;       /* Why, to fill out fsd.bytes.b[3-8] ??*/
 		nonewline = 0;
+
+	    /*  dbgpr("la_parse:  long line, 1st fsb.spcl.len=%ld\n", fsb.spcl.len); */
+
 #ifdef LA_LONGLINES
 		longline = NO;
 #endif
@@ -555,11 +571,13 @@ char          *buf;
 	    goto err;
 	}
 
+/* dbgpr("la_parse: lcnt=%ld, lnchcnt=%ld nfsb=%d\n", lcnt, lnchcnt, nfsb); */
+
 	/* make the fsdbytes for the line */
 	if (lnchcnt <= LA_MAX_NON_SPECIAL_FSD) {
 	    if (nonewline)
 		goto save;
-	    if (fsdchcnt + lnchcnt > (long) LA_FSDNBMAX) {
+	    if (fsdchcnt + lnchcnt > (long) LA_FSDNBMAX) {  /* lalocal.h:  32767 */
 		toobigfsd = YES;
  save:          savelength = lnchcnt;
 		if (lcnt)
@@ -571,15 +589,21 @@ char          *buf;
 	    {
 		short shorttmp;
 
-		fsdchcnt += shorttmp = lnchcnt;
+		fsdchcnt += shorttmp = (short) lnchcnt;
 		totchcnt += shorttmp;
 		if (shorttmp > ~LA_LLINE) {
-		    fsb.bytes.b[nfsb++] = -(shorttmp >> LA_NLLINE);
+		    fsb.bytes.b[nfsb++] = (char) -(shorttmp >> LA_NLLINE);
 		    shorttmp &= ~LA_LLINE;
 		}
-		fsb.bytes.b[nfsb++] = shorttmp;
+		fsb.bytes.b[nfsb++] = (char) shorttmp;
 	    }
 	} else {
+
+/*
+dbgpr("  lnchcnt (%ld) > LA_MAX_NON_SPECIAL_FSD (%ld)\n",
+    lnchcnt, LA_MAX_NON_SPECIAL_FSD);
+*/
+
 #ifdef LA_LONGLINES
 	    longline = YES;
 	    goto save;
