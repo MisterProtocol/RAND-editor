@@ -1801,12 +1801,40 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
     if (getc(gbuf) || upblanks)	upblanks = YES;	/* Added Purdue	CS 2/8/83 MAB */
     if (getc(gbuf) || upnostrip)upnostrip = YES;/* Added Purdue	CS 2/8/83 MAB */
 
+    /* Restore the mark if it was active on last session */
+
+      /* The markenv struct is defined in e.m.h but duplicated here
+       * to avoid all the unused variable warnings by including e.m.h
+       */
+    static struct markenv {
+	Nlines  mrkwinlin;
+	ANcols  mrkwincol;
+	ASlines mrklin;
+	Scols   mrkcol;
+    } statef_mrk;
+    extern struct markenv *curmark;
+
+    if (getc (gbuf)) {  /* curmark */
+	statef_mrk.mrkwinlin = getlong(gbuf);
+    /*  statef_mrk.mrkwincol = getshort(gbuf);  */
+	statef_mrk.mrkwincol = getlong(gbuf);
+	statef_mrk.mrklin = getc(gbuf);
+	statef_mrk.mrkcol = getshort(gbuf);
+
+/**
+dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
+   statef_mrk.mrkwinlin, statef_mrk.mrkwincol, statef_mrk.mrklin, (short) statef_mrk.mrkcol);
+ **/
+	curmark = &statef_mrk;
+
+#ifdef OUT
     if (getc (gbuf)) {  /* curmark */
 	getskip (sizeof (long)
 		 + sizeof (short)
 		 + sizeof (char)
 		 + sizeof (short),
 		 gbuf);
+#endif
     }
 
 #ifdef LMCAUTO
@@ -1912,7 +1940,8 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 			Slines tmplin;
 			Scols tmpcol;
 			lin = getlong  (gbuf);
-			col = getshort (gbuf);
+		     /* col = getshort (gbuf); */
+			col = getlong (gbuf);
 			tmplin = getc (gbuf);
 			tmpcol = getshort (gbuf);
 			if (ichar != ONE_FILE) {
@@ -1949,7 +1978,8 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 		    Slines tmplin;
 		    Scols tmpcol;
 		    lin = getlong  (gbuf);
-		    col = getshort (gbuf);
+		 /* col = getshort (gbuf); */
+		    col = getlong (gbuf);
 		    tmplin = getc (gbuf);
 		    tmpcol = getshort (gbuf);
 		    if (feoferr (gbuf))

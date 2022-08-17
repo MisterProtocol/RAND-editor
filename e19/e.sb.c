@@ -589,6 +589,7 @@ Flag fatalflg;
 /*
 * 3/2014:  e64 bug, until the cause of the core dump is fixed, let's punt
 * with a useful message to the user.
+* 8/2022:  the bug was fixed in the ../la1 package
 */
 #ifdef OUT
 if( n > 2 * 32768L ) {
