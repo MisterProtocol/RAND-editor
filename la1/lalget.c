@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 /*
  * la_lget (plas, buf, nchars)
  *
@@ -27,8 +29,10 @@ Reg5 int nchars;
 	return (0);
 
     nonewl = NO;
-    if ((j = la_lrsize (plas)) > nchars)
+    if ((j = (int) la_lrsize (plas)) > nchars) {
+    /*  dbgpr("la_lget:  la_rsize=%d, setting j to %d\n", j, nchars); */
 	j = nchars;
+    }
     else if (   cfsd->fsdbytes[0] == 0
 	     && cfsd->fsdbytes[1] == 1
 	    ) {
@@ -36,13 +40,25 @@ Reg5 int nchars;
 	buf[--j] = LA_NEWLINE;
 	nonewl = YES;
     }
+
+/*
+dbgpr("la_lget:j=%d, nchars=%d fsdbytes[0]=(%d), fsdbytes[1]=(%d)\n",
+  j, nchars, cfsd->fsdbytes[0], cfsd->fsdbytes[1]);
+*/
+
     if (j > 0) {
 	Reg6 Ff_stream *ffn;
 
 	ff_seek (ffn = cfsd->fsdfile->la_ffs,
 		 (long) (cfsd->fsdpos + plas->la_ffpos), 0);
-	if (ff_read (ffn, buf, j, 0) != j) {    /* yes, read directly */
+/*      if (ff_read (ffn, buf, j, 0) != j) {  */  /* yes, read directly */
+	int rc;
+	if ((rc = ff_read (ffn, buf, j, 0, NULL)) != j) {    /* yes, read directly */
 	    la_errno = LA_READERR;
+/*
+dbgpr("la_lget returning -1: rc=%d from ff_read, seekpos=%ld, returning -1., j=%d nchars=%d\n",
+    rc, cfsd->fsdpos + plas->la_ffpos, j, nchars);
+*/
 	    return (-1);
 	}
     }

@@ -1,6 +1,8 @@
 #include "lalocal.h"
 #include <stdlib.h>
 
+#include "la_prototypes.h"
+
 #ifdef GCC
 extern void	*malloc ();
 #else
@@ -85,25 +87,29 @@ La_bytepos *nbytes;
     La_fsd *n2fsd;      /* new fsd 2 of 3 */
     La_fsd *n3fsd;      /* new fsd 3 of 3 */
     La_file *claf;      /* fast pointer to current la_file */
-    short fsline;       /* fast copy of current la_fsline */
+    long /*short*/ fsline;       /* fast copy of current la_fsline */
     char *cp2;          /* pointer to middle portion fsdbyte */
     char *cp3;          /* pointer to third  portion fsdbyte */
-    short fsbyte1;      /* num of fsdbytes in new fsd 1 of 3 */
-    short fsbyte2;      /* num of fsdbytes in new fsd 2 of 3 */
-    short fsbyte3;      /* num of fsdbytes in new fsd 3 of 3 */
-    short ffpos;        /* fast copy of current la_ffpos */
+    unsigned int /*short*/ fsbyte1;      /* num of fsdbytes in new fsd 1 of 3 */
+    unsigned int /*short*/ fsbyte2;      /* num of fsdbytes in new fsd 2 of 3 */
+    unsigned int /*short*/ fsbyte3;      /* num of fsdbytes in new fsd 3 of 3 */
+    long /*short*/ ffpos;        /* fast copy of current la_ffpos */
     static La_linepos lzero;    /* always 0 */
 #ifdef LA_BP
     static La_bytepos bzero;    /* always 0 */
 #endif
-    short nbytes2;      /* number of bytes described by  middle fsd portion */
+    long /*short*/ nbytes2;      /* number of bytes described by  middle fsd portion */
 
     /* see if we are at the end of the chain */
     if ((cfsd = plas->la_cfsd) == plas->la_file->la_lfsd) {
 	*pnlines = 0;
  noneed:
 	/*printf ("Break - none at line %d\n", plas->la_lpos); **/
+    /*  dbgpr("la_break: Break - none at line %ld, at end of chain??\n", plas->la_lpos); */
 	/*la_sdump (plas, ""); **/
+#ifdef DBG_DEBUG
+	/*  dbgpr_la_sdump(plas, ""); */
+#endif
 #ifdef LA_BP
 	*nbytes = 0;
 #endif
@@ -133,16 +139,22 @@ La_bytepos *nbytes;
 	else {
 	    /* break cfsd into 2 new fsds */
 	    /*printf ("Break in 2 at line %d\n", plas->la_lpos); **/
+	/*  dbgpr("Break cfsd into 2 new fsds at line %d\n", plas->la_lpos); */
 	}
     } else if (   fsline > 0
 	       && fsline + nlines < cfsd->fsdnlines
 	      ) {
 	/* break cfsd into 3 new fsds */
 	/*printf ("Break in 3 at line %d\n", plas->la_lpos); **/
+	/* dbgpr("Break cfsd into 3 new fsds at line %d\n", plas->la_lpos); */
     } else {
 	/* can't do the whole thing within current fsd */
 	/*printf ("Break twice at line %d\n", plas->la_lpos); **/
+    /*  dbgpr("Break twice at line %d\n", plas->la_lpos); */
 	/*la_sdump (plas, ""); **/
+#ifdef DBG_DEBUG
+	dbgpr_la_sdump (plas, "");
+#endif
 	Reg1 La_fsd *tfsd;
 	La_stream nlas;
 
@@ -156,7 +168,9 @@ La_bytepos *nbytes;
 	if (la_clone (plas, &nlas) == (La_stream *) 0)
 	    goto bad1;
 	/*la_sdump (&nlas, ""); **/
-
+#ifdef DBG_DEBUG
+	dbgpr_la_sdump (&nlas, "");
+#endif
 	/*  seek to end of area to be deleted, break fsd */
 	(void) la_lseek (&nlas, nlines, 1);
 	if (mode == BRK_COPY)
@@ -184,20 +198,23 @@ La_bytepos *nbytes;
 	return (YES);
     }
     /*la_sdump (plas, ""); **/
+#ifdef DBG_DEBUG
+    dbgpr_la_sdump (plas, "");
+#endif
 
     /* figure how many fsdbytes in each of the 2 (possibly 3) new fsds */
-    fsbyte1 = plas->la_fsbyte;
+    fsbyte1 = (unsigned int) plas->la_fsbyte;
     {
-	Reg1 short nb2;
+	Reg1 int /*short*/ nb2;
 	Reg2 char *cp1;
-	Reg4 short j;
+	Reg4 int /*short*/ j;
 
 	cp1 = &cfsd->fsdbytes[fsbyte1];
 	nb2 = 0;
 	if (nlines) {
 	    /* can't possibly be a special fsd */
 	    cp2 = cp1;
-	    for (j = nlines; j--;) {
+	    for (j = (int)nlines; j--;) {
 #ifndef NOSIGNEDCHAR
 		if (*cp1 < 0)
 		    nb2 += -(*cp1++) << LA_NLLINE;
@@ -207,11 +224,11 @@ La_bytepos *nbytes;
 #endif
 		nb2 += *cp1++;
 	    }
-	    fsbyte2 = cp1 - cp2;
+	    fsbyte2 = (unsigned int) (cp1 - cp2);
 	} else
 	    fsbyte2 = 0;
 	cp3 = cp1;
-	for (j = cfsd->fsdnlines - (fsline + nlines); j--;)
+	for (j = (int) (cfsd->fsdnlines - (fsline + nlines)); j--;)
 #ifndef NOSIGNEDCHAR
 	    if (*cp1++ < 0)
 		cp1++;
@@ -219,12 +236,17 @@ La_bytepos *nbytes;
 	    if (*cp1++ & LA_LLINE)
 		cp1++;
 #endif
-	fsbyte3 = cp1 - cp3;
+	fsbyte3 = (unsigned int) (cp1 - cp3);
 	nbytes2 = nb2;
     }
 
     /* alloc the 2 (possibly 3) new fsds and fill them in */
     /*printf ("size1=%d size3=%d\n", LA_FSDSIZE+fsbyte1, LA_FSDSIZE+fsbyte3); **/
+/*
+dbgpr("  fsbyte1=%d fsbyte3=%d size1=%ld size3=%ld\n",
+    fsbyte1, fsbyte2, (long)LA_FSDSIZE+fsbyte1, (long)LA_FSDSIZE+fsbyte3);
+*/
+
     claf = cfsd->fsdfile;
 #ifdef  REALLOC
     if (mode == BRK_AGAIN) {
@@ -240,10 +262,10 @@ La_bytepos *nbytes;
 	    return (NO);
 	}
 	tfsd->fsdnbytes = ffpos;
-	tfsd->fsdnlines = fsline;
+	tfsd->fsdnlines = (char) fsline;
 	tfsd->fsdfile   = claf;
 	tfsd->fsdpos    = cfsd->fsdpos;
-	my_move (cfsd->fsdbytes, tfsd->fsdbytes, (unsigned int) fsbyte1);
+	my_move (cfsd->fsdbytes, tfsd->fsdbytes, fsbyte1);
     }
     if (mode == BRK_REAL || (mode == BRK_COPY && nlines == 0)) {
 	Reg1 La_fsd *tfsd;
@@ -258,10 +280,10 @@ La_bytepos *nbytes;
 	    goto bad1;
 	}
 	tfsd->fsdnbytes = cfsd->fsdnbytes - ffpos - nbytes2;
-	tfsd->fsdnlines = cfsd->fsdnlines - fsline - nlines;
+	tfsd->fsdnlines = (char) (cfsd->fsdnlines - fsline - nlines);
 	tfsd->fsdfile = claf;
 	tfsd->fsdpos = cfsd->fsdpos + ffpos + nbytes2;
-	my_move (cp3, tfsd->fsdbytes, (unsigned int) fsbyte3);
+	my_move (cp3, tfsd->fsdbytes, fsbyte3);
     }
     if (nlines) {
 	Reg1 La_fsd *tfsd;
@@ -273,10 +295,10 @@ La_bytepos *nbytes;
 	    goto bad2;
 	}
 	tfsd->fsdnbytes = nbytes2;
-	tfsd->fsdnlines = nlines;
+	tfsd->fsdnlines = (char) nlines;
 	tfsd->fsdfile = claf;
 	tfsd->fsdpos = cfsd->fsdpos + ffpos;
-	my_move (cp2, tfsd->fsdbytes, (unsigned int) fsbyte2);
+	my_move (cp2, tfsd->fsdbytes, fsbyte2);
     }
 #ifdef  REALLOC
     else
@@ -285,6 +307,8 @@ La_bytepos *nbytes;
 
     if (mode == BRK_REAL) {
 #ifdef  REALLOC
+
+
 	if ((n1fsd = (La_fsd *) realloc ((char *) cfsd,
 		    (unsigned int) (LA_FSDSIZE + fsbyte1))) == NULL) {
 	    if (n2fsd)
@@ -292,7 +316,7 @@ La_bytepos *nbytes;
 	    goto bad1;
 	}
 	n1fsd->fsdnbytes = ffpos;
-	n1fsd->fsdnlines = fsline;
+	n1fsd->fsdnlines = (char) fsline;
 #else/* REALLOC */
 	n1fsd->fsdback = cfsd->fsdback;
 #endif/*REALLOC */
@@ -321,7 +345,7 @@ La_bytepos *nbytes;
 	{
 	    /* fix up any streams whose current fsd was the one we are breaking */
 	    Reg2 La_stream *tlas;
-	    Reg4 short fsln;
+	    Reg4 long /*short*/ fsln;
 
 	    fsln = fsline;
 	    for (tlas = la_firststream; tlas; tlas = tlas->la_sforw) {
@@ -329,9 +353,9 @@ La_bytepos *nbytes;
 		    if (tlas->la_fsline < fsln)
 			tlas->la_cfsd = n1fsd;
 		    else {
-			Reg1 short j;
+			Reg1 int /*short*/ j;
 
-			if (tlas->la_fsline < (j = fsln + nlines)) {
+			if (tlas->la_fsline < (j = (int) (fsln + nlines))) {
 			    tlas->la_cfsd = n2fsd;
 			    tlas->la_fsline -= fsln;
 			    tlas->la_fsbyte -= fsbyte1;
@@ -365,5 +389,10 @@ La_bytepos *nbytes;
     *nbytes = nlines ? nbytes2 : 0;
 #endif
     /*la_sdump (plas, ""); **/
+
+#ifdef DBG_DEBUG
+    dbgpr_la_sdump (plas, "");
+#endif
+
     return (YES);
 }

@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 #ifndef LA_BP
 La_bytepos
 la_bsize (plas)
@@ -28,7 +30,7 @@ La_stream *plas;
 		nbytes += *cp++;
 	    }
 	} else {
-	    La_linesize speclength;
+	    La_linelength speclength;
 
 	    if (*++cp)
 		nbytes++;

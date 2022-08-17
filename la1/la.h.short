@@ -13,8 +13,9 @@
 
 #ifdef  BIGDADDR
 #define LA_LONGFILES            /* handle files with more than 32,767 lines*/
-#define LA_LONGLINES            /* lines > 32511 long (32767-256) */
+#define LA_LONGLINES            /* lines > 32511 long */
 #endif/*BIGDADDR */
+
 
 #ifdef  LA_LONGLINES
 # define LA_MAXLINE MAXLONG
@@ -26,7 +27,7 @@
 
 #ifdef  LA_LONGFILES
 # define LA_MAXNLINES MAXLONG
- typedef long La_linepos;        /* must not be unsigned */
+typedef long La_linepos;        /* must not be unsigned */
 #else/* LA_LONGLINES */
 # define LA_MAXNLINES MAXSHORT
 typedef short La_linepos;       /* must not be unsigned */
@@ -48,18 +49,11 @@ typedef struct lafsd {
     struct lafile *fsdfile;     /* lafile pointer of file containing lines.*/
 				/*  0 if this is the last fsd in chain.    */
     long fsdpos;                /* location of first character             */
-    long  fsdnbytes;            /* num of bytes in this fsd if regular fsd */
+    short fsdnbytes;            /* num of bytes in this fsd if regular fsd */
     char fsdnlines;             /* number of lines in this fsd.            */
 				/*  0 if this is the last fsd in chain.    */
     char fsdbytes[1];           /* bytes describing the linelengths.       */
  } La_fsd;
-
-/* 8/14/22:  La_fsd->fsdbytes[] is used to store the lengths of lines
- * in the fsd.  The comments at the end of lalrsize.c
- * describe how fsdbytes[0] and fsdbytes[1] are encoded.
- */
-typedef unsigned int La_linelength; /* A 'long' doesn't yet work */
-
 
 typedef struct lafile {
     La_fsd          *la_ffsd;   /* first fsd in the chain                  */
@@ -83,10 +77,10 @@ typedef struct lafile {
 #define LA_MODIFIED   04        /* file has been modified */
 
 struct la_fpos {                /* used by la_ldelete */
-    long            xla_fsline;/* which line of current fsd starting at 0 */
-    long            xla_fsbyte;/* index into fsdbytes in current fsd */
-    long            xla_lbyte; /* offset from beginning of current line */
-    long            xla_ffpos; /* fsd fsdpos + this = offset in la_ffs */
+    short            xla_fsline;/* which line of current fsd starting at 0 */
+    short            xla_fsbyte;/* index into fsdbytes in current fsd */
+    short            xla_lbyte; /* offset from beginning of current line */
+    short            xla_ffpos; /* fsd fsdpos + this = offset in la_ffs */
  };
 struct la_spos {                /* used by la_align */
     struct la_fpos   la_fpos;
@@ -205,6 +199,3 @@ extern int        ff_close (), ff_read (), ff_point (), ff_write ();
 #define LA_NOTSAME   19 /* la_align of 2 streams into different files */
 #define LA_BADCOLL   20 /* la_lcollects interleaved */
 #define LA_BRKCOLL   21 /* la_lcollect broken by other insert */
-
-
-extern void dbgpr(char *, ...);  /* added 7/28/22 for debugging */

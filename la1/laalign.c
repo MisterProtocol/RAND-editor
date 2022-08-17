@@ -1,5 +1,7 @@
 #include "lalocal.h"
 
+#include "la_prototypes.h"
+
 La_linepos
 la_align (olas, nlas)
 Reg1 La_stream *olas;

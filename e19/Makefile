@@ -34,7 +34,8 @@ SIG_INCL =signal.h
 # forward will require changing to whatever whims Apple is fronting
 # that year.  Or, you can change Mojave to use the SDK for 10.14, but
 # I haven't tried that.    -- Mike O'Brien, 3/7/21, mid-COVID
-STD     = /usr/include/
+#STD     = /usr/include/
+STD	= /Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/
 
 # --begin 2/21/2020 comments, amended MOB 3/8/2021

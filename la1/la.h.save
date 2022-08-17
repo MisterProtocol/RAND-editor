@@ -13,8 +13,9 @@
 
 #ifdef  BIGDADDR
 #define LA_LONGFILES            /* handle files with more than 32,767 lines*/
-#define LA_LONGLINES            /* lines > 32511 long (32767-256) */
+#define LA_LONGLINES            /* lines > 32511 long */
 #endif/*BIGDADDR */
+
 
 #ifdef  LA_LONGLINES
 # define LA_MAXLINE MAXLONG
@@ -26,7 +27,7 @@
 
 #ifdef  LA_LONGFILES
 # define LA_MAXNLINES MAXLONG
- typedef long La_linepos;        /* must not be unsigned */
+typedef long La_linepos;        /* must not be unsigned */
 #else/* LA_LONGLINES */
 # define LA_MAXNLINES MAXSHORT
 typedef short La_linepos;       /* must not be unsigned */
@@ -53,13 +54,6 @@ typedef struct lafsd {
 				/*  0 if this is the last fsd in chain.    */
     char fsdbytes[1];           /* bytes describing the linelengths.       */
  } La_fsd;
-
-/* 8/14/22:  La_fsd->fsdbytes[] is used to store the lengths of lines
- * in the fsd.  The comments at the end of lalrsize.c
- * describe how fsdbytes[0] and fsdbytes[1] are encoded.
- */
-typedef unsigned int La_linelength; /* A 'long' doesn't yet work */
-
 
 typedef struct lafile {
     La_fsd          *la_ffsd;   /* first fsd in the chain                  */
