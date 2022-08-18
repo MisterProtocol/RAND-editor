@@ -503,7 +503,7 @@ Your current screensize is %d w X %d h.\n",
 	    eddeffile (YES);
 	keyedit (argv[curarg]);
     }
-    else if (!replaying || ichar != NO_WINDOWS)
+    else if (!replaying || ichar != NO_WINDOWS) {
 	/*   E was reentered without a cmdline filename.  If present, we don't
 	 *   want to process the rest of a .e_profile (in e.t.c).
 	 *   Note, the 1st line(s) of the the profile beginning with
@@ -512,6 +512,7 @@ Your current screensize is %d w X %d h.\n",
 	if (!noStateFile)
 	    dot_profile = NO;
 	putupwin ();
+    }
     return;
 }
 
