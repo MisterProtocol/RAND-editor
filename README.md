@@ -292,7 +292,7 @@ before the PostScript generator can see them.
 
 ### Shell files for Macs
 
-Modern MacOS version hate like crazy to leave core dump files.  To get
+Modern versions of MacOS hate like crazy to leave core dump files.  To get
 an "e" core dump file for debugging purposes, you have to
 issue "limit core unl" to the top-level shell, then run a couple of
 shell files in the top-level distribution directory.  The file
