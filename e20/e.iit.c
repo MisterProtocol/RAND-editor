@@ -90,6 +90,7 @@ S_looktbl itsyms[] = {
 #ifdef RECORDING
     {"play",    CCPLAY},
 #endif
+    {"put",	CCPUT},
     {"quit",    CCQUIT},
     {"quote",   042},
     {"range",   CCRANGE},

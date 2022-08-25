@@ -150,6 +150,7 @@ S_looktbl cmdtable[] = {
 #ifdef NOTYET
    {"print"   , CMDPRINT    },
 #endif /* NOTYET */
+   {"put"     , CMD_PICK    },
    {"range"   , CMDRANGE    },
    {"re"      , CMDPATTERN  },
 #ifdef RECORDING
