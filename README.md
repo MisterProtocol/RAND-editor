@@ -253,6 +253,15 @@ out on the whole `config` thing by quite a few decades.  (Personal note:
 Frankly, I'm surprised it even uses `make`.  It didn't used to.  In the
 old days it was compiled by a shell script. --MOB)
 
+A note about man/Makefile: The "e" manpage uses nroff/troff diversions
+(the .di command).  However, the current "man" command, in a brilliant
+example of reinventing the wheel, uses a rewrite of nroff/troff called
+"mandoc", and it does not support diversions.  These are (mostly) harmless
+in normal "man" output, but building the PostScript version of the man
+page has problems with the blizzard of "mandoc" errors.  Hence there
+is a bit of fast footwork in man/Makefile to get rid of the mandoc errors
+before the PostScript generator can see them.
+
 ### Shell files for Macs
 
 Modern MacOS version hate like crazy to leave core dump files.  To get

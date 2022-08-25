@@ -22,7 +22,7 @@ e.term.out: e.term.tbl
 hardcopy:  e.1
 #	ditroff -Tpsc -man  e.1 | psdit > e.1.ps
 	man -t ./e.1 > tmp.ps
-# "mandoc" does support ".di". Things still work but pollute the output
+# "mandoc" does not support ".di". Things still work but pollute the output
 # file with mandoc error messages.  Gotta get rid of them.  The resulting
 # PS file still works.
 	sed -e"/^mandoc/d" < tmp.ps > e.1.ps
