@@ -95,6 +95,34 @@ and so forth.  Using these terminals, administrative assistants (then
 called secretaries) could begin doing useful work in "e" in about half an
 hour.
 
+### **OPEN**, **CLOSE**, **PICK**, and **PUT**
+
+Modern editors typically have only one buffer, which is shared by the
+"copy" and "paste" operations.  "e" handles things differently.
+
+The terms "copy" and "paste" did not exist when "e" was written.
+Instead, "e" uses the terminology **PICK** and **PUT**.  As mentioned
+above under "History", RAND had terminals created with special keycaps
+labeled **OPEN**, **CLOSE**, **PICK** and **PUT** in a vertical row.
+**OPEN** inserted blank lines at the cursor, **CLOSE** deleted text,
+**PICK** selected text and put it in a special PICK buffer, and **PUT**
+inserted the contents of the PICK buffer at the cursor position.
+**CLOSE** also put the deleted text into a buffer, but it was (and is)
+a separate buffer from that used by **PICK**.  This buffer could be
+re-inserted into the text by pressing the **CMD** key, followed by **PUT**.
+
+As the years went on, and the editor underwent further development, the
+**PUT** key fell into disfavor.  It still exists in the editor code, but is
+not bound to a key.  Instead, the **CMD** key is used with **PICK** and
+**CLOSE** to insert text from the PICK and CLOSE buffers respectively.
+
+Whether the **PUT** key should be re-enabled is currently a matter of
+philosophical discussion.
+
+It should be noted that there are several other buffers used by "e" for more
+esoteric purposes, such as the "adjust" buffer.  The introduction of these
+extra buffers may have influenced the fate of the **PUT** key.
+
 ### Terminal Handling
 
 All of this is by way of saying that, as "e" spread to different (some very
