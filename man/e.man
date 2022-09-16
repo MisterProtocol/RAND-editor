@@ -725,9 +725,7 @@ a name by executing \fI<cmd>store [name]\fR. The named macros may
 be replayed by the command \fI<cmd>play $name [N]\fR.
 .br
 Macros may be saved to a file.
-This is done via the
-.SM update macros
-editor command.
+This is done via the \fIupdate macros\fR editor command.
 The file is named, by default, "~/.e_macros".
 This name may be overridden either by the environment variable
 .SM EMACROFILE
