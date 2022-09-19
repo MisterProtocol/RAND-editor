@@ -260,6 +260,13 @@ Turns off file locking if the editor was compiled with the
 option
 .SM FILELOCKING.
 .TP
+.B \-nomacros
+.br
+Prevents reading a ".e_macros" file if one exists.
+See
+.SM "MACROS"
+in a later section.
+.TP
 .B \-search=string
 .br
 Sets the initial search string.
@@ -722,12 +729,17 @@ This support is in the form of a "record/play" capability.
 As documented in the section "COMMANDS", the editor supports "record",
 "play", and "store" commands.  The command \fI<cmd>record\fR begins
 recording editor commands and typed text, until a second \fI<cmd>record\fR
-command is given.  The macro that has been recorded may then be replayed
+command is given.  
+The command \fI<cmd>-record\fR will also stop recording;
+the first version is provided so that it may be assigned
+to a key via a keyboard description file which can be used
+both to start and stop a macro recording.
+The macro that has been recorded may then be replayed
 by the command \fI<cmd>play [N]\fR. The optional count \fIN\fR gives the
 number of times the macro should be replayed; once is the default.
 The macro thus recorded may be assigned
 a name by executing \fI<cmd>store [name]\fR. The named macros may
-be replayed by the command \fI<cmd>play $name [N]\fR.
+be replayed by the command \fI<cmd>$name [N]\fR.
 .br
 Macros may be saved to a file.
 This is done via the \fIupdate macros\fR editor command.
@@ -4043,7 +4055,7 @@ terminals. ("_" is correct ASCII.)
 .\}
 .ps 10
 .vs 12
-.lf 1389 ./e.man
+.lf 1401 ./e.man
 .\".bp
 .ps 10
 .vs 12
@@ -4638,7 +4650,7 @@ on an individual user basis.
 .fc
 .cp \n(3c
 .lf 28
-.lf 1410 ./e.man
+.lf 1422 ./e.man
 .SH PLATFORMS SUPPORTED
 .sp
 This version of the editor has been ported to, and tested on,
