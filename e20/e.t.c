@@ -20,6 +20,8 @@ file e.t.c
 #include "e.wi.h"
 #endif /* LMCMARG */
 
+int pendChar = 0;
+
 #ifdef  SYSSELECT
 #include <sys/time.h>
 #else /* SYSSELECT */
@@ -1409,6 +1411,8 @@ Reg2 Flag peekflg;
     static Flag knockdown  = NO;    /* set when entering CTRL chars into a file, eg, ^X^CI is a tab */
     /*extern*/ unsigned Short getkey1 ();
 
+dbgpr("getkey:  **OLD** routine called\n");
+
     if (peekflg == WAIT_KEY && keyused == NO) {
 	return (Uint)key; /* then getkey is really a no-op */
     }
@@ -1471,9 +1475,9 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp;
 
-/*
+/**/
 dbgpr("getkey1:  **OLD** routine called\n");
-*/
+/**/
 
     if (replaying) Block {
 	static Small replaydone = 0;
@@ -3548,11 +3552,11 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp = &chbuf[0];
 
-/** /
+/**/
 dbgpr("mGetkey1: peekflg=%d replaying=%d recovering=%d, silent=%d, entering=%d, winup=%d\n",
   peekflg, replaying, recovering, silent, entering, windowsup);
 dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
-/ **/
+/**/
 
     int c;
     static int replay_cnt;  /* number of chars replayed */
@@ -3942,6 +3946,7 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 
 		/* skip mouse position reports w/o a prior press event */
 		MEVENT evt;
+
 		while((c = wgetch(stdscr)) == KEY_MOUSE) {
 		    getmouse(&evt);
 		    if (evt.bstate & REPORT_MOUSE_POSITION)
@@ -3949,6 +3954,11 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		    ungetmouse(&evt);   /* push back the event */
 		    c = wgetch(stdscr);
 		    break;
+		}
+		dbgpr("mGetkey, got c=%o pendChar=%d\n", c, pendChar);
+		if (pendChar) {
+		    pendChar = 0;
+		    return(c);
 		}
 #else
 		c = wgetch(stdscr);
@@ -4203,6 +4213,8 @@ MapCursesKey (int c)
     int idx = c - KEY_MIN;
     FKey_p = (Uchar *) NULL;
 
+pendChar = 0;
+
     if ( Key2Ecode[idx].keycode == c ) {
 	if ( Key2Ecode[idx].len == 1 ) {  /* eg, A Fkey maps to 1 E cmd */
 	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
@@ -4211,7 +4223,7 @@ MapCursesKey (int c)
 		Key2Ecode[idx].keyname);
 	    return( (int) Key2Ecode[idx].ecmd1 );
 	}
-#ifdef OUT
+ /*#ifdef OUT */
 	else {  /* more than one ecmd */
 	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
 		Key2Ecode[idx].ecmd1,
@@ -4221,14 +4233,17 @@ MapCursesKey (int c)
 	    /* for some reason, using ungetch() didn't work in all cases */
 
 	    /* first, ungetch() the remaining codes in reverse order */
+	    int i;
 	    for (i = Key2Ecode[idx].len - 2; i >= 0; i--) {
 		ungetch( (int) Key2Ecode[idx].ecmdstr[i] );
 		dbgpr("...ungetch (%o)(%c)\n",
 		    Key2Ecode[idx].ecmdstr[i],
 		    Key2Ecode[idx].ecmdstr[i] );
 	    }
+	    pendChar = 1;
 	}
-#endif
+ /* #endif */
+#ifdef OUT
        else {
 	   /* A Fkey maps to more than one E cmd.  We return the
 	    * 1st cmd and set a ptr to the rest so that mGetkey1()
@@ -4236,6 +4251,7 @@ MapCursesKey (int c)
 	    */
 	   FKey_p = Key2Ecode[idx].ecmdstr;
        }
+#endif
 
        return( (int) Key2Ecode[idx].ecmd1 );
     }
@@ -4465,10 +4481,25 @@ addCursesFkey (char *line ) {
     keyname[offset] = '\0';
 /*  dbgpr("addCursesFkey:  keyname = (%s), value=(%s)\n", keyname, cp); */
 
-    if ((keycode = CursesKeyValue(keyname)) == -1) {
-	dbgpr("%s is not a recognized ncurses keyname.\n", keyname);
-	getout (YES, "%s is not a valid ncurses keyname\n", keyname);
-	return;
+    /* If we have KEY_nnn where nnn is the decimal keycode,
+     * there's no need to look it up.
+     */
+    keycode = 0;
+    if (!strncmp(keyname, "KEY_", 4)) {
+	char *s = keyname + 4;
+	if (isdigit(*s) && isdigit(*(s+1)) && isdigit(*(s+2))) {
+	    sscanf(s, "%d", &keycode);
+	/*  dbgpr("%s keycode is %d\n", keyname, keycode); */
+	}
+    }
+
+    /* do not have KEY_nnn */
+    if (keycode == 0) {
+	if ((keycode = CursesKeyValue(keyname)) == -1) {
+	    dbgpr("%s is not a recognized ncurses keyname.\n", keyname);
+	    getout (YES, "%s is not a valid ncurses keyname\n", keyname);
+	    return;
+	}
     }
 
     idx = keycode - KEY_MIN;
