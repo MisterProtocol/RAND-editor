@@ -323,7 +323,7 @@ extern char *highlight_info_str;
 extern int bracematching;
 
 #ifdef  RECORDING
-Flag    optnomacros;    /* YES = don't read .e_macros */
+Flag    optnomacros = NO;    /* YES = don't read .e_macros */
 char    *optmacrofile;  /* -macrofile=filename option specified */
 void    ReadMacroFile (void);
 #endif /* RECORDING */
@@ -455,11 +455,6 @@ Reg2 char *argv[];
 	nButtonLines = 0;
     }
 
-#ifdef  RECORDING
-    if( !optnomacros )
-	ReadMacroFile();        /* TODO: add option to skip this */
-#endif
-
     if (helpflg) {
 	showhelp ();
 	getout (NO, "");
@@ -471,6 +466,11 @@ Reg2 char *argv[];
 	fflush(stdout);
 	exit(-1);
     }
+
+#ifdef  RECORDING
+    if( !optnomacros )
+	ReadMacroFile();        /* TODO: add option to skip this */
+#endif
 
 /* best to init curses after E's options are checked */
 #ifdef NCURSES
@@ -2640,7 +2640,8 @@ infoint0 ()
     inf_area = col; col += 9;   /* "999x9999" etc. */
 
     inf_at = col; col += 3;     /* "At"         */
-    inf_line = col; col += 8;   /* line         */
+/*  inf_line = col; col += 8;*/ /* line         */
+    inf_line = col; col += 9;   /* line         */  /* see also e.m.c */
     inf_in = col; col += 3;     /* "in"         */
     inf_file = col;             /* filename     */
 

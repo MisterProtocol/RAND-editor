@@ -14,6 +14,7 @@ file e.record.c
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef RECORDING
 
@@ -21,6 +22,7 @@ extern int fileno();
 extern char *optmacrofile;      /* TODO:  move to e.h */
 extern Flag optshowbuttons;
 extern Flag have_record_button;
+char *macrofilename; /* populated by ReadMacroFile() */
 
 Flag recording, playing, recording_defined, macroing;
 Flag play_silent;
@@ -52,9 +54,9 @@ SetRecording(cmd)
 Short cmd;
 {
 
-/**/
+/** /
 dbgpr("SetRecording, cmd=%d %04o\n", cmd, cmd);
-/**/
+/ **/
 
     if (recording) {        /* a toggle */
 	recording = NO;
@@ -68,7 +70,7 @@ dbgpr("SetRecording, cmd=%d %04o\n", cmd, cmd);
 	    rec_len = lastcmd_len;
 	lastcmd_len = 0;
 	rec_p = rec_text;
-dbgpr("  -- set recording to NO, rec_len=%d\n", rec_len);
+/** / dbgpr("  -- set recording to NO, rec_len=%d\n", rec_len); / **/
 	return CROK;
     }
     if (!macroing && rec_size)
@@ -90,8 +92,9 @@ void
 RecordChar(c)
 unsigned Short c;
 {
+/*
 dbgpr("RecordChar, top, c=%d %04o\n", c,c);
-
+*/
     if (c == CCRECORD)  /* silently, we're about to cancel a recording */
 	return;
 
@@ -135,11 +138,11 @@ dbgpr("RecordChar, top, c=%d %04o\n", c,c);
 	return;
     }
 #endif
-/**/
+/** /
 dbgpr("RecordChar: add c=(%04o)(%c)\n", c, c);
-/**/
+/ **/
 
-    *rec_p++ = c;
+    *rec_p++ = (Uchar) c;
     rec_len++;
 
     if (rec_len >= rec_size) {  /* full, assume more to come */
@@ -158,7 +161,7 @@ dbgpr("RecordChar: add c=(%04o)(%c)\n", c, c);
 Cmdret
 UnSetRecording()
 {
-dbgpr("UnSetRecording\n");
+/*dbgpr("UnSetRecording\n"); */
 
     recording = NO;
     info (inf_record, 3, "");
@@ -230,7 +233,7 @@ char *arg;
 
     sprintf(tmp, "DoMacro: |%s|", name+1);
     if(DebugVal == 2)
-	info(0, strlen(tmp), tmp);
+	info(0, (Scols) strlen(tmp), tmp);
 
     if ((mp = FindMacro(name+1)) == (struct macros *)NULL) {
 	if (rec_len) {
@@ -375,27 +378,86 @@ ReadMacroFile()
 {
 
     FILE *fp;
-    char *macfile;
+    char *macfile = (char *)NULL;
     char buf[8*BUFSIZ];
 /*  char mbuf[4*BUFSIZ], *t; */
-    char name[200], *index();
-    char tmp[500];
+    char name[256], *index();
+    char tmp[256];
     struct macros *mp;
+    char ok_if_missing = NO;
+    char sourceENV = NO;
 
-    macfile = tmp;
-
-    /*
-     *  1st choice:   command line
-     *  2nd:          EMACROFILE environment variable
-     *  3rd:          ~/.e_macros
+    /*  Precedence:
+     *  1st:          command line
+     *  2nd:          ./.e_macros
+     *  3rd:          EMACROFILE environment variable
+     *  4th:          ~/.e_macros
      */
-    if( optmacrofile && *optmacrofile )
-	strcpy( tmp, optmacrofile );
-    else if(( macfile = (char *)getenv( "EMACROFILE" )) == NULL )
-	sprintf( tmp, "%s/%s", getmypath(), MACROFILE );
 
-    if(( fp = fopen( macfile, "r" )) == NULL )
+    if( optmacrofile && *optmacrofile ) {
+	strcpy( tmp, optmacrofile );
+	if (*optmacrofile == '~') {
+	    sprintf (tmp, "%s%s", getmypath(), optmacrofile+1);
+	}
+	macfile = tmp;
+    /*  dbgpr("ReadMacroFile: source is cmdline option:  %s\n", macfile); */
+    }
+
+    if (!macfile) {
+	/* ./.e_macros */
+	if( access(MACROFILE, R_OK) != -1 ) {
+	    strcpy( tmp, MACROFILE );
+	    macfile = tmp;
+	/*  dbgpr("ReadMacroFile: source is cur dir:  %s\n", macfile); */
+	}
+
+	if (!macfile) {     /* env */
+	    char *cp;
+	    if(( cp = (char *)getenv( "EMACROFILE" )) != NULL ) {
+		strcpy( tmp, cp );
+		macfile = tmp;
+	    /*  dbgpr("ReadMacroFile: source is ENV %s\n", macfile); */
+		sourceENV = YES;
+	    }
+
+	    if (!macfile) {     /* ~/.e_macros */
+		sprintf( tmp, "%s/%s", getmypath(), MACROFILE );
+		if (access(tmp, R_OK) != -1 ) {
+		    macfile = tmp;
+		    ok_if_missing = YES;
+		/*  dbgpr("ReadMacroFile: source is home dir:  %s\n", macfile); */
+		}
+	    }
+
+	}
+    }
+
+    if( !macfile ) {
+	dbgpr("ReadMacroFile:  no file to process\n");
 	return;
+    }
+
+    /* save name for use in SaveMacros() */
+
+    macrofilename = calloc(strlen(macfile)+1, sizeof(char));
+    strcpy(macrofilename, macfile);
+
+    /** /dbgpr("macrofilename=(%s)\n", macrofilename);  / **/
+
+    if(( fp = fopen( macrofilename, "r" )) == NULL ) {
+	dbgpr("ReadMacroFile:  unable to open %s\n", macrofilename);
+	if( ok_if_missing ) /* eg, ~/.e_macros */
+	    return;
+
+	if (sourceENV)
+	   printf("ReadMacroFile:  unable to open EMACROFILE variable: (%s)\n",
+	       getenv("EMACROFILE"));
+	else
+	   printf("ReadMacroFile:  unable to open %s\n", macrofilename);
+
+	fflush(stdout);
+	exit(-1);
+    }
 
     mp = &macros[0];
 
@@ -410,7 +472,11 @@ ReadMacroFile()
      * format:  name len DATAname len DATA...
      */
     while( !feof( fp )) {
-	fscanf( fp, "%s %d ", name, &mp->len );
+	if( fscanf( fp, "%s %d ", name, &mp->len ) == EOF ) {
+	/*  dbgpr("EOF at fscanf() while reading macros\n"); */
+	    break;
+	}
+
 	mp->name = salloc((Ncols)strlen(name) + 1, NO);
 	strcpy( mp->name, name );
 
@@ -421,7 +487,7 @@ ReadMacroFile()
 	}
 	mp++;
 	if( ++n_macrosdefined >= NMACROS ) {
-	    mesg( ERRALL+1, "Bad format in ~/.e_macro file" );
+	    mesg( ERRALL+1, "Exceeded max number of macros (%d) in ~/.e_macro file", NMACROS );
 	    break;
 	}
     }
@@ -440,9 +506,11 @@ void
 SaveMacros()
 {
     char *macfile;
-    char tmp[200], savname[200];
+    char tmp[256], savname[256];
     struct macros *mp;
     FILE *fp;
+
+/* dbgpr("SaveMacros:  macrofilename=%s\n", macrofilename);*/
 
     if( userid == 0 || geteuid() == 0 ) {
 	mesg( ERRALL+1, "Sorry, not allowed for root." );
@@ -454,6 +522,7 @@ SaveMacros()
 	return;
     }
 
+#ifdef OUT
     /*
      *  if EMACROFILE is set in the environment, use it.
      */
@@ -465,8 +534,38 @@ SaveMacros()
     /* save old .e_macros */
     sprintf( savname, "%s/,%s", getmypath(), MACROFILE );
     mv(macfile, savname);
+#endif
 
-    if(( fp = fopen( macfile, "w" )) == NULL ) {
+    if (macrofilename == NULL) {    /* then save to ~/.e_macros  */
+	sprintf( tmp, "%s/%s", getmypath(), MACROFILE );
+	macfile = tmp;
+	/* save orig if exists */
+	if (access(macfile, R_OK) != -1) {
+	    /* create backup filename, eg ~/,.e_macros */
+	    sprintf(savname, "%s/,%s", getmypath(), MACROFILE);
+	  /*dbgpr("SaveMacros:  backup=(%s)\n", savname);*/
+	    mv(macfile, savname);
+	}
+    }
+    else {
+	macfile = macrofilename;
+	char *cp;
+
+	if( (cp = rindex(macfile, '/')) != NULL ) {
+	    int offset = (int) (cp - macfile);
+	    strcpy(savname, macfile);
+	    sprintf(savname + offset + 1, ",%s", cp+1);
+	/*  dbgpr("SaveMacros:  backup=(%s) offs=%d\n", savname, offset); */
+	    mv(macfile, savname);
+	}
+	else {
+	    sprintf(savname, ",%s", macfile);
+	/*  dbgpr("SaveMacros:  backup=(%s)\n", savname); */
+	    mv(macfile, savname);
+	}
+    }
+
+    if( (fp = fopen( macfile, "w" )) == NULL ) {
 	sprintf( tmp, "Can't open %s for writing.", macfile );
 	mesg( ERRALL+1, tmp );
 	return;
@@ -474,10 +573,11 @@ SaveMacros()
 
     fprintf( fp, "# DO NOT EDIT, THIS FILE WAS AUTOMATICALLY GENERATED BY E\n" );
     for( mp = &macros[0]; mp->name; mp++ ) {
+	if (mp->len == 0) continue; /* !!! */
 	fprintf( fp, "%s %d ", mp->name, mp->len );
 	fwrite( mp->text, (size_t)sizeof(Uchar), (size_t)mp->len, fp );
     }
-    fchmod(fileno(fp), 0444);       /* help prevent accidental changes */
+/*  fchmod(fileno(fp), 0444); */    /* help prevent accidental changes */
     fclose(fp);                     /* while browsing in E */
 
     return;
@@ -507,6 +607,12 @@ char *opt;
 	printf ("\n\rNAME");
 	if (opt && *opt)
 	    printf ("\tKEYSTROKES");
+
+/** /
+for(i=0; i<10; i++)
+  printf ("\n\rdbug:  i=%d, name=(%s) len=%d",
+    i,  macros[i].name, macros[i].len);
+/ **/
 
 	for (mp = &macros[0]; mp != &macros[NMACROS]; mp++) {
 	    if (!mp->name || !mp->len)
