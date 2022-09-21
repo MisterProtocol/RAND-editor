@@ -392,10 +392,12 @@ char *keycaps[] = {
 		"-page",        /* 21 */
 		"+sch",         /* 22 */
 		"wright",       /* 23 */
-		"+lines",       /* 24 */
+	/*      "+lines", */    /* 24 */
+		"+line",        /* 24 */
 		"dchar",        /* 25 */
 		"+word",        /* 26 */
-		"-lines",       /* 27 */
+	/*      "-lines", */    /* 27 */
+		"-line",        /* 27 */
 		"-word",        /* 30 */
 		"+page",        /* 31 */
 		"chwin",        /* 32 */
@@ -434,7 +436,22 @@ char *keycaps[] = {
 		"dword",        /* 232 */
 		"X",            /* 233 */
 		"record",       /* 234 */
-		"play"          /* 235 */
+		"play",         /* 235 */
+#ifdef NCURSES
+		"mouse",        /* 236 */
+		"mouseonoff",   /* 237 */
+		"brace",        /* 240 */
+		"put",          /* 241 */
+		"unmark",       /* 242 */
+		"regex",        /* 243 */
+
+		"+win",         /* 244 */
+		"-win",         /* 245 */
+		"-close",       /* 246 */
+		"-erase",       /* 247 */
+		"-rec"          /* 250 */
+#endif
+
 };
 #endif /* RECORDING */
 

@@ -78,7 +78,12 @@ unsigned Short mGetkey (Flag, struct timeval *);
 unsigned Short mGetkey1(Flag, struct timeval *);
 Char MapCursesKey(Char);
 
+/* If !NULL, points to remaining codes to process from a F_KEY mapping/press */
+/* which are defined in the user's EKBFILE */
+Uchar *FKey_p;
+
 #include "e.keys.h"
+#include <ctype.h>
 
 char *getEkeyname(int);
 char *getCursesKeyname(int);
@@ -1466,6 +1471,10 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp;
 
+/*
+dbgpr("getkey1:  **OLD** routine called\n");
+*/
+
     if (replaying) Block {
 	static Small replaydone = 0;
 	if (replaydone) {
@@ -2366,7 +2375,7 @@ else {
 		break;
 
 	    case CCPICK:
-/* /dbgpr("param: key=CCPICK, cmdflg=%d\n", cmdflg);/ */
+/** /dbgpr("param: key=CCPICK, cmdflg=%d\n", cmdflg);/ **/
 		if (!cmdflg)
 		    goto done;
 		Block {
@@ -2456,7 +2465,7 @@ else {
  prchar:    if (insmode && ppos < ccmdlen) {
 	    my_move (&ccmdp[ppos], &ccmdp[ppos + 1],
 		  (Uint) (ccmdlen++ - ppos));
-	    ccmdp[ppos] = key;
+	    ccmdp[ppos] = (char) key;
 	    Block {
 		Reg1 Short i;
 		Reg2 Slines lin;
@@ -2471,7 +2480,7 @@ else {
 	else {
 	    if (ppos == ccmdlen)
 		ccmdlen++;
-	    ccmdp[ppos++] = key;
+	    ccmdp[ppos++] = (char) key;
 	    putch (key, NO);
 	}
     }
@@ -3138,7 +3147,7 @@ dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
 	    Reg7 S_window *oldwin;
 	    /* wmove = readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1); */
 	    wmove = readjtop (tw->wlin, from, num, delta);
-	    winfirst = from - (tw->wlin += wmove);
+	    winfirst = (Slines) (from - (tw->wlin += wmove));
 	    if (tw == curwksp && !cwkspflg)
 		continue;
 	    first = winfirst > 0 ? winfirst : 0;
@@ -3473,9 +3482,11 @@ Flag peekflg;
     static Flag knockdown  = NO;
     /*extern*/ unsigned Short mGetkey1 ();
 
-/*
+/*dbgpr("mGetkey, top:  peekflg=%d\n", peekflg);*/
+
+/** /
 dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar, (char) haveChar, (char) peekCh);
-*/
+/ **/
     if (peekflg == WAIT_KEY && keyused == NO) {
 	dbgpr("mGetkey: WAIT_KEY==yes and keyused==NO, returning key=%d (a no-op)\n", key);
 	return (Uint)key; /* then getkey is really a no-op */
@@ -3488,7 +3499,7 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 #endif /* SYSSELECT */
 
 #ifdef NCURSES
-/* /dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n",
+/** /dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n",
       knockdown, rkey,rkey,(char)rkey); / **/
 #endif /* NCURSES */
 
@@ -3516,6 +3527,7 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 	}
     }
     key = (int)rkey;
+/** /dbgpr("mGetkey returning (%o)\n", rkey); / **/
     return rkey;
 }
 
@@ -3536,11 +3548,11 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp = &chbuf[0];
 
-/**
+/** /
 dbgpr("mGetkey1: peekflg=%d replaying=%d recovering=%d, silent=%d, entering=%d, winup=%d\n",
   peekflg, replaying, recovering, silent, entering, windowsup);
 dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
- **/
+/ **/
 
     int c;
     static int replay_cnt;  /* number of chars replayed */
@@ -3905,9 +3917,20 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		}
 #endif
 
+		/* MapCursesKey() sets FKey_p when a Fkey press maps
+		 * to more than one E cmd/chars.  See MapCursesKey() below.
+		 */
+		if (FKey_p) {
+		    unsigned short ch = *FKey_p++;
+		    if (*FKey_p == '\0')
+			FKey_p = NULL;
+		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
+		    return ch;
+		}
 
 		/* normal keyboard input begins here */
 		int c, c1;
+
 
 #ifdef USE_MOUSE_POSITION
 
@@ -3936,7 +3959,7 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 
 #endif /* USE_MOUSE_POSITION */
 
-/** / dbgpr("c=%o\n", c);  / **/
+/** / dbgpr("c=%o KEY_BACKSPACE=%o\n", c, KEY_BACKSPACE);  / **/
 
 		if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 
@@ -3992,7 +4015,7 @@ fflush(dbgfile);
 		}
 #endif /* NOTYET */
 		else {
-		    chbuf[lcnt] = c;
+		    chbuf[lcnt] = (Uchar) c;
 		}
 	     /* if ((nread = xread (inputfile, (char *) &chbuf[lcnt], nread)) > 0) Block { */
 		nread = 1;  /* so we don't have to recode the following.... */
@@ -4010,7 +4033,7 @@ fflush(dbgfile);
 			    if (*--cp == CCINT)
 				break;
 			} while (--nr);
-			if ((nr = cp - stcp) > 0) {
+			if ((nr = (int) (cp - stcp)) > 0) {
 			    /* found CCINT character in chars just read */
 			    /* and some characters in front of it are to be */
 			    /* thrown away */
@@ -4052,9 +4075,9 @@ lcnt, lexrem, lp-chbuf);
     if (peekflg != WAIT_KEY)
 #ifdef UNSCHAR
     {
-/*
-dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%d)(%c)\n", *lp, *lp);
-*/
+/** /
+dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%o)(%c)\n", *lp, *lp);
+/ **/
 	return *lp;
     }
 #else
@@ -4093,10 +4116,24 @@ dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%d)(%c)\n", *lp, *lp);
     }
 }
 
+
+
 #ifdef NCURSES
 #ifdef USER_FKEYS
 
-/* see /usr/include/ncurses.h for KEY_Fn keycode values */
+/* see /usr/include/ncurses.h or e.keys.h for KEY_Fn keycode values */
+
+struct Key2Ecode {
+ int keycode;       /* ncurses KEY_ value */
+ Uchar  ecmd1;      /* 1st E cmd, eg:  KEY_F6:<+page> */
+ Uchar *ecmdstr;    /* 2nd -> end of e cmds, eg:  KEY_F6:<+word><redraw><-page> */
+ int len;           /* num Uchars in ecmdstr */
+ char keyname[16];  /* tmp for debugging */
+} Key2Ecode[0633 - KEY_MIN];   /* defined in ncurses.h,  0633 - 0401 */
+
+
+
+#ifdef OUT /* old method */
 
 struct UserDefinedFuncKeys {
 int keycode;    /* these codes are not really used, we index 0-35 */
@@ -4143,6 +4180,7 @@ int cmdval;
 {300,   -1},     /* CTRL_F12 0454-0411 = 35 */
 
 };
+#endif /* OUT */
 
 #endif /* USER_FKEYS */
 
@@ -4158,6 +4196,53 @@ MapCursesKey (int c)
     }
 
 #ifdef USER_FKEYS
+
+/*  int i; */
+
+    /* new mapping */
+    int idx = c - KEY_MIN;
+    FKey_p = (Uchar *) NULL;
+
+    if ( Key2Ecode[idx].keycode == c ) {
+	if ( Key2Ecode[idx].len == 1 ) {  /* eg, A Fkey maps to 1 E cmd */
+	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
+		Key2Ecode[idx].ecmd1,
+	       getEkeyname(Key2Ecode[idx].ecmd1), c,
+		Key2Ecode[idx].keyname);
+	    return( (int) Key2Ecode[idx].ecmd1 );
+	}
+#ifdef OUT
+	else {  /* more than one ecmd */
+	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
+		Key2Ecode[idx].ecmd1,
+	       getEkeyname(Key2Ecode[idx].ecmd1), c,
+		Key2Ecode[idx].keyname);
+
+	    /* for some reason, using ungetch() didn't work in all cases */
+
+	    /* first, ungetch() the remaining codes in reverse order */
+	    for (i = Key2Ecode[idx].len - 2; i >= 0; i--) {
+		ungetch( (int) Key2Ecode[idx].ecmdstr[i] );
+		dbgpr("...ungetch (%o)(%c)\n",
+		    Key2Ecode[idx].ecmdstr[i],
+		    Key2Ecode[idx].ecmdstr[i] );
+	    }
+	}
+#endif
+       else {
+	   /* A Fkey maps to more than one E cmd.  We return the
+	    * 1st cmd and set a ptr to the rest so that mGetkey1()
+	    * will input them after processing the 1st one.
+	    */
+	   FKey_p = Key2Ecode[idx].ecmdstr;
+       }
+
+       return( (int) Key2Ecode[idx].ecmd1 );
+    }
+
+/* old method */
+#ifdef OUT
+
     /* User define KEY_Fn ? */
 
     /*
@@ -4166,15 +4251,18 @@ MapCursesKey (int c)
      * 0441 - 0454  (289-300):  CTRL_F1 - CTRL_F12
      */
     if (c >= 0411 && c <= 0454) {
-	int i = c - 0411;   /* i will be 0-11, 12-23, 24-35 */
+	i = c - 0411;   /* i will be 0-11, 12-23, 24-35 */
     /*  if (UserFuncKeys[i].keycode >= 0) {  */
 	if (UserFuncKeys[i].cmdval >= 0) {
 	    return (UserFuncKeys[i].cmdval);
 	}
     }
+#endif  /* OUT */
+
 #endif /* USER_FKEYS */
 
     switch( c ) {
+	/* common keypad functions */
 
 	case KEY_MOUSE:             /* mouse event */
 	    return CCMOUSE;
@@ -4228,6 +4316,7 @@ MapCursesKey (int c)
     }
     return NOCHAR;
 }
+
 
 /* debug routines, these require an #include of e.keys.h */
 /*
@@ -4284,8 +4373,14 @@ dbg_winlist()
 
 #ifdef USER_FKEYS
 
-void addCursesFuncKey (char *);
+#ifdef OUT
+void addCursesFuncKey (char *);     /* old method */
+#endif
 
+void addCursesFkey (char *);
+int CursesKeyValue(char *keyname);
+
+#ifdef OUT
 void
 addCursesFuncKey(char *line)
 {
@@ -4338,12 +4433,13 @@ addCursesFuncKey(char *line)
 
     for (i=0; itsyms[i].str != NULL; i++) {
     /*  dbgpr("cmp (%s) to (%s)\n", itsyms[i].str, ecmd); */
-	if (strstr(itsyms[i].str, ecmd)) {
+	if (strcmp(itsyms[i].str, ecmd) == 0) {
 	    cmdval = (int) itsyms[i].val;
 	    UserFuncKeys[idx].cmdval = cmdval;
 	    break;
 	}
     }
+
 
 /** /
     dbgpr("line=(%s)\n", line);
@@ -4351,6 +4447,179 @@ addCursesFuncKey(char *line)
 / **/
     return;
 }
+#endif  /* OUT */
 
+void
+addCursesFkey (char *line ) {
+
+    char keyname[64], *cp;
+    int keycode, offset, idx, i;
+
+    extern S_looktbl itsyms[];     /* see e.iit.c */
+
+    if ((cp = index(line, ':')) == NULL) {
+	getout (YES, "kbfile no colon found in %s\n", line);
+    }
+    offset = (int) (cp - line);
+    strncpy (keyname, line, (size_t) offset);
+    keyname[offset] = '\0';
+/*  dbgpr("addCursesFkey:  keyname = (%s), value=(%s)\n", keyname, cp); */
+
+    if ((keycode = CursesKeyValue(keyname)) == -1) {
+	dbgpr("%s is not a recognized ncurses keyname.\n", keyname);
+	getout (YES, "%s is not a valid ncurses keyname\n", keyname);
+	return;
+    }
+
+    idx = keycode - KEY_MIN;
+/*  dbgpr("keycode=%d %o idx=%d for key=(%s)\n", keycode, keycode, idx, keyname); */
+
+    /*
+     *  Punt if the the keycode is already defined
+     */
+    if (Key2Ecode[idx].keycode == keycode) {
+	getout(YES, "kbfile error, key %s is already defined.", keyname);
+    }
+
+    Uchar ecmds[128];
+    Uchar tmp[128], *tp;
+
+    int cnt = 0;  /* number of ecmds[] entries */
+
+    /*  Using a cnt to keep track of the number of ecmds because ecmds
+     *  can contail entries of value=0 which is the E code for <cmd>.
+     *  Had an interesting time figuring out why strlen() didn't work ...:)
+     */
+
+    /* parse line looking up <ecmd> values */
+    for (cp++; *cp; cp++) {
+	if (*cp == '<') {       /* eg, <+page> */
+		/* The code in itparse allows "^B:<nnn>" where nnn is
+		 * the octal code of an E function,  eg, <013> is <home>.
+		 * This is not imlemented here.
+		 */
+	    tp = tmp;
+	    cp++;
+	    while (*cp && *cp != '>')
+		*tp++ = (Uchar) *cp++;
+	    *tp = '\0';
+	    if (!*cp) {   /* '>' not found */
+		dbgpr("bad kbfile entry, missing '>' in  (%s)\n", line);
+		getout(YES, "kbfile entry missing '>' in line: %s", line);
+		return;
+	    }
+
+	/*  dbgpr("addCursesFkey: looking up <%s>\n", tmp); */
+
+	    int cmdval = -1;
+	    for (i=0; itsyms[i].str != NULL; i++) {
+		if (strcmp(itsyms[i].str, (char *)tmp) == 0) {
+		/*
+		    dbgpr(" -- itsyms: found (%s) matches (%s) at i=%d\n",
+			tmp, itsyms[i].str, i);
+		 */
+		    cmdval = (int) itsyms[i].val;
+		    break;
+		}
+	    }
+	    if (cmdval == -1) {
+		dbgpr("<%s> not found\n", tmp);
+		getout(YES, "<%s> is not a valid e command in line: %s", tmp, line);
+		return;
+	    }
+	/*  dbgpr("lookup, <%s> is ecmd %04o\n", tmp, cmdval); */
+
+	    ecmds[cnt++] = (Uchar) cmdval;
+	    ecmds[cnt] = '\0';
+	/*  dbgpr("adding cmd=(%o) to ecmds[], len now=%d\n", cmdval, cnt); */
+	}
+	else if (*cp == '"') {  /* eg, KEY_F3:<cmd>"-er"<ret> */
+	    tp = tmp;
+	    cp++;
+	    while (*cp && *cp != '"')
+		*tp++ = (Uchar) *cp++;
+	    *tp = '\0';
+
+	    if (!*cp) {   /* " not found */
+		dbgpr("bad kbfile entry, missing \" in  (%s)\n", line);
+		getout(YES, "kbfile entry missing \" in line: %s", line);
+		return;
+	    }
+
+	    /* copy the text to ecmds */
+	    tp = tmp;
+	    while (*tp) {
+		ecmds[cnt++] = *tp++;
+	    }
+	    ecmds[cnt] = '\0';
+	/*  dbgpr("adding text=(%s) to ecmds[], len now=%d\n", tmp, cnt); */
+	}
+	else if (*cp == '^') {  /* convert Ucase char to ctrl char, A -> ^A */
+	    cp++;
+	    if (*cp != '?' && (*cp < '@' || *cp > '_')) /* eg, A-Z */
+		getout (YES, "kbfile: ^%c needs to be A-Z in %s\n", *cp, line);
+	    /* ecmds[cnt++] = *cp^0100; */
+	    ecmds[cnt++] = CCCTRLQUOTE;   /* 034 */
+	    ecmds[cnt++] = (Uchar) *cp;
+	    ecmds[cnt] = '\0';
+	    dbgpr("added ^%c = (%o) to %s\n", *cp, ecmds[cnt-1], keyname);
+	}
+	else {  /* ?? */
+	    dbgpr("bad kbfile entry, missing '<' or \" in  (%s)\n", line);
+	    getout(YES, "kbfile entry does not start with '<' or \" in line: %s", line);
+	    return;
+	}
+    }
+
+#ifdef OUT
+    /* dbg */
+    dbgpr("len=%d, ecmds=", cnt);
+    for (i=0; i <= cnt; i++)
+	dbgpr("(%o)(%c),", ecmds[i], ecmds[i] );
+    dbgpr("\n\n");
+#endif
+
+    strcpy(Key2Ecode[idx].keyname, keyname);    /* tmp for debugging */
+    Key2Ecode[idx].keycode = keycode;  /* as a check if key already defined */
+    Key2Ecode[idx].len = cnt;
+
+    /* It is likely that the vast majority of F key mappings
+     * will point to a single E function, so we might save
+     * something by avoiding the calloc for a single byte.
+     */
+    Key2Ecode[idx].ecmd1 = ecmds[0];
+    if (cnt > 1) {  /* copy remaining e codes to ecmdstr */
+	Key2Ecode[idx].ecmdstr = calloc((size_t) cnt, sizeof(Uchar));
+	for (i=0; i < cnt; i++)
+	    Key2Ecode[idx].ecmdstr[i] = ecmds[i+1];
+	Key2Ecode[idx].ecmdstr[i] = '\0';   /* !!! */
+
+#ifdef OUT
+	/* dbg */
+	for (i=0; i < cnt - 1; i++)
+	    dbgpr("ecmdstr[%d] = (%o)(%c)\n",i,
+		Key2Ecode[idx].ecmdstr[i],
+		isprint(Key2Ecode[idx].ecmdstr[i]) ? Key2Ecode[idx].ecmdstr[i] : ' ');
+#endif
+    }
+
+    return;
+}
+
+
+
+int
+CursesKeyValue(char *keyname) {
+    int i;
+    for (i=0; CursesKeyCodes[i].val != -1; i++) {
+	if( strncmp(CursesKeyCodes[i].name, keyname, strlen(keyname)) == 0 ) {
+	/*  dbgpr("CursesKeyValue:  (%s)=(%d)\n", keyname,  CursesKeyCodes[i].val); */
+	    return CursesKeyCodes[i].val;
+	}
+    }
+    dbgpr("CursesKeyValue:  (%s) not found\n", keyname);
+    return -1;
+}
 #endif /* USER_FKEYS */
 #endif /* NCURSES */
+

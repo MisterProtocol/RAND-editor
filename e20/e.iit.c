@@ -16,7 +16,7 @@ file e.iit.c
 
 #ifdef NCURSES
 #ifdef USER_FKEYS
-extern void addCursesFuncKey();
+extern void addCursesFkey();
 #endif /* USER_FKEYS */
 #endif /* NCURSES */
 
@@ -39,6 +39,7 @@ S_looktbl itsyms[] = {
     {"-line",   CCMILINE},
     {"-mark",   CCUNMARK},
     {"-page",   CCMIPAGE},
+    {"-pick",   CCPUT},
     {"-sch",    CCMISRCH},
     {"-tab",    CCBACKTAB},
     {"-word",   CCLWORD},
@@ -90,7 +91,7 @@ S_looktbl itsyms[] = {
 #ifdef RECORDING
     {"play",    CCPLAY},
 #endif
-    {"put",	CCPUT},
+    {"put",     CCPUT},
     {"quit",    CCQUIT},
     {"quote",   042},
     {"range",   CCRANGE},
@@ -129,8 +130,6 @@ char *filename;
     FILE *f;
     int str_len, val_len;
 
-
-
     if ((f = fopen (filename, "r")) == NULL)
 	/* todo, try filename in user's home directory */
 	/* dbgpr("mypath=%s\n", mypath); */
@@ -144,8 +143,8 @@ char *filename;
 #ifdef NCURSES
 #ifdef USER_FKEYS
 	/* eg, KEY_F4,  SHIFT_F8,  CTRL_F2 */
-	if(strstr(line, "KEY_") || strstr(line, "SHIFT_") || strstr(line, "CTRL_")) {
-	    addCursesFuncKey(line);
+	if (strstr(line, "KEY_") || strstr(line, "SHIFT_") || strstr(line, "CTRL_")) {
+	    addCursesFkey(line);
 	    continue;
 	}
 #endif /* USER_FKEYS */
@@ -269,7 +268,7 @@ int *str_lenp, *val_lenp; /* Where to put the respective lengths */
 		*outp++ = c^0100;
 		break;
 	    case ':':
-		*str_lenp = outp - strp;
+		*str_lenp = (int) (outp - strp);
 		if (gotval++)
 		    getout (YES, "kbfile too many colons in %s\n", line);
 		if (*str_lenp > TMPSTRLEN)
@@ -280,7 +279,7 @@ int *str_lenp, *val_lenp; /* Where to put the respective lengths */
 		getout (YES, "kbfile bad char <%o> in %s\n", c, line);
 	}
     }
-    *val_lenp = outp - valp;
+    *val_lenp = (int) (outp - valp);
     if (*str_lenp > TMPSTRLEN)
 toolong:
 	getout (YES, "kbfile line too long %s\n", line);
