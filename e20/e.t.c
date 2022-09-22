@@ -20,7 +20,7 @@ file e.t.c
 #include "e.wi.h"
 #endif /* LMCMARG */
 
-int pendChar = 0;
+int pendFKeys = 0;
 
 #ifdef  SYSSELECT
 #include <sys/time.h>
@@ -1411,7 +1411,7 @@ Reg2 Flag peekflg;
     static Flag knockdown  = NO;    /* set when entering CTRL chars into a file, eg, ^X^CI is a tab */
     /*extern*/ unsigned Short getkey1 ();
 
-dbgpr("getkey:  **OLD** routine called\n");
+/*dbgpr("getkey:  **OLD** routine called\n");*/
 
     if (peekflg == WAIT_KEY && keyused == NO) {
 	return (Uint)key; /* then getkey is really a no-op */
@@ -1475,9 +1475,9 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp;
 
-/**/
+/** /
 dbgpr("getkey1:  **OLD** routine called\n");
-/**/
+/ **/
 
     if (replaying) Block {
 	static Small replaydone = 0;
@@ -2154,13 +2154,17 @@ param ()
     Reg5 Flag cmdflg;
     Reg7 Flag uselast;
 
-/* /dbgpr("param(), begin\n"); / */
+/** /dbgpr("param(), begin, pendFKeys=%d\n", pendFKeys); / **/
 
     uselast = NO;
     entering = YES;     /* set this flag so that getkey1() knows you are in
 			 * this routine. */
     savecurs ();
     setbul (NO);
+
+
+    /* don't wait if Fn data pending */
+    int oneSec = pendFKeys ? 0 : 1;
 
     if (ccmdl == 0) {  /* first time only */
 	ccmdp = salloc (ccmdl = LPARAM, YES);
@@ -2182,7 +2186,8 @@ param ()
 	*c1 = '\0';
 	ppos = ccmdlen = lcmdlen;
 #ifdef SYSSELECT
-	struct timeval k_timeval = {1, 0};      /* one-second timer */
+	struct timeval k_timeval = {oneSec, 0};      /* one-second timer */
+
 /*tmp*/
 	/*getkey (WAIT_KEY, &k_timeval);*/
 	mGetkey (WAIT_KEY, &k_timeval);
@@ -2195,7 +2200,7 @@ param ()
 	ppos = Z;
 	ccmdlen = Z;
 #ifdef SYSSELECT
-	struct timeval k_timeval = {1, 0}; /* one-second timer */
+	struct timeval k_timeval = {oneSec, 0}; /* one-second timer */
 #endif /* SYSSELECT */
 #ifdef  NOCMDCMD
 rmcmd:
@@ -2223,8 +2228,9 @@ rmcmd:
     }
 
     cmdflg = NO;
+
 #ifdef SYSSELECT
-    struct timeval k_timeval = {1, 0}; /* one-second timer */
+    struct timeval k_timeval = {oneSec, 0}; /* one-second timer */
 
 /*  for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY, &k_timeval)) { */
     for (; ; cmdflg = key == CCCMD, keyused = YES, mGetkey (WAIT_KEY, &k_timeval)) {
@@ -3552,11 +3558,11 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp = &chbuf[0];
 
-/**/
+/** /
 dbgpr("mGetkey1: peekflg=%d replaying=%d recovering=%d, silent=%d, entering=%d, winup=%d\n",
   peekflg, replaying, recovering, silent, entering, windowsup);
 dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
-/**/
+/ **/
 
     int c;
     static int replay_cnt;  /* number of chars replayed */
@@ -3926,8 +3932,10 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		 */
 		if (FKey_p) {
 		    unsigned short ch = *FKey_p++;
-		    if (*FKey_p == '\0')
+		    if (*FKey_p == '\0') {
 			FKey_p = NULL;
+			pendFKeys = 0;
+		    }
 		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
 		    return ch;
 		}
@@ -3954,11 +3962,6 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		    ungetmouse(&evt);   /* push back the event */
 		    c = wgetch(stdscr);
 		    break;
-		}
-		dbgpr("mGetkey, got c=%o pendChar=%d\n", c, pendChar);
-		if (pendChar) {
-		    pendChar = 0;
-		    return(c);
 		}
 #else
 		c = wgetch(stdscr);
@@ -4213,17 +4216,19 @@ MapCursesKey (int c)
     int idx = c - KEY_MIN;
     FKey_p = (Uchar *) NULL;
 
-pendChar = 0;
+    pendFKeys = 0;  /* set when Fkey maps to more than one cmd */
 
     if ( Key2Ecode[idx].keycode == c ) {
 	if ( Key2Ecode[idx].len == 1 ) {  /* eg, A Fkey maps to 1 E cmd */
+	    /*
 	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
 		Key2Ecode[idx].ecmd1,
 	       getEkeyname(Key2Ecode[idx].ecmd1), c,
 		Key2Ecode[idx].keyname);
+	    */
 	    return( (int) Key2Ecode[idx].ecmd1 );
 	}
- /*#ifdef OUT */
+#ifdef OUT
 	else {  /* more than one ecmd */
 	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
 		Key2Ecode[idx].ecmd1,
@@ -4240,18 +4245,17 @@ pendChar = 0;
 		    Key2Ecode[idx].ecmdstr[i],
 		    Key2Ecode[idx].ecmdstr[i] );
 	    }
-	    pendChar = 1;
+	    pendFKeys = 1;
 	}
- /* #endif */
-#ifdef OUT
-       else {
-	   /* A Fkey maps to more than one E cmd.  We return the
-	    * 1st cmd and set a ptr to the rest so that mGetkey1()
-	    * will input them after processing the 1st one.
-	    */
-	   FKey_p = Key2Ecode[idx].ecmdstr;
-       }
 #endif
+	else {
+	    /* A Fkey maps to more than one E cmd.  We return the
+	     * 1st cmd and set a ptr to the rest so that mGetkey1()
+	     * will input the remainder after processing the 1st one.
+	     */
+	    FKey_p = Key2Ecode[idx].ecmdstr;
+	    pendFKeys = 1;
+	}
 
        return( (int) Key2Ecode[idx].ecmd1 );
     }

@@ -73,3 +73,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Mac junk
+.DS_Store
