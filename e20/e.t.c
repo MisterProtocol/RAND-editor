@@ -83,6 +83,7 @@ Char MapCursesKey(Char);
 /* If !NULL, points to remaining codes to process from a F_KEY mapping/press */
 /* which are defined in the user's EKBFILE */
 Uchar *FKey_p;
+int getFkeychar(void);
 
 #include "e.keys.h"
 #include <ctype.h>
@@ -277,7 +278,7 @@ dbgpr("putup0a:  curwksp->wlin=%d\n", curwksp->wlin);
 	    poscursor (-1, ln);
 	    putch ((Uchar)(chgborders == 1 ? lmc : INMCH), NO);
 	    if (curwin->lmchars)
-	      curwin->lmchars[ln] = lmc;
+	      curwin->lmchars[ln] = (Uchar) lmc;
 	} else Block {
 	    Reg1 Slines lt;
 	    Slines lb;
@@ -302,7 +303,7 @@ lt, ln, strlen(curwin->lmchars), curwin, enterwin );
 		    putch (chgborders == 1 ? lmc : INMCH, NO);
 		}
 		if (curwin->lmchars)
-		  curwin->lmchars[lt] = lmc;
+		  curwin->lmchars[lt] = (Uchar) lmc;
 	    }
 	}
 
@@ -414,7 +415,7 @@ dbgpr("putup6: ricol=(%d), col=(%d) lcol=(%d)\n", ricol, col, lcol);
 	if (freshputup) {
 	    poscursor (curwin->rmarg - curwin->ltext, ln);
 	    putch (chgborders == 1 ? rmc : INMCH, NO);
-	    curwin->rmchars[ln] = rmc;
+	    curwin->rmchars[ln] = (Uchar) rmc;
 	} else if ((curwin->rmchars[ln] & CHARMASK) != rmc) {
 	    if (   chgborders
 		&& (   !borderbullets
@@ -431,7 +432,7 @@ dbgpr(" chgborders=%d, borderbullets=%d, ln=%d, newcurline=%d\n",
 		poscursor (curwin->rmarg - curwin->ltext, ln);
 		putch (chgborders == 1 ? rmc : INMCH, NO);
 	    }
-	    curwin->rmchars[ln] = rmc;
+	    curwin->rmchars[ln] = (Uchar) rmc;
 	}
     }
 ret:
@@ -467,7 +468,7 @@ Ncols right;
 /*  dbgpr("fnbcol: left=(%d) right=(%d) line[0]=(%c) line[1]=(%c) line[2]=(%c)\n", left,right,line[0],line[1],line[2]); **/
 
     if (right < left)
-	return left - 1;
+	return (int)(left - 1);
 
     /* this code is a little tricky because it looks for a premature '\n' */
     cpl = &line[left];
@@ -476,11 +477,11 @@ Ncols right;
 	if (   *cp == '\n'
 	    || cp >= cpr
 	   )
-	    return left - 1;
+	    return (int) (left - 1);
 	if (   *cp != ' '
 	    && cp >= cpl
 	   )
-	    return cp - line;
+	    return (int) (cp - line);
     }
     /* returns from inside for loop */
     /* NOTREACHED */
@@ -517,22 +518,22 @@ Reg1 Scols num;
 		num -= 95;
 	    }
 	    else {
-		buf[cnt++] = num + 040;
+		buf[cnt++] = (char) (num + 040);
 		num = Z;
 	    }
 	}
 	else {
 	    if (num > 2) {
-		buf[cnt++] = chr;
+		buf[cnt++] = (char) chr;
 		num--;
 	    }
 	    if (num > 1) {
-		buf[cnt++] = chr;
+		buf[cnt++] = (char) chr;
 		num--;
 	    }
 	    num--;
 	}
-	buf[cnt++] = chr;
+	buf[cnt++] = (char) chr;
 	d_write (buf, cnt);
     }
     return;
@@ -690,7 +691,7 @@ tm_unbullet (allbullets, occ, tb, ordch, igntab)
 	if (!igntab && occ > 0) {
 	    for (i = Z; i < ntabs && tabs[i] < curwksp->wcol + occ; i++) ;
 	    if (tabs[i] - curwksp->wcol == occ && ntabs > 0 && i < ntabs)
-		ordch = ordch + (BTMCH - BMCH);
+		ordch = (Uchar) (ordch + (BTMCH - BMCH));
 	}
 	poscursor (occ, tb);
 	putch (ordch, NO);
@@ -1258,8 +1259,8 @@ if( DebugVal ) {
 
     /* the 041 below is for the terminal simulator cursor addressing */
     putscbuf[0] = VCCAAD;
-    putscbuf[1] = 041 + curwin->ltext + col;
-    putscbuf[2] = 041 + curwin->ttext + lin;
+    putscbuf[1] = (Uchar) (041 + curwin->ltext + col);
+    putscbuf[2] = (Uchar) (041 + curwin->ttext + lin);
     d_write (putscbuf, 3);
 
     return;
@@ -2205,13 +2206,20 @@ param ()
 #ifdef  NOCMDCMD
 rmcmd:
 #endif /* NOCMDCMD */
+
+	if (pendFKeys) {
+	    key = /* (unsigned Short) */ (char) getFkeychar();
+	}
+	else {
 #ifdef SYSSELECT
-/*      getkey (WAIT_KEY, &k_timeval); */
-/*tmp*/
-	mGetkey (WAIT_KEY, &k_timeval);
+	    mGetkey (WAIT_KEY, &k_timeval);
 #else
-	getkey (WAIT_KEY);
+	    getkey (WAIT_KEY);
 #endif /* SYSSELECT */
+	}
+
+/*dbgpr("param, checking key=%o\n", key);*/
+
 	switch (key) {
 	case CCDELCH:
 	case CCMOVELEFT:
@@ -3930,6 +3938,13 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		/* MapCursesKey() sets FKey_p when a Fkey press maps
 		 * to more than one E cmd/chars.  See MapCursesKey() below.
 		 */
+		if (pendFKeys) {
+		    int ch = getFkeychar();
+		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
+		    return (unsigned Short) ch;
+		}
+
+#ifdef OUT
 		if (FKey_p) {
 		    unsigned short ch = *FKey_p++;
 		    if (*FKey_p == '\0') {
@@ -3939,6 +3954,7 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
 		    return ch;
 		}
+#endif /* OUT */
 
 		/* normal keyboard input begins here */
 		int c, c1;
@@ -4658,3 +4674,17 @@ CursesKeyValue(char *keyname) {
 #endif /* USER_FKEYS */
 #endif /* NCURSES */
 
+
+int
+getFkeychar() {
+    if (FKey_p) {
+	int c = (int) *FKey_p++;
+	if (*FKey_p == '\0') {
+	    FKey_p = NULL;
+	    pendFKeys = 0;
+	}
+    /*  dbgpr("FKey_p, c=(%o)\n", c); */
+	return c;
+    }
+    return NOCHAR;
+}
