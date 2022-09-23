@@ -313,11 +313,6 @@ Reg2 char *argv[];
 	chk_profile( optprofile );
 #endif /* STARTUPFILE */
 
-#ifdef  RECORDING
-    if( !optnomacros )
-	ReadMacroFile();        /* TODO: add option to prevent this */
-#endif
-
     if (helpflg) {
 	showhelp ();
 	getout (NO, "");
@@ -329,6 +324,11 @@ Reg2 char *argv[];
 	fflush(stdout);
 	exit(-1);
     }
+
+#ifdef  RECORDING
+    if( !optnomacros )
+	ReadMacroFile();        /* TODO: add option to prevent this */
+#endif
 
 #ifdef NOPE
 /* #ifdef TERMCAP */
