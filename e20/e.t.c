@@ -1479,6 +1479,8 @@ Small peekflg;
 /** /
 dbgpr("getkey1:  **OLD** routine called\n");
 / **/
+static int oldcount = 0;
+oldcount++;
 
     if (replaying) Block {
 	static Small replaydone = 0;
@@ -2188,9 +2190,6 @@ param ()
 	ppos = ccmdlen = lcmdlen;
 #ifdef SYSSELECT
 	struct timeval k_timeval = {oneSec, 0};      /* one-second timer */
-
-/*tmp*/
-	/*getkey (WAIT_KEY, &k_timeval);*/
 	mGetkey (WAIT_KEY, &k_timeval);
 #else
 	getkey (WAIT_KEY);
@@ -2207,16 +2206,19 @@ param ()
 rmcmd:
 #endif /* NOCMDCMD */
 
+#ifdef SYSSELECT
 	if (pendFKeys) {
-	    key = /* (unsigned Short) */ (char) getFkeychar();
+	    key = (Char) getFkeychar();
+	    if (recording) {
+		RecordChar (key);
+	    }
 	}
 	else {
-#ifdef SYSSELECT
 	    mGetkey (WAIT_KEY, &k_timeval);
-#else
-	    getkey (WAIT_KEY);
-#endif /* SYSSELECT */
 	}
+#else
+	getkey (WAIT_KEY);
+#endif /* SYSSELECT */
 
 /*dbgpr("param, checking key=%o\n", key);*/
 
@@ -3191,16 +3193,16 @@ dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
 		chgborders = 0;
 	    if (delta == 0) {
 		/* wmove will also be 0 at this point */
-		putup (first, winfirst + num - 1, 0, MAXWIDTH);
+		putup (first, (Slines)(winfirst + num - 1), 0, MAXWIDTH);
 	    } else if (delta > 0) {
 		if (winfirst + delta + num > endwin)
 		    putup (first, endwin, 0, MAXWIDTH);
 		else if (from >= la_lsize (curlas) - delta)
-		    putup (first, winfirst + delta + num - 1, 0, MAXWIDTH);
+		    putup (first, (Slines)(winfirst + delta + num - 1), 0, MAXWIDTH);
 		else if (  !vinsdel (first, delta, curwin == oldwin)
 			 && num > 0
 			)
-		    putup (winfirst + delta, winfirst + delta + num - 1,
+		    putup (winfirst + delta, (Slines) (winfirst + delta + num - 1),
 			   0, MAXWIDTH);
 	    } else { /* delta < 0 */
 		if (   first - (delta - wmove) > endwin
@@ -3210,11 +3212,11 @@ dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
 		   )
 		    putup (first, endwin, 0, MAXWIDTH);
 		else if (from >= la_lsize (curlas))
-		    putup (first, winfirst - delta - 1, 0, MAXWIDTH);
+		    putup (first, (Slines) (winfirst - delta - 1), 0, MAXWIDTH);
 		else if (   !vinsdel (first, delta - wmove, curwin == oldwin)
 			 && num > 0
 			)
-		    putup (first, winfirst + num - 1, 0, MAXWIDTH);
+		    putup (first, (Slines) (winfirst + num - 1), 0, MAXWIDTH);
 	    }
 	    chgborders = 1;
 	    switchwindow (oldwin);
@@ -3822,10 +3824,10 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	    return( (Uint)get_profilekey( NO ));
 #endif /* STARTUPFILE */
 
-/**
+/** /
 dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD=(%d)\n",
    lcnt, lp-chbuf, lexrem, NREAD);
- **/
+/ **/
 
 	if (lcnt < 0)
 	    fatal (FATALBUG, "lcnt < 0");
@@ -3912,10 +3914,10 @@ dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD
 #endif /* FSYNCKEYS */
 #endif /* SYSSELECT */
 
-/*
+/** /
 dbgpr("e.t.c, mGetkey1: before xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
 inputfile, lcnt, lexrem, lp-chbuf, nread);
-*/
+/ **/
 
 #ifdef OUT
 		/*
@@ -3935,26 +3937,14 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		}
 #endif
 
-		/* MapCursesKey() sets FKey_p when a Fkey press maps
-		 * to more than one E cmd/chars.  See MapCursesKey() below.
+		/*  When a Fkey press maps to more than one E cmd/chars,
+		 *  MapCursesKey() sets the pendFKeys flag.  See MapCursesKey() below.
 		 */
 		if (pendFKeys) {
 		    int ch = getFkeychar();
 		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
 		    return (unsigned Short) ch;
 		}
-
-#ifdef OUT
-		if (FKey_p) {
-		    unsigned short ch = *FKey_p++;
-		    if (*FKey_p == '\0') {
-			FKey_p = NULL;
-			pendFKeys = 0;
-		    }
-		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
-		    return ch;
-		}
-#endif /* OUT */
 
 		/* normal keyboard input begins here */
 		int c, c1;
@@ -4019,30 +4009,6 @@ fflush(dbgfile);
 		/ **/
 		    return ((Uint)c1);
 		}
-
-
-#ifdef NOTYET
-/* Originally I thought a change was also needed to
- * handle the ^X^{key} and ^X^C{key} functions, but the orig
- * code seems to handle them ok.  Since the curses keypad is now enabled
- * each function key sends a single key (instead of eg, ESC followed by
- * a series of keys, and only need to look ahead for 1 more key. We already
- * have the ^X, so if the 2nd char is not C, at one more for the
- * case ^X^C{escchar} which is how a control character is inserted in the file.
- * If the 2nd char is not C, we have ^X{key} which is a command,
- * eg, ^X^L is <wright>, ^X^H is <wleft>
- */
-		else if (c == CTRL('X') ) {   /* start of an two */
-		    chbuf[0] = c;
-		    chbuf[1] = wgetch(stdscr);
-		    stcp = &chbuf[0];
-		    lexrem = 1;
-		      /* does kb_inlex place the CCcode in chbuf[0] */
-		    nread = (*kbd.kb_inlex) (stcp, &lexrem))
-		    c1 = chbuf[0];
-		    return c1;
-		}
-#endif /* NOTYET */
 		else {
 		    chbuf[lcnt] = (Uchar) c;
 		}
@@ -4083,64 +4049,42 @@ fflush(dbgfile);
 		}
 		else
 		    fatal (FATALIO, "Unexpected EOF in key input.");
-/*
+/** /
 dbgpr("e.t.c, mGetkey1: after xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
 inputfile, lcnt, lexrem, lp-chbuf, nread);
-*/
+/ **/
 	    } while (lcnt - lexrem == 0);
 	}
     }
 
-/*
+/** /
 dbgpr("e.t.c, mGetkey1: AFTER xread loop, lcnt=(%d), lexrem=(%d), lp-chbuf=(%d)\n",
 lcnt, lexrem, lp-chbuf);
-*/
+/ **/
 
     if ( lcnt - lexrem <= 0 && peekflg != WAIT_KEY ) {
 /*      dbgpr("mGetkey1: lcnt=%d lexrem=%d, return NOCHAR, peekflg=%d\n", lcnt, lexrem, peekflg); */
 	return NOCHAR;
     }
 
-    if (peekflg != WAIT_KEY)
-#ifdef UNSCHAR
-    {
-/** /
-dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%o)(%c)\n", *lp, *lp);
-/ **/
+    if (peekflg != WAIT_KEY) {
+#ifndef UNSCHAR
+	*lp = *lp & CHARMASK;
+#endif
 	return *lp;
     }
-#else
-	return *lp & CHARMASK;
-#endif
 
     Block {
 	Reg1 unsigned Short rchar;
 
-
-#ifdef UNSCHAR
+#ifndef UNSCHAR
+	*lp = *lp & CHARMASK;
+#endif
 	lcnt--;
 	rchar = *lp++;
-#else
-	lcnt--;
-	rchar = *lp++ & CHARMASK;
-#endif
-
-#ifdef OUT
-/* moved to end of mGetKey() */
-	if (keyfile != NULL && rchar != CCINT) {
-	    putc (rchar, keyfile);
-	    if (numtyp > MAXTYP) {
-		flushkeys ();
-		numtyp = 0;
-	    }
-	}
-#endif
-
-/* moved to end of mGetKey() so Curses KEY_xxx keys are saved */
-#ifdef xRECORDING
-	if (recording)
-	    RecordChar (rchar);
-#endif /* RECORDING */
+/** /
+dbgpr("end of mGetkey, lcnt=%d rchar=(%o)(%c)\n", lcnt, rchar, rchar);
+/ **/
 	return rchar;
     }
 }
@@ -4152,13 +4096,14 @@ dbgpr("e.t.c, peekflg != WAIT_KEY, returning (%o)(%c)\n", *lp, *lp);
 
 /* see /usr/include/ncurses.h or e.keys.h for KEY_Fn keycode values */
 
+
 struct Key2Ecode {
  int keycode;       /* ncurses KEY_ value */
  Uchar  ecmd1;      /* 1st E cmd, eg:  KEY_F6:<+page> */
  Uchar *ecmdstr;    /* 2nd -> end of e cmds, eg:  KEY_F6:<+word><redraw><-page> */
  int len;           /* num Uchars in ecmdstr */
  char keyname[16];  /* tmp for debugging */
-} Key2Ecode[0633 - KEY_MIN];   /* defined in ncurses.h,  0633 - 0401 */
+} Key2Ecode[MAX_KEY];   /* defined in e.keys.h as 0633 */
 
 
 
@@ -4220,7 +4165,7 @@ MapCursesKey (int c)
 
 /** / dbgpr("MapCursesKey: c=%o\n", c);  / **/
 
-    if( c < KEY_MIN || c > KEY_MAX ) {
+    if( c < KEY_MIN || c > MAX_KEY ) {
 	return ERR;  /* defined in curses as -1, or ?? NOCHAR ?? */
     }
 
@@ -4381,7 +4326,7 @@ char *
 getCursesKeyname (int c) {
     unsigned int i;
 
-    if( c < KEY_MIN || c > KEY_MAX ) {
+    if( c < KEY_MIN || c > MAX_KEY ) {
 	return "NOT FOUND";
     }
     for(i=0; i < sizeof(Curses_Keys) / sizeof(Curses_Keys[0]); i++) {
@@ -4522,14 +4467,20 @@ addCursesFkey (char *line ) {
 	}
     }
 
-    idx = keycode - KEY_MIN;
-/*  dbgpr("keycode=%d %o idx=%d for key=(%s)\n", keycode, keycode, idx, keyname); */
+    if (keycode > MAX_KEY)
+	getout(YES, "kbfile error:  max key value of %d in %s is decimal %d (%04o).\n",
+	    keycode, keyname, MAX_KEY, MAX_KEY);
 
+    idx = keycode - KEY_MIN;
+/** /
+    dbgpr("keycode=%d %o idx=%d for key=(%s) MAX_KEY=%d \n",
+	keycode, keycode, idx, keyname, MAX_KEY);
+/ **/
     /*
      *  Punt if the the keycode is already defined
      */
     if (Key2Ecode[idx].keycode == keycode) {
-	getout(YES, "kbfile error, key %s is already defined.", keyname);
+	getout(YES, "kbfile error: key %s is already defined.", keyname);
     }
 
     Uchar ecmds[128];
@@ -4613,7 +4564,7 @@ addCursesFkey (char *line ) {
 	    ecmds[cnt++] = CCCTRLQUOTE;   /* 034 */
 	    ecmds[cnt++] = (Uchar) *cp;
 	    ecmds[cnt] = '\0';
-	    dbgpr("added ^%c = (%o) to %s\n", *cp, ecmds[cnt-1], keyname);
+	/*  dbgpr("added ^%c = (%o) to %s\n", *cp, ecmds[cnt-1], keyname); */
 	}
 	else {  /* ?? */
 	    dbgpr("bad kbfile entry, missing '<' or \" in  (%s)\n", line);

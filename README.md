@@ -171,7 +171,7 @@ xterm-1002, xterm-1003, or xterm-x11mouse.  We also added a
 -mouseinit=value option to specify a custom mouse initialization.
 
 On the Mac, we recommend installing and using the third-party program
-"iTerm2", available at http://iterm2.com.  Using "TERM=iTerm2", the
+"iTerm2", available at http://iterm2.com.  Using "TERM=xterm-256color", the
 editor runs fine when compiled against ncurses-6.2.
 However, if the editor is compiled against ncurses-5.4, it is necessary
 to "unsetenv TERMINFO_DIRS" for iTerm2 to work correctly.
@@ -182,7 +182,7 @@ is set by iTerm2, causes the system definition to be used.  Unsetting
 this environment variable in .cshrc or .profile is feasible because
 the shell executes these after iTerm2 has set up the environment.)
 
-It should be noted that the 'main' branch, e19, doesn't use any of this,
+It should be noted that the 'original' branch, e19, doesn't use any of this,
 and in fact uses the older <sgtty.h> terminal interface.  The newer
 interface, <term.h>, is used by the mouse support code in branch 'main'.
 However, the code still includes <sgtty.h> for some of its code.  These

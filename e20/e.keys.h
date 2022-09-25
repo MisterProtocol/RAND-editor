@@ -340,8 +340,9 @@ NcursesKeyCode CursesKeyCodes[] = {
 {"KEY_SUSPEND",        0627},
 {"KEY_UNDO",           0630},
 {"KEY_RESIZE",         0632},
+/* nxt is no longer defined in version 6.2 */
 /* {"KEY_EVENT",          0633}, */
 {NULL,  -1}
 };
 
-
+#define MAX_KEY 0633

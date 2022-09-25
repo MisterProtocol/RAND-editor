@@ -478,6 +478,7 @@ $(O)e.t.o: e.h
 $(O)e.t.o: e.inf.h
 $(O)e.t.o: e.m.h
 $(O)e.t.o: e.tt.h
+$(O)e.t.o: e.keys.h
 $(O)e.t.o: $(STD)$(SIG_INCL)
 $(O)e.tb.o: e.h
 $(O)e.tb.o: e.m.h

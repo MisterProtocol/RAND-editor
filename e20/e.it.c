@@ -42,6 +42,7 @@ int *count;
 	}
 
 	code = itget (&inp, count, ithead, outp);
+	dbgpr("itget returns code=(%d)(%03o) count=%d\n", code, code, *count);
 	if (code >= 0) {    /* Number of characters resulting */
 	    outp += code;
 	    continue;
