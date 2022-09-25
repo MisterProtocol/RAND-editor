@@ -420,8 +420,9 @@ ReadMacroFile()
     /*
      * format:  name len DATAname len DATA...
      */
+    char space;
     while( !feof( fp )) {
-	if( fscanf( fp, "%s %d ", name, &mp->len ) == EOF ) {
+	if( fscanf( fp, "%s %d%c", name, &mp->len, &space ) == EOF ) {
 	/*  dbgpr("EOF at fscanf() while reading macros\n"); */
 	    break;
 	}
@@ -563,8 +564,11 @@ char *opt;
 	    if (opt && *opt && strcmp(opt, mp->name))
 		continue;
 	    printf ("\n\r%s\t", mp->name);
+#ifdef OUT
+/* better to show values */
 	    if (!opt || !*opt)  /* just print names */
 		continue;
+#endif
 	    seenany = 1;
 	    for (i = 0; i < mp->len; i++) {
 		c = mp->text[i];
@@ -573,7 +577,7 @@ char *opt;
 		else
 		    printf ("<%s>", keycaps[c < 040 ? c : c - 0177 + 040]);
 	    }
-	    printf ("\n\r");
+	    /*printf ("\n\r");*/
 	}
 	if (!seenany && opt && *opt)
 	    printf ("\n\r\n\rMacro \"%s\" is not defined.\r\n", opt);
