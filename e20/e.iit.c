@@ -154,7 +154,6 @@ char *filename;
 	case KBINIT:
 	    kbinilen = val_len;
 	    kbinistr = salloc (kbinilen, NO);
-	    kbinistr = salloc (kbinilen, NO);
 	    my_move (value, kbinistr, (ulong) kbinilen);
 	    break;
 	case KBEND:

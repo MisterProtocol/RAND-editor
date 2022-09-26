@@ -30,6 +30,7 @@ int *count;
     Uchar *inp, *outp;
     int i;
 
+/**/ dbgpr ("in_file called, count=%d\n", *count); /**/
     for (inp = lexp, i = *count; i-- > 0;)
 	*inp++ &= 0177;           /* Mask off high bit of all chars */
 /* outp should be different so a string can be replaced by a longer one */
@@ -55,6 +56,7 @@ int *count;
 	--*count;
     }
     my_move ((char *) inp, (char *) outp, (ulong) *count);
+/**/ dbgpr ("in_file returning %d\n", outp-lexp); /**/
     return outp - lexp;
 }
 
@@ -67,7 +69,7 @@ If some prefix of the input matches the table, returns the number of
 
 If no match, returns IT_NOPE.
 
-If the input matches some proper previx of an entry in the input table,
+If the input matches some proper prefix of an entry in the input table,
    returns IT_MORE.
 
 cpp and countp are not changed in the last two cases.

@@ -191,6 +191,9 @@ dbgpr("initCurses:  optuseextnames=%d\n", optuseextnames);
 	term.tt_height, term.tt_width, getmaxx(stdscr), getmaxy(stdscr));
 **/
 
+    extern int ESCDELAY;
+    ESCDELAY = 0;
+
     initCursesDone = YES;
 
 /*  clear(); */
