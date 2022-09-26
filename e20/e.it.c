@@ -30,7 +30,7 @@ int *count;
     Uchar *inp, *outp;
     int i;
 
-/**/ dbgpr ("in_file called, count=%d\n", *count); /**/
+/** / dbgpr ("in_file called, count=%d\n", *count); / **/
     for (inp = lexp, i = *count; i-- > 0;)
 	*inp++ &= 0177;           /* Mask off high bit of all chars */
 /* outp should be different so a string can be replaced by a longer one */
@@ -43,7 +43,7 @@ int *count;
 	}
 
 	code = itget (&inp, count, ithead, outp);
-	dbgpr("itget returns code=(%d)(%03o) count=%d\n", code, code, *count);
+/** /	dbgpr("itget returns code=(%d)(%03o) count=%d\n", code, code, *count); / **/
 	if (code >= 0) {    /* Number of characters resulting */
 	    outp += code;
 	    continue;
@@ -56,7 +56,7 @@ int *count;
 	--*count;
     }
     my_move ((char *) inp, (char *) outp, (ulong) *count);
-/**/ dbgpr ("in_file returning %d\n", outp-lexp); /**/
+/** / dbgpr ("in_file returning %d\n", outp-lexp); / **/
     return outp - lexp;
 }
 

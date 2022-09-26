@@ -60,6 +60,11 @@ GROUP = bin
 #    -DSUNOS4 for SunOS4.x
 #    -DETC=... completely defines the old /etc/e directory.  The default
 #       is /usr/local/lib/e.
+#    DEPRECATED: Do NOT enable -DFSYNCKEYS in the "main" branch; it
+#       does not work correctly with "ncurses".  Code has been introduced
+#       to accomplish the same thing "ncurses" style with the "timeout()" 
+#	function.  (We think this has to do with how "ncurses"
+#	handles ESC.)
 #    -DFSYNCKEYS will frequently do an fsync on the keystroke file.
 #    -DASCIIKEYINFO .ek? file info at beginning is all ascii
 #    -DHOSTTMPNAMES tmp files created with hostname, eg: ".ek1.hostname"
@@ -93,6 +98,8 @@ S5DEFINES = -DUNIXV7 -DASCIIKEYINFO -DSYSIII -DSYSV \
 #         -DFSYNCKEYS \
 #         -DCBREAK -DTERMCAP -DFILELOCKING
 
+# Don't define -DFSYNCKEYS in any version that uses "ncurses".
+# See above.
 # BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO -DFSYNCKEYS \
 
 BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO \

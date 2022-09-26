@@ -3824,10 +3824,10 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	    return( (Uint)get_profilekey( NO ));
 #endif /* STARTUPFILE */
 
-/**/
+/** /
 dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD=(%d)\n",
    lcnt, lp-chbuf, lexrem, NREAD);
-/**/
+/ **/
 
 	if (lcnt < 0)
 	    fatal (FATALBUG, "lcnt < 0");
@@ -3874,6 +3874,8 @@ dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD
 	    do Block {
 		Reg3 int nread;
 		nread = NREAD - lcnt;
+
+#ifdef OUT
 #ifdef  SYSSELECT
 #ifdef  FSYNCKEYS
 		/*
@@ -3881,7 +3883,6 @@ dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD
 		 *  the keystroke file.  (Needs to be done only once!).
 		 */
 #ifdef FDSET
-/**/ dbgpr ("Before select: lcnt = %d, lexrem = %d, chbuf[0] = %c, chbuf[1] = %c, chbuf[2] = %c\n", lcnt, lexrem, chbuf[0], chbuf[1], chbuf[2]); 
 		Block {
 		    fd_set readmask;
 		    FD_ZERO(&readmask);
@@ -3896,6 +3897,7 @@ dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD
 			fsynckeys();    /* also does a fflush */
 			numtyp = 0;
 		    }
+		    dbgpr("timer went off\n");
 		}
 #else
 		Block {
@@ -3914,11 +3916,12 @@ dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD
 #endif /* FDSET */
 #endif /* FSYNCKEYS */
 #endif /* SYSSELECT */
+#endif /* OUT */
 
-/**/
+/** /
 dbgpr("e.t.c, mGetkey1: before xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
 inputfile, lcnt, lexrem, lp-chbuf, nread);
-/**/
+/ **/
 
 #ifdef OUT
 		/*
@@ -3950,6 +3953,32 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		/* normal keyboard input begins here */
 		int c, c1;
 
+		/* If user hasn't typed anything in a minute
+		 * flush any keystrokes
+		 *
+		 * This replaces the code in FSYNCKEYS,
+		 * which screws up keystroke definitions
+		 * under "ncurses".
+		 */
+/** / 		dbgpr("setting timer\n");  / **/
+		timeout(60000); /* change to 60000 after debugging */
+		c = wgetch(stdscr);
+		if (c == ERR) {  /* timer went off,  no input avail */
+/** /		    dbgpr("timer expired\n");  / **/
+		    if (numtyp) {
+			flushkeys();
+			numtyp = 0;
+/** /			dbgpr("flushing key\n");  / **/
+		    }
+		}
+		else {
+		    ungetch(c);
+/** /		    dbgpr("got key, calling ungetch(%o)\n", c); / **/
+		}
+		timeout(-1); /* restore blocking read mode */
+/** /		dbgpr("timer off\n");  / **/
+
+
 
 #ifdef USE_MOUSE_POSITION
 
@@ -3961,7 +3990,7 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 
 		/* skip mouse position reports w/o a prior press event */
 		MEVENT evt;
-/**/ dbgpr ("Enter wgetch()\n");
+
 		while((c = wgetch(stdscr)) == KEY_MOUSE) {
 		    getmouse(&evt);
 		    if (evt.bstate & REPORT_MOUSE_POSITION)
@@ -3970,7 +3999,6 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 		    c = wgetch(stdscr);
 		    break;
 		}
-/**/ dbgpr ("Exit wgetch()\n");
 #else
 		c = wgetch(stdscr);
 #endif /* NCURSES_MOUSE_VERSION */
@@ -3984,7 +4012,7 @@ inputfile, lcnt, lexrem, lp-chbuf, nread);
 
 		if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 
-/* #ifdef OUT */
+#ifdef OUT
 /*debug*/
 char hat = ' ';
 c1 = c;
@@ -4001,7 +4029,7 @@ else {
 }
 fflush(dbgfile);
 /*end debug*/
-/* #endif / * OUT */
+#endif /* OUT */
 
 		if( c >= KEY_MIN ) {
 		    c1 = MapCursesKey(c);
@@ -4051,10 +4079,10 @@ fflush(dbgfile);
 		}
 		else
 		    fatal (FATALIO, "Unexpected EOF in key input.");
-/**/
+/** /
 dbgpr("e.t.c, mGetkey1: after xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
 inputfile, lcnt, lexrem, lp-chbuf, nread);
-/**/
+/ **/
 	    } while (lcnt - lexrem == 0);
 	}
     }

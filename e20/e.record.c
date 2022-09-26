@@ -491,7 +491,7 @@ ReadMacroFile()
 	/*  dbgpr("EOF at fscanf() while reading macros\n"); */
 	    break;
 	}
-	dbgpr("got name=%s len=%d space=(%c)\n", name, mp->len, space);
+/** /	dbgpr("got name=%s len=%d space=(%c)\n", name, mp->len, space); / **/
 
 	mp->name = salloc((Ncols)strlen(name) + 1, NO);
 	strcpy( mp->name, name );
