@@ -749,6 +749,10 @@ This name may be overridden either by the environment variable
 or by means of the "\-macrofile=filename" command line option.
 This file will be read in automatically.
 The command line option "\-nomacros" prevents this.
+The command \fI<cmd>undefine macroname\fR is used to remove a macro
+definition,  which is useful prior to
+issuing the "<cmd>update macros" command to remove a definition
+from the \fI.e_macros\fR file.
 .SH COMMANDS
 The following commands are available to the user by opening the
 command line via the
@@ -1209,6 +1213,13 @@ made part of the state of each window, so that the TRACK mode can be
 reestablished following an interruption, and the TRACK command has been
 changed so that it toggles the TRACK mode, in the same way as does
 INSERT.
+.RE
+.TP
+undefine macroname
+.br
+Removes macroname.  This command is useful
+prior to issuing the "update macros" command
+to remove a macro definition from the \fI.e_macros\fR file.
 .RE
 .TP
 update | \-update [ inplace | \-inplace | \-readonly | macros]
@@ -4055,7 +4066,7 @@ terminals. ("_" is correct ASCII.)
 .\}
 .ps 10
 .vs 12
-.lf 1401 ./e.man
+.lf 1412 ./e.man
 .\".bp
 .ps 10
 .vs 12
@@ -4650,7 +4661,7 @@ on an individual user basis.
 .fc
 .cp \n(3c
 .lf 28
-.lf 1422 ./e.man
+.lf 1433 ./e.man
 .SH PLATFORMS SUPPORTED
 .sp
 This version of the editor has been ported to, and tested on,
