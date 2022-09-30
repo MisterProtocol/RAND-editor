@@ -6,6 +6,7 @@ features never duplicated by any other editor.
 The contents of this
 repository consist of the original code from RAND of e19, ported to Linux
 and called e19.59, and then ported to the Mac in 2021.
+The "main" branch has additional features, such as mouse support.
 
 The code in the
 repository can build binaries of the editor for both Linux and MacOS.
@@ -13,7 +14,7 @@ Small tweaks to the Makefiles are necessary to compile the
 code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed in the
-Makefiles.
+Makefiles, particularly e20/Makefile.
 
 The code can also be compiled and run under Windows using WSL, the Windows
 Subsystem for Linux, in which case it builds and runs just as it would
@@ -29,8 +30,26 @@ After you have some text entered, start clicking the buttons at the
 bottom of the screen with the mouse to see what various editor commands
 do.
 
+N.b.: The editor does not support having its window resized. You must
+exit the editor, resize the window, and restart the editor.
+
+You can start the editor in two ways:
+
+1) `e filename` will edit the named file, or, if it does not exist,
+will ask you if you want to create it.
+
+2) `e` with no arguments will start up editing the last file you
+edited in the current directory, at the place in the file where you
+exited the editor.
+If you have not previously run the editor in the current directory,
+it will open a new file called `scratch`.
+
 The files in the "man" directory will give you much more extensive
 documentation on how the editor works.
+We earnestly suggest you read the manual page.
+There are several reports listed there, published by The RAND Corporation,
+which provide extensive documentation.
+These reports may be downloaded for free from http://rand.org.
 
 ### Branches
 
@@ -64,6 +83,11 @@ they have been useful in the past in debugging problems with the editor.
 "pres.c", for example, will print the editor "state files" in a
 human-readable form.  If you're not interested in them they may simply
 be removed.
+
+The `t_xcolor` directory contains a complete distribution of the `ncurses`
+library, together with other small programs such as `test_keys` which may
+prove useful if you choose to redefine the mapping of terminal keys
+to editor commands via a keyboard definitions file.
 
 ### History
 
