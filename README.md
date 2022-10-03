@@ -165,6 +165,9 @@ has a built-in terminal description file, "e" will use the internal
 information.  Otherwise, "e" will use either `terminfo` or `termcap`
 terminal descriptions, depending on how it is compiled (see below).
 #### "ncurses"
+**N.B.: CURRENTLY THE MOUSE DOES NOT WORK CORRECTLY WITH NCURSES-6.2
+OR NCURSES-6.3. IT WORKS CORRECTLY WITH THE GENERALLY INSTALLED
+NCURSES-5.4.**
 The original version of the editor does its own input and terminal
 handling, without reference to external libraries, although it can
 make use of `curses` to write to terminals that do not have built-in
