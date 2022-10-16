@@ -90,8 +90,8 @@ char   *file;
     if (horiz) Block {
 	/* newwin is below oldwin on the screen  */
 	Reg1 Slines i;
-	oldwin->bmarg = oldwin->tmarg + cursorline + 1;
-	oldwin->btext = oldwin->bedit = cursorline - 1;
+	oldwin->bmarg = (ASlines) (oldwin->tmarg + cursorline + 1);
+	oldwin->btext = oldwin->bedit = (ASlines)(cursorline - 1);
 	if ((i = (newwin->btext + 1) * (int)sizeof oldwin->firstcol[0]) > 0) {
 	    my_move ((char *)&oldwin->firstcol[cursorline + 1],
 		   (char *)newwin->firstcol, (ulong) i);
@@ -102,13 +102,13 @@ char   *file;
     else Block {
 	/* newwin is to the right of oldwin on the screen  */
 	Reg1 Slines i;
-	oldwin->rmarg = oldwin->lmarg + cursorcol + 1;
-	oldwin->rtext = oldwin->redit = cursorcol - 1;
+	oldwin->rmarg = (AScols) (oldwin->lmarg + cursorcol + 1);
+	oldwin->rtext = oldwin->redit = (AScols) (cursorcol - 1);
 	for (i = newwin->btext; i >= 0; i--) {
 	    if (oldwin->lastcol[i] > oldwin->rtext + 1) {
 		newwin->firstcol[i] = 0;
-		newwin->lastcol[i] = oldwin->lastcol[i] - cursorcol - 1;
-		oldwin->lastcol[i] = oldwin->rtext + 1;
+		newwin->lastcol[i] = (AScols) (oldwin->lastcol[i] - cursorcol - 1);
+		oldwin->lastcol[i] = (AScols) (oldwin->rtext + 1);
 		oldwin->rmchars[i] = MRMCH;
 	    }
 	}
@@ -119,7 +119,7 @@ char   *file;
 	/* the number of curwin is new prevwin */
 	for (winnum = 0; winlist[winnum] != curwin; winnum++)
 	    continue;
-	newwin->prevwin = winnum;
+	newwin->prevwin = (ASmall) winnum;
     }
     nwinlist++;
 
@@ -205,22 +205,22 @@ Flag    editflg;
        )
 	return 0;
 
-    win->winflgs = wf;
-    win->lmarg = cl;
-    win->tmarg = lt;
-    win->rmarg = cr;
-    win->bmarg = lb;
+    win->winflgs = (AFlag) wf;
+    win->lmarg = (AScols) cl;
+    win->tmarg = (ASlines) lt;
+    win->rmarg = (AScols) cr;
+    win->bmarg = (ASlines) lb;
     if (editflg) {
-	win->ltext = cl + 1;
-	win->ttext = lt + 1;
-	win->rtext = cr - cl - 2;
-	win->btext = lb - lt - 2;
+	win->ltext = (AScols) (cl + 1);
+	win->ttext = (ASlines) (lt + 1);
+	win->rtext = (AScols) (cr - cl - 2);
+	win->btext = (ASlines) (lb - lt - 2);
     }
     else {
-	win->ltext = cl;
-	win->ttext = lt;
-	win->rtext = cr - cl;
-	win->btext = lb - lt;
+	win->ltext = (AScols) cl;
+	win->ttext = (ASlines) lt;
+	win->rtext = (AScols) (cr - cl);
+	win->btext = (ASlines) (lb - lt);
     }
     win->ledit = 0;
     win->tedit = 0;
@@ -247,7 +247,7 @@ Flag    editflg;
 		    win->rmchars = &win->lmchars[size];
 		    /* can't use bfill here because firstcol may not be a char */
 		    for (i = Z; i < size; i++) {
-			win->firstcol[i] = win->rtext + 1;
+			win->firstcol[i] = (AScols) (win->rtext + 1);
 			win->lastcol[i] = 0;
 		    }
 		    return win;
@@ -290,7 +290,7 @@ removewindow ()
 	Slines j;
 	register Slines tmp;
 	pwin->firstcol[j = pwin->btext + 1] = 0;
-	pwin->lastcol[j++] = pwin->rtext + 1;
+	pwin->lastcol[j++] = (AScols) (pwin->rtext + 1);
 	if ((tmp = (thewin->btext + 1) * (int)sizeof *thewin->firstcol) > 0) {
 	    my_move ((char *)&thewin->firstcol[0],
 		  (char *)&pwin->firstcol[j], (ulong) tmp);
@@ -300,22 +300,22 @@ removewindow ()
 	stcol = 0;
 	stlin = pwin->btext + 1;
 	pwin->bmarg = thewin->bmarg;
-	pwin->btext = pwin->bmarg - pwin->tmarg - 2;
+	pwin->btext = (ASlines) (pwin->bmarg - pwin->tmarg - 2);
 	pwin->bedit = pwin->btext;
     }
     else Block {
 	/* thewin is to the right of pwin on the screen  */
 	register Slines tmp;
 	for (tmp = Z; tmp <= pwin->btext; tmp++) {
-	    pwin->lastcol[tmp] = thewin->lastcol[tmp] +
-		thewin->lmarg - pwin->lmarg;
+	    pwin->lastcol[tmp] = (AScols) (thewin->lastcol[tmp] +
+		thewin->lmarg - pwin->lmarg);
 	    if (pwin->firstcol[tmp] > pwin->rtext)
 		pwin->firstcol[tmp] = pwin->rtext;
 	}
 	stcol = pwin->rtext + 1;
 	stlin = 0;
 	pwin->rmarg = thewin->rmarg;
-	pwin->rtext = pwin->rmarg - pwin->lmarg - 2;
+	pwin->rtext = (AScols) (pwin->rmarg - pwin->lmarg - 2);
 	pwin->redit = pwin->rtext;
     }
     chgwindow (ppnum);
@@ -354,8 +354,8 @@ Small winnum;
 	while (winnum < nwinlist && oldwin != winlist[winnum++])
 	    continue;
     }
-    curwksp->ccol = cursorcol;
-    curwksp->clin = cursorline;
+    curwksp->ccol = (AScols) cursorcol;
+    curwksp->clin = (ASlines) cursorline;
     newwin = winlist[winnum % nwinlist];    /* wrap back to window 0 */
     if (newwin == oldwin)     /* ALWAYS rewrite first line */
 	entfstline = YES;       /* don't skip over blanks */
@@ -491,7 +491,7 @@ drawmarg (window, col, line, chr)
 {
     col -= (window->wksp->wcol - 1);
     if (col >= 0 && col <= window->rtext) {
-	poscursor (col + window->lmarg, line);
+	poscursor ((Scols) (col + window->lmarg), (Slines) line);
 	putch (chr, NO);
     }
 }

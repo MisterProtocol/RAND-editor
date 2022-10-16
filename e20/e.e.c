@@ -142,7 +142,7 @@ Flag    puflg;
      /* putline (NO); */
 	putline ();
 	/* make the second line */
-	cline[col] = csave;
+	cline[col] = (char)csave;
 	ncline = nsave - col;
 	if (ncline <= 0)
 	    ncline = 2;
@@ -390,7 +390,7 @@ chgcase (xabs)
 		GetLine (curwksp->wlin + cursorline);
 		curcol = cursorcol + curwksp->wcol;
 		if (curcol < ncline - 1) {
-			cline [curcol] = caseit (cline [curcol], xabs);
+			cline [curcol] = (char)caseit (cline [curcol], xabs);
 			putch ((Uchar) cline [curcol], YES);
 		} else
 			movecursor (RT, 1);
@@ -1018,8 +1018,8 @@ Flag puflg;
 #ifdef LMCCASE
 			    case OPCCASE:
 			    case OPCAPS:
-				*cpto = caseit (*cpto,
-				    opc & OPCCASE ? NO: YES);
+				*cpto = (char)(caseit (*cpto,
+				    opc & OPCCASE ? NO: YES));
 				continue;
 #endif /* LMCCASE */
 			    }

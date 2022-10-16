@@ -575,7 +575,7 @@ savestate ()
 	putlong  (curmark->mrkwincol, stfile);
 	putc     (curmark->mrklin, stfile);
 	putshort ((short) curmark->mrkcol, stfile);
-dbgpr("savestate, mrkwincol=%ld mrkcol=%d\n", curmark->mrkwincol, curmark->mrkcol);
+/*dbgpr("savestate, mrkwincol=%ld mrkcol=%d\n", curmark->mrkwincol, curmark->mrkcol);*/
     }
 
 #ifdef LMCAUTO

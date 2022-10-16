@@ -33,7 +33,7 @@ char chr;
 	fb->fb_buf[offset] = chr;
 	fb->fb_wflg = 1;
 	if (fb->fb_count <= offset)     /* fb->fb_count MAX= offset + 1;    */
-	    fb->fb_count =  offset + 1;
+	    fb->fb_count =  (short) (offset + 1);
 	ff->f_offset++;
 	if (fp->fn_size < ff->f_offset) /* fp->fn_size MAX= ff->f_offset;   */
 	    fp->fn_size = ff->f_offset;

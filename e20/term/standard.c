@@ -162,7 +162,7 @@ int *count;
     Block {
 	Reg1 int conv;
 	*count = nr;     /* number left over - still raw */
-	conv = ocp - lexp;
+	conv = (int) (ocp - lexp);
 	while (nr-- > 0)
 	    *ocp++ = *icp++;
 	return conv;

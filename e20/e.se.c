@@ -119,14 +119,14 @@ Small delta;
     switch (tmp) {
     case 0:
 	if (delta > 0)
-	    nl = max (0, la_lsize (curlas)
-			 - (curwksp->wlin + cursorline)) + 1;
+	    nl = max (0, (int) (la_lsize (curlas)
+			 - (curwksp->wlin + cursorline)) + 1);
 	else
-	    nl = curwksp->wlin + cursorline + 1;
+	    nl = (int)(curwksp->wlin + cursorline + 1);
 	break;
 
     case 1:
-	nl = parmlines;
+	nl = (int)parmlines;
 	break;
 
     case 2:
@@ -136,7 +136,7 @@ Small delta;
     case 3:
 	if (markcols)
 	    return NORECTERR;
-	nl = marklines;
+	nl = (int)marklines;
 	break;
     }
 
@@ -243,8 +243,8 @@ Small delta;
 	if (moved && !rplshow)
 	    putupwin ();
     }
-r1: *fcp = delim;
-r2: s2[-1] = delim;
+r1: *fcp = (char)delim;
+r2: s2[-1] = (char)delim;
 
     return CROK;
 }
@@ -477,7 +477,7 @@ Flag puflg;
 	&& (lin = slin - curwksp->wlin) >= 0
 	&& lin <= curwin->btext
        )
-	putup (-1, lin, (Scols) max (0, scol - curwksp->wcol),
+	putup (-1, (Slines) lin, (Scols) max (0, scol - curwksp->wcol),
 	       (Scols) (wdelta == 0 ? rpls2len : MAXWIDTH));
     redisplay (curfile, slin, 1, 0, NO);
     if (patmode){
@@ -604,7 +604,7 @@ Flag    puflg;
 		movewin (winlin, wincol, (Slines) lin, (Scols) col, YES);
 	    else {
 		clrbul ();
-		poscursor ((Scols) col, lin);
+		poscursor ((Scols) col, (Slines) lin);
 	    }
 	    if (delay)
 		setbul (YES);

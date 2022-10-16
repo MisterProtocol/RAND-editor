@@ -132,7 +132,7 @@ Nlines  ln;
 
 	    ch = *cp++ & 0177;
 	    if ((ch >= 040 && ch < 0177))
-		*clp++ = ch;
+		*clp++ = (char) ch;
 	    else if (ch == '\t'&& !litmode) Block {
     /*      else if (ch == '\t') Block {  */
 		Reg1 Ncols ri;
@@ -161,7 +161,7 @@ Nlines  ln;
 		    if (ch != ESCCHAR)
 			ch |= 0100;
 		}
-		*clp++ = ch;
+		*clp++ = (char) ch;
 	    }
 	}
     }
@@ -205,7 +205,7 @@ putline ()
     (void) la_lseek (&tlas, clineno, 0);
     cline[ncline - 1] = '\n';
     chkcline ();
-    nr = dechars (cline);
+    nr = (int) dechars (cline);
     fcline = NO;
     clinelas = (La_stream *) 0; /* force a GetLine next time */
     Block {
@@ -292,7 +292,7 @@ char   *line;
 		cc = (*fm == ESCCHAR) ? *fm++ : (*fm++ & 037);
 	    if (cc == '\n')
 		break;
-	    *to++ = cc;
+	    *to++ = (char) cc;
 	    ++cn;
 	}
     else if (uptabs){
@@ -316,7 +316,7 @@ char   *line;
 		}
 		if (cc == '\n')
 		    break;
-		*to++ = cc;
+		*to++ = (char) cc;
 		lnb = MAXLINE;
 	    }
 	    ++cn;
@@ -329,7 +329,7 @@ char   *line;
 		cc = (*fm == ESCCHAR) ? *fm++ : (*fm++ & 037);
 	    if (cc == '\n')
 		break;
-	    *to++ = cc;
+	    *to++ = (char) cc;
 	    ++cn;
 	}
     else
@@ -349,7 +349,7 @@ char   *line;
 		    *to++ = ' ';
 		if (cc == '\n')
 		    break;
-		*to++ = cc;
+		*to++ = (char) cc;
 	    }
 	    ++cn;
 	}

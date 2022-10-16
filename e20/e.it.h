@@ -39,6 +39,7 @@ and other nodes are of the form:
 
 #endif
 
+#ifdef OUT
 struct itable {
     char it_c;              /* Character to be matched */
     int  it_leaf:1;         /* This is a leaf */
@@ -52,7 +53,6 @@ struct itable {
     struct itable *it_next; /* Next one to try */
 };
 
-#define TMPSTRLEN 1000   /* Has to be long for init strings */
 
 #define NULLIT (struct itable *)0
 
@@ -62,15 +62,21 @@ struct itable {
 
 extern struct itable *ithead;
 
+#define IT_NOPE -1      /* Not found */
+#define IT_MORE -2      /* Maybe, need more input */
+
+#endif /* OUT */
+
+
 /* The following will have to be changed if you want to allow space to
    be redefined or some such */
+
 #define KBINIT  040     /* Must not conflict with CC codes */
 #define KBEND   041
 
 extern S_looktbl itsyms[];
 
-#define IT_NOPE -1      /* Not found */
-#define IT_MORE -2      /* Maybe, need more input */
+#define TMPSTRLEN 1000   /* Has to be long for init strings */
 
 extern char *kbinistr;
 extern char *kbendstr;

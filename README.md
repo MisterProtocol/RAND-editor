@@ -165,9 +165,6 @@ has a built-in terminal description file, "e" will use the internal
 information.  Otherwise, "e" will use either `terminfo` or `termcap`
 terminal descriptions, depending on how it is compiled (see below).
 #### "ncurses"
-**N.B.: CURRENTLY THE MOUSE DOES NOT WORK CORRECTLY WITH NCURSES-6.2
-OR NCURSES-6.3. IT WORKS CORRECTLY WITH THE GENERALLY INSTALLED
-NCURSES-5.4.**
 The original version of the editor does its own input and terminal
 handling, without reference to external libraries, although it can
 make use of `curses` to write to terminals that do not have built-in
@@ -179,7 +176,7 @@ Currently, the editor appears to compile and run without problems
 with the ncurses library versions 5.4 and 5.7 using the
 terminfo files distributed with those library versions.
 
-The editor also compiles and runs with the 6.2 ncurses library.
+The editor also compiles and runs with the 6.2 and 6.3 ncurses libraries.
 We did run into a problem initializing mouse position reporting
 using the 6.2 distributed terminfo xterm-256color file with an old
 xterm terminal emulator that did not support the SGR xterm mouse
@@ -201,17 +198,17 @@ On the Mac, we recommend installing and using the third-party program
 "iTerm2", available at http://iterm2.com.  Using "TERM=xterm-256color", the
 editor runs fine when compiled against ncurses-6.2.
 However, if the editor is compiled against ncurses-5.4, it is necessary
-to "unsetenv TERMINFO_DIRS" for iTerm2 to work correctly.
+to "unsetenv TERMINFO\_DIRS" for iTerm2 to work correctly.
 (Recent versions of iTerm2 include a private TERMINFO description file
 for "xterm-256color" which does not work well with versions of ncurses
-prior to 6.2.  Unsetting the TERMINFO_DIRS environment variable, which
+prior to 6.2.  Unsetting the TERMINFO\_DIRS environment variable, which
 is set by iTerm2, causes the system definition to be used.  Unsetting
 this environment variable in .cshrc or .profile is feasible because
 the shell executes these after iTerm2 has set up the environment.)
 
 It should be noted that the 'original' branch, e19, doesn't use any of this,
-and in fact uses the older <sgtty.h> terminal interface.  The newer
-interface, <term.h>, is used by the mouse support code in branch 'main'.
+and in fact uses the older \<sgtty.h> terminal interface.  The newer
+interface, \<term.h>, is used by the mouse support code in branch 'main'.
 However, the code still includes <sgtty.h> for some of its code.  These
 two include files are not supposed to be used together, but our
 mandate was not to rewrite the entire editor.  Therefore, there is
@@ -316,6 +313,22 @@ in normal "man" output, but building the PostScript version of the man
 page has problems with the blizzard of "mandoc" errors.  Hence there
 is a bit of fast footwork in man/Makefile to get rid of the mandoc errors
 before the PostScript generator can see them.
+
+Alternatively, `man -t e` will prevent the use of "mandoc" entirely,
+and produce PostScript output with diversions handled properly by
+`groff`.
+Capture the output in "e.ps", and read that with an appropriate reader
+for a much more legible man page.
+For a third alternative, go to /etc/man.conf and change the "-mandoc" references
+to "-man", which prevents use of "mandoc" in favor of forcing the use
+of the full `groff` program.  Test thoroughly on this one!
+
+Finally, using Homebrew or MacPorts to install "man-db" will give you a "gman"
+command, which, unlike Apple's installed "man" command, does not hardwire
+a call to "mandoc" into the binary.  (Apple claims to have done this because
+Darwin OS does not have "roff".  It has "nroff" and "troff" both, so
+this is jejune and stupid.)  The "gman" command renders regular man pages
+as well as the "e" man page without muss, fuss or bother.
 
 ### Shell files for Macs
 

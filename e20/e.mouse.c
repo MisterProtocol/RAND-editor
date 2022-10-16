@@ -5,12 +5,11 @@ file e.mouse.c
 #endif
 
 
-#include "localenv.h"
 #include "e.h"
 #include "e.m.h"
 #include "e.cm.h"
 #include "e.tt.h"
-#include "ctype.h"
+#include <ctype.h>
 #include <string.h>
 
 #ifdef NCURSES
@@ -191,9 +190,9 @@ dbgpr("initCurses:  optuseextnames=%d\n", optuseextnames);
 	term.tt_height, term.tt_width, getmaxx(stdscr), getmaxy(stdscr));
 **/
 
-    extern int ESCDELAY;
+/*  extern int ESCDELAY;
     ESCDELAY = 0;
-
+ */
     initCursesDone = YES;
 
 /*  clear(); */
@@ -278,7 +277,7 @@ dbgpr("init_mousemotion=%d, optuseext=%d\n", init_mousemotion, optuseextnames);
     {
 	int len;
 
-	len = strlen(kbs_str);
+	len = (int) strlen(kbs_str);
 	if (len == 1 && *kbs_str == '\b') {
 	    bs_flag = 1;
 	}
@@ -352,7 +351,7 @@ initCursesColor()
 	     * via -bg=r,g,b or -setab=N [1-255]
 	     */
 	    if ( bg_rgb_options ) {
-		r1 = init_color(36, opt_bg_r, opt_bg_g, opt_bg_b);      /* -bg=r,g,b */
+		r1 = init_color(36, (short)opt_bg_r, (short)opt_bg_g, (short)opt_bg_b);      /* -bg=r,g,b */
 		bg_idx = 36;
 		/*setab_p = strdup(tparm(setab,36));*/
 		if (r1 == ERR)
@@ -368,7 +367,7 @@ initCursesColor()
 	     * via -fg=r,g,b or -setaf=N [1-255]
 	     */
 	    if ( fg_rgb_options ) {
-		r1 = init_color(37, opt_fg_r, opt_fg_g, opt_fg_b);      /* -fg=r,g,b */
+		r1 = init_color(37, (short)opt_fg_r, (short)opt_fg_g, (short)opt_fg_b);      /* -fg=r,g,b */
 		fg_idx = 37;
 		/*setaf_p = strdup(tparm(setaf,37));*/
 		if (r1 == ERR)
@@ -1520,12 +1519,12 @@ dbgpr("row %d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
     row, n_labels, nslots, label_widths, indent);
 / **/
 
-    tp->begx = indent;
+    tp->begx = (short)indent;
 
     switchwindow (&buttonwin);
     for (i=0; i < tablesize; i++) {
 
-	w = strlen((tp+i)->label);
+	w = (int)strlen((tp+i)->label);
 
 	if ((tp+i)->begx + w > (int)term.tt_width)
 	    break;
@@ -1535,7 +1534,7 @@ dbgpr("row %d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
 	    putch((Uchar)*s, NO);
 	}
 
-	(tp+i)->endx = (tp+i)->begx + w;
+	(tp+i)->endx = (short) ((tp+i)->begx + w);
 	x_next = (tp+i)->endx;
 
 	if (i+1 == tablesize) { /* just finished last entry */
@@ -1549,7 +1548,7 @@ dbgpr("buttoninit: i=%d beg=%d end=%d label=%s\n",
 	if ((tp+i+1)->label[0] != '/' ) {
 	    x_next += nspaces;  /* no space between pairs, eg, +L/-L */
 	}
-	(tp+i+1)->begx = x_next;
+	(tp+i+1)->begx = (short)x_next;
 /** /
 dbgpr("buttoninit: i=%d beg=%d end=%d label=%s\n",
     i, (tp+i)->begx, (tp+i)->endx, (tp+i)->label);
@@ -1881,7 +1880,7 @@ getyx(stdscr, y, x);
     int i;
 
     strncpy(ibuf, buf, 9);
-    int len = strlen(ibuf);
+    int len = (int)strlen(ibuf);
 
     for (i=len; i<9; i++) {
 	ibuf[i] = ' ';
@@ -1923,7 +1922,7 @@ endMotion(int begy, int begx)
 {
 
     /* E's (0,0) is curses (1,1) */
-    curmark->mrklin = begy - curwin->ttext;
+    curmark->mrklin = (ASlines) (begy - curwin->ttext);
     curmark->mrkcol = begx - curwin->ltext;
 
 /** /
@@ -2373,7 +2372,7 @@ add_mybutton(int cnt, char *label, int fcode, int row, mouse_button_table *table
 
     row_ptr[cnt].ecmd = fcode;
     row_ptr[cnt].label = strdup(label);
-    row_ptr[cnt].bnum = cnt;    /* field not used */
+    row_ptr[cnt].bnum = (short) cnt;    /* field not used */
     row_ptr[cnt].begx = 0;
     row_ptr[cnt].endx = 0;
 

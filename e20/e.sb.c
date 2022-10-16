@@ -15,7 +15,6 @@ file e.sb.c
 #include SIG_INCL
 #include <sys/stat.h>
 #include <utime.h>
-#include <stdarg.h>
 
 #if SYSIII || SOLARIS
 #include <fcntl.h>
@@ -817,6 +816,7 @@ void
 flushkeys ()
 {
     fflush (keyfile);
+    numtyp = 0;
     if (ferror (keyfile))
 	fatal (FATALIO, "ERROR WRITING keys FILE.");
     return;
@@ -923,7 +923,7 @@ int crmode;
     }
 
     for (;;) {
-	if ((j = read (fd1, buf, sizeof buf)) == 0) {
+	if ((j = (int)read (fd1, buf, sizeof buf)) == 0) {
 	    retval = 0;
 	    break;
 	}

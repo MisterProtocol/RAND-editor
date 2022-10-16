@@ -20,13 +20,9 @@ file e.t.c
 #include "e.wi.h"
 #endif /* LMCMARG */
 
-int pendFKeys = 0;
+#include "e.h.h"  /* for MSSO and MSSE definitions */
 
-#ifdef  SYSSELECT
 #include <sys/time.h>
-#else /* SYSSELECT */
-#include SIG_INCL
-#endif /* SYSSELECT */
 
 #ifdef TESTRDNDELAY
 # undef EMPTY
@@ -68,36 +64,38 @@ Flag entering = NO;     /* set if e is in the param () routine. */
 
 int fnbcol (char *, Ncols, Ncols);
 
-unsigned Short getkey1 (Flag, struct timeval *);
+/*unsigned Short getkey1 (Flag, struct timeval *);*/
 Flag dintrup (void);
 Flag la_int (void);
 void exchgcmds (void);
 
-#ifdef NCURSES
+int mapInputCh(int c);
+
+Uint getPlayChar(Flag peekflg);
+Uint getReplayChar (void);
+Flag pendINTkey(void);  /* has an interrupt key been typed */
+Flag pendKey(void);     /* has any key been typed */
 
 /* these are replacement versions of getkey and getkey1 */
 unsigned Short mGetkey (Flag, struct timeval *);
 unsigned Short mGetkey1(Flag, struct timeval *);
-Char MapCursesKey(Char);
+extern Char MapCursesKey(Char);
+extern Char MapCtrlKey(Char);
+extern int getFkeychar(void);
+extern int pendFKeys;
 
-/* If !NULL, points to remaining codes to process from a F_KEY mapping/press */
-/* which are defined in the user's EKBFILE */
-Uchar *FKey_p;
-int getFkeychar(void);
+extern int defINTchar;  /* the input ^X value of CCINT, set in e.keys.c */
+extern int altINTchar;  /* the input Fn value of CCINT if user so defined */
 
-#include "e.keys.h"
-#include <ctype.h>
-
-char *getEkeyname(int);
-char *getCursesKeyname(int);
-char *dbg_KeyName(int);
+extern char *getEkeyname(int);
+extern char *getCursesKeyname(int);
+extern char *dbg_KeyName(int);
 
 #ifdef MOUSE_BUTTONS
 extern int mouseFuncKey;
 extern void getMouseButtonEvent();
 #endif /* MOUSE_BUTTONS */
 
-#endif /* NCURSES */
 
 Flag finished_replay = NO;
 extern off_t replay_filesize;
@@ -115,6 +113,8 @@ extern void bm_unbullet (Flag, Ncols, Ncols, int, int);
 extern void stmarg0 (Ncols, Flag, Flag);
 #endif /* LMCMARG */
 extern void setbul ();
+void outbulletchar (char c, Flag);
+#define BULCHAR1 ' '
 extern void clrbul ();
 extern void savecurs ();
 extern void restcurs ();
@@ -142,6 +142,7 @@ extern void doMouseReplay(int, int);
 void MesgHack (Small, char *);
 
 void mesg (int, ...);
+
 
 #define SIGSEGV_PATCH  /* tmp to deal with mem violation */
 
@@ -275,7 +276,7 @@ dbgpr("putup0a:  curwksp->wlin=%d\n", curwksp->wlin);
 	/*   border as far up as necessary. */
 
 	if (freshputup) {
-	    poscursor (-1, ln);
+	    poscursor (-1, (Slines)ln);
 	    putch ((Uchar)(chgborders == 1 ? lmc : INMCH), NO);
 	    if (curwin->lmchars)
 	      curwin->lmchars[ln] = (Uchar) lmc;
@@ -285,8 +286,8 @@ dbgpr("putup0a:  curwksp->wlin=%d\n", curwksp->wlin);
 	    if (ln == ls && lmc != ELMCH)
 		lb = 0;
 	    else
-		lb = ln;
-	    for (lt = ln; lt >= lb; lt--) {
+		lb = (Slines) ln;
+	    for (lt = (Slines)ln; lt >= lb; lt--) {
 /**
 dbgpr("e.t.c:270, lt=%d, ln=%d length of lmchars=(%d) curwin=(%o) enterwin=(%o)\n",
 lt, ln, strlen(curwin->lmchars), curwin, enterwin );
@@ -341,8 +342,8 @@ dbgpr("putup1: rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncline=
 	    if (col < strtcol)
 		col = strtcol;
 	}
-	curwin->firstcol[ln] = fc;
-	poscursor ((Scols) col, ln);
+	curwin->firstcol[ln] = (AScols) fc;
+	poscursor ((Scols) col, (Slines) ln);
 /* /
 dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);
 / */
@@ -352,7 +353,7 @@ dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);
 #endif /* OUT */
 	Block {
 	    Reg1 Scols tmp;
-	    if ((tmp = fc - col) > 0) {
+	    if ((tmp = (Scols)(fc - col)) > 0) {
 		multchar (' ', tmp);
 		col = fc;
 	    }
@@ -374,10 +375,10 @@ dbgpr("putup3: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
 		tmp = rlimit;
 		rmc = MRMCH;
 	    }
-	    lstcol = tmp;
+	    lstcol = (Scols) tmp;
 	}
-	if (lstcol < col)
-	    lstcol = col;
+	if (lstcol < (Scols) col)
+	    lstcol = (Scols) col;
 /* /
 dbgpr("putup4: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
 / */
@@ -398,7 +399,7 @@ dbgpr("putup6: ricol=(%d), col=(%d) lcol=(%d)\n", ricol, col, lcol);
 				 &cline[lcol + col]);
 		    } else
 		 */     d_write (&cline[lcol + col], (Short) (ricol - col));
-		cursorcol += (ricol - col);
+		cursorcol += (Scols) (ricol - col);
 	    }
 	}
 	/* determine how many trailing blanks we need to put out */
@@ -409,11 +410,11 @@ dbgpr("putup6: ricol=(%d), col=(%d) lcol=(%d)\n", ricol, col, lcol);
 	       )
 		multchar (' ', tmp);
 	}
-	curwin->lastcol[ln] = (lstcol == fc) ? 0 : lstcol;
+	curwin->lastcol[ln] = (AScols) ((lstcol == fc) ? 0 : lstcol);
 
 	/* what to do about the right border */
 	if (freshputup) {
-	    poscursor (curwin->rmarg - curwin->ltext, ln);
+	    poscursor (curwin->rmarg - curwin->ltext, (Slines)ln);
 	    putch (chgborders == 1 ? rmc : INMCH, NO);
 	    curwin->rmchars[ln] = (Uchar) rmc;
 	} else if ((curwin->rmchars[ln] & CHARMASK) != rmc) {
@@ -429,7 +430,7 @@ dbgpr("(else) freshputup=%d, rmc=%d, curwin->rmchars[ln]=%d\n",
 dbgpr(" chgborders=%d, borderbullets=%d, ln=%d, newcurline=%d\n",
   chgborders, borderbullets, ln, newcurline);
 / */
-		poscursor (curwin->rmarg - curwin->ltext, ln);
+		poscursor (curwin->rmarg - curwin->ltext, (Slines)ln);
 		putch (chgborders == 1 ? rmc : INMCH, NO);
 	    }
 	    curwin->rmchars[ln] = (Uchar) rmc;
@@ -602,7 +603,10 @@ Flag newbullets;
 	}
 #endif /* LMCMARG */
 	poscursor (oldccol, -1);
-	putch (BULCHAR, NO);
+    /*  putch (BULCHAR, NO); */
+	outbulletchar(BULCHAR1, NO);
+	/*MSSO,  putch ('*', NO),  MSSE;*/
+
 #ifdef LMCMARG
 	if (occ > oldccol)
 	    /*tm_unbullet (allbullets, occ, -1, TMCH, BTMCH, NO);*/
@@ -625,7 +629,10 @@ Flag newbullets;
 	}
 #endif /* LMCMARG */
 	poscursor (oldccol, curwin->btext + 1);
-	putch (BULCHAR, NO);
+    /*  putch (BULCHAR, NO); */
+	outbulletchar(BULCHAR1, NO);
+	/*MSSO,  putch (' ', NO),  MSSE;*/
+
 #ifdef LMCMARG
 	if (occ > oldccol)
 	    /*bm_unbullet (allbullets, occ, curwin->btext + 1, BMCH, TTMCH, NO);*/
@@ -645,19 +652,37 @@ Flag newbullets;
 	    putch (curwin->rmchars[ocl], NO);
 	}
 	poscursor (curwin->rtext + 1, oldcline);
-	putch (BULCHAR, NO);
+    /*  putch (BULCHAR, NO); */
+	outbulletchar(BULCHAR1, NO);
+	/*MSSO,  putch (' ', NO),  MSSE;*/
 	/* do left side */
 	if (!allbullets) {
 	    poscursor (-1, ocl);
 	    putch (curwin->lmchars[ocl], NO);
 	}
 	poscursor (-1, oldcline);
-	putch (BULCHAR, NO);
+    /*  putch (BULCHAR, NO); */
+	/*MSSO,  putch (' ', NO),  MSSE;*/
+	outbulletchar(BULCHAR1, NO);
     }
     poscursor (oldccol, oldcline);
     d_put (0);
     return;
 }
+
+/*
+ *  Use term so mode if supported
+ */
+
+void
+outbulletchar(char c, Flag how) {
+    if (term.tt_so) {
+	MSSO, putch(c, how), MSSE;
+    }
+    else
+	putch(c, how);
+}
+
 
 /*
  * trw - redo these two
@@ -693,7 +718,7 @@ tm_unbullet (allbullets, occ, tb, ordch, igntab)
 	    if (tabs[i] - curwksp->wcol == occ && ntabs > 0 && i < ntabs)
 		ordch = (Uchar) (ordch + (BTMCH - BMCH));
 	}
-	poscursor (occ, tb);
+	poscursor ((Scols)occ, (Slines)tb);
 	putch (ordch, NO);
     }
 }
@@ -719,7 +744,7 @@ bm_unbullet (allbullets, occ, tb, ordch, xordch)
     /*Ncols i;*/
 
     if (!allbullets) {
-	poscursor (occ, tb);
+	poscursor ((Scols)occ, (Slines)tb);
 	putch (occ == linewidth - curwksp->wcol
 #ifdef LMCAUTO
 	       || (autolmarg && (occ == autolmarg - curwksp->wcol))
@@ -808,20 +833,6 @@ setmarg (old, new)
 }
 #endif /* LMCMARG */
 
-#ifndef SYSSELECT
-#ifdef COMMENT
-int
-bulalarm ()
-.
-    A null routine to catch the SIGALRM signal which may come in as part
-    of the 1 second timeout for a bullet.
-#endif
-int
-bulalarm ()
-{
-    return;
-}
-#endif /* SYSSELECT */
 
 static int bulsave = -1;    /* saved character from setbul */
 
@@ -835,8 +846,9 @@ setbul (wt)
 #endif
 void
 setbul (wt)
-Flag wt;
+Flag __attribute__((unused)) wt;
 {
+/*dbgpr("setbul:  %d=term.tt_bullets\n", term.tt_bullets);*/
     if (!term.tt_bullets)
 	return;
     if (curfile != NULLFILE) {
@@ -849,35 +861,25 @@ Flag wt;
     else
 	bulsave = ' ';
 
-    putch (BULCHAR, YES);
+/*  putch (BULCHAR, YES); */
+    outbulletchar(BULCHAR1, NO);
+/*  MSSO,  putch (' ', NO),  MSSE; */
     movecursor (LT, 1);
     d_put (0);
+#ifdef OUT  /* no longer needed */
     if (wt) {
-#ifdef  SYSSELECT
 	Block {
 	    static struct timeval onesec = { 1, 0 };
 
-	    /*getkey (WAIT_PEEK_KEY, &onesec);*/
 	    mGetkey (WAIT_PEEK_KEY, &onesec);
 	    /* either this read will time out
 	     * or a key will have come in, in which case we want to clear
 	     * bullet right away and reset the alarm.
 	     **/
-#else /* SYSSELECT */
-      /*if (getkey (PEEK_KEY) == NOCHAR) {*/
-	if (mGetkey (PEEK_KEY) == NOCHAR) {
-	    (void) signal (SIGALRM, bulalarm);
-	    alarm (1);
-	    if (getkey (WAIT_PEEK_KEY) != NOCHAR)
-		alarm (0);
-	    /* either this read will be interrupted by the alarm,
-	     * or a key will have come in, in which case we want to clear
-	     * bullet right away and reset the alarm.
-	     **/
-#endif /* SYSSELECT */
 	}
 	clrbul ();
     }
+#endif
     return;
 }
 
@@ -924,7 +926,7 @@ Reg1 Nlines number;
     number = max (0, number);
     wincol = curwksp->wcol;
     if (curwin->btext > 1)
-	defpl = defplline;
+	defpl = (Small) defplline;
     else
 	defpl = Z;
     if (number == 0) {
@@ -934,7 +936,7 @@ Reg1 Nlines number;
     else
 	cc = cursorcol;
     cl = min (number, defpl);
-    movewin (number - defpl, wincol, cl, cc, 1);
+    movewin (number - defpl, wincol, (Slines) cl, cc, 1);
     return;
 }
 
@@ -977,7 +979,7 @@ dbgpr("\nvertmvwin:  nl=%ld curwksp->wlin=%d cursorline=%d, curwin->btext=%d cur
 	nl -= winlin;
 	winlin = Z;
     }
-    cl = (Slines) cursorline - nl;
+    cl = (Slines) (cursorline - nl);
 
     if (abs (nl) > curwin->btext)
 	cl = cursorline;
@@ -1106,8 +1108,8 @@ if( 1 && curwin == &enterwin ) {
 	if (   (curwin->winflgs & TRACKSET)
 	    && (newdisplay & (WLINMOVED | WCOLMOVED))
 	   ) {
-	    awksp->clin = curslin;
-	    awksp->ccol = curscol;
+	    awksp->clin = (ASlines) curslin;
+	    awksp->ccol = (AScols) curscol;
 	}
     }
 
@@ -1123,7 +1125,7 @@ if( 1 && curwin == &enterwin ) {
 		    && curwksp->wlin < la_lsize (curlas)
 		    && curwksp->wlin - vdist < la_lsize (curlas)
 		   )
-		    (void) vinsdel (0, -vdist, YES);
+		    (void) vinsdel (0, (Slines) -vdist, YES);
 		else
 		    putupwin ();
 	    }
@@ -1163,8 +1165,8 @@ savecurs ()
     lastsv = sv_curs;
     sv_curs = (struct svcs *) salloc (sizeof *sv_curs, YES);
     sv_curs->sv_lastsv = lastsv;
-    sv_curs->sv_curscol = cursorcol;
-    sv_curs->sv_cursline = cursorline;
+    sv_curs->sv_curscol = (AScols) cursorcol;
+    sv_curs->sv_cursline = (ASlines) cursorline;
     return;
 }
 
@@ -1280,7 +1282,8 @@ movecursor (func, cnt)
 Small func;
 Reg4 Nlines cnt;
 {
-    Reg3 Slines lin;
+    /*Reg3 Slines lin;*/
+    Reg3 Nlines lin;
     Reg2 Ncols col;
 
 
@@ -1359,425 +1362,14 @@ dbgpr("movecursor: func=%d [1=UP 2=DN 5=RT 6=LT] cnt=%d col=%d cursorcol=%d\n", 
 	if ((ldif || cdif) && func)
 	    movewin (curwksp->wlin + ldif,
 		     curwksp->wcol + cdif,
-		     lin, (Scols) col, YES);
+		     (Slines) lin, (Scols) col, YES);
 	else
-	    poscursor ((Scols) col, lin);
+	    poscursor ((Scols) col, (Slines) lin);
     }
     return;
 }
 
 
-
-#ifdef  SYSSELECT
-#ifdef COMMENT
-unsigned Short
-getkey (peekflg, timeout)
-    Flag peekflg;
-    struct timeval *timeout;
-.
-    Read another character from the input stream.  If the last character
-    wasn't used up (keyused == NO) don't read after all.
-.
-    peekflg is one of
-      WAIT_KEY      wait for a character, ignore interrupted read calls.
-      PEEK_KEY      peek for a character
-      WAIT_PEEK_KEY wait for a character, then peek at it;
-		    if read times out, return NOCHAR.
-#endif /* COMMENT */
-unsigned Short
-getkey (peekflg, timeout)
-Flag peekflg;
-struct timeval *timeout;
-#else /* SYSSELECT */
-#ifdef COMMENT
-unsigned Short
-getkey (peekflg)
-    Flag peekflg;
-.
-    Read another character from the input stream.  If the last character
-    wasn't used up (keyused == NO) don't read after all.
-.
-    peekflg is one of
-      WAIT_KEY      wait for a character, ignore interrupted read calls.
-      PEEK_KEY      peek for a character
-      WAIT_PEEK_KEY wait for a character, then peek at it;
-		   if read is interrupted, return NOCHAR.
-#endif
-unsigned Short
-getkey (peekflg)
-Reg2 Flag peekflg;
-#endif /* SYSSELECT */
-{
-    Reg1 unsigned Short rkey;
-    static Flag knockdown  = NO;    /* set when entering CTRL chars into a file, eg, ^X^CI is a tab */
-    /*extern*/ unsigned Short getkey1 ();
-
-/*dbgpr("getkey:  **OLD** routine called\n");*/
-
-    if (peekflg == WAIT_KEY && keyused == NO) {
-	return (Uint)key; /* then getkey is really a no-op */
-    }
-
-#ifdef  SYSSELECT
-    rkey = getkey1 (peekflg, timeout);
-#else /* SYSSELECT */
-    rkey = getkey1 (peekflg);
-#endif /* SYSSELECT */
-
-    if (knockdown && rkey < 040)
-	rkey |= 0100;
-    if (peekflg != WAIT_KEY)
-	return rkey;
-    knockdown = rkey == CCCTRLQUOTE;    /* ^\ knockdown next char   */
-    keyused = NO;
-    key = (int)rkey;
-    return rkey;
-}
-
-#ifdef  SYSSELECT
-#ifdef COMMENT
-static unsigned Short
-getkey1 (peekflg, timeout)
-    Small peekflg;
-    struct timeval *timeout;
-.
-    Return the next key from the input stream.
-    Write the key to the keystroke file unless it is CCINT, which will NOT
-    be written to the keyfile by this routine.  The caller will write it
-    there if and only if it actually interrupted something.
-    See getkey() for the function of peekflg.
-    if peekflg is WAIT_PEEK_CHAR, then wait for timeout microseconds.
-#endif
-/*static unsigned Short*/
-unsigned Short
-getkey1 (peekflg, timeout)
-Small peekflg;
-struct timeval *timeout;
-#else /* SYSSELECT */
-#ifdef COMMENT
-static unsigned Short
-getkey1 (peekflg)
-    Small peekflg;
-.
-    Return the next key from the input stream.
-    Write the key to the keystroke file unless it is CCINT, which will NOT
-    be written to the keyfile by this routine.  The caller will write it
-    there if and only if it actually interrupted something.
-    See getkey() for the function of peekflg.
-#endif
-/*static unsigned Short*/
-unsigned Short
-getkey1 (peekflg)
-Small peekflg;
-#endif /* SYSSELECT */
-{
-    static Short lcnt;
-    static int   lexrem;        /* portion of lcnt that is still raw */
-    static Uchar chbuf[NREAD];
-    static Uchar *lp;
-
-/** /
-dbgpr("getkey1:  **OLD** routine called\n");
-/ **/
-static int oldcount = 0;
-oldcount++;
-
-    if (replaying) Block {
-	static Small replaydone = 0;
-	if (replaydone) {
- finishreplay:
-	    close (inputfile);
-	    inputfile = STDIN;
-	    if (silent) {
-		silent = NO;
-		(*term.tt_ini1) (); /* not d_put(VCCICL) because fresh() */
-				    /* follows */
-		windowsup = YES;
-		fresh ();
-	    }
-	    mesg (ERRALL + 1,
-		  recovering
-		  ? "Recovery completed."
-		  : replaydone == 1
-		    ? "Replay completed."
-		    : "Replay aborted."
-		 );
-	    d_put (0);
-	    replaying = NO;
-	    recovering = NO;
-	    replaydone = 0;
-#ifdef  STARTUPFILE
-	    /*
-	     *  Don't read the the .e_profile file if recovering
-	     *  from a crash.
-	     */
-	    if( dot_profile ) {
-		fclose( fp_profile );
-		dot_profile = NO;
-	    }
-#endif /* STARTUPFILE */
-	    /*goto nonreplay; */
-	    goto nonreplay;
-	    return CCRETURN;
-	}
-	if (   !recovering
-	    && !xempty (STDIN) /* any key stops replay */
-	   ) {
-	    lcnt = 0;
-	    replaydone = 2;
-	    while (xread (STDIN, chbuf, NREAD) > 0 && !xempty (STDIN))
-		continue;
-	    goto endreplay;
-	}
-	if (lcnt <= 0) Block {
-	    static Uchar charsaved;
-	    static Uchar svchar;
-	    d_put (0);
-	    for (;;) {
-		Reg1 Uchar *cp;
-		/* note that keystroke file is in canonical format and
-		 * doesn't have to go through inlex */
-		cp = lp = chbuf;
-		if (charsaved)
-		    *cp++ = svchar;
-		if ((lcnt = xread (inputfile, (char *) cp, (size_t)(NREAD - charsaved)))
-		    >= 0) {
-		    if (lcnt > 0) {
-			svchar = cp[lcnt - 1];
-			if (!charsaved) {
-			    charsaved = 1;
-			    if (--lcnt == 0)
-				continue;
-			}
-		    }
-		    break;
-		}
-		if (errno != EINTR)
-		    fatal (FATALIO, "Error reading input.");
-	    }
-	}
-	if (   lcnt == 0
-#ifdef UNSCHAR
-	    || *lp == CCSTOP
-#else
-	    || (*lp & CHARMASK) == CCSTOP
-#endif
-	   ) {
-	    replaydone = 1;
- endreplay:
-	    if (!entering)
-		goto finishreplay;
-	    else {
-		*chbuf = CCINT;
-		lp = chbuf;
-		lcnt = 1;
-	    }
-	}
-    }
-
-#ifdef RECORDING
-    else if (playing) {
-	    extern Flag play_silent;
-
-	lp = (Uchar *)PlayChar (peekflg);
-	if (!playing && play_silent) {
-	    silent = 0;
-	    fresh();
-	}
-	/*
-	 * Any key stops playback
-	 */
-	if (!xempty(STDIN)) {
-		char c;
-	    /*
-	     *  throw away keystroke[s]
-	     */
-	    do {
-		read (inputfile, &c, 1);
-	    } while (!xempty(STDIN));
-	    if( play_silent )
-		silent = 0;
-	    play_count = 0;
-	/*  playing = 0;  */
-	    return (CCINT);
-	}
-
-	/*goto endGetkey1;*/
-	return (unsigned Short)*lp;
-    }
-#endif /* RECORDING */
-
-    else {
- nonreplay:
-
-#ifdef  STARTUPFILE
-	/*
-	 *  Input from the .e_profile file?
-	 */
-	if( dot_profile && peekflg == WAIT_KEY )
-	    return( (Uint)get_profilekey( NO ));
-#endif /* STARTUPFILE */
-
-	if (lcnt < 0)
-	    fatal (FATALBUG, "lcnt < 0");
-	if (   (lcnt - lexrem == 0 && peekflg != PEEK_KEY)
-	    || (lcnt < NREAD && !xempty (inputfile))
-	   ) {
-	    /* read some more */
-	    if (lcnt == 0)
-		lp = chbuf;
-	    else if (lp > chbuf) {
-		if (lcnt == 1)
-		    /* handle frequent case more efficiently */
-		    *chbuf = *lp;
-		else
-		    my_move ((char *)lp, (char *) chbuf, (ulong) lcnt);
-		lp = chbuf;
-	    }
-	    d_put (0);
-#ifdef  SYSSELECT
-#ifdef FDSET
-	    Block {
-		fd_set readmask;
-		FD_ZERO(&readmask);
-		FD_SET(inputfile, &readmask);
-		/*dbgpr("inputfile=(%d)\n", inputfile);*/
-		if (   peekflg == WAIT_PEEK_KEY
-		    && select (inputfile + 1, &readmask, NULL, NULL, timeout) <= 0
-		   )
-		    return NOCHAR;
-	    }
-#else /* FDSET */
-	    Block {
-		int z = 0;
-		int readmask = 1 << inputfile;
-
-		if (   peekflg == WAIT_PEEK_KEY
-		    && select (inputfile + 1, &readmask, &z, &z, timeout) <= 0
-		   )
-		    return NOCHAR;
-	    }
-#endif /* FDSET */
-#endif /* SYSSELECT */
-	    do Block {
-		Reg3 int nread;
-		nread = NREAD - lcnt;
-#ifdef  SYSSELECT
-#ifdef  FSYNCKEYS
-		/*
-		 *  If this 1 min. timer goes off, flush and fsync
-		 *  the keystroke file.  (Needs to be done only once!).
-		 */
-#ifdef FDSET
-		Block {
-		    fd_set readmask;
-		    FD_ZERO(&readmask);
-		    FD_SET(inputfile, &readmask);
-		    /*dbgpr("inputfile=(%d)\n", inputfile); **/
-		    struct timeval tval;
-		    int rc = 0;
-
-		    tval.tv_sec = 60, tval.tv_usec = 0;
-		    rc = select (inputfile + 1, &readmask, NULL, NULL, &tval);
-		    if (rc == 0 && numtyp) {
-			fsynckeys();    /* also does a fflush */
-			numtyp = 0;
-		    }
-		}
-#else
-		Block {
-		    int z = 0;
-		    int readmask = 1 << inputfile;
-		    struct timeval tval;
-		    int rc = 0;
-
-		    tval.tv_sec = 60, tval.tv_usec = 0;
-		    rc = select (inputfile + 1, &readmask, &z, &z, &tval);
-		    if (rc == 0 && numtyp) {
-			fsynckeys();    /* also does a fflush */
-			numtyp = 0;
-		    }
-		}
-#endif /* FDSET */
-#endif /* FSYNCKEYS */
-#endif /* SYSSELECT */
-		if ((nread = xread (inputfile, (char *) &chbuf[lcnt], (size_t)nread))
-		    > 0) Block {
-		    Reg4 Uchar *stcp;
-		    stcp = &chbuf[lcnt -= lexrem];
-		    lexrem += nread;
-		    if ((nread = (*kbd.kb_inlex) (stcp, &lexrem)) > 0) Block {
-			Reg1 Uchar *cp;
-			Reg2 int nr;
-			cp = &stcp[nread];
-			/* look ahead for interrupts */
-			nr = nread;
-			do {
-			    if (*--cp == CCINT)
-				break;
-			} while (--nr);
-			if ((nr = cp - stcp) > 0) {
-			    /* found CCINT character in chars just read */
-			    /* and some characters in front of it are to be */
-			    /* thrown away */
-			    lp += lcnt + nr;
-			    lcnt = nread - nr + lexrem;
-			}
-			else
-			    lcnt += nread + lexrem;
-		    }
-		    else
-			lcnt += lexrem;
-		}
-		else if (nread < 0) {
-		    if (errno != EINTR)
-			fatal (FATALIO, "Error reading input.");
-		    if (peekflg == WAIT_PEEK_KEY)
-			break;
-		}
-		else
-		    fatal (FATALIO, "Unexpected EOF in key input.");
-	    } while (lcnt - lexrem == 0);
-	}
-    }
-
-    if (   lcnt - lexrem <= 0
-	&& peekflg != WAIT_KEY
-       )
-	return NOCHAR;
-
-    if (peekflg != WAIT_KEY)
-#ifdef UNSCHAR
-	return *lp;
-#else
-	return *lp & CHARMASK;
-#endif
-
-    Block {
-	Reg1 unsigned Short rchar;
-
-	lcnt--;
-
-#ifdef UNSCHAR
-	rchar = *lp++;
-#else
-	rchar = *lp++ & CHARMASK;
-#endif
-
-	if (keyfile != NULL && rchar != CCINT) {
-	    putc ((int)rchar, keyfile);
-	    if (numtyp > MAXTYP) {
-		flushkeys ();
-		numtyp = 0;
-	    }
-	}
-#ifdef RECORDING
-	if (recording)
-	    RecordChar (rchar);
-#endif /* RECORDING */
-	return rchar;
-    }
-}
 
 
 #ifdef RDNDELAY
@@ -1915,22 +1507,23 @@ dintrup ()
 Flag
 dintrup ()
 {
+
+    if( replaying )
+	return 0;
+
+    /* returns 1 if CCINT, 0 otherwise */
+    return pendINTkey();
+
+#ifdef OUT
+/*  No one can type fast enough via this method to interrupt
+ *  a putup().  On a 300 baud terminal, maybe...
+ */
     Reg1 unsigned Short ichar;
 
-/* todo, modify mGetkey to handle PEEK_KEY in replay mode */
-if( replaying )
-  return 0;
-
     intrupnum = 0;
-#ifdef SYSSELECT
     static struct timeval k_timeval = {1, 0}; /* one-second timeout */
 
-    ichar = getkey (PEEK_KEY, &k_timeval);
-/*  ichar = mGetkey (PEEK_KEY, &k_timeval); */
-#else /* SYSSELECT */
-    ichar = getkey (PEEK_KEY);
-/*  ichar = mGetkey (PEEK_KEY); */
-#endif /* SYSSELECT */
+    ichar = mGetkey (PEEK_KEY, &k_timeval);
 
     switch (ichar) {
 	case CCOPEN:
@@ -1990,6 +1583,7 @@ if( replaying )
 	    break;
     }
     return NO;
+#endif /* OUT */
 }
 
 #ifdef COMMENT
@@ -2015,40 +1609,36 @@ sintrup ()
     Look ahead for certain keys which will interrupt a search or any
     subprogram, e.g. a "run", "fill", etc.
     Return YES if such a key is found, else NO.
+
+10/2022: now looks for CCINT (<esc>-\  on std keyboard)
 #endif
 Flag
 sintrup ()                        /* Whether to intrup search/exec      */
 {
     intrupnum = 0;                /* reset the counter                  */
 
-#ifdef SYSSELECT
+    Flag rc = pendINTkey();    /* now uses ncurses nodelay()... */
+/*  dbgpr("sintrup, rc=%d\n", rc); */
+    if (rc) keyused = YES;
+    return rc;
+
+#ifdef OUT
     struct timeval k_timeval = {1, 0}; /* one-second timer */
     struct timeval k_t = {1, 0};
 
-    if (getkey (PEEK_KEY, &k_timeval) == CCINT) {
-/*  if (mGetkey (PEEK_KEY, &k_timeval) == CCINT) { */
+    if (mGetkey (PEEK_KEY, &k_timeval) == CCINT) {
 	putc (CCINT, keyfile);
 	keyused = YES;
 	k_timeval = k_t; /* C standard best practice: reinitialize
 			    it after use */
-     /* mGetkey (WAIT_KEY, &k_timeval); */
-	getkey (WAIT_KEY, &k_timeval);
+	mGetkey (WAIT_KEY, &k_timeval);
 	keyused = YES;
 	return YES;
     }
-#else
-    if (getkey (PEEK_KEY) == CCINT) {
-/*  if (mGetkey (PEEK_KEY) == CCINT) { */
-	putc (CCINT, keyfile);
-	keyused = YES;
-    /*  mGetkey (WAIT_KEY); */
-	getkey (WAIT_KEY);
-	keyused = YES;
-	return YES;
-    }
-#endif /* SYSSELECT */
 
     return NO;
+#endif /* OUT */
+
 }
 
 #ifdef COMMENT
@@ -2087,9 +1677,9 @@ Flag    flg;
     }
     if (flg && chr != ' ') {
 	if (curwin->firstcol[cursorline] > cursorcol)
-	    curwin->firstcol[cursorline] = cursorcol;
+	    curwin->firstcol[cursorline] = (AScols) cursorcol;
 	if (curwin->lastcol[cursorline] <= cursorcol)
-	    curwin->lastcol[cursorline] = cursorcol + 1;
+	    curwin->lastcol[cursorline] = (AScols) (cursorcol + 1);
     }
 
     /*  Adjust cursorcol, cursorline for edge effects of screen.
@@ -2188,25 +1778,18 @@ param ()
 	    putch ((Uchar)(*c1++ = *c2++), NO);
 	*c1 = '\0';
 	ppos = ccmdlen = lcmdlen;
-#ifdef SYSSELECT
 	struct timeval k_timeval = {oneSec, 0};      /* one-second timer */
 	mGetkey (WAIT_KEY, &k_timeval);
-#else
-	getkey (WAIT_KEY);
-#endif /* SYSSELECT */
     }
     else {
 	ccmdp[0] = '\0';
 	ppos = Z;
 	ccmdlen = Z;
-#ifdef SYSSELECT
 	struct timeval k_timeval = {oneSec, 0}; /* one-second timer */
-#endif /* SYSSELECT */
 #ifdef  NOCMDCMD
 rmcmd:
 #endif /* NOCMDCMD */
 
-#ifdef SYSSELECT
 	if (pendFKeys) {
 	    key = (Char) getFkeychar();
 	    if (recording) {
@@ -2216,9 +1799,6 @@ rmcmd:
 	else {
 	    mGetkey (WAIT_KEY, &k_timeval);
 	}
-#else
-	getkey (WAIT_KEY);
-#endif /* SYSSELECT */
 
 /*dbgpr("param, checking key=%o\n", key);*/
 
@@ -2239,15 +1819,9 @@ rmcmd:
 
     cmdflg = NO;
 
-#ifdef SYSSELECT
     struct timeval k_timeval = {oneSec, 0}; /* one-second timer */
 
-/*  for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY, &k_timeval)) { */
     for (; ; cmdflg = key == CCCMD, keyused = YES, mGetkey (WAIT_KEY, &k_timeval)) {
-#else
-    for (; ; cmdflg = key == CCCMD, keyused = YES, getkey (WAIT_KEY)) {
-#endif /* SYSSELECT */
-
 /** /
 if (CTRLCHAR) {
  dbgpr("param: got ctrlkey=(%o)(%s) curwin=(%o) enterwin=(%o) cmdflg=%d keyused=%d\n",
@@ -3199,10 +2773,10 @@ dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
 		    putup (first, endwin, 0, MAXWIDTH);
 		else if (from >= la_lsize (curlas) - delta)
 		    putup (first, (Slines)(winfirst + delta + num - 1), 0, MAXWIDTH);
-		else if (  !vinsdel (first, delta, curwin == oldwin)
+		else if (  !vinsdel (first, (Slines)delta, curwin == oldwin)
 			 && num > 0
 			)
-		    putup (winfirst + delta, (Slines) (winfirst + delta + num - 1),
+		    putup ((Slines)(winfirst + delta), (Slines) (winfirst + delta + num - 1),
 			   0, MAXWIDTH);
 	    } else { /* delta < 0 */
 		if (   first - (delta - wmove) > endwin
@@ -3213,7 +2787,7 @@ dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
 		    putup (first, endwin, 0, MAXWIDTH);
 		else if (from >= la_lsize (curlas))
 		    putup (first, (Slines) (winfirst - delta - 1), 0, MAXWIDTH);
-		else if (   !vinsdel (first, delta - wmove, curwin == oldwin)
+		else if (   !vinsdel (first, (Slines)(delta - wmove), curwin == oldwin)
 			 && num > 0
 			)
 		    putup (first, (Slines) (winfirst + num - 1), 0, MAXWIDTH);
@@ -3485,38 +3059,52 @@ tglstrmode ()
 }
 
 
-/* mGetkey and mGetkey1 are tmp copies, for debugging */
+/* mGetkey and mGetkey1 are replacements for getkey and getkey1 */
 
-#ifdef SYSSELECT
+#ifdef COMMENT
+.
+    Read another character from the input stream.  If the last character
+    wasn't used up (keyused == NO) don't read after all.
+.
+    peekflg is one of
+      WAIT_KEY      wait for a character, ignore interrupted read calls.
+      PEEK_KEY      peek for a character
+      WAIT_PEEK_KEY wait for a character, then peek at it;
+		    if read times out, return NOCHAR.
+
+***************************************************************
+Oct 2022:
+The timeout parameter is no longer used in mGetkey/mGetkey1 and
+can be removed from all calls to mGetkey. The peekflg is currently
+always WAIT_KEY.  Both arguments will likely be removed in
+the future.
+
+If a routine needs to peek at the next char, see the notes in front of
+the mapInputCh() routine, near the end of this file.
+**************************************************************
+
+#endif /* COMMENT */
+
 unsigned Short
 mGetkey (peekflg, timeout)
 Flag peekflg;
 struct timeval *timeout;
-#else
-unsigned Short
-mGetkey (peekflg)
-Flag peekflg;
-#endif
 {
     Reg1 unsigned Short rkey;
     static Flag knockdown  = NO;
-    /*extern*/ unsigned Short mGetkey1 ();
+    /*extern*/ /*unsigned Short mGetkey1 ();*/
 
 /*dbgpr("mGetkey, top:  peekflg=%d\n", peekflg);*/
 
 /** /
-dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar, (char) haveChar, (char) peekCh);
+dbgpr("mGetkey: peekflg=%d keyused=%d (key=%03o) \n", peekflg, keyused, key);
 / **/
     if (peekflg == WAIT_KEY && keyused == NO) {
 	dbgpr("mGetkey: WAIT_KEY==yes and keyused==NO, returning key=%d (a no-op)\n", key);
 	return (Uint)key; /* then getkey is really a no-op */
     }
 
-#ifdef  SYSSELECT
     rkey = mGetkey1 (peekflg, timeout);
-#else /* SYSSELECT */
-    rkey = mGetkey1 (peekflg);
-#endif /* SYSSELECT */
 
 #ifdef NCURSES
 /** /dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n",
@@ -3542,7 +3130,6 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 	    putc ((int)rkey, keyfile);
 	    if (numtyp > MAXTYP) {
 		flushkeys ();
-		numtyp = 0;
 	    }
 	}
     }
@@ -3552,21 +3139,18 @@ dbgpr("mGetkey: peekflg=%d haveChar=%d ('%c') peekCh=(%c)\n", peekflg, haveChar,
 }
 
 
-#ifdef  SYSSELECT
 unsigned Short
 mGetkey1 (peekflg, timeout)
 Small peekflg;
 struct timeval *timeout;
-#else /* SYSSELECT */
-unsigned Short
-mGetkey1 (peekflg)
-Small peekflg;
-#endif /* SYSSELECT */
 {
-    static Short lcnt;
-    static int   lexrem = 0;         /* portion of lcnt that is still raw */
-    static Uchar chbuf[NREAD];
-    static Uchar *lp = &chbuf[0];
+    int __attribute__((unused)) delay_ms = 0;
+
+    /* no longer using the timeout values here */
+    if (timeout && timeout->tv_sec) {
+	delay_ms = (int) (timeout->tv_sec * 1000);
+   /** /dbgpr("mGetkey1:  delay_ms=%d\n", delay_ms); / **/
+    }
 
 /** /
 dbgpr("mGetkey1: peekflg=%d replaying=%d recovering=%d, silent=%d, entering=%d, winup=%d\n",
@@ -3574,8 +3158,169 @@ dbgpr("mGetkey1: peekflg=%d replaying=%d recovering=%d, silent=%d, entering=%d, 
 dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 / **/
 
-    int c;
+    if (replaying) {    /* a crash */
+	while (replaying) {
+	    return getReplayChar();
+	}
+    }
+#ifdef RECORDING
+    else if (playing) {
+	return getPlayChar(peekflg);
+    }
+#endif /* RECORDING */
+
+    else {
+	static int firstkey = 1;
+
+/* START HACK */
+	if (firstkey) {
+		static Uchar redraw_buf[] = { CCCMD, 'r', 'e', 'd', '\015', '-' };
+		static Uchar *redraw_ptr = redraw_buf;
+
+		if (*redraw_ptr != '-') {  /* since CCCMD is 0, use '-' as stop point */
+		   return (*redraw_ptr++);
+		}
+
+		firstkey = 0;
+		/* return (CCCMD); */
+	}
+/* END HACK */
+
+#ifdef  STARTUPFILE
+	/*
+	 *  Input from the .e_profile file?
+	 */
+	if( dot_profile && peekflg == WAIT_KEY ) {
+	    int c = get_profilekey( NO );
+    /** /   dbgpr("mGetkey: returning profile key=(%3o)\n", c); / **/
+	    return ((Uint) c);
+	}
+
+#endif /* STARTUPFILE */
+
+	d_put (0);  /* !!! required */
+
+	/* This while loop could be removed, but it
+	 * may be useful in the future if a need to do a
+	 * 'continue' arises.
+	 */
+	while (1) {
+	    /*  If a Fkey press maps to more than one E cmd/chars,
+	     *  the pendFKeys flag is set.  See MapCursesKey() in e.keys.c
+	     */
+	    if (pendFKeys) {
+		int ch = getFkeychar();
+	    /*  dbgpr("FKey_p, ch=(%o)\n", ch); */
+		return (unsigned Short) ch;
+	    }
+
+	    /* normal keyboard input begins here */
+	    int c, c1;
+
+	    /* If user hasn't typed anything in a minute
+	     * flush any keystrokes
+	     *
+	     * This replaces the code in FSYNCKEYS,
+	     * which screws up keystroke definitions
+	     * under "ncurses".
+	     */
+	    timeout(60000); /* change to 60000 after debugging */
+	    c = wgetch(stdscr);
+	    if (c == ERR) {  /* timer went off,  no input avail */
+		if (numtyp) {
+		    flushkeys();
+		}
+	    }
+	    else {
+		ungetch(c);
+	    }
+	    timeout(-1); /* restore blocking read mode */
+
+#ifdef USE_MOUSE_POSITION
+
+#if 1 /*NCURSES_MOUSE_VERSION == 1*/
+	    /* In 5.7, the REPORT_MOUSE_POSITION event results whenever
+	     * the mouse is moved; in 6.2 it is reported only when a key is
+	     * held down and the mouse is moved
+	     */
+
+	    /* skip mouse position reports w/o a prior press event */
+	    MEVENT evt;
+
+	    while((c = wgetch(stdscr)) == KEY_MOUSE) {
+		getmouse(&evt);
+		if (evt.bstate & REPORT_MOUSE_POSITION)
+		    continue;
+		ungetmouse(&evt);   /* push back the event */
+		c = wgetch(stdscr);
+		break;
+	    }
+#else
+	    c = wgetch(stdscr);
+#endif /* NCURSES_MOUSE_VERSION */
+
+#else
+	    c = wgetch(stdscr);
+
+#endif /* USE_MOUSE_POSITION */
+
+	    /** /dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c); / **/
+
+	    if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
+
+	    c1 = mapInputCh(c);
+	    return (Uint) c1;
+
+#ifdef OUT
+/*  This section was moved to mapInputCh(c) so that
+ *  the decoding can be used in other routines interested in
+ *  peeking at the next input char, w/wout a delay
+ */
+	    if (c >= KEY_MIN) {     /* a Fkey or EKBFILE mapping */
+		c1 = MapCursesKey(c);
+	       /** /
+	       dbgpr("wGetkey1, MapCursesKey:  (%04o)->(%04o) (%s))\n",
+		    c, c1, getEkeyname(c1));
+	       / **/
+		return ((Uint)c1);
+	    }
+	    else if (c < 32) {     /* 32=' ', have ctrl-ch or esc sequence */
+		c1 = MapCtrlKey(c);
+	  /** / dbgpr("MapCtrlKey returned %03o for c=%03o\n", c1, c); / **/
+		return ((Uint)c1);
+	    }
+	    else {
+	/** /   dbgpr("mGetkey: returning ascii char (%c)(%03o)\n", c, c); / **/
+		return (Uint) c;
+	    }
+#endif /* OUT */
+	}
+    }
+    return NOCHAR;  /* not reached */
+}
+
+
+#ifdef OUT
+void
+dbg_winlist()
+{
+    int i;
+
+    for (i = 0; i < nwinlist; i++) {
+	dbgpr("winlist[%d]=(%o)\n", i, winlist[i]);
+    }
+    return;
+}
+#endif /* OUT */
+
+
+
+Uint
+getReplayChar()
+{
     static int replay_cnt;  /* number of chars replayed */
+    int c;
+
     if (replaying) Block {
 	static Small replaydone = 0;
 
@@ -3661,13 +3406,11 @@ dbgpr("---replaydone\n");
 
 	    return CCNULL;
 
-	    /*goto m_nonreplay; why? */
 	}
 
 	/* any key stops replay */
 	replay_cnt++;
 
-#ifdef NCURSES
 	/*    Keep track of how many chars are left in keystroke file to
 	 *    allow the replay to be cancelled before the last few keystrokes
 	 */
@@ -3683,31 +3426,22 @@ dbgpr("---replaydone\n");
 		nodelay(stdscr,TRUE);
 		wgetch(stdscr);  /* keyboard input, not from keystroke file */
 		nodelay(stdscr, FALSE);
-		lcnt = 0;
+		/*lcnt = 0;*/
 		replaydone = 2;
 		goto endreplay;
 	    }
 	}
-		  /* don't think we need this anymore...*/
+	    /* don't think we need this anymore...*/
 	if( !recovering ) {
 	    nodelay(stdscr,TRUE);
 	    int rc = wgetch(stdscr);  /* keyboard input, not keystroke file */
 	    nodelay(stdscr, FALSE);
 	    if (rc != ERR) {
-		lcnt = 0;
+		/*lcnt = 0;*/
 		replaydone = 2;
 		goto endreplay;
 	    }
 	}
-#else
-	if ( !recovering && !xempty (STDIN) ) {
-	    lcnt = 0;
-	    replaydone = 2;
-	    while (xread (STDIN, chbuf, NREAD) > 0 && !xempty (STDIN))
-		continue;
-	    goto endreplay;
-	}
-#endif /* NCURSES */
 
 
 /*
@@ -3739,11 +3473,6 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	    if (!entering)
 		goto finishreplay;
 	    else {
-		/*
-		*chbuf = CCINT;
-		lp = chbuf;
-		lcnt = 1;
-		*/
 		c = CCINT;
 	    }
 	}
@@ -3753,919 +3482,121 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	return (Uint)c;
     }
 
-#ifdef RECORDING
-    else if (playing) {
-	    extern Flag play_silent;
+    return CCNULL;  /* not reached */
+}
 
-	lp = (Uchar *)PlayChar (peekflg);
-	if (!playing && play_silent) {
-	    silent = 0;
-	    fresh();
-	}
-	/*
-	 * Any key stops playback
-	 */
-#ifdef NCURSES
-	nodelay(stdscr,TRUE);
-	int rc = getch();
-	nodelay(stdscr, FALSE);
-	if (rc != ERR) {
-	    return (CCINT);
-	}
-	else {
-	  return (unsigned Short)*lp;
-	}
-#else
-	if (!xempty(STDIN)) {
-	    char c;
-	    /*
-	     *  throw away keystroke[s]
-	     */
-	    do {
-		read (inputfile, &c, 1);
-	    } while (!xempty(STDIN));
-	    if( play_silent )
-		silent = 0;
-	    play_count = 0;
-	/*  playing = 0;  */
-	    return (CCINT);
-	}
-	/*goto endGetkey1;*/
-	return (unsigned Short)*lp;
-#endif /* NCURSES */
+Uint
+getPlayChar(Flag peekflg)
+{
+    Uchar *cp = PlayChar (peekflg);
+
+    /*
+     * Any key stops playback
+     */
+    nodelay(stdscr,TRUE);
+    int rc = getch();
+    nodelay(stdscr, FALSE);
+    if (rc != ERR) {
+	return (CCINT);
     }
-#endif /* RECORDING */
+    return (unsigned Short) *cp;
+}
 
+
+
+/* returns 1 if an interrupt character been typed */
+Flag
+pendINTkey()
+{
+    nodelay(stdscr,TRUE);
+    int c = wgetch(stdscr);  /* keyboard input pending */
+    nodelay(stdscr, FALSE);
+    if (c == ERR) return 0;
+
+    if (c == defINTchar || (altINTchar && (c == altINTchar)))
+	return 1;
+
+#ifdef OUT
+    /* very unlikely a user would add CCINT to a multi-char Fn sequence,
+     * but here's how to check, if we ever need it.
+     */
+    if (pendFKeys) {
+	char *cp;
+	for (cp = FKey_p; cp < FKey_end; cp++) {
+	    if (*cp == defINTchar || (altINTchar && (*cp == altINTchar))
+		return 1;
+	}
+    }
+#endif
+
+    ungetch(c);
+
+    return 0;
+}
+
+
+
+/*  returns 1 if any key is pending (not used yet)
+ *
+ */
+Flag
+pendKey()
+{
+    nodelay(stdscr,TRUE);
+    int c = wgetch(stdscr);  /* keyboard input pending */
+    nodelay(stdscr, FALSE);
+    if (c == ERR) return 0;
+
+    ungetch(c);
+
+    return 1;
+}
+
+/*
+ * Other routines may use mapInputCh(c) to peek at the next input char
+ * after doing:
+ *
+ *      c = wgetch(stdscr);
+ *      ungetch(c);
+ *      c1 = mapInputCh(c);  // c1 is either ascii or a CCecmd, see e.h
+ */
+
+/* returns either an ascii char, or a CCcode (eg, CCOPEN)
+ */
+
+int
+mapInputCh(int c)
+{
+    int c1;
+
+    if (c >= KEY_MIN) {     /* a Fkey or EKBFILE mapping */
+	c1 = MapCursesKey(c);
+       /** /
+       dbgpr("mapInputCh, MapCursesKey:  (%04o)->(%04o) (%s))\n",
+	    c, c1, getEkeyname(c1));
+       / **/
+    }
+    else if (c < 32) {     /* 32=' ', have ctrl-ch or esc sequence */
+	c1 = MapCtrlKey(c);
+	/** / dbgpr("mapInputCh:  MapCtrlKey returned %03o for c=%03o\n", c1, c); / **/
+    }
     else {
-	static int firstkey = 1;
+	/** /   dbgpr("mapInputCh: returning ascii char (%c)(%03o)\n", c, c); / **/
+	c1 = c;
+    }
 
-/* label not used
- m_nonreplay:
+/* DEBUG */
+/*
+    char tmp[32];
+    if (c1 < 040 || c1 > 0177) {
+	snprintf(tmp, sizeof(tmp), "%s", getEkeyname(c1));
+    }
+    else {
+	tmp[0] = (char) c1;
+	tmp[1] = '\0';
+    }
+    dbgpr("mapInputCh, c=(%04o) maps to (%04o) (%s)\n", c, c1, tmp);
 */
 
-/* START HACK */
-	if (firstkey) {
-		static Uchar redraw_buf[] = { CCCMD, 'r', 'e', 'd', '\015', '-' };
-		static Uchar *redraw_ptr = redraw_buf;
-
-		if (*redraw_ptr != '-') {  /* since CCCMD is 0, use '-' as stop point */
-		   return (*redraw_ptr++);
-		}
-
-		firstkey = 0;
-		/* return (CCCMD); */
-	}
-/* END HACK */
-#ifdef  STARTUPFILE
-	/*
-	 *  Input from the .e_profile file?
-	 */
-	if( dot_profile && peekflg == WAIT_KEY )
-	    return( (Uint)get_profilekey( NO ));
-#endif /* STARTUPFILE */
-
-/** /
-dbgpr("e.t.c, mGetkey1, nonreplay:  lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), NREAD=(%d)\n",
-   lcnt, lp-chbuf, lexrem, NREAD);
-/ **/
-
-	if (lcnt < 0)
-	    fatal (FATALBUG, "lcnt < 0");
-	if (   (lcnt - lexrem == 0 && peekflg != PEEK_KEY)
-	    || (lcnt < NREAD && !xempty (inputfile))
-	   ) {
-	    /* read some more */
-	    if (lcnt == 0)
-		lp = chbuf;
-	    else if (lp > chbuf) {
-		if (lcnt == 1) {
-		    /* handle frequent case more efficiently */
-		    *chbuf = *lp;
-		}
-		else
-		    my_move ((char *)lp, (char *) chbuf, (ulong) lcnt);
-		lp = chbuf;
-	    }
-	    d_put (0);
-#ifdef  SYSSELECT
-#ifdef FDSET
-	    Block {
-		fd_set readmask;
-		FD_ZERO(&readmask);
-		FD_SET(inputfile, &readmask);
-		/*dbgpr("inputfile=(%d)\n", inputfile);*/
-		if (   peekflg == WAIT_PEEK_KEY
-		    && select (inputfile + 1, &readmask, NULL, NULL, timeout) <= 0
-		   )
-		    return NOCHAR;
-	    }
-#else /* FDSET */
-	    Block {
-		int z = 0;
-		int readmask = 1 << inputfile;
-
-		if (   peekflg == WAIT_PEEK_KEY
-		    && select (inputfile + 1, &readmask, &z, &z, timeout) <= 0
-		   )
-		    return NOCHAR;
-	    }
-#endif /* FDSET */
-#endif /* SYSSELECT */
-	    do Block {
-		Reg3 int nread;
-		nread = NREAD - lcnt;
-
-#ifdef OUT
-#ifdef  SYSSELECT
-#ifdef  FSYNCKEYS
-		/*
-		 *  If this 1 min. timer goes off, flush and fsync
-		 *  the keystroke file.  (Needs to be done only once!).
-		 */
-#ifdef FDSET
-		Block {
-		    fd_set readmask;
-		    FD_ZERO(&readmask);
-		    FD_SET(inputfile, &readmask);
-		    /*dbgpr("inputfile=(%d)\n", inputfile); */
-		    struct timeval tval;
-		    int rc = 0;
-
-		    tval.tv_sec = 60, tval.tv_usec = 0;
-		    rc = select (inputfile + 1, &readmask, NULL, NULL, &tval);
-		    if (rc == 0 && numtyp) {
-			fsynckeys();    /* also does a fflush */
-			numtyp = 0;
-		    }
-		    dbgpr("timer went off\n");
-		}
-#else
-		Block {
-		    int z = 0;
-		    int readmask = 1 << inputfile;
-		    struct timeval tval;
-		    int rc = 0;
-
-		    tval.tv_sec = 60, tval.tv_usec = 0;
-		    rc = select (inputfile + 1, &readmask, &z, &z, &tval);
-		    if (rc == 0 && numtyp) {
-			fsynckeys();    /* also does a fflush */
-			numtyp = 0;
-		    }
-		}
-#endif /* FDSET */
-#endif /* FSYNCKEYS */
-#endif /* SYSSELECT */
-#endif /* OUT */
-
-/** /
-dbgpr("e.t.c, mGetkey1: before xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
-inputfile, lcnt, lexrem, lp-chbuf, nread);
-/ **/
-
-#ifdef OUT
-		/*
-		 *  With the introduction of Curses initialization, there's a problem
-		 *  displaying the initial edit screen.  These steps seem to force
-		 *  the display.
-		 */
-		static Flag init_redraw = 1;
-		if (init_redraw) {
-		    init_redraw = 0;
-		/*  dbgpr("init_redraw, doing fresh()\n"); */
-		    fresh();
-		    poscursor(cursorcol, cursorline);
-		    /*ungetch(CCRETURN);*/
-		    /*return CCCMD;*/
-		    return (CCNULL);
-		}
-#endif
-
-		/*  When a Fkey press maps to more than one E cmd/chars,
-		 *  MapCursesKey() sets the pendFKeys flag.  See MapCursesKey() below.
-		 */
-		if (pendFKeys) {
-		    int ch = getFkeychar();
-		/*  dbgpr("FKey_p, ch=(%o)\n", ch); */
-		    return (unsigned Short) ch;
-		}
-
-		/* normal keyboard input begins here */
-		int c, c1;
-
-		/* If user hasn't typed anything in a minute
-		 * flush any keystrokes
-		 *
-		 * This replaces the code in FSYNCKEYS,
-		 * which screws up keystroke definitions
-		 * under "ncurses".
-		 */
-/** / 		dbgpr("setting timer\n");  / **/
-		timeout(60000); /* change to 60000 after debugging */
-		c = wgetch(stdscr);
-		if (c == ERR) {  /* timer went off,  no input avail */
-/** /		    dbgpr("timer expired\n");  / **/
-		    if (numtyp) {
-			flushkeys();
-			numtyp = 0;
-/** /			dbgpr("flushing key\n");  / **/
-		    }
-		}
-		else {
-		    ungetch(c);
-/** /		    dbgpr("got key, calling ungetch(%o)\n", c); / **/
-		}
-		timeout(-1); /* restore blocking read mode */
-/** /		dbgpr("timer off\n");  / **/
-
-
-
-#ifdef USE_MOUSE_POSITION
-
-#if 1 /*NCURSES_MOUSE_VERSION == 1*/
-		/* In 5.7, the REPORT_MOUSE_POSITION event results whenever
-		 * the mouse is moved; in 6.2 it is reported only when a key is
-		 * held down and the mouse is moved
-		 */
-
-		/* skip mouse position reports w/o a prior press event */
-		MEVENT evt;
-
-		while((c = wgetch(stdscr)) == KEY_MOUSE) {
-		    getmouse(&evt);
-		    if (evt.bstate & REPORT_MOUSE_POSITION)
-			continue;
-		    ungetmouse(&evt);   /* push back the event */
-		    c = wgetch(stdscr);
-		    break;
-		}
-#else
-		c = wgetch(stdscr);
-#endif /* NCURSES_MOUSE_VERSION */
-
-#else
-		c = wgetch(stdscr);
-
-#endif /* USE_MOUSE_POSITION */
-
-/** / dbgpr("c=%o KEY_BACKSPACE=%o\n", c, KEY_BACKSPACE);  / **/
-
-		if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
-
-#ifdef OUT
-/*debug*/
-char hat = ' ';
-c1 = c;
-if(c1 < ' ') {
-  hat = '^';
-  c1 += 96;
-}
-if( c > 0400 ) {  /* curses KEY_xxx */
-  dbgpr("\nwgetch(),keyboard input c=(%d)(%04o)(%s)\n", c, c, getCursesKeyname(c) );
-}
-else {
-  dbgpr("\nwgetch(),keyboard input c=(%d)(%04o)('%c%c'), entering=%d\n",
-    c, c, hat,c1, entering);
-}
-fflush(dbgfile);
-/*end debug*/
-#endif /* OUT */
-
-		if( c >= KEY_MIN ) {
-		    c1 = MapCursesKey(c);
-		/** /
-		   dbgpr("wGetkey1, MapCursesKey:  (%04o)->(%04o) (%s))\n",
-			c, c1, getEkeyname(c1));
-		/ **/
-		    return ((Uint)c1);
-		}
-		else {
-		    chbuf[lcnt] = (Uchar) c;
-		}
-	     /* if ((nread = xread (inputfile, (char *) &chbuf[lcnt], nread)) > 0) Block { */
-		nread = 1;  /* so we don't have to recode the following.... */
-		if( nread > 0 ) Block {
-		    Reg4 Uchar *stcp;
-		    stcp = &chbuf[lcnt -= lexrem];
-		    lexrem += nread;
-		    if ((nread = (*kbd.kb_inlex) (stcp, &lexrem)) > 0) Block {
-			Reg1 Uchar *cp;
-			Reg2 int nr;
-			cp = &stcp[nread];
-			/* look ahead for interrupts */
-			nr = nread;
-			do {
-			    if (*--cp == CCINT)
-				break;
-			} while (--nr);
-			if ((nr = (int) (cp - stcp)) > 0) {
-			    /* found CCINT character in chars just read */
-			    /* and some characters in front of it are to be */
-			    /* thrown away */
-			    lp += lcnt + nr;
-			    lcnt = nread - nr + lexrem;
-			}
-			else
-			    lcnt += nread + lexrem;
-		    }
-		    else
-			lcnt += lexrem;
-		}
-		else if (nread < 0) {
-		    if (errno != EINTR)
-			fatal (FATALIO, "Error reading input.");
-		    if (peekflg == WAIT_PEEK_KEY)
-			break;
-		}
-		else
-		    fatal (FATALIO, "Unexpected EOF in key input.");
-/** /
-dbgpr("e.t.c, mGetkey1: after xread, fd=%d lcnt=(%d), lexrem=(%d), lp-chbuf=(%d), nread=(%d)\n",
-inputfile, lcnt, lexrem, lp-chbuf, nread);
-/ **/
-	    } while (lcnt - lexrem == 0);
-	}
-    }
-
-/** /
-dbgpr("e.t.c, mGetkey1: AFTER xread loop, lcnt=(%d), lexrem=(%d), lp-chbuf=(%d)\n",
-lcnt, lexrem, lp-chbuf);
-/ **/
-
-    if ( lcnt - lexrem <= 0 && peekflg != WAIT_KEY ) {
-/*      dbgpr("mGetkey1: lcnt=%d lexrem=%d, return NOCHAR, peekflg=%d\n", lcnt, lexrem, peekflg); */
-	return NOCHAR;
-    }
-
-    if (peekflg != WAIT_KEY) {
-#ifndef UNSCHAR
-	*lp = *lp & CHARMASK;
-#endif
-	return *lp;
-    }
-
-    Block {
-	Reg1 unsigned Short rchar;
-
-#ifndef UNSCHAR
-	*lp = *lp & CHARMASK;
-#endif
-	lcnt--;
-	rchar = *lp++;
-/** /
-dbgpr("end of mGetkey, lcnt=%d rchar=(%o)(%c)\n", lcnt, rchar, rchar);
-/ **/
-	return rchar;
-    }
-}
-
-
-
-#ifdef NCURSES
-#ifdef USER_FKEYS
-
-/* see /usr/include/ncurses.h or e.keys.h for KEY_Fn keycode values */
-
-
-struct Key2Ecode {
- int keycode;       /* ncurses KEY_ value */
- Uchar  ecmd1;      /* 1st E cmd, eg:  KEY_F6:<+page> */
- Uchar *ecmdstr;    /* 2nd -> end of e cmds, eg:  KEY_F6:<+word><redraw><-page> */
- int len;           /* num Uchars in ecmdstr */
- char keyname[16];  /* tmp for debugging */
-} Key2Ecode[MAX_KEY];   /* defined in e.keys.h as 0633 */
-
-
-
-#ifdef OUT /* old method */
-
-struct UserDefinedFuncKeys {
-int keycode;    /* these codes are not really used, we index 0-35 */
-int cmdval;
-} UserFuncKeys[] = {
-
-{265,   -1},     /* KEY_F1  0411-0411 = 0 */
-{266,   -1},     /* KEY_F2  0412-0411 = 1 */
-{267,   -1},     /* KEY_F3  0413 */
-{268,   -1},     /* KEY_F4  0414 */
-{269,   -1},     /* KEY_F5  0415 */
-{270,   -1},     /* KEY_F6  0416 */
-{271,   -1},     /* KEY_F7  0417 */
-{272,   -1},     /* KEY_F8  0420 */
-{273,   -1},     /* KEY_F9  0421 */
-{274,   -1},     /* KEY_F10 0422 */
-{275,   -1},     /* KEY_F11 0423 */
-{276,   -1},     /* KEY_F12 0424-0411 = 11 */
-
-{277,   -1},     /* SHIFT_F1 0425-0411 = 12 */
-{278,	-1},     /* SHIFT_F2 */
-{279,	-1},     /* SHIFT_F3 */
-{280,	-1},     /* SHIFT_F4 */
-{281,	-1},     /* SHIFT_F5 */
-{282,	-1},     /* SHIFT_F6 */
-{283,	-1},     /* SHIFT_F7 */
-{284,	-1},     /* SHIFT_F8 */
-{285,	-1},     /* SHIFT_F9 */
-{286,	-1},     /* SHIFT_F10 */
-{287,	-1},     /* SHIFT_F11 */
-{288,   -1},     /* SHIFT_F12 0440-0411 = 23 */
-
-{289,   -1},     /* CTRL_F1 0441-0411 = 24 */
-{290,	-1},     /* CTRL_F2 */
-{291,	-1},     /* CTRL_F3 */
-{292,	-1},     /* CTRL_F4 */
-{293,	-1},     /* CTRL_F5 */
-{294,	-1},     /* CTRL_F6 */
-{295,	-1},     /* CTRL_F7 */
-{296,	-1},     /* CTRL_F8 */
-{297,	-1},     /* CTRL_F9 */
-{298,	-1},     /* CTRL_F10 */
-{299,	-1},     /* CTRL_F11 */
-{300,   -1},     /* CTRL_F12 0454-0411 = 35 */
-
-};
-#endif /* OUT */
-
-#endif /* USER_FKEYS */
-
-
-int
-MapCursesKey (int c)
-{
-
-/** / dbgpr("MapCursesKey: c=%o\n", c);  / **/
-
-    if( c < KEY_MIN || c > MAX_KEY ) {
-	return ERR;  /* defined in curses as -1, or ?? NOCHAR ?? */
-    }
-
-#ifdef USER_FKEYS
-
-/*  int i; */
-
-    /* new mapping */
-    int idx = c - KEY_MIN;
-    FKey_p = (Uchar *) NULL;
-
-    pendFKeys = 0;  /* set when Fkey maps to more than one cmd */
-
-    if ( Key2Ecode[idx].keycode == c ) {
-	if ( Key2Ecode[idx].len == 1 ) {  /* eg, A Fkey maps to 1 E cmd */
-	    /*
-	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
-		Key2Ecode[idx].ecmd1,
-	       getEkeyname(Key2Ecode[idx].ecmd1), c,
-		Key2Ecode[idx].keyname);
-	    */
-	    return( (int) Key2Ecode[idx].ecmd1 );
-	}
-#ifdef OUT
-	else {  /* more than one ecmd */
-	    dbgpr("MapCursesKey, NEW returning (%o)(%s) for Fkey=(%o)(%s)\n",
-		Key2Ecode[idx].ecmd1,
-	       getEkeyname(Key2Ecode[idx].ecmd1), c,
-		Key2Ecode[idx].keyname);
-
-	    /* for some reason, using ungetch() didn't work in all cases */
-
-	    /* first, ungetch() the remaining codes in reverse order */
-	    int i;
-	    for (i = Key2Ecode[idx].len - 2; i >= 0; i--) {
-		ungetch( (int) Key2Ecode[idx].ecmdstr[i] );
-		dbgpr("...ungetch (%o)(%c)\n",
-		    Key2Ecode[idx].ecmdstr[i],
-		    Key2Ecode[idx].ecmdstr[i] );
-	    }
-	    pendFKeys = 1;
-	}
-#endif
-	else {
-	    /* A Fkey maps to more than one E cmd.  We return the
-	     * 1st cmd and set a ptr to the rest so that mGetkey1()
-	     * will input the remainder after processing the 1st one.
-	     */
-	    FKey_p = Key2Ecode[idx].ecmdstr;
-	    pendFKeys = 1;
-	}
-
-       return( (int) Key2Ecode[idx].ecmd1 );
-    }
-
-/* old method */
-#ifdef OUT
-
-    /* User define KEY_Fn ? */
-
-    /*
-     * 0411 - 0424  (265-276):  KEY_F1 - KEY_F12
-     * 0425 - 0440  (277-288):  SHIFT_F1 - SHIFT_F12
-     * 0441 - 0454  (289-300):  CTRL_F1 - CTRL_F12
-     */
-    if (c >= 0411 && c <= 0454) {
-	i = c - 0411;   /* i will be 0-11, 12-23, 24-35 */
-    /*  if (UserFuncKeys[i].keycode >= 0) {  */
-	if (UserFuncKeys[i].cmdval >= 0) {
-	    return (UserFuncKeys[i].cmdval);
-	}
-    }
-#endif  /* OUT */
-
-#endif /* USER_FKEYS */
-
-    switch( c ) {
-	/* common keypad functions */
-
-	case KEY_MOUSE:             /* mouse event */
-	    return CCMOUSE;
-	case KEY_ENTER:             /* enter/send key */
-	    return CCRETURN;
-	case KEY_BACKSPACE:         /* backspace key */
-	    return CCBACKSPACE;
-	case KEY_DC:                /* delete-character */
-	    return CCDELCH;
-	case KEY_BREAK:             /* Break key (unreliable) */
-	    return CCCMD;
-	case KEY_DOWN:              /* down-arrow key */
-	    return CCMOVEDOWN;
-	case KEY_UP:                /* up-arrow key */
-	    return CCMOVEUP;
-	case KEY_LEFT:              /* left arrow key */
-	    return CCMOVELEFT;
-	case KEY_RIGHT:             /* right arrow key */
-	    return CCMOVERIGHT;
-	case KEY_HOME:              /* home key */
-	    return CCHOME;
-	case KEY_NPAGE:             /* next-page key */
-	    return CCPLPAGE;
-	case KEY_PPAGE:             /* previous-page key */
-	    return CCMIPAGE;
-	case KEY_IC:                /* insert key */
-	    return CCINSMODE;
-
-#ifdef OUT
-	case 0414:
-       /*   dbgpr("MapCursesKey:  F4 pressed\n"); */
-	    return NOCHAR;
-
-	case 0415:
-	/*  dbgpr("MapCursesKey:  F5 pressed\n"); */
-	    return NOCHAR;
-
-	case KEY_F(2):
-	/*  dbgpr("MapCursesKey:  F2 pressed\n"); */
-	    return KEY_F(2);
-#endif /* OUT */
-
-	case KEY_F(6):
-	/*  dbgpr("MapCursesKey:  F6 pressed\n"); */
-	/*  return KEY_F(6); */
-	    return CCMOUSEONOFF;
-
-	default:
-	    return NOCHAR;  /* 0400, NOTE this conflicts with KEY_CODE_YES below */
-			    /* but is unlikely to be any issue */
-    }
-    return NOCHAR;
-}
-
-
-/* debug routines, these require an #include of e.keys.h */
-/*
- *   Lookup the name of an E command code
- *   eg, for 012 return "CCMOVEDOWN"
- */
-
-char *
-getEkeyname(int c) {
-
-    unsigned int i;
-
-    for(i=0; i < sizeof(E_Keys) / sizeof(E_Keys[0]); i++) {
-       if( E_Keys[i].val == c )
-	 return E_Keys[i].name;
-    }
-    return "NOT FOUND";
-}
-
-/*
- *   Lookup the name of a curses keycode
- *   eg, for 0402 return "KEY_DOWN"
- */
-
-char *
-getCursesKeyname (int c) {
-    unsigned int i;
-
-    if( c < KEY_MIN || c > MAX_KEY ) {
-	return "NOT FOUND";
-    }
-    for(i=0; i < sizeof(Curses_Keys) / sizeof(Curses_Keys[0]); i++) {
-       if( Curses_Keys[i].val == c )
-	 return Curses_Keys[i].name;
-    }
-
-    return "NOT FOUND";
-}
-
-
-#ifdef OUT
-void
-dbg_winlist()
-{
-    int i;
-
-    for (i = 0; i < nwinlist; i++) {
-	dbgpr("winlist[%d]=(%o)\n", i, winlist[i]);
-    }
-    return;
-}
-#endif /* OUT */
-
-
-#ifdef USER_FKEYS
-
-#ifdef OUT
-void addCursesFuncKey (char *);     /* old method */
-#endif
-
-void addCursesFkey (char *);
-int CursesKeyValue(char *keyname);
-
-#ifdef OUT
-void
-addCursesFuncKey(char *line)
-{
-
-    extern S_looktbl itsyms[];     /* see e.iit.c */
-
-    int Fnum;           /* 1-12 for now */
-    char ecmd[32];
-    int i;
-    int cmdval = -1;
-
-    /* Offset into UserFuncKeys[]:
-     *    0 for F1-F1, 12 for SHIFT_F1-F12, and 24 for CTRL_F1-F12
-     */
-    int key_offset;
-
-    /* line eg, "KEY_F8:<+page>"  */
-
-    int l_offset = 0;
-
-    if (strstr(line, "KEY_")) {
-	l_offset = 3;
-	key_offset = 0;
-    }
-    else if (strstr(line, "SHIFT_")) {
-	l_offset = 5;
-	key_offset = 12;
-    }
-    else if (strstr(line, "CTRL_")) {
-	l_offset = 4;
-	key_offset = 24;
-    }
-    else {
-	dbgpr("addCursesFKey: bad format: %s\n", line);
-	return;
-    }
-
-    /* sscan the Fnumber, and ecmd:  omitting ending '>')  */
-    if (sscanf (line + l_offset, "_F%d:<%[^>]", &Fnum, ecmd) != 2) {
-	dbgpr("addCursesFKey: bad format: %s\n", line);
-	return;
-    }
-
-    if (Fnum < 1 || Fnum > 12) {
-	dbgpr("addCursesFuncKey:  FKey value (%d) not supported: 1-12\n", Fnum);
-	return;
-    }
-
-    int idx = Fnum + key_offset - 1;
-
-    for (i=0; itsyms[i].str != NULL; i++) {
-    /*  dbgpr("cmp (%s) to (%s)\n", itsyms[i].str, ecmd); */
-	if (strcmp(itsyms[i].str, ecmd) == 0) {
-	    cmdval = (int) itsyms[i].val;
-	    UserFuncKeys[idx].cmdval = cmdval;
-	    break;
-	}
-    }
-
-
-/** /
-    dbgpr("line=(%s)\n", line);
-    dbgpr("Fnum=%d ecmd=%s ECMD=%d idx=%d\n", Fnum, ecmd, cmdval, idx);
-/ **/
-    return;
-}
-#endif  /* OUT */
-
-void
-addCursesFkey (char *line ) {
-
-    char keyname[64], *cp;
-    int keycode, offset, idx, i;
-
-    extern S_looktbl itsyms[];     /* see e.iit.c */
-
-    if ((cp = index(line, ':')) == NULL) {
-	getout (YES, "kbfile no colon found in %s\n", line);
-    }
-    offset = (int) (cp - line);
-    strncpy (keyname, line, (size_t) offset);
-    keyname[offset] = '\0';
-/*  dbgpr("addCursesFkey:  keyname = (%s), value=(%s)\n", keyname, cp); */
-
-    /* If we have KEY_nnn where nnn is the decimal keycode,
-     * there's no need to look it up.
-     */
-    keycode = 0;
-    if (!strncmp(keyname, "KEY_", 4)) {
-	char *s = keyname + 4;
-	if (isdigit(*s) && isdigit(*(s+1)) && isdigit(*(s+2))) {
-	    sscanf(s, "%d", &keycode);
-	/*  dbgpr("%s keycode is %d\n", keyname, keycode); */
-	}
-    }
-
-    /* do not have KEY_nnn */
-    if (keycode == 0) {
-	if ((keycode = CursesKeyValue(keyname)) == -1) {
-	    dbgpr("%s is not a recognized ncurses keyname.\n", keyname);
-	    getout (YES, "%s is not a valid ncurses keyname\n", keyname);
-	    return;
-	}
-    }
-
-    if (keycode > MAX_KEY)
-	getout(YES, "kbfile error:  max key value of %d in %s is decimal %d (%04o).\n",
-	    keycode, keyname, MAX_KEY, MAX_KEY);
-
-    idx = keycode - KEY_MIN;
-/** /
-    dbgpr("keycode=%d %o idx=%d for key=(%s) MAX_KEY=%d \n",
-	keycode, keycode, idx, keyname, MAX_KEY);
-/ **/
-    /*
-     *  Punt if the the keycode is already defined
-     */
-    if (Key2Ecode[idx].keycode == keycode) {
-	getout(YES, "kbfile error: key %s is already defined.", keyname);
-    }
-
-    Uchar ecmds[128];
-    Uchar tmp[128], *tp;
-
-    int cnt = 0;  /* number of ecmds[] entries */
-
-    /*  Using a cnt to keep track of the number of ecmds because ecmds
-     *  can contail entries of value=0 which is the E code for <cmd>.
-     *  Had an interesting time figuring out why strlen() didn't work ...:)
-     */
-
-    /* parse line looking up <ecmd> values */
-    for (cp++; *cp; cp++) {
-	if (*cp == '<') {       /* eg, <+page> */
-		/* The code in itparse allows "^B:<nnn>" where nnn is
-		 * the octal code of an E function,  eg, <013> is <home>.
-		 * This is not imlemented here.
-		 */
-	    tp = tmp;
-	    cp++;
-	    while (*cp && *cp != '>')
-		*tp++ = (Uchar) *cp++;
-	    *tp = '\0';
-	    if (!*cp) {   /* '>' not found */
-		dbgpr("bad kbfile entry, missing '>' in  (%s)\n", line);
-		getout(YES, "kbfile entry missing '>' in line: %s", line);
-		return;
-	    }
-
-	/*  dbgpr("addCursesFkey: looking up <%s>\n", tmp); */
-
-	    int cmdval = -1;
-	    for (i=0; itsyms[i].str != NULL; i++) {
-		if (strcmp(itsyms[i].str, (char *)tmp) == 0) {
-		/*
-		    dbgpr(" -- itsyms: found (%s) matches (%s) at i=%d\n",
-			tmp, itsyms[i].str, i);
-		 */
-		    cmdval = (int) itsyms[i].val;
-		    break;
-		}
-	    }
-	    if (cmdval == -1) {
-		dbgpr("<%s> not found\n", tmp);
-		getout(YES, "<%s> is not a valid e command in line: %s", tmp, line);
-		return;
-	    }
-	/*  dbgpr("lookup, <%s> is ecmd %04o\n", tmp, cmdval); */
-
-	    ecmds[cnt++] = (Uchar) cmdval;
-	    ecmds[cnt] = '\0';
-	/*  dbgpr("adding cmd=(%o) to ecmds[], len now=%d\n", cmdval, cnt); */
-	}
-	else if (*cp == '"') {  /* eg, KEY_F3:<cmd>"-er"<ret> */
-	    tp = tmp;
-	    cp++;
-	    while (*cp && *cp != '"')
-		*tp++ = (Uchar) *cp++;
-	    *tp = '\0';
-
-	    if (!*cp) {   /* " not found */
-		dbgpr("bad kbfile entry, missing \" in  (%s)\n", line);
-		getout(YES, "kbfile entry missing \" in line: %s", line);
-		return;
-	    }
-
-	    /* copy the text to ecmds */
-	    tp = tmp;
-	    while (*tp) {
-		ecmds[cnt++] = *tp++;
-	    }
-	    ecmds[cnt] = '\0';
-	/*  dbgpr("adding text=(%s) to ecmds[], len now=%d\n", tmp, cnt); */
-	}
-	else if (*cp == '^') {  /* convert Ucase char to ctrl char, A -> ^A */
-	    cp++;
-	    if (*cp != '?' && (*cp < '@' || *cp > '_')) /* eg, A-Z */
-		getout (YES, "kbfile: ^%c needs to be A-Z in %s\n", *cp, line);
-	    /* ecmds[cnt++] = *cp^0100; */
-	    ecmds[cnt++] = CCCTRLQUOTE;   /* 034 */
-	    ecmds[cnt++] = (Uchar) *cp;
-	    ecmds[cnt] = '\0';
-	/*  dbgpr("added ^%c = (%o) to %s\n", *cp, ecmds[cnt-1], keyname); */
-	}
-	else {  /* ?? */
-	    dbgpr("bad kbfile entry, missing '<' or \" in  (%s)\n", line);
-	    getout(YES, "kbfile entry does not start with '<' or \" in line: %s", line);
-	    return;
-	}
-    }
-
-#ifdef OUT
-    /* dbg */
-    dbgpr("len=%d, ecmds=", cnt);
-    for (i=0; i <= cnt; i++)
-	dbgpr("(%o)(%c),", ecmds[i], ecmds[i] );
-    dbgpr("\n\n");
-#endif
-
-    strcpy(Key2Ecode[idx].keyname, keyname);    /* tmp for debugging */
-    Key2Ecode[idx].keycode = keycode;  /* as a check if key already defined */
-    Key2Ecode[idx].len = cnt;
-
-    /* It is likely that the vast majority of F key mappings
-     * will point to a single E function, so we might save
-     * something by avoiding the calloc for a single byte.
-     */
-    Key2Ecode[idx].ecmd1 = ecmds[0];
-    if (cnt > 1) {  /* copy remaining e codes to ecmdstr */
-	Key2Ecode[idx].ecmdstr = calloc((size_t) cnt, sizeof(Uchar));
-	for (i=0; i < cnt; i++)
-	    Key2Ecode[idx].ecmdstr[i] = ecmds[i+1];
-	Key2Ecode[idx].ecmdstr[i] = '\0';   /* !!! */
-
-#ifdef OUT
-	/* dbg */
-	for (i=0; i < cnt - 1; i++)
-	    dbgpr("ecmdstr[%d] = (%o)(%c)\n",i,
-		Key2Ecode[idx].ecmdstr[i],
-		isprint(Key2Ecode[idx].ecmdstr[i]) ? Key2Ecode[idx].ecmdstr[i] : ' ');
-#endif
-    }
-
-    return;
-}
-
-
-
-int
-CursesKeyValue(char *keyname) {
-    int i;
-    for (i=0; CursesKeyCodes[i].val != -1; i++) {
-	if( strncmp(CursesKeyCodes[i].name, keyname, strlen(keyname)) == 0 ) {
-	/*  dbgpr("CursesKeyValue:  (%s)=(%d)\n", keyname,  CursesKeyCodes[i].val); */
-	    return CursesKeyCodes[i].val;
-	}
-    }
-    dbgpr("CursesKeyValue:  (%s) not found\n", keyname);
-    return -1;
-}
-#endif /* USER_FKEYS */
-#endif /* NCURSES */
-
-
-int
-getFkeychar() {
-    if (FKey_p) {
-	int c = (int) *FKey_p++;
-	if (*FKey_p == '\0') {
-	    FKey_p = NULL;
-	    pendFKeys = 0;
-	}
-    /*  dbgpr("FKey_p, c=(%o)\n", c); */
-	return c;
-    }
-    return NOCHAR;
+    return c1;
 }

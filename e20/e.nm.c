@@ -126,7 +126,7 @@ ERROR:  must define one or the other
 	fileflags[curfile] |= RENAMED;
     }
  ret:
-    info (inf_file, strlen (names[infofile]), opstr);
+    info (inf_file, (Scols) strlen (names[infofile]), opstr);
     names[curfile] = append (opstr, "");
     return CROK;
 }

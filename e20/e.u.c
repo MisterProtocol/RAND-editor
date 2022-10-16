@@ -189,6 +189,7 @@ Flag    puflg;
 	    if ((newfn = getnxfn ()) >= MAXFILES - 1)
 		toomany = YES;      /* we'll get you next time */
 	    intok = YES;
+/*dbgpr("e.u.c:  la_open on file %s\n", file);*/
 	    if ((nlas = la_open (file, "", &tlas, (La_bytepos) 0,
 		    (Ff_stream *) 0, 0, fwriteable)) == NULL) {
 		intok = NO;
@@ -307,20 +308,14 @@ mesg(TELALL+3, "File ", file, xyz);}
 		sav_dotprofile = dot_profile;
 		dot_profile = NO;
 #endif /* STARTUPFILE */
-#ifdef NCURSES
 		fflush(stdout);
 		if (initCursesDone) {
 /** dbgpr("editfile:  calling fgetc(stdin)\n"); **/
 		   key = wgetch(stdscr);
-		   /*key = fgetc(stdin);*/
 		}
 		else {
 		    key = fgetc(stdin);
 		}
-#else
-/**/dbgpr("editfile:  calling getkey()\n");/**/
-		getkey (WAIT_KEY);
-#endif /* NCURSES */
 /** /dbgpr("editfile:  key is (%o)(%c)\n", key, key); / **/
 #ifdef  STARTUPFILE
 		dot_profile = sav_dotprofile;
@@ -445,7 +440,7 @@ Ncols   col;
     cwksp->clin = lwksp->clin;
 
     (void) la_clone (&fnlas[fn], curlas = &cwksp->las);
-    cwksp->wfile = curfile = fn;
+    cwksp->wfile = (AFn) (curfile = fn);
     return;
 }
 
@@ -500,7 +495,7 @@ char *file;
 	if ((sb.st_mode&S_IFMT) != S_IFLNK)         /* not a symbolic link */
 	    break;
 
-	if ((nc = readlink (file, linkname, sizeof(linkname))) == -1) {
+	if ((nc = (int) readlink (file, linkname, sizeof(linkname))) == -1) {
 	    mesg (ERRALL + 2, "Can't read symbolic link ", file);
 	    return NULL;
 	}

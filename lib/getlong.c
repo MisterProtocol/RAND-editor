@@ -13,13 +13,13 @@ register FILE *iop;
 
     cp = (char *) &i;
     tmp = sizeof (long);
-    *cp++ = getc (iop);
+    *cp++ = (char) getc (iop);
 /*    if (iop->_flag&_IOEOF) */
     if(feof(iop))
 	return -1;
     --tmp;
     do
-	*cp++ = getc (iop);
+	*cp++ = (char) getc (iop);
     while (--tmp);
 
     return i;

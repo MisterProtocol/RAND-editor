@@ -235,7 +235,7 @@ Flag setclr;
 	    if (gc >= '0' && gc <= '9') {
 		if (cp >= &ts[TNDIG])
 		    goto bad;
-		*cp++ = gc;
+		*cp++ = (char)gc;
 	    }
 	    else
 		break;

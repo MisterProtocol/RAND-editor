@@ -44,7 +44,7 @@ int count;
 	    ff->f_offset += num;
 	    cnt -= num;
 	    if((offset += num) >= fb->fb_count)
-		fb->fb_count = offset;
+		fb->fb_count = (short) offset;
 #ifdef DEBUG
 	    if(fb->fb_count > FF_BSIZE) {
 		write(2, "ff:write cnt past blk\n", 22);

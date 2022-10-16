@@ -106,11 +106,7 @@ dbgpr("--end of show keyboard, n_keylines=%d\n", n_keylines);
 / **/
 
 wait:   keyused = YES;
-#ifdef NCURSES
 	qq = mGetkey (WAIT_KEY, NULL);
-#else
-	qq = getkey (WAIT_KEY, NULL);
-#endif
 	if (morehelp(qq) == YES) goto wait;
 	restcurs();
 	mesg(TELALL+1, " ");
@@ -141,11 +137,7 @@ morehelp (key)
 
 	if ((helpin = fopen (helpfile, "r")) == NULL) {
 		printf ("Can't open %s\n\r", helpfile);
-#ifdef NCURSES
 		mGetkey (WAIT_KEY, NULL);
-#else
-		getkey (WAIT_KEY);
-#endif
 		return (NO);
 	}
 	else {

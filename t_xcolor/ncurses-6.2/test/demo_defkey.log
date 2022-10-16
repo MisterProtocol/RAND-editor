@@ -1,0 +1,70 @@
+KEY_F(1) is \EOP
+\E[24~ was bound to KEY_F(12)
+\E[24~ is now bound to KEY_F(1)
+KEY_F(2) is \EOQ
+\E[23~ was bound to KEY_F(11)
+\E[23~ is now bound to KEY_F(2)
+KEY_F(3) is \EOR
+\E[21~ was bound to KEY_F(10)
+\E[21~ is now bound to KEY_F(3)
+KEY_F(4) is \EOS
+\E[20~ was bound to KEY_F(9)
+\E[20~ is now bound to KEY_F(4)
+KEY_F(5) is \E[15~
+\E[19~ was bound to KEY_F(8)
+\E[19~ is now bound to KEY_F(5)
+KEY_F(6) is \E[17~
+\E[18~ was bound to KEY_F(7)
+\E[18~ is now bound to KEY_F(6)
+KEY_F(7) is not bound
+\E[17~ was bound to KEY_F(6)
+\E[17~ is now bound to KEY_F(7)
+KEY_F(8) is not bound
+\E[15~ was bound to KEY_F(5)
+\E[15~ is now bound to KEY_F(8)
+KEY_F(9) is not bound
+\EOS was bound to KEY_F(4)
+\EOS is now bound to KEY_F(9)
+KEY_F(10) is not bound
+\EOR was bound to KEY_F(3)
+\EOR is now bound to KEY_F(10)
+KEY_F(11) is not bound
+\EOQ was bound to KEY_F(2)
+\EOQ is now bound to KEY_F(11)
+KEY_F(12) is not bound
+\EOP was bound to KEY_F(1)
+\EOP is now bound to KEY_F(12)
+KEY_LEFT is \EOD
+\E[D is now bound to KEY_LEFT
+KEY_UP is \EOA
+\E[A is now bound to KEY_UP
+KEY_DOWN is \EOB
+\E[B is now bound to KEY_DOWN
+KEY_RIGHT is \EOC
+\E[C is now bound to KEY_RIGHT
+KEY_A1 is not bound
+KEY_A1 unchanged
+KEY_A3 is not bound
+KEY_A3 unchanged
+KEY_B2 is \EOE
+KEY_B2 deleted
+KEY_C1 is not bound
+KEY_C1 unchanged
+KEY_C3 is not bound
+KEY_C3 unchanged
+Keycode 1023 is not bound
+\EO conflicts with longer strings
+Keycode 1023 unchanged
+Keycode 276, name KEY_F(12)
+Keycode 262, name KEY_HOME
+Keycode 262, name KEY_HOME
+Keycode 262, name KEY_HOME
+Keycode 262, name KEY_HOME
+Keycode 262, name KEY_HOME
+Keycode 275, name KEY_F(11)
+Keycode 274, name KEY_F(10)
+Keycode 269, name KEY_F(5)
+Keycode 55, name 7
+Keycode 56, name 8
+Keycode 57, name 9
+Keycode 113, name q

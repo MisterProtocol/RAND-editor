@@ -134,7 +134,7 @@ S_looktbl *table;
     namptr = name;
     tblptr = lname;
     for (;;) {
-	if ((*tblptr++ = isupper (*namptr)? tolower (*namptr++): *namptr++)
+	if ((*tblptr++ = (char)(isupper (*namptr) ? tolower (*namptr++) : *namptr++))
 	    == '\0')
 	    break;
 	if (tblptr >= &lname[MAXLUPN])
@@ -148,7 +148,7 @@ S_looktbl *table;
 		break;
 	}
 	if (*namptr == '\0') {  /* end of name or exact match */
-	    length = namptr - lname;
+	    length = (Small)(namptr - lname);
 	    if (longest < length) {
 		longest = length;
 		ambig = NO;
@@ -384,7 +384,7 @@ int (*tblfunc) ();
     svchr = *cp;
     *cp = '\0';
     tmp = lookup (cp1, table);
-    *cp = svchr;
+    *cp = (char)svchr;
     if (tmp < 0)
 	return tmp;
     if (tblfunc)

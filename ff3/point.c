@@ -20,6 +20,6 @@ int nchars;
 
     if ((ffbuf = ff_getblk (ff->f_file, addr / FF_BSIZE)) == NULL)
 	return -1;
-    *buf = &ffbuf->fb_buf[offset = addr % FF_BSIZE];
+    *buf = (char *) (&ffbuf->fb_buf[offset = addr % FF_BSIZE]);
     return MIN (nchars, FF_BSIZE - offset);
 }

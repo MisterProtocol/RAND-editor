@@ -94,7 +94,7 @@ KeyNameTable Curses_Keys[] = {
 {0631,    "KEY_MOUSE"},
 {0400,    "KEY_CODE_YES"},
 {0401,    "KEY_MIN"},
-{0401,    "KEY_BREAK"},
+{0401,    "KEY_BREAK"},     /* idx=0 in Key2Ecode[] */
 {0402,    "KEY_DOWN"},
 {0403,    "KEY_UP"},
 {0404,    "KEY_LEFT"},
@@ -102,7 +102,7 @@ KeyNameTable Curses_Keys[] = {
 {0406,    "KEY_HOME"},
 {0407,    "KEY_BACKSPACE"},
 {0410,    "KEY_F0"},
-{0411,    "KEY_F1"},
+{0411,    "KEY_F1"},        /* idx=8 in Key2Ecode[]*/
 {0412,    "KEY_F2"},
 {0413,    "KEY_F3"},
 {0414,    "KEY_F4"},
@@ -346,3 +346,62 @@ NcursesKeyCode CursesKeyCodes[] = {
 };
 
 #define MAX_KEY 0633
+
+typedef struct sKey2Ecode {
+ int keycode;       /* ncurses KEY_ value */
+ Uchar  ecmd1;      /* 1st E cmd, eg:  KEY_F6:<+page> */
+ Uchar *ecmdstr;    /* 2nd -> end of e cmds, eg:  KEY_F6:<+word><redraw><-page> */
+ int len;           /* num Uchars in ecmdstr */
+ char keyname[16];  /* tmp for debugging */
+} sKey2Ecode;
+
+/*
+ * struct KeyCtrl[] is populated with the standard keyboard mapping
+ * for each ctrl-{ch}ar.  If a user's keyboard file changes any ^ch
+ * we record them here in two methods:
+ *
+ *  1. if ^ch maps to a single E command, simply replace
+ *     the KeyCtrl[^ch].ecmd1 value.
+ *  2. if ^maps to more than 1, set the 1st E command (or text char)
+ *     to KeyCtrl[^ch].ecmd1, and populate KeyCtrl[^ch].ecmdstr
+ *     with the remaining cmds/chars; and update len
+ */
+
+sKey2Ecode KeyCtrl[32] = {
+  /* see term/standard.c */
+{   0,  (Uchar)CCCMD       , (Uchar *) NULL, 1, {} },  /* <BREAK > */
+{   1,  (Uchar)CCCMD       , (Uchar *) NULL, 1, {} },  /* <cntr A> */
+{   2,  (Uchar)CCLWORD     , (Uchar *) NULL, 1, {} },  /* <cntr B> */
+{   3,  (Uchar)CCBACKSPACE , (Uchar *) NULL, 1, {} },  /* <cntr C> */
+{   4,  (Uchar)CCMILINE    , (Uchar *) NULL, 1, {} },  /* <cntr D> */
+{   5,  (Uchar)CCMIPAGE    , (Uchar *) NULL, 1, {} },  /* <cntr E> */
+{   6,  (Uchar)CCPLLINE    , (Uchar *) NULL, 1, {} },  /* <cntr F> */
+{   7,  (Uchar)CCHOME      , (Uchar *) NULL, 1, {} },  /* <cntr G> */
+{   8,  (Uchar)CCMOVELEFT  , (Uchar *) NULL, 1, {} },  /* <cntr H> */
+{   9,  (Uchar)CCTAB       , (Uchar *) NULL, 1, {} },  /* <cntr I> */
+{  10,  (Uchar)CCMOVEDOWN  , (Uchar *) NULL, 1, {} },  /* <cntr J> */
+{  11,  (Uchar)CCMOVEUP    , (Uchar *) NULL, 1, {} },  /* <cntr K> */
+{  12,  (Uchar)CCMOVERIGHT , (Uchar *) NULL, 1, {} },  /* <cntr L> */
+{  13,  (Uchar)CCRETURN    , (Uchar *) NULL, 1, {} },  /* <cntr M> */
+{  14,  (Uchar)CCRWORD     , (Uchar *) NULL, 1, {} },  /* <cntr N> */
+{  15,  (Uchar)CCOPEN      , (Uchar *) NULL, 1, {} },  /* <cntr O> */
+{  16,  (Uchar)CCPICK      , (Uchar *) NULL, 1, {} },  /* <cntr P> */
+{  17,  (Uchar)CCUNAS1     , (Uchar *) NULL, 0, {} },  /* <cntr Q> */
+{  18,  (Uchar)CCPLPAGE    , (Uchar *) NULL, 1, {} },  /* <cntr R> */
+{  19,  (Uchar)CCUNAS1     , (Uchar *) NULL, 0, {} },  /* <cntr S> */
+{  20,  (Uchar)CCMISRCH    , (Uchar *) NULL, 1, {} },  /* <cntr T> */
+{  21,  (Uchar)CCMARK      , (Uchar *) NULL, 1, {} },  /* <cntr U> */
+{  22,  (Uchar)CCCLOSE     , (Uchar *) NULL, 1, {} },  /* <cntr V> */
+{  23,  (Uchar)CCDELCH     , (Uchar *) NULL, 1, {} },  /* <cntr W> */
+{  24,  (Uchar)CCUNAS1     , (Uchar *) NULL, 0, {} },  /* <cntr X> */
+{  25,  (Uchar)CCPLSRCH    , (Uchar *) NULL, 1, {} },  /* <cntr Y> */
+{  26,  (Uchar)CCINSMODE   , (Uchar *) NULL, 1, {} },  /* <cntr Z> */
+{  27,  (Uchar)CCINSMODE   , (Uchar *) NULL, 1, {} },  /* <cntr [> <esc> */
+{  28,  (Uchar)CCINT       , (Uchar *) NULL, 1, {} },  /* <cntr \> */
+{  29,  (Uchar)CCREPLACE   , (Uchar *) NULL, 1, {} },  /* <cntr ]> */
+{  30,  (Uchar)CCERASE     , (Uchar *) NULL, 1, {} },  /* <cntr ^> */
+{  31,  (Uchar)CCSETFILE   , (Uchar *) NULL, 1, {} }   /* <cntr _> */
+};
+
+
+sKey2Ecode KeyEsc[64];

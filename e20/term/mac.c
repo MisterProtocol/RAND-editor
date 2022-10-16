@@ -29,7 +29,7 @@ int *count;
 	    if (chr == 0177)         /* DEL KEY KLUDGE FOR NOW */
 		*ocp++ = CCBACKSPACE;
 	    else
-		*ocp++ = chr;
+		*ocp++ = (char) chr;
 	}
 	else if (chr == 033) {
 	    if (nr < 2) {
@@ -183,7 +183,7 @@ int *count;
     Block {
 	int conv;
 	*count = nr;     /* number left over - still raw */
-	conv = ocp - lexp;
+	conv = (int) (ocp - lexp);
 	while (nr-- > 0)
 	    *ocp++ = *icp++;
 	return conv;

@@ -527,28 +527,28 @@ re_comp(sp)
 						break;
 					}
 					while (ep[-1] < c) {
-						*ep = ep[-1] + 1;
+						*ep = (char)(ep[-1] + 1);
 						ep++;
 						cclcnt++;
 						if (ep >= &expbuf[ESIZE])
 							comerr(retoolong);
 					}
 				}
-				*ep++ = c;
+				*ep++ = (char)c;
 				cclcnt++;
 				if (ep >= &expbuf[ESIZE])
 					comerr(retoolong);
 			} while ((c = *sp++) != ']');
-			lastep[1] = cclcnt;
+			lastep[1] = (char)cclcnt;
 			continue;
 
 		case '\\':
 			if ((c = *sp++) == '(') {
 				if (numbra >= NBRA)
 					comerr("too many \\(\\) pairs");
-				*bracketp++ = numbra;
+				*bracketp++ = (char)numbra;
 				*ep++ = CBRA;
-				*ep++ = numbra++;
+				*ep++ = (char)numbra++;
 				continue;
 			}
 			if (c == ')') {
@@ -560,17 +560,17 @@ re_comp(sp)
 			}
 			if (c >= '1' && c < ('1' + NBRA)) {
 				*ep++ = CBACK;
-				*ep++ = c - '1';
+				*ep++ = (char)(c - '1');
 				continue;
 			}
 			*ep++ = CCHR;
-			*ep++ = c;
+			*ep++ = (char)c;
 			continue;
 
 		defchar:
 		default:
 			*ep++ = CCHR;
-			*ep++ = c;
+			*ep++ = (char)c;
 		}
 	}
 }
@@ -732,7 +732,7 @@ re_advance(lp, ep, last)
 			if (braelist[i = *ep++] == 0)
 				return(-1);
 			curlp = lp;
-			ct = braelist[i] - braslist[i];
+			ct = (int)(braelist[i] - braslist[i]);
 			while (re_backref(i, lp))
 				lp += ct;
 			while (lp >= curlp) {

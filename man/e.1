@@ -91,7 +91,15 @@ of the editor.
 Options \-bullets and \-nobullets forces border bullets on or off
 regardless of line speed or terminal type.  Line speeds of 1200
 baud and slower and some terminal types set border bullets off in
-the absence of these options.
+the absence of these options. "Border bullets" does not refer to
+the characters making up the border of the editing window in "e".
+They refer to four characters placed at the top, bottom, left and
+right of the current window indicating the current postion of the
+cursor.
+They are chiefly useful on terminals or terminal emulators which
+do not have a blinking cursor, but some people may prefer them
+as an added indication of the cursor position.
+If the terminal supports highlighting, they will be highlighted.
 .TP
 .B \-create
 .br
@@ -4066,7 +4074,7 @@ terminals. ("_" is correct ASCII.)
 .\}
 .ps 10
 .vs 12
-.lf 1412 ./e.man
+.lf 1420 ./e.man
 .\".bp
 .ps 10
 .vs 12
@@ -4661,7 +4669,7 @@ on an individual user basis.
 .fc
 .cp \n(3c
 .lf 28
-.lf 1433 ./e.man
+.lf 1441 ./e.man
 .SH PLATFORMS SUPPORTED
 .sp
 This version of the editor has been ported to, and tested on,

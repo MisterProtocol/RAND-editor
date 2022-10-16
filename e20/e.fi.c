@@ -4,7 +4,8 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <localenv.h>
-#include <la.h>
+/* #include "../la1/la.h" */
+#include "e.h"
 
 #ifdef BUILTINFILL
 /********************* end of standard filter declarations *****************/

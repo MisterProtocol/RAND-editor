@@ -101,7 +101,7 @@ int arena;
 		    Reg1 Ff_stream *ffi;
 		    if ((ffi = ff_gfil (fp, md))) {
 			fp->fn_refs++;
-			fp->fn_mode |= md;
+			fp->fn_mode |= (char) md;
 			return ffi;
 		    } else
 			return 0;
@@ -168,8 +168,8 @@ int arena;
 	    fp1->fn_memaddr = (char *) 0;
 #endif  /* EUNICE */
 	(void) lseek (chan, seekpos, 0);
-	fp1->fn_fd   = chan;
-	fp1->fn_mode = md;
+	fp1->fn_fd   = (char) chan;
+	fp1->fn_mode = (char) md;
 	fp1->fn_refs = 1;
 	fp1->fn_realblk = 0;
 	fp1->fb_qf = (Ff_buf *) 0;
@@ -189,7 +189,7 @@ int mode;
 	    errno = EMFILE;
 	    return 0;
 	}
-    fp->f_mode   = mode;
+    fp->f_mode   = (char) mode;
     fp->f_file   = fnp;
     fp->f_count  = 1;
     fp->f_offset = 0;
@@ -292,7 +292,7 @@ Reg4 int rdflg;
 		}
 		if (rdflg) {
 		    ff_stats.fs_read++;
-		    if ((fb->fb_count = read (fp->fn_fd,fb->fb_buf,FF_BSIZE))
+		    if ((fb->fb_count = (short) read (fp->fn_fd,fb->fb_buf,FF_BSIZE))
 			== -1)
 			return 0;
 		} else
@@ -386,7 +386,7 @@ int release;    /* if non-0, then release the block from the active chain */
 	}
 #endif
 	for ( try = 1
-	    ; (cnt = write (fp->fn_fd, fb->fb_buf, (size_t) fb->fb_count))
+	    ; (cnt = (int) write (fp->fn_fd, fb->fb_buf, (size_t) fb->fb_count))
 	      != fb->fb_count
 	    ; try++
 	    ) {

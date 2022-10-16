@@ -8,6 +8,7 @@ file e.it.c
 	Copyright abandoned, 1983, The Rand Corporation
 #endif
 
+#ifdef OUT
 
 #include "e.h"
 #ifdef  KBFILE
@@ -30,7 +31,8 @@ int *count;
     Uchar *inp, *outp;
     int i;
 
-/** / dbgpr ("in_file called, count=%d\n", *count); / **/
+/*dbgpr("lexp[0]=(%o), count=%d\n", *lexp, *count);*/
+
     for (inp = lexp, i = *count; i-- > 0;)
 	*inp++ &= 0177;           /* Mask off high bit of all chars */
 /* outp should be different so a string can be replaced by a longer one */
@@ -43,7 +45,7 @@ int *count;
 	}
 
 	code = itget (&inp, count, ithead, outp);
-/** /	dbgpr("itget returns code=(%d)(%03o) count=%d\n", code, code, *count); / **/
+/*dbgpr("itget returns code=(%d)(%03o) count=%d\n", code, code, *count);*/
 	if (code >= 0) {    /* Number of characters resulting */
 	    outp += code;
 	    continue;
@@ -56,8 +58,7 @@ int *count;
 	--*count;
     }
     my_move ((char *) inp, (char *) outp, (ulong) *count);
-/** / dbgpr ("in_file returning %d\n", outp-lexp); / **/
-    return outp - lexp;
+    return (int)(outp - lexp);
 }
 
 #ifdef COMMENT
@@ -69,7 +70,7 @@ If some prefix of the input matches the table, returns the number of
 
 If no match, returns IT_NOPE.
 
-If the input matches some proper prefix of an entry in the input table,
+If the input matches some proper previx of an entry in the input table,
    returns IT_MORE.
 
 cpp and countp are not changed in the last two cases.
@@ -114,3 +115,5 @@ next:
 }
 
 #endif /* KBFILE */
+
+#endif /* OUT */

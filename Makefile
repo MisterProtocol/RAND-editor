@@ -84,7 +84,7 @@ LINUX=-DLINUX -D_BSD_SOURCE -D_DEFAULT_SOURCE -DTERMSIM -DGCC
 S5DEFINES = -DUNIXV7 -DASCIIKEYINFO -DSYSIII -DSYSV \
 	  -DSAVETMPFILES \
 	  -DHOSTTMPNAMES \
-	  -DCBREAK -DTERMSIM -DTERMCAP -DFILELOCKING -DSAVETMPFILES $(LINUX)
+	  -DCBREAK -DTERMSIM -DTERMCAP -DFILELOCKING $(LINUX)
 #         -DCBREAK -DTERMSIM -DTERMCAP $(LINUX)
 
 
@@ -112,7 +112,7 @@ BSDDEFINES = -DUNIXV7  -DASCIIKEYINFO \
 
 #trw:11.19.06
 S5CFLAGS    = -g -Wall -Wextra -Wno-implicit-fallthrough -Wsign-conversion \
-  -Wmissing-prototypes # -O
+  -Wmissing-prototypes -Wconversion # -O
 
 #S5CFLAGS   = -g # -O
 #S5CFLAGS   = -g -traditional -traditional-cpp # -O
@@ -135,7 +135,7 @@ target sys5: E_TCLIB = -lncurses
 # point to wherever you have ncurses-6.2 installed.
 # mob 10/17/2021
 BSDCFLAGS  = -g -Wall -Wextra -Wno-implicit-fallthrough -Wsign-conversion \
-    -Wmissing-prototypes -Wno-nullability-completeness # -O
+    -Wmissing-prototypes -Wno-nullability-completeness -Wconversion # -O
 #BSDCFLAGS  = -g -I/Users/obrien/Projects/ncurses/include -I/Users/obrien/Projects/ncurses/include/ncurses # -O
 S5LDFLAGS  = -g
 BSDLDFLAGS = -g

@@ -122,7 +122,7 @@ dbgpr("printchar(), key=(%d)(%3o)('%c), curwksp->clin=%d, curwksp->ccol=%d, curw
 	}
 /*      if (key != ' ') {   */
 	    fill (&cline[ncline - 1], (Uint) (curcol + 2 - ncline), ' ');
-	    cline[curcol] = key;
+	    cline[curcol] = (char)key;
 	    ncline = curcol + 2;
 	    cline[ncline - 1] = '\n';
 /*      }   */
@@ -145,14 +145,14 @@ dbgpr("printchar(), key=(%d)(%3o)('%c), curwksp->clin=%d, curwksp->ccol=%d, curw
 	    my_move (&cline[curcol], &cline[curcol + 1],
 		  (Uint) (ncline - curcol));
 	    ncline++;
-	    cline[curcol] = key;
+	    cline[curcol] = (char)key;
 	    thiscol = curcol - curwksp->wcol;
 	    putupdelta = 1;
 	    putup (-1, cursorline, (Scols) thiscol, MAXWIDTH);
 	    poscursor ((Scols) thiscol+1, cursorline);
 	}
 	else {
-	    cline[curcol] = key;
+	    cline[curcol] = (char)key;
 	    putch (key, YES);
 	}
 	shortencline ();
@@ -176,11 +176,11 @@ dbgpr("printchar(), key=(%d)(%3o)('%c), curwksp->clin=%d, curwksp->ccol=%d, curw
 	curcol = autolmarg + ccsave - curcol + 1 - curwksp->wcol;
 	for (nc = 0; curcol < 0; curcol += deflwin, nc += deflwin);
 	nl = (cursorline >= curwin->bedit) ? defplline : 0;
-	cursorline -= nl;
+	cursorline -= (Slines)nl;
 	movewin (curwksp->wlin + nl, curwksp->wcol - nc,
-	  cursorline, curcol, YES);
+	  cursorline, (Scols)curcol, YES);
 	GetLine (curwksp->wlin + cursorline + 1);
-	poscursor (curcol, cursorline + 1);
+	poscursor ((Scols)curcol, cursorline + 1);
 	x = CROK;
     }
     if ((cursorcol == curwin->rtext - 10) && !autofill)
@@ -466,7 +466,7 @@ dodword (ind)
 
 	/* ok - delete the word. */
 
-	ncline += (putupdelta = curcol - cwcol);
+	ncline += (putupdelta = (Scols)(curcol - cwcol));
 	if (deletdwd != (char *) 0) sfree (deletdwd);
 	deletdwd = salloc ((int) 1 - putupdelta, YES);
 /*      my_move (&cline[curcol], deletdwd, (int) - putupdelta); */
@@ -512,7 +512,7 @@ dodword (ind)
 	    GetLine(ln);
     } else {           /* ind=NO ==> restore the last deleted word */
 	fcline = YES;
-	putupdelta = strlen (deletdwd);
+	putupdelta = (Scols)strlen (deletdwd);
 	if (xcline)
 	    extend (ln - la_lsize(curlas));
 	putbks (curcol, putupdelta);

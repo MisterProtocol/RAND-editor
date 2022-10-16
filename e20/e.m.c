@@ -84,13 +84,13 @@ newnumber:
 dbgpr("mainloop:  nlines=%d, cursorline=%d, curwksp->wlin=%d\n",
 nlines, cursorline, curwksp->wlin);
 / **/
-		info (inf_line, 8, ich);
+		info (inf_line, 9, ich);
 		infoline = nlines;
 	    }
 	}
 
 	if (curfile != infofile && (fileflags[curfile] & INUSE)) {
-	    info (inf_file, strlen (names[infofile]), names[curfile]);
+	    info (inf_file, (Scols)strlen (names[infofile]), names[curfile]);
 	    infofile = curfile;
 	}
 
@@ -157,7 +157,7 @@ marklines, markcols, mklinstr, mkcolstr);
 		Reg1 char *cp;
 		Reg3 int len;
 		cp = append (mklinstr, mkcolstr);
-		len = strlen (cp);
+		len = (int) strlen (cp);
 		info (inf_area, max (len, infoarealen), cp);
 		infoarealen = len;
 		sfree (cp);
@@ -193,21 +193,12 @@ marklines, markcols, mklinstr, mkcolstr);
 
 
 /**
-dbgpr("e.m.c, mainloop(), waiting for getkey\n");
+dbgpr("e.m.c, mainloop(), waiting for mGetkey\n");
  **/
 
-#ifdef NCURSES
+	mGetkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
 
-
-	/*  mGetkey uses the curses getch() for input.
-	 */
-	if( initCursesDone ) {
-	    mGetkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
-	}
-	else {
-	    getkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
-	}
-	/* /
+	/** /
 	if( key < ' ' || key >= 0177 ) {
 	  dbgpr("e.m.c: mGetkey returned key=(%d)(%04o)(%s)\n\n", key, key, getEkeyname(key));
 	}
@@ -215,7 +206,7 @@ dbgpr("e.m.c, mainloop(), waiting for getkey\n");
 	  dbgpr("e.m.c, mGetkey returned key=(%d)(%04o)('%c') line=%d col=%d\n\n",
 	    key, key, (char)key, cursorline, cursorcol);
 	}
-	/ */
+	/ **/
 
 /* /
 dbgpr("mainloop:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
@@ -224,13 +215,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
     curwksp, wholescreen.wksp, enterwin.wksp, infowin.wksp);
 / */
 
-#else
-	getkey (WAIT_KEY, NULL);   /* returns value in global 'key' */
-#endif /* NCURSES */
-
-
 /* begin curses changes */
-	/*if( key == KEY_MOUSE ) { */
 	if( key == CCMOUSE ) {
 	    /*debug_inputkey(KEY_MOUSE, "e.m.c mainloop(), mGetkey()"); */
 	    /* handle mouse event */
@@ -299,8 +284,8 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 			    nl = (cursorline == curwin->btext) ? defplline : 0;
 			    nc = autolmarg - curwksp->wcol;
 			    for (df = 0; nc < 0; nc += deflwin, df += deflwin);
-			    cursorline -= nl;
-			    cursorcol = nc;
+			    cursorline -= (Slines) nl;
+			    cursorcol = (Scols) nc;
 			    if (nl || df)
 			      movewin(curwksp->wlin + nl, curwksp->wcol - df,
 				cursorline, cursorcol, YES);
@@ -331,12 +316,12 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 		    } else {
 			if (cm == RT && cursorcol >= curwin->redit) {
 			    movewin (curwksp->wlin, curwksp->wcol + defrwin,
-				     cursorline, cursorcol + 1 - defrwin, YES);
+				     cursorline, (Scols)(cursorcol + 1 - defrwin), YES);
 			} else if (cm == LT && cursorcol <= curwin->ledit) {
 			    Ncols df;
 			    df = min (deflwin, curwksp->wcol);
 			    movewin (curwksp->wlin, curwksp->wcol - df,
-				     cursorline, cursorcol - 1 + df, YES);
+				     cursorline, (Scols)(cursorcol - 1 + df), YES);
 			} else
 			    movecursor (cm, 1);
 		    }
@@ -614,9 +599,9 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 	    }
 gotcmd:
 	    param ();
-/* /
+/** /
 dbgpr("after param(): key=%o cmdmode=%d, paramv=(%s)\n", key, cmdmode, paramv);
-/ */
+/ **/
 	    if (cmdmode && key != CCRETURN)
 		goto notcmderr;
 
@@ -797,8 +782,8 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 			    goto llcor;
 
 			case CCMOVEDOWN:
-			    if ((lns = la_lsize (curlas) -
-				       (curwksp->wlin + cursorline)) > 0)
+			    if ((lns = (int)(la_lsize (curlas) -
+				       (curwksp->wlin + cursorline))) > 0)
 				lns = min (lns, curwin->btext - cursorline);
 			    else
 		    llcor:      lns = curwin->btext - cursorline;
@@ -818,7 +803,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 
 			case CCMOVERIGHT:
 			    GetLine (curwksp->wlin + cursorline);
-			    if ((lns = ncline - 1 - (curwksp->wcol + cursorcol))
+			    if ((lns = (int)(ncline - 1 - (curwksp->wcol + cursorcol)))
 				  > 0)
 				lns = min (lns, curwin->rtext - cursorcol);
 			    else
@@ -832,7 +817,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		    case 1:
 			if (parmlines <= 0)
 			    goto notposerr;
-			lns = parmlines;
+			lns = (int)parmlines;
  multmove:              movecursor (cntlmotions[key], lns);
 			break;
 
@@ -855,7 +840,6 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 #endif /* LMCHELP */
 #ifdef RECORDING
 		case CCRECORD:
-dbgpr("e.m.c:  case CCRECORD calling UnSetRecording\n");
 		    donetype = UnSetRecording();
 		    goto doneswitch;
 
@@ -920,7 +904,7 @@ dbgpr("e.m.c:  case CCRECORD calling UnSetRecording\n");
 		    case 1:
 			if (parmlines <= 0)
 			    goto notposerr;
-			chgwindow (parmlines - 1);
+			chgwindow ((Small)(parmlines - 1));
 			loopflags.bullet = YES;
 			break;
 
@@ -951,7 +935,7 @@ dbgpr("e.m.c:  case CCRECORD calling UnSetRecording\n");
 		    case 1:
 			if (parmlines <= 0)
 			    goto notposerr;
-			mword((key == CCLWORD) ? -1 : 1, parmlines);
+			mword((key == CCLWORD) ? -1 : 1, (int)parmlines);
 			break;
 
 		    case 2:

@@ -64,8 +64,8 @@ Flag silent;
 
     savewksp (cwksp = curwksp);
 
-    cwksp->ccol = cursorcol;
-    cwksp->clin = cursorline;
+    cwksp->ccol = (AScols) cursorcol;
+    cwksp->clin = (ASlines) cursorline;
 
     curwin->wksp    = curwin->altwksp;
     curwin->altwksp = cwksp;
@@ -93,8 +93,8 @@ register S_wksp *pwk;
     register S_wksp *lwksp;
 
     if (curwksp == pwk) {
-	pwk->ccol = cursorcol;
-	pwk->clin = cursorline;
+	pwk->ccol = (AScols) cursorcol;
+	pwk->clin = (ASlines) cursorline;
     }
     if (pwk->wfile == NULLFILE)
 	return;

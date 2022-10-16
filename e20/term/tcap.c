@@ -380,14 +380,14 @@ char *term;
 #define E_MIN_WIDTH     3
 #define E_MIN_HEIGHT    5
 
-    if ((t_tcap.tt_width = tgetnum("co")) < E_MIN_WIDTH )
+    if ((t_tcap.tt_width = (short) tgetnum("co")) < E_MIN_WIDTH )
 	 t_tcap.tt_width = E_MIN_WIDTH;
-    if ((t_tcap.tt_height = tgetnum("li")) < E_MIN_HEIGHT )
+    if ((t_tcap.tt_height = (char) tgetnum("li")) < E_MIN_HEIGHT )
 	t_tcap.tt_height = E_MIN_HEIGHT;
 
     if (tgetflag ("xv"))
 	t_tcap.tt_width--;   /* vt100 brain damage */
-/* if no home command, fake it with cursor movement. */
+/* if no home command, fake it with cursor movement.*/
     if ((HO = tgetstr("ho", &cp)) == NULL)
 	t_tcap.tt_home = punt_tcap;
 /* can't do without either clear or clear to end of display */
@@ -400,7 +400,7 @@ char *term;
 /* got to have cursor addressing */
     if ((CM = tgetstr("cm", &cp)) == NULL)
 	    return NG;
-    t_tcap.tt_naddr = strlen(tgoto(CM, 10, 10));
+    t_tcap.tt_naddr = (char) strlen(tgoto(CM, 10, 10));
 /* set up backspace; if none, fake with cm */
     if ((BC = tgetstr("bc", &cp)) == NULL) {
 	if (tgetflag("bs")) {
@@ -408,12 +408,12 @@ char *term;
 	} else {
 	    t_tcap.tt_left = punt_tcap;
 	    t_tcap.tt_nleft = t_tcap.tt_naddr;
-	    t_tcap.tt_nbsp  = 2 * t_tcap.tt_naddr + 1;
+	    t_tcap.tt_nbsp  = (char) (2 * t_tcap.tt_naddr + 1);
 	    goto endbc;
 	}
     }
-    t_tcap.tt_nleft = strlen(BC);
-    t_tcap.tt_nbsp = 2*strlen(BC)+1;
+    t_tcap.tt_nleft = (char) strlen(BC);
+    t_tcap.tt_nbsp = (char) (2*strlen(BC)+1);
 endbc:
 /* what's this? a null string for right cursor? */
     if ((ND = tgetstr("nd", &cp)) == NULL) {
@@ -422,14 +422,14 @@ endbc:
 /* I overrule it:
 	ND = "";       */
     } else
-	t_tcap.tt_nright = strlen(ND);
+	t_tcap.tt_nright = (char) strlen(ND);
 /* fake up with cm if needed */
     if ((UP = tgetstr("up", &cp)) == NULL) {
 	t_tcap.tt_up = punt_tcap;
 	t_tcap.tt_nup = t_tcap.tt_naddr;
     }
     else
-	t_tcap.tt_nup = strlen(UP);
+	t_tcap.tt_nup = (char) strlen(UP);
 #ifdef COMMENT
 /* with strange flavors of c/r and n/l, fake them too. */
     if (tgetflag("nc")) {
@@ -451,8 +451,8 @@ endbc:
 	t_tcap.tt_nnl = t_tcap.tt_naddr;
     }
     else {
-	t_tcap.tt_ndn = strlen(DO);
-	t_tcap.tt_nnl = strlen(CR)+strlen(DO);
+	t_tcap.tt_ndn = (char) strlen(DO);
+	t_tcap.tt_nnl = (char) (strlen(CR)+strlen(DO));
     }
 /* unless both il and dl work, remove them */
     AL = tgetstr("al", &cp);

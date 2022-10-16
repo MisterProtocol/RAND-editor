@@ -687,11 +687,7 @@ for(i=0; i<10; i++) {
 	}
 
 	keyused = YES;
-#ifdef NCURSES
 	rc = mGetkey (WAIT_KEY, NULL);
-#else
-	rc = getkey (WAIT_KEY, NULL);
-#endif
 	if (rc == CCRETURN ) break;
     }
 

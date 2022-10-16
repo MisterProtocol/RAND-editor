@@ -1,4 +1,4 @@
-This is the firs/ line.
+This is the first line.
 This is the second line.
 Line 3 is gone again.
 This is the fourth line, with a blank line above.

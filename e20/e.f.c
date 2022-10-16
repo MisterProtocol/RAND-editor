@@ -207,7 +207,7 @@ char name[];
 
     if (stat (name[0] ? name : ".", &statbuf) == -1)
 	return 0;
-    return statbuf.st_nlink;
+    return (Flag)statbuf.st_nlink;
 }
 
 #ifdef COMMENT
@@ -225,7 +225,7 @@ Fd fildes;
 
     if (fstat (fildes, &statbuf) == -1)
 	return 0;
-    return statbuf.st_nlink;
+    return (Flag)statbuf.st_nlink;
 }
 
 #ifdef COMMENT

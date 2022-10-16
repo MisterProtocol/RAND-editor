@@ -27,7 +27,8 @@
  * Used to be on V6 there was a ldiv routine that left the remainder in
  * a global 'ldivr', but that went away with V7.  --dave yost
  **/
-#define my_ldiv(a,b,c) ((*(c) = (a) % (b)), ((long)(a)) / (b))
+/* #define my_ldiv(a,b,c) ((*(c) = (a) % (b)), ((long)(a)) / (b)) */
+#define my_ldiv(a,b,c) ((*(c) = (int)  ((long) a) % ((long) b)), ((long)(a)) / ((long) b))
 
 /* the following include must appear in the right order */
 #include "ff.h"

@@ -148,7 +148,7 @@ Flag leftflg;
     if (exchlines || exchcols) {
 	if (!exchcols) {
 	    /* exchange the cols so mark will set them back */
-	    tmp = curmark->mrkwincol;
+	    tmp = (int)curmark->mrkwincol;
 	    curmark->mrkwincol = prevmark->mrkwincol;
 	    prevmark->mrkwincol = tmp;
 	    tmp = curmark->mrkcol;
@@ -157,12 +157,12 @@ Flag leftflg;
 	}
 	else if (!exchlines) {
 	    /* exchange the lines so mark will set them back */
-	    tmp = curmark->mrkwinlin;
+	    tmp = (int)curmark->mrkwinlin;
 	    curmark->mrkwinlin = prevmark->mrkwinlin;
 	    prevmark->mrkwinlin = tmp;
 	    tmp = curmark->mrklin;
 	    curmark->mrklin = prevmark->mrklin;
-	    prevmark->mrklin = tmp;
+	    prevmark->mrklin = (ASlines)tmp;
 	}
 	return exchmark (NO) & WINMOVED;
     }
@@ -210,7 +210,7 @@ markprev ()
     prevmark->mrkwincol = curwksp->wcol;
     prevmark->mrkwinlin = curwksp->wlin;
     prevmark->mrkcol = cursorcol;
-    prevmark->mrklin = cursorline;
+    prevmark->mrklin = (ASlines)cursorline;
     return;
 }
 
@@ -281,7 +281,7 @@ dbgpr("highlightarea:  curmark:  mrkwincol=%d, mrkwinlin=%d, mrkcol=%d, mrklin=%
 	bot_line = top_line;
 	last_top = top_line;
 	last_bot = bot_line;;
-	last_marklines = marklines;
+	last_marklines = (int)marklines;
 	last_cursorline = cursorline;
 	last_col = cursorcol;
 	firsttime = 0;
@@ -344,7 +344,7 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 /** / dbgpr("1a: cursor=bottom, topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	else {
-	    top_line = curwin->ttext + topmark() - curwksp->wlin;
+	    top_line = (int)(curwin->ttext + topmark() - curwksp->wlin);
 	    /*bot_line = top_line + marklines - 1;*/
 	    /*bot_line = curwin->btext + 1; */
 	    bot_line = curwin->ttext + curwin->btext;
@@ -358,7 +358,7 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	    bot_line = top_line;
 	}
 	else {
-	    bot_line = top_line + marklines - 1;
+	    bot_line = (int)(top_line + marklines - 1);
 	}
 	if (bot_line > curwin->ttext + curwin->btext) {
 	    bot_line = curwin->ttext + curwin->btext;
@@ -375,18 +375,18 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 	else if (curmark->mrkwinlin == curwksp->wlin) {
 	    if (cursorline > curmark->mrklin) {
 		top_line = curwin->ttext + curmark->mrklin;
-		bot_line = top_line + marklines - 1;
+		bot_line = (int)(top_line + marklines - 1);
 	    }
 	    else {
 		top_line = curwin->ttext + cursorline;
-		bot_line = top_line + marklines - 1;
+		bot_line = (int)(top_line + marklines - 1);
 	    }
 /** / dbgpr("4: mrkwinlin = wlin, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
 	}
 	/* topmark() on current screen */
 	else if (curwksp->wlin < topmark()) {
-	    top_line = curwin->ttext + topmark() - curwksp->wlin;
-	    bot_line = top_line + marklines - 1;
+	    top_line = (int)(curwin->ttext + topmark() - curwksp->wlin);
+	    bot_line = (int)(top_line + marklines - 1);
 	    if (bot_line > curwin->ttext + curwin->btext)
 		bot_line = curwin->ttext + curwin->btext;
 /** / dbgpr("5: wlin < topmark(), top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
@@ -444,7 +444,7 @@ top_line, bot_line, last_top, last_bot);
 
     last_top = top_line;
     last_bot = bot_line;;
-    last_marklines = marklines;
+    last_marklines = (int)marklines;
     last_cursorline = cursorline;
     last_col = cursorcol;
 
@@ -528,7 +528,7 @@ HiLightRect(int from, int to, int mrkcol, int curcol)
     char *cp;
 
     int beg_mark;
-    int mark_len = markcols;  /* how many chars to highlight */
+    int mark_len = (int)markcols;  /* how many chars to highlight */
     int line;
     int adj_markcol = mrkcol;
 
@@ -557,20 +557,20 @@ HiLightRect(int from, int to, int mrkcol, int curcol)
     }
     else if (mrkcol < curwksp->wcol) {  /* mark began left of our window */
 	adj_markcol = 0;
-	mark_len = markcols - curwksp->wcol + mrkcol;
+	mark_len = (int)(markcols - curwksp->wcol + mrkcol);
 	/** /dbgpr("1a: mrkcol < wksp->wcol, adj_markcol=%d, mrkcol=%d new mark_len=%d\n",
 	   adj_markcol, mrkcol, mark_len); / **/
     }
     else if (curmark->mrkwincol == 0 && mrkcol >= curwksp->wcol) {
-	adj_markcol = mrkcol - curwksp->wcol;
+	adj_markcol = (int)(mrkcol - curwksp->wcol);
 	/** /dbgpr("2: mrkwincol=0, adj_markcol=%d\n", adj_markcol); / **/
     }
     else if (curmark->mrkwincol > curwksp->wcol) {
-	adj_markcol = mrkcol + (curmark->mrkwincol - curwksp->wcol);
+	adj_markcol = (int)(mrkcol + (curmark->mrkwincol - curwksp->wcol));
 	/** /dbgpr("3: mrkwincol > wksp->wcol, adj_markcol=%d\n", adj_markcol); / **/
     }
     else if (curwksp->wcol > curmark->mrkwincol) {
-	adj_markcol = mrkcol - (curwksp->wcol - curmark->mrkwincol);
+	adj_markcol = (int)(mrkcol - (curwksp->wcol - curmark->mrkwincol));
 	/** /dbgpr("4: wcol > mrkwincol, adj_markcol=%d\n", adj_markcol); / **/
     }
     else {
@@ -694,10 +694,10 @@ dbgpr("cursorline=%d cursor_screenline=%d cursorcol=%d cursor_screencol=%d\n",
     if (last_y > 0) {
 	if (last_wlin >= curwksp->wlin && last_wlin <= (curwksp->wlin + curwin->btext)) {
 	    if (last_wlin < curwksp->wlin) {
-		last_y -= (curwksp->wlin - last_wlin);
+		last_y -= (int)((curwksp->wlin - last_wlin));
 	    }
 	    else if (last_wlin > curwksp->wlin) {
-		last_y += (last_wlin - curwksp->wlin);
+		last_y += (int)((last_wlin - curwksp->wlin));
 	    }
 
 	    /* for some reason, redrawing only the rt matching brace
@@ -918,7 +918,7 @@ dbgpr("rc=%d from FindBraceForw, l_num=%d c_num=%d\n", rc, l_num, c_num);
 	    }
 
 	    snprintf(msg, sizeof(msg), " Matching %c not found ", end_ch);
-	    int len = strlen(msg);
+	    int len = (int)strlen(msg);
 
 
 	    if (rc == 2) {  /* bracematchCoding mode, not found */
@@ -1052,7 +1052,7 @@ dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wl
 		}
 
 		snprintf(msg, sizeof(msg), " Matching %c not found ", end_ch);
-		int len = strlen(msg);
+		int len = (int)strlen(msg);
 
 		if (braceRange == 0) {
 		    strcat(msg, "searching to beginning of the file");
@@ -1110,7 +1110,7 @@ dbgpr("found %c at line %d col %d, cursor_screenline=%d, cursor_screencol=%d, wl
     /* save these in order to clear the mark, next time */
     last_y = line;
     last_x = match_col;
-    last_wlin = curwksp->wlin;
+    last_wlin = (int)curwksp->wlin;
 /*  last_ch = end_ch; */
 
     if (match_error)
@@ -1215,7 +1215,7 @@ ttext=%d nextline=%d braceRange=%d\n",
 	for (i=ncline+1; i >= 0; i--) {
 	    if (cline[i] == end_ch) {
 		if (cnt <= 0) {
-		    *lnum = ln; *cnum = i;
+		    *lnum = ln; *cnum = (int)i;
 		 /* dbgpr("--found %c at ln %d c %d\n", end_ch, ln, i); */
 		    return 1;
 		}
@@ -1289,7 +1289,7 @@ dbgpr("FindForw:  have end_ch %c at ln %d c %d braceCoding=%d\n",
 / **/
 
 		if (cnt <= 0) {
-		    *lnum = ln; *cnum = i;
+		    *lnum = ln; *cnum = (int)i;
 		/*  dbgpr("--found %c at ln %d c %d\n", end_ch, ln, i); */
 		    return 1;
 		}
@@ -1297,7 +1297,7 @@ dbgpr("FindForw:  have end_ch %c at ln %d c %d braceCoding=%d\n",
 		 * to be a } in column 0
 		 */
 		if (i == 0 && end_ch == '}' && bracematchCoding) {
-		    *lnum = ln; *cnum = i;
+		    *lnum = ln; *cnum = (int)i;
 		    return 2;
 		}
 

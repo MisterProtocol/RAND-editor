@@ -277,7 +277,7 @@ if( 0 || debug_d_write ) {
 			if ((chr != image[icursor]) && !redraw)
 			{
 			    putscr (chr);
-			    image[icursor] = chr;
+			    image[icursor] = (Uchar)chr;
 			}
 			if (redraw && chr != ' ')
 			    putscr (chr);
@@ -1313,7 +1313,7 @@ Flag wrtflg;
 		    putscr (0); /* update terminal cursor */
 		    (*term.tt_clreol) ();
 		    if (cp) {
-			icol = (icursor = cp - image) - lincurs;
+			icol = (Scols)((icursor = (Short)((cp - image) - lincurs)));
 			putscr (*cp);
 		    }
 		    icursor = savicursor;

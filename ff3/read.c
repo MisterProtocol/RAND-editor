@@ -46,7 +46,7 @@ char *brklst;
 	    if (dn <= 0)
 		break;
 	    if (dn < rn)
-		rn = dn;
+		rn = (int) dn;
 	}
 	Block {
 	    Reg1 char *from;
@@ -93,5 +93,5 @@ char *brklst;
 	} while (--nbrk);
     }
  ret:
-    return from - buf;
+    return ( (int) (from - buf) );
 }

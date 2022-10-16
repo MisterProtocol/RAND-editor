@@ -42,6 +42,7 @@ void alarmproc (int);
 
 Cmdret fillopts (char *, char **, Small);
 
+Flag pendINTkey(void);
 
 #ifdef COMMENT
 Cmdret
@@ -405,6 +406,10 @@ Flag    safe;       /* OK for program to write directly on changes file */
     int  pipe2[2];
 #endif
     sprintf (tmp, "%s/run", etcdir);
+    if (access(tmp, X_OK)) {
+	mesg(ERRALL + 3, "The run command (", tmp, ") is not found or is not executable.");
+	return CROK;
+    }
     runargs[0] = &tmp[0];
     runargs[1] = (char *)NULL;
 
@@ -555,6 +560,19 @@ Flag    safe;       /* OK for program to write directly on changes file */
 	&& receive (chgend, from, closeflg ? number : 0, iqbuf, puflg)
        )
 	return CROK;
+
+    /*  10/2022:  run cmd was either aborted or not found.
+     *  Filtering out multiple CCINT keys the user may have pressed,
+     *  avoids a 'no operation to interrupt' message.
+     *
+     *  Note:  the i++ is just in case something goes wrong in
+     *  the pendINTkey()) routine.
+     */
+    int i = 0;
+    while (pendINTkey() && i++ < 25) ;
+    if (i)
+	dbgpr("--skiped %d CCINTs\n", i);
+
     execabortmesg (funcnm);
     d_put (0);
     return CROK;
@@ -656,7 +674,7 @@ Reg2 int child2;
     for (;;) {
 	alarmed = NO;
 	alarmsig = signal (SIGALRM, alarmproc);
-	alarm (EXECTIM);
+	alarm (EXECTIM);    /* 5 sec default */
 #ifdef RUNSAFE
 	if (wait (&retstat) == progid)
 	    progid = 0;
@@ -678,8 +696,10 @@ Reg2 int child2;
 	    alarmed = NO; /* in case it just happened before the alarm (0) */
 	    break;
 	}
-	if (sintrup ())
+	if (sintrup ()) {
+	/*  dbgpr("runlines:  got CCINT\n"); */
 	    break;
+	}
     }
     (void) signal (SIGALRM, alarmsig);
 
@@ -705,8 +725,9 @@ Reg2 int child2;
 #endif
 	return NO;
     }
-    if (sintrup ())
+    if (sintrup ()) {
 	return NO;
+    }
 
     Block {
 	Reg3 int exitstat;
@@ -791,7 +812,7 @@ Flag    puflg;          /* putup when done */
     }
     redisplay (curfile, from, min (nins, nclose), nins - nclose, puflg);
     if (puflg)
-	poscursor (cursorcol, from - curwksp->wlin);
+	poscursor (cursorcol, (Slines)(from - curwksp->wlin));
     return YES;
 }
 

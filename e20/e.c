@@ -20,7 +20,6 @@ file e.c
 #include "e.sg.h"
 #include "e.inf.h"
 #include <sys/stat.h>
-#include <stdarg.h>
 #if SYSIII || SOLARIS
 #include <fcntl.h>
 #endif
@@ -560,8 +559,8 @@ Your current screensize is %d w X %d h.\n",
 		    inpfname, a_w, a_h, term.tt_width, term.tt_height );
 	    }
 	    ichar = a_ichar;
-	    term.tt_width = a_w;
-	    term.tt_height = a_h;
+	    term.tt_width = (short)a_w;
+	    term.tt_height = (char)a_h;
 	    initwindows (YES);
 	}
     }
@@ -1277,12 +1276,12 @@ startup ()
     }
     Block {
 	Reg1 Short indv;
-	indv = strlen (tmppath) + VRSCHAR;
+	indv = (int) (strlen (tmppath) + VRSCHAR);
 	for (evrsn = '1'; ; evrsn++) {
 	    if (evrsn > '9')
 		getout (NO, "\n%s: No free temp file names left\n", progname);
-	    la_cfile[indv] = evrsn;
-	    rfile[indv] = evrsn;
+	    la_cfile[indv] = (char) evrsn;
+	    rfile[indv] = (char) evrsn;
 #ifndef FILELOCKING
 	    Block {
 		Reg3 int i;
@@ -1314,7 +1313,7 @@ startup ()
     fileflags[NULLFILE] = INUSE;
 
     /* make the rest of the file names */
-    bkeystr[VRSCHAR] = keystr[VRSCHAR] = evrsn;
+    bkeystr[VRSCHAR] = keystr[VRSCHAR] = (char)evrsn;
     Block {
 	Reg1 char *c;
 	c = append (keystr, name);
@@ -1374,7 +1373,7 @@ startup ()
 #else
 	len = strlen (keytmp);
 #endif
-	indv = strlen (tmppath) + VRSCHAR;
+	indv = (int) strlen (tmppath) + VRSCHAR;
 
 	if (*tmppath == '/')
 	    strcpy(tdir, deftmpdir);
@@ -1411,8 +1410,8 @@ dbgpr("main1:  dp->d_name=(%s)\n", dp->d_name);
 #endif
 		    close(i);
 		    evrsn = dp->d_name[indv];
-		    bkeytmp[indv] = keytmp[indv] = la_cfile[indv] = evrsn;
-		    rfile[indv] = evrsn;
+		    bkeytmp[indv] = keytmp[indv] = la_cfile[indv] = (char)evrsn;
+		    rfile[indv] = (char)evrsn;
 		    dorecov (0);        /* 1 or 0 ? */
 		    crashed = YES;
 		    break;
@@ -1479,9 +1478,6 @@ options are:\n", progname);
 
     printf ("\
 %c -dtermcap\n", optdtermcap == YES ? '*' : ' ');
-
-    printf ("\
-%c -bullets\n", optbullets == YES ? '*' : ' ');
 
     printf ("\
 * -help\n");
@@ -1843,7 +1839,7 @@ gettermtype ()
 	extern int nop ();
 
 	getkbfile (kbfile);
-	kbd.kb_inlex = in_file;
+    /*  kbd.kb_inlex = in_file; 10/2022: no longer used */
 	kbd.kb_init  = nop;
 	kbd.kb_end   = nop;
     }
@@ -1891,7 +1887,7 @@ setitty ()
     struct termio temp_termio;
 
 #   ifdef CBREAK
-	char ixon = cbreakflg;
+	char ixon = (char)cbreakflg;
 #   else  /* CBREAK */
 	char ixon = NO;
 #   endif /* CBREAK; */
@@ -1959,7 +1955,7 @@ setitty ()
 #endif /* CBREAK */
 
     Block {
-	Reg1 int tmpflags;
+	Reg1 short tmpflags;
 	tmpflags = instty.sg_flags;
 #ifdef  CBREAK
 	if (cbreakflg)
@@ -1991,7 +1987,7 @@ setotty ()
 #endif /* SYSIII */
 	fast = YES;
     else Block {
-	Reg1 int i;
+	Reg1 short i;
 #ifdef MESG_NO
 	struct stat statbuf;
 #endif /* MESG_NO */
@@ -2005,13 +2001,13 @@ represent which is true but undocumented for System 3.
 In fact the system 3 Bs are identical to the version 7 Bs.
 #endif /* COMMENT */
 #define SPEED ((out_termio.c_cflag)&CBAUD)
-	i = out_termio.c_oflag;
+	i = (short) out_termio.c_oflag;
 	out_termio.c_oflag &= (unsigned short) ~(OLCUC|ONLCR|OCRNL|ONOCR|ONLRET);
 	if( (out_termio.c_oflag & TABDLY) == TAB3)
 	    out_termio.c_oflag &= (unsigned short) ~TABDLY;
 	if(ioctl(STDOUT,TCSETA,&out_termio) >= 0) {
 	    ostyflg = YES;
-	    out_termio.c_oflag = i;  /* all set up for cleanup */
+	    out_termio.c_oflag = (unsigned short)i;  /* all set up for cleanup */
 	}
 #else /* SYSIII */
 #define SPEED (outstty.sg_ospeed)
@@ -2067,7 +2063,7 @@ makescrfile ()
 		(Ff_stream *) 0, 0, 0))
 	    getout (YES, "can't open %s", names[j]);
 	(void) la_clone (&fnlas[j], &lastlook[j].las);
-	lastlook[j].wfile = j;
+	lastlook[j].wfile = (AFn)j;
 	fileflags[j] = INUSE | CANMODIFY;
     }
 
@@ -2169,8 +2165,8 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 	    /*
 	     *  Can readjust screensize to statefile parameters.
 	     */
-	    term.tt_width = ncol;
-	    term.tt_height = nlin;
+	    term.tt_width = (short)ncol;
+	    term.tt_height = (char)nlin;
 	    initwindows (YES);
 	}
     }
@@ -2334,7 +2330,7 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 	statef_mrk.mrkwinlin = getlong(gbuf);
     /*  statef_mrk.mrkwincol = getshort(gbuf);  */
 	statef_mrk.mrkwincol = getlong(gbuf);
-	statef_mrk.mrklin = getc(gbuf);
+	statef_mrk.mrklin = (ASlines)getc(gbuf);
 	statef_mrk.mrkcol = getshort(gbuf);
 
 /**/
@@ -2408,7 +2404,7 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
 	    Reg6 Small gf;
 	    Reg5 S_window *window;
 	    window = winlist[n] = (S_window *) salloc (SWINDOW, YES);
-	    window->prevwin = getc (gbuf);
+	    window->prevwin = (ASmall)getc (gbuf);
 	    if (ichar != ALL_WINDOWS)
 		window->prevwin = 0;
 	    Block {
@@ -2422,7 +2418,7 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
 		lmarg = getshort (gbuf);
 		bmarg = getc (gbuf);
 		rmarg = getshort (gbuf);
-		winflgs = getc (gbuf);
+		winflgs = (AFlag)getc (gbuf);
 		if (ichar != ALL_WINDOWS) {
 		    tmarg = 0;
 		    lmarg = 0;
@@ -2466,8 +2462,8 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
 				gf = 1;
 			    /* this sets them up to get copied into
 			     * curwksp->ccol & clin */
-			    poscursor (curwksp->ccol = tmpcol,
-				       curwksp->clin = tmplin);
+			    poscursor (curwksp->ccol = (AScols)tmpcol,
+				       curwksp->clin = (ASlines)tmplin);
 			}
 			else
 			    poscursor (0, 0);
@@ -2507,8 +2503,8 @@ dbgpr("statef markinfo: mrkwinlin=%ld, mrkwincol=%ld, mrklin=%d mrkcol=%d\n",
 		    if (editfile (fname, col, lin, 0, n == winnum ? NO : YES)
 			== 1) {
 			gf = 2;
-			poscursor (curwksp->ccol = tmpcol,
-				   curwksp->clin = tmplin);
+			poscursor (curwksp->ccol = (AScols)tmpcol,
+				   curwksp->clin = (ASlines)tmplin);
 		    }
 		    chgborders = 1;
 		}
@@ -2889,7 +2885,7 @@ initwindows (resizing)
 		 term.tt_height - NENTERLINES - NINFOLINES - nButtonLines,
 		 term.tt_width - 1,
 		 term.tt_height - 1 - NINFOLINES - nButtonLines, 0, NO);
-    enterwin.redit = term.tt_width - 1;
+    enterwin.redit = (AScols)(term.tt_width - 1);
     /* info display window. */
     setupwindow (&infowin, 0,
 		 term.tt_height - NINFOLINES - nButtonLines,

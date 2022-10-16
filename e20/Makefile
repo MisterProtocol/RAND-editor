@@ -84,7 +84,7 @@ HFILES  =  e.cm.h e.e.h e.fn.h e.func.h \
 OFILES  = \
 	$(O)e.o $(O)e.cm.o $(O)e.d.o $(O)e.dif.o $(O)e.e.o \
 	$(O)e.f.o $(O)e.fi.o $(O)e.h.o $(O)e.iit.o \
-	$(O)e.it.o $(O)e.la.o $(O)e.m.o $(O)e.main.o \
+	$(O)e.it.o $(O)e.keys.o $(O)e.la.o $(O)e.m.o $(O)e.main.o \
 	$(O)e.mk.o $(O)e.nm.o $(O)e.p.o $(O)e.pa.o \
 	$(O)e.profile.o $(O)e.put.o $(O)e.q.o $(O)e.r.o \
 	$(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.ru.o $(O)e.sb.o \
@@ -104,6 +104,7 @@ CFILES  = \
 	e.h.c \
 	e.iit.c \
 	e.it.c \
+	e.keys.c \
 	e.la.c \
 	e.m.c \
 	e.mouse.c \
@@ -153,6 +154,7 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 	   $(O)e.ru.o $(O)e.cm.o $(O)e.d.o $(O)e.it.o \
 	   $(O)e.la.o $(O)e.m.o $(O)e.p.o $(O)e.r.o $(O)e.sb.o \
 	   $(O)e.tt.o $(O)e.x.o $(O)e.profile.o $(O)e.mouse.o \
+	   $(O)e.keys.o \
 	$(LALIB) \
 	$(FFLIB) \
 	$(MISCLIB) \
@@ -179,16 +181,25 @@ $(FFLIB):
 $(MISCLIB):
 
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
-depend:
+depend.sys5:
+	-rm Ifdefs
+	-ln Ifdefs.sys5 Ifdefs
 	/bin/bash Makedep $(HFILES) $(CFILES)
 
-# Be sure the defs in "Ifdefs" agree with $(DEFS)
-Comments: $(CFILES)
-	Makedoc $(CFILES)
+depend.bsd:
+	-rm Ifdefs
+	-ln Ifdefs.bsd Ifdefs
+	/bin/bash Makedep $(HFILES) $(CFILES)
 
+### "Comments:" and "Calls:" depend on shell files that don't work any more and
+### hence are not included.  Better tools are available externally.
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
-Calls:  $(CFILES)
-	Makecalls $(CFILES)
+#Comments: $(CFILES)
+#	Makedoc $(CFILES)
+#
+# Be sure the defs in "Ifdefs" agree with $(DEFS)
+#Calls:  $(CFILES)
+#	Makecalls $(CFILES)
 
 lint:
 	lint $(DEFS) $(INCL) $(CFILES) \
@@ -242,6 +253,10 @@ $(O)e.iit.o: e.iit.c
 $(O)e.it.o: e.it.c
 	$(CC) $(CFLAGS) $(INCL) -c e.it.c
 	mv e.it.o $(O)e.it.o
+
+$(O)e.keys.o: e.keys.c
+	$(CC) $(CFLAGS) $(INCL) -c e.keys.c
+	mv e.keys.o $(O)e.keys.o
 
 $(O)e.la.o: e.la.c
 	$(CC) $(CFLAGS) $(INCL) -c e.la.c
@@ -363,13 +378,22 @@ $(O)pres.o: pres.c
 
 # DO NOT DELETE THIS LINE
 
+e.h: $(STD)stdlib.h
+e.h: $(STD)sys/types.h
+e.h: $(STD)unistd.h
+e.h: $(STD)stdio.h
+e.h: $(STD)string.h
+e.h: $(STD)fcntl.h
+e.h: $(STD)ncurses.h
+e.h: $(STD)term.h
 e.h: $(LOCALINCL)c_env.h
 e.h: $(LOCALINCL)localenv.h
 e.h: $(STD)sys/types.h
 e.h: $(LA)la.h
-e.h: $(FF)ff.h
 e.h: e.t.h
-e.sg.h: $(STD)$(SGTT_INCL)
+e.sg.h: undefs.h
+e.sg.h: $(STD)sgtty.h
+e.sg.h: $(STD)sys/ioctl.h
 $(O)e.o: e.h
 $(O)e.o: e.e.h
 $(O)e.o: e.it.h
@@ -379,33 +403,49 @@ $(O)e.o: e.fn.h
 $(O)e.o: e.sg.h
 $(O)e.o: e.inf.h
 $(O)e.o: $(STD)sys/stat.h
+$(O)e.o: $(STD)fcntl.h
+$(O)e.o: $(STD)sys/dir.h
+$(O)e.o: $(STD)sys/file.h
+$(O)e.o: $(STD)unistd.h
+$(O)e.o: $(STD)dirent.h
 $(O)e.o: $(STD)$(SIG_INCL)
+$(O)e.o: $(STD)sys/resource.h
+$(O)e.o: e.showkeys.c
+$(O)e.o: e.showkeys.c
+$(O)e.cm.o: $(STD)ctype.h
 $(O)e.cm.o: e.h
 $(O)e.cm.o: e.e.h
 $(O)e.cm.o: e.m.h
 $(O)e.cm.o: e.ru.h
 $(O)e.cm.o: e.cm.h
 $(O)e.cm.o: e.wi.h
+$(O)e.cm.o: e.tt.h
 $(O)e.cm.o: $(STD)$(SIG_INCL)
 $(O)e.d.o: e.h
 $(O)e.d.o: e.tt.h
 $(O)e.d.o: e.it.h
 $(O)e.d.o: $(STD)$(SIG_INCL)
-$(O)e.dif.o: $(STD)ctype.h
-$(O)e.dif.o: e.h
-$(O)e.dif.o: e.m.h
-$(O)e.dif.o: e.cm.h
 $(O)e.e.o: e.h
 $(O)e.e.o: e.m.h
 $(O)e.e.o: e.cm.h
 $(O)e.e.o: e.e.h
 $(O)e.f.o: e.h
 $(O)e.f.o: $(STD)sys/stat.h
+$(O)e.fi.o: $(STD)ctype.h
+$(O)e.fi.o: $(STD)sys/types.h
+$(O)e.fi.o: $(LOCALINCL)localenv.h
+$(O)e.fi.o: e.h
+$(O)e.h.o: e.h
+$(O)e.h.o: e.cm.h
+$(O)e.h.o: e.m.h
+$(O)e.h.o: e.tt.h
+$(O)e.h.o: e.h.h
 $(O)e.iit.o: e.h
 $(O)e.iit.o: e.it.h
-$(O)e.iit.o: $(STD)ctype.h
-$(O)e.it.o: e.h
-$(O)e.it.o: e.it.h
+$(O)e.keys.o: e.h
+$(O)e.keys.o: e.keys.h
+$(O)e.keys.o: e.it.h
+$(O)e.keys.o: $(STD)ctype.h
 $(O)e.la.o: e.h
 $(O)e.la.o: e.m.h
 $(O)e.la.o: $(STD)$(SIG_INCL)
@@ -415,13 +455,17 @@ $(O)e.m.o: e.inf.h
 $(O)e.m.o: e.m.h
 $(O)e.m.o: e.tt.h
 $(O)e.m.o: e.e.h
-$(O)e.main.o: e.h
-$(O)e.mk.o: e.h
-$(O)e.mk.o: e.inf.h
-$(O)e.mk.o: e.m.h
 $(O)e.mouse.o: e.h
 $(O)e.mouse.o: e.m.h
 $(O)e.mouse.o: e.cm.h
+$(O)e.mouse.o: e.tt.h
+$(O)e.mouse.o: $(STD)ctype.h
+$(O)e.mouse.o: $(STD)string.h
+$(O)e.main.o: e.h
+$(O)e.mk.o: e.h
+$(O)e.mk.o: e.tt.h
+$(O)e.mk.o: e.inf.h
+$(O)e.mk.o: e.m.h
 $(O)e.nm.o: e.h
 $(O)e.nm.o: e.inf.h
 $(O)e.nm.o: e.m.h
@@ -429,14 +473,23 @@ $(O)e.nm.o: e.cm.h
 $(O)e.nm.o: $(STD)sys/stat.h
 $(O)e.p.o: e.h
 $(O)e.p.o: e.cm.h
+$(O)e.p.o: e.inf.h
+$(O)e.p.o: e.m.h
+$(O)e.p.o: $(STD)ctype.h
 $(O)e.pa.o: $(STD)ctype.h
 $(O)e.pa.o: e.h
 $(O)e.pa.o: e.m.h
 $(O)e.pa.o: e.cm.h
+$(O)e.profile.o: e.h
+$(O)e.profile.o: e.m.h
+$(O)e.profile.o: $(STD)sys/stat.h
+$(O)e.profile.o: e.tt.h
 $(O)e.put.o: e.h
 $(O)e.put.o: e.m.h
 $(O)e.put.o: e.cm.h
 $(O)e.put.o: e.e.h
+$(O)e.q.o: $(STD)sys/types.h
+$(O)e.q.o: $(STD)sys/stat.h
 $(O)e.q.o: e.h
 $(O)e.q.o: e.m.h
 $(O)e.q.o: e.cm.h
@@ -446,64 +499,95 @@ $(O)e.q.o: $(STD)$(SIG_INCL)
 $(O)e.ra.o: e.h
 $(O)e.ra.o: e.m.h
 $(O)e.ra.o: e.cm.h
+$(O)e.re.o: $(STD)ctype.h
 $(O)e.re.o: e.h
 $(O)e.re.o: e.m.h
 $(O)e.re.o: e.cm.h
 $(O)e.re.o: e.se.h
 $(O)e.record.o: e.h
 $(O)e.record.o: e.cm.h
-$(O)e.record.o: e.m.h
 $(O)e.record.o: e.inf.h
+$(O)e.record.o: e.m.h
+$(O)e.record.o: e.tt.h
+$(O)e.record.o: e.h.h
+$(O)e.record.o: $(STD)sys/types.h
+$(O)e.record.o: $(STD)sys/stat.h
+$(O)e.record.o: $(STD)unistd.h
 $(O)e.ru.o: e.h
 $(O)e.ru.o: e.e.h
 $(O)e.ru.o: e.m.h
 $(O)e.ru.o: e.cm.h
 $(O)e.ru.o: e.ru.h
+$(O)e.ru.o: $(STD)signal.h
 $(O)e.ru.o: $(STD)$(SIG_INCL)
 $(O)e.sb.o: e.h
 $(O)e.sb.o: e.fn.h
 $(O)e.sb.o: e.sg.h
 $(O)e.sb.o: $(STD)$(SIG_INCL)
 $(O)e.sb.o: $(STD)sys/stat.h
+$(O)e.sb.o: $(STD)utime.h
+$(O)e.sb.o: $(STD)fcntl.h
+$(O)e.sb.o: $(STD)sys/file.h
+$(O)e.sb.o: $(STD)unistd.h
+$(O)e.sb.o: $(STD)pwd.h
+$(O)e.showkeys.o: $(STD)stdio.h
+$(O)e.showkeys.o: $(STD)sys/types.h
+$(O)e.showkeys.o: $(STD)sys/stat.h
 $(O)e.se.o: $(STD)ctype.h
 $(O)e.se.o: e.h
 $(O)e.se.o: e.m.h
 $(O)e.se.o: e.cm.h
-$(O)e.profile.o: e.h
+$(O)e.se.o: e.se.h
 $(O)e.sv.o: e.h
 $(O)e.sv.o: e.m.h
 $(O)e.sv.o: e.cm.h
 $(O)e.sv.o: $(STD)sys/stat.h
+$(O)e.sv.o: $(STD)sys/types.h
+$(O)e.t.o: $(STD)errno.h
 $(O)e.t.o: e.h
 $(O)e.t.o: e.inf.h
 $(O)e.t.o: e.m.h
 $(O)e.t.o: e.tt.h
-$(O)e.t.o: e.keys.h
-$(O)e.t.o: $(STD)$(SIG_INCL)
+$(O)e.t.o: e.wi.h
+$(O)e.t.o: e.h.h
+$(O)e.t.o: $(STD)sys/time.h
+$(O)e.t.o: $(STD)fcntl.h
 $(O)e.tb.o: e.h
 $(O)e.tb.o: e.m.h
 $(O)e.tb.o: e.cm.h
 $(O)e.tt.o: e.h
 $(O)e.tt.o: e.tt.h
+$(O)e.tt.o: e.sg.h
+$(O)e.tt.o: term/eoldfix.h
 $(O)e.tt.o: term/standard.c
 $(O)e.tt.o: term/tcap.c
 $(O)e.tt.o: term/annarbor.c
-$(O)e.tt.o: term/ambas.c
+$(O)e.tt.o: term/xl.c
 $(O)e.tt.o: term/adm3a.c
 $(O)e.tt.o: term/adm31.c
 $(O)e.tt.o: term/dy.c
 $(O)e.tt.o: term/dm4000.c
+$(O)e.tt.o: term/free100.c
 $(O)e.tt.o: term/h19.c
 $(O)e.tt.o: term/intext.c
 $(O)e.tt.o: term/intext2.c
 $(O)e.tt.o: term/adm42.c
 $(O)e.tt.o: term/c100.c
+$(O)e.tt.o: term/mbee.c
 $(O)e.tt.o: term/po.c
+$(O)e.tt.o: term/vt52.c
+$(O)e.tt.o: term/tv910.c
 $(O)e.tt.o: term/vt100.c
+$(O)e.tt.o: term/sun.c
+$(O)e.tt.o: term/wy50.c
+$(O)e.tt.o: term/mac.c
+$(O)e.tt.o: term/xl.c
+$(O)e.tt.o: term/cue.c
 $(O)e.u.o: e.h
 $(O)e.u.o: e.m.h
 $(O)e.u.o: e.cm.h
 $(O)e.u.o: $(STD)sys/stat.h
+$(O)e.u.o: $(STD)pwd.h
 $(O)e.wi.o: e.h
 $(O)e.wi.o: e.cm.h
 $(O)e.wi.o: e.inf.h
