@@ -598,7 +598,7 @@ typedef struct savebuf {
 #define CCPLWIN        0244     /* +w (for button function) */
 #define CCMIWIN        0245     /* -w (for button function) */
 #define CCMICLOSE      0246     /* -close (for button function) */
-#define CCMIERASE      0247     /* -close (for button function) */
+#define CCMIERASE      0247     /* -er    (for button function) */
 #define CCMIRECORD     0250     /* -record (for button function) */
 
 #define CCHIGHEST      0250 /* nxt is 0251 */

@@ -267,6 +267,8 @@ void highlightarea(Flag setmode, Flag redrawflg);
 extern Flag initCursesDone;
 #endif
 
+void debugAllWindows(void);
+
 #ifdef  NOCMDCMD
 Flag optnocmd;          /* YES = -nocmdcmd; <cmd><cmd> functions disabled */
 #endif /* NOCMDCMD */
@@ -1955,7 +1957,7 @@ setitty ()
 #endif /* CBREAK */
 
     Block {
-	Reg1 short tmpflags;
+	Reg1 int tmpflags;
 	tmpflags = instty.sg_flags;
 #ifdef  CBREAK
 	if (cbreakflg)
@@ -1987,7 +1989,7 @@ setotty ()
 #endif /* SYSIII */
 	fast = YES;
     else Block {
-	Reg1 short i;
+	Reg1 int i;
 #ifdef MESG_NO
 	struct stat statbuf;
 #endif /* MESG_NO */
@@ -2001,7 +2003,7 @@ represent which is true but undocumented for System 3.
 In fact the system 3 Bs are identical to the version 7 Bs.
 #endif /* COMMENT */
 #define SPEED ((out_termio.c_cflag)&CBAUD)
-	i = (short) out_termio.c_oflag;
+	i = out_termio.c_oflag;
 	out_termio.c_oflag &= (unsigned short) ~(OLCUC|ONLCR|OCRNL|ONOCR|ONLRET);
 	if( (out_termio.c_oflag & TABDLY) == TAB3)
 	    out_termio.c_oflag &= (unsigned short) ~TABDLY;
@@ -2894,7 +2896,6 @@ initwindows (resizing)
 #ifdef MOUSE_BUTTONS
     if (optshowbuttons == YES) {
 
-
 	/* button window. */
 	setupwindow (&buttonwin, 0,
 		     term.tt_height - nButtonLines,
@@ -2905,10 +2906,17 @@ initwindows (resizing)
 #endif /* MOUSE_BUTTONS */
     curwin = &wholescreen;
 
-/** /
+/**/
+dbgpr("initwindows(), enterwin.(tmarg=%d, bmarg=%d,ttext=%d,btext=%d) term.tt_height=%d\n",
+enterwin.tmarg, enterwin.bmarg, enterwin.ttext, enterwin.btext, term.tt_height);
 dbgpr("initwindows(), buttonwin.(tmarg=%d, bmarg=%d,ttext=%d,btext=%d) term.tt_height=%d\n",
 buttonwin.tmarg, buttonwin.bmarg, buttonwin.ttext, buttonwin.btext, term.tt_height);
-/ **/
+/**/
+
+void debugAllWindows(void);
+debugAllWindows();
+
+
     return;
 }
 
@@ -2920,7 +2928,6 @@ buttonwin.tmarg, buttonwin.bmarg, buttonwin.ttext, buttonwin.btext, term.tt_heig
 void
 resize_handler (int sig)
 {
-
     if (sig != SIGWINCH)
 	return;
 
@@ -2931,11 +2938,12 @@ resize_handler (int sig)
     if (ioctl(0, TIOCGWINSZ, (char *) &winsize) == 0) {
 	h = winsize.ws_row;
 	w = winsize.ws_col;
-     /**/ dbgpr("got SIGWINCH sig=%d, h=%d w=%d LINES=%d, COLS=%d\n", sig, h, w, LINES, COLS); /**/
+   /**/ dbgpr("got SIGWINCH sig=%d, h=%d w=%d LINES=%d, COLS=%d\n", sig, h, w, LINES, COLS); /**/
     }
 
     /* if the window is smaller, advice how best to recover */
     char buf[128] = "";
+if(0){
     if (h < term.tt_height || w < term.tt_width) {
 	snprintf(buf, 80, "Enlarge to at least %d x %d, then <cmd>redraw to recover.",
 	   term.tt_height, term.tt_width);
@@ -2944,8 +2952,26 @@ resize_handler (int sig)
 	mesg(ERRALL + 2, "Window size changes are not supported. ",  buf);
 	fflush(stdout);
     }
+}
+    if (nwinlist > 1) {
+	mesg(ERRALL + 1, "Win size changes are not supported with multiple E windows.");
+	fflush(stdout);
+	return;
+    }
+
+    /* early testing, see e.resize.c  ... */
+    extern void ResizeWindows(int h, int w);
+    ResizeWindows(h, w);
 
     signal(SIGWINCH, resize_handler);
+
+    if (h == term.tt_height && w == term.tt_width)
+	return;
+
+    /* for E, on exit this ncurses func() leaves the cursor
+     * at the bottom of the new window size vs. original window size
+     */
+    resizeterm(h, w);
 }
 
 #ifdef SHOWKEYS_INPLACE

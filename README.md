@@ -10,11 +10,21 @@ The "main" branch has additional features, such as mouse support.
 
 The code in the
 repository can build binaries of the editor for both Linux and MacOS.
+
+Make sure to see the section labeled "IMPORTANT" in the "Makefiles"
+segment below before building the editor.
+
 Small tweaks to the Makefiles are necessary to compile the
 code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed in the
 Makefiles, particularly e20/Makefile.
+If Apple changes the architecture of `XCode` again this is likely to
+become an adventure.
+The main problem is not with the MacOS compilers finding the `#include`
+files.  The compilers are configured to find them wherever they live,
+as long as your MacOS developer environment is set up correctly.
+The problem is with the dependencies listed in the Makefiles.
 
 The code can also be compiled and run under Windows using WSL, the Windows
 Subsystem for Linux, in which case it builds and runs just as it would
@@ -32,6 +42,8 @@ do.
 
 N.b.: The editor does not support having its window resized. You must
 exit the editor, resize the window, and restart the editor.
+This feature is undergoing current development and will be supported
+in a future release.
 
 You can start the editor in two ways:
 
@@ -304,6 +316,12 @@ carefully and changed as necessary for the local environment.  "e" missed
 out on the whole `config` thing by quite a few decades.  (Personal note: 
 Frankly, I'm surprised it even uses `make`.  It didn't used to.  In the
 old days it was compiled by a shell script. --MOB)
+
+IMPORTANT: In building "e", the first thing you should do is change
+to the `e20` directory and run either `make sys5.depend` or `make bsd.depend`,
+depending on whether you're building the editor for Linux or MacOS.
+You only need to do this once, unless you change the code in such a
+way as to change which `#include` files are included via a `#define`.
 
 A note about man/Makefile: The "e" manpage uses nroff/troff diversions
 (the .di command).  However, the current "man" command, in a brilliant
