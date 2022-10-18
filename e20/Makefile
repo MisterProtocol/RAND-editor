@@ -54,7 +54,7 @@ ifdef MacOSX
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
-STD     = /Library/Developer/CommandLinetools/SDKs/MacOSX12.3.sdk/usr/include/
+STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX12.3.sdk/usr/include/
 endif
 
 # --begin 2/21/2020 comments, amended MOB 3/8/2021
@@ -91,7 +91,6 @@ OFILES  = \
 	$(O)e.se.o $(O)e.sv.o $(O)e.t.o $(O)e.tb.o $(O)e.tt.o \
 	$(O)e.u.o $(O)e.wi.o $(O)e.wk.o $(O)e.x.o \
 	$(O)e.mouse.o \
-	$(O)e.resize.o \
 	$(CHKMALLOC)
 
 CFILES  = \
@@ -121,7 +120,6 @@ CFILES  = \
 	e.ra.c \
 	e.re.c \
 	e.record.c \
-	e.resize.c \
 	e.ru.c \
 	e.sb.c \
 	e.showkeys.c \
@@ -157,7 +155,6 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 	   $(O)e.la.o $(O)e.m.o $(O)e.p.o $(O)e.r.o $(O)e.sb.o \
 	   $(O)e.tt.o $(O)e.x.o $(O)e.profile.o $(O)e.mouse.o \
 	   $(O)e.keys.o \
-	   $(O)e.resize.o \
 	$(LALIB) \
 	$(FFLIB) \
 	$(MISCLIB) \
@@ -184,16 +181,25 @@ $(FFLIB):
 $(MISCLIB):
 
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
-depend:
+depend.sys5:
+	-rm Ifdefs
+	-ln Ifdefs.sys5 Ifdefs
 	/bin/bash Makedep $(HFILES) $(CFILES)
 
-# Be sure the defs in "Ifdefs" agree with $(DEFS)
-Comments: $(CFILES)
-	Makedoc $(CFILES)
+depend.bsd:
+	-rm Ifdefs
+	-ln Ifdefs.bsd Ifdefs
+	/bin/bash Makedep $(HFILES) $(CFILES)
 
+### "Comments:" and "Calls:" depend on shell files that don't work any more and
+### hence are not included.  Better tools are available externally.
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
-Calls:  $(CFILES)
-	Makecalls $(CFILES)
+#Comments: $(CFILES)
+#	Makedoc $(CFILES)
+#
+# Be sure the defs in "Ifdefs" agree with $(DEFS)
+#Calls:  $(CFILES)
+#	Makecalls $(CFILES)
 
 lint:
 	lint $(DEFS) $(INCL) $(CFILES) \
@@ -316,9 +322,6 @@ $(O)e.record.o: e.record.c
 	$(CC) $(CFLAGS) $(INCL) -c e.record.c
 	mv e.record.o $(O)e.record.o
 
-$(O)e.resize.o: e.resize.c
-	$(CC) $(CFLAGS) $(INCL) -c e.resize.c
-	mv e.resize.o $(O)e.resize.o
 $(O)e.ru.o: e.ru.c
 	$(CC) $(CFLAGS) $(INCL) -c e.ru.c
 	mv e.ru.o $(O)e.ru.o
@@ -366,6 +369,9 @@ $(O)e.x.o: e.x.c
 $(O)pres.o: pres.c
 	$(CC) $(CFLAGS) $(INCL) -c pres.c
 	mv pres.o $(O)pres.o
+
+e.h: e.t.h
+	touch e.h
 
 #e.h:    $(LOCALINCL)/c_env.h $(.PRECIOUS)
 #        touch e.h
