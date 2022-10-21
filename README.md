@@ -181,6 +181,8 @@ carefully and changed as necessary for the local environment.  "e" missed
 out on the whole `config` thing by quite a few decades.  Frankly, I'm
 surprised it even uses `make`.  It didn't used to.  In the old days it was
 compiled by a shell script.
+In particular, `e19/Makefile` must be edited, as indicated therein,
+to build either a Linux or a MacOS version of `e`.
 
 ### What to Do First
 
