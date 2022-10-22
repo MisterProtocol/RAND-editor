@@ -247,6 +247,7 @@ extern void chk_profile();
 extern void initwindows();
 _Noreturn void getout (Flag, char *, ...);
 extern int fileno();
+void resize_handler (int sig);
 
 #ifdef COMMENT
 void
@@ -329,6 +330,14 @@ Reg2 char *argv[];
     if( !optnomacros )
 	ReadMacroFile();        /* TODO: add option to prevent this */
 #endif
+
+    /* 10/2022:  Define useful "internal" cmds.
+     * Eg, "<cmd>red<ret>" facilitates window
+     * resizing.  See e.resize.c
+     */
+    extern void AddDefaultMacros();
+    AddDefaultMacros();
+
 
 #ifdef NOPE
 /* #ifdef TERMCAP */
@@ -857,9 +866,6 @@ startup ()
 	    case SIGTSTP:
 	    case SIGCONT:
 #endif
-#ifdef SIGWINCH
-	    case SIGWINCH:
-#endif /* SIGWINCH */
 #define XWINDOWS    /*fornow*/
 #ifdef XWINDOWS
 #ifdef SIGIO
@@ -868,6 +874,11 @@ startup ()
 #endif /* XWINDOWS */
 		/* leave at SIG_DFL */
 		break;
+#ifdef SIGWINCH
+	    case SIGWINCH:
+		signal(i, resize_handler);
+		break;
+#endif /* SIGWINCH */
 
 	    default:
 		if (signal (i, SIG_DFL) != SIG_IGN)
@@ -2324,5 +2335,62 @@ initwindows (resizing)
 
     curwin = &wholescreen;
     return;
+}
+
+/*
+ * catch a resize window signal, and resize
+ * windows.
+ */
+
+
+void
+resize_handler (int sig)
+{
+    if (sig != SIGWINCH)
+	return;
+
+    signal(SIGWINCH, SIG_IGN);
+
+    struct winsize winsize;
+    int h=0, w=0;
+    if (ioctl(0, TIOCGWINSZ, (char *) &winsize) == 0) {
+	h = winsize.ws_row;
+	w = winsize.ws_col;
+    }
+
+#ifdef OUT
+    /* if the window is smaller, advice how best to recover */
+    char buf[128] = "";
+    if (h < term.tt_height || w < term.tt_width) {
+	snprintf(buf, 80, "Enlarge to at least %d x %d, then <cmd>redraw to recover.",
+	   term.tt_height, term.tt_width);
+    }
+    if (h != term.tt_height || w != term.tt_width) {
+	mesg(ERRALL + 2, "Window size changes are not supported. ",  buf);
+	fflush(stdout);
+    }
+#endif /* OUT */
+
+#ifdef OUT
+    if (nwinlist > 8) {
+	mesg(ERRALL + 1, "Win size changes are limited to 8 E windows.");
+	fflush(stdout);
+	signal(SIGWINCH, resize_handler);
+	return;
+    }
+#endif /* OUT */
+
+/*
+    if (h == term.tt_height && w == term.tt_width)
+	return;
+*/
+
+    /* early testing, see e.resize.c  ... */
+    extern void ResizeWindows(int h, int w);
+
+    ResizeWindows(h, w);
+
+    signal(SIGWINCH, resize_handler);
+
 }
 

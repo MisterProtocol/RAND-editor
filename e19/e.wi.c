@@ -225,6 +225,15 @@ Flag    editflg;
 	if ((win->altwksp = (S_wksp *) okalloc (sizeof (S_wksp)))) Block {
 	    Reg2 Slines size;
 	    size = term.tt_height - NINFOLINES - NENTERLINES - NHORIZBORDERS;
+
+	    /*  10/2022:  With the addition of window resizing, the window arrays
+	     *  arrays (lmchars, rmchars, firstcol, and lastcol) could be too small
+	     *  when a window is enlarged.  For now, just initialize the array
+	     *  sizes to accommmodate a large window height.  This only applies
+	     *  to edit windows.
+	     */
+	    size = max(MAXWINLINES, size); /* default 80 */
+
 	    if ((win->firstcol = (AScols *) okalloc (2 * size * (sizeof *win->firstcol)))) {
 		win->lastcol = &win->firstcol[size];
 		if ((win->lmchars

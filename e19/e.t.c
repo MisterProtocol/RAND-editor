@@ -2910,10 +2910,10 @@ Flag    cwkspflg;
     Reg6 Slines first;      /* first line of area in window to be changed */
     Reg2 Slines endwin;     /* height of window -1 */
 
-/**/
+/** /
 dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
   fn,from,num,delta,cwkspflg);
-/**/
+/ **/
     for (win = Z; win < nwinlist; win++) {
 	if ((tw = winlist[win]->altwksp)->wfile == fn)
 	    /*tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1);*/

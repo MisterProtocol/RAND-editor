@@ -76,7 +76,7 @@ OFILES  = \
 	$(O)e.it.o $(O)e.la.o $(O)e.m.o $(O)e.main.o \
 	$(O)e.mk.o $(O)e.nm.o $(O)e.p.o $(O)e.pa.o \
 	$(O)e.profile.o $(O)e.put.o $(O)e.q.o $(O)e.r.o \
-	$(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.ru.o $(O)e.sb.o \
+	$(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.resize.o $(O)e.ru.o $(O)e.sb.o \
 	$(O)e.se.o $(O)e.sv.o $(O)e.t.o $(O)e.tb.o $(O)e.tt.o \
 	$(O)e.u.o $(O)e.wi.o $(O)e.wk.o $(O)e.x.o \
 	$(CHKMALLOC)
@@ -106,6 +106,7 @@ CFILES  = \
 	e.ra.c \
 	e.re.c \
 	e.record.c \
+	e.resize.c \
 	e.ru.c \
 	e.sb.c \
 	e.se.c \
@@ -136,7 +137,7 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB) newrev
 	   $(O)e.wi.o $(O)e.wk.o $(OLA)lalflush.o $(O)e.u.o \
 	   $(O)e.f.o $(O)e.fi.o $(OLA)laopen.o $(O)e.dif.o \
 	   $(O)e.h.o $(O)e.se.o $(O)e.e.o $(O)e.mk.o \
-	   $(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.t.o \
+	   $(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.resize.o $(O)e.t.o \
 	   $(O)e.ru.o $(O)e.cm.o $(O)e.d.o $(O)e.it.o \
 	   $(O)e.la.o $(O)e.m.o $(O)e.p.o $(O)e.r.o $(O)e.sb.o \
 	   $(O)e.tt.o $(O)e.x.o $(O)e.profile.o \
@@ -290,6 +291,10 @@ $(O)e.record.o: e.record.c
 	$(CC) $(CFLAGS) $(INCL) -c e.record.c
 	mv e.record.o $(O)e.record.o
 
+$(O)e.resize.o: e.resize.c
+	$(CC) $(CFLAGS) $(INCL) -c e.resize.c
+	mv e.resize.o $(O)e.resize.o
+
 $(O)e.ru.o: e.ru.c
 	$(CC) $(CFLAGS) $(INCL) -c e.ru.c
 	mv e.ru.o $(O)e.ru.o
@@ -434,6 +439,10 @@ $(O)e.record.o: e.h
 $(O)e.record.o: e.cm.h
 $(O)e.record.o: e.m.h
 $(O)e.record.o: e.inf.h
+$(O)e.resize.o: e.h
+$(O)e.resize.o: e.tt.h
+$(O)e.resize.o: e.wi.h
+$(O)e.resize.o: e.m.h
 $(O)e.ru.o: e.h
 $(O)e.ru.o: e.e.h
 $(O)e.ru.o: e.m.h

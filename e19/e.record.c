@@ -50,6 +50,7 @@ SetRecording(cmd)
 Short cmd;
 {
     if (recording) {        /* a toggle */
+dbgpr("SetRecording, cancelling a recording\n");
 	recording = NO;
 	info (inf_record, 3, "");
 	/*
@@ -82,6 +83,9 @@ void
 RecordChar(c)
 unsigned Short c;
 {
+
+dbgpr("RecordChar:  (%o)(%c) len now=%d\n", c, c, rec_len);
+
     if (c == CCRECORD)  /* silently, we're about to cancel a recording */
 	return;
 
@@ -95,6 +99,7 @@ unsigned Short c;
 
     *rec_p++ = c;
     rec_len++;
+
 
     if (rec_len >= rec_size) {  /* full, assume more to come */
 	  Uchar *cp;
@@ -296,6 +301,7 @@ char *mname;
     for (mp = &macros[0]; mp != &macros[NMACROS]; mp++) {
 	if (!mp->name)
 	    break;
+    //  dbgpr("FindMacro: cmp(%s) to (%s)\n", mname, mp->name);
 	if (!strncmp(mname, mp->name, len))
 	    return (mp);
     }
@@ -446,6 +452,29 @@ ReadMacroFile()
     return;
 }
 
+/* create internal macros */
+void
+AddDefaultMacros()
+{
+    struct macros *mp;
+
+    /* 1.  Add  name=REDRAW  text="\0red\015"
+     *
+     */
+    mp = &macros[n_macrosdefined++];
+    mp->name = salloc(7, NO);
+    strcpy(mp->name, "REDRAW");
+    mp->text = (unsigned char *)salloc(6, NO);
+    mp->text[0] = CCCMD;
+    strncpy((char *)mp->text+1, "red\015", 5);
+    mp->len = 5;
+    mp->text[mp->len+1] = '\0';
+
+    return;
+}
+
+
+
 /*
  * Save defined macros in ~/.e_macros.
  *
@@ -547,6 +576,10 @@ char *opt;
     unsigned Short rc;
     struct macros *mp;
     register int i, c;
+    int haveName = 0;
+
+    if (opt && *opt)
+	haveName++;
 
     savecurs();
     while (1) {
@@ -558,6 +591,28 @@ char *opt;
 	if (opt && *opt)
 	    printf ("\tKEYSTROKES");
 
+/** /
+for(i=0; i<10; i++) {
+  printf ("\n\rdbug:  i=%d, name=(%s) len=%d text=",
+    i,  macros[i].name, macros[i].len);
+  int j;
+  for(j=0; j<macros[i].len; j++)
+    printf ("(%o)", macros[i].text[j] );
+}
+/ **/
+
+	/* 1st show 'current' unmamed macro */
+	if (!haveName && rec_p && rec_len > 0) {
+	    printf("\r\n*\t");
+	    for (i = 0; i < rec_len; i++) {
+		c = rec_p[i];
+		if (c >= 040 && c < 0177)
+		    putchar (c);
+		else
+		    printf ("<%s>", keycaps[c < 040 ? c : c - 0177 + 040]);
+	    }
+	}
+
 	for (mp = &macros[0]; mp != &macros[NMACROS]; mp++) {
 	    if (!mp->name || !mp->len)
 		break;
@@ -565,7 +620,7 @@ char *opt;
 		continue;
 	    printf ("\n\r%s\t", mp->name);
 #ifdef OUT
-/* better to show values */
+/* better to show the values */
 	    if (!opt || !*opt)  /* just print names */
 		continue;
 #endif
@@ -579,8 +634,13 @@ char *opt;
 	    }
 	    /*printf ("\n\r");*/
 	}
-	if (!seenany && opt && *opt)
+
+	if (!seenany && haveName)
 	    printf ("\n\r\n\rMacro \"%s\" is not defined.\r\n", opt);
+
+	if (!haveName && rec_p && rec_len > 0) {
+	    printf ("\n\r\n\r* Current unnamed macro");
+	}
 
 	keyused = YES;
 	rc = getkey (WAIT_KEY);
