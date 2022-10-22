@@ -14,6 +14,12 @@ code on MacOS Catalina
 or subsequent versions of MacOS, because of changes in the location
 of the `#include` files.  These changes are discussed below.
 
+One feature has been added, out of practical necessity: Since in modern
+times "e" is run exclusively in terminal windows under window systems on
+Linux and MacOS, and since these terminal windows can be resized, "e" now
+responds to the containing terminal window being resized by suitably
+changing the geometry of its own windows.
+
 ### Branches
 
 It is intended that there be two branches in this repository, which will
