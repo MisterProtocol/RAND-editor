@@ -147,6 +147,20 @@ char *optmouse_stop;
 #endif /* NCURSES_MOUSE */
 #endif /* NCURSES */
 
+/* 10/2022:
+ * When startup occurs via "e<CR>", by default we now override
+ * the window size values (if they differ from those) in the ".esXXX"
+ * state file, and resize the windows to match the current screen size.
+ *
+ * TODO:  add an option -noresize to override the auto-resize.
+ */
+Flag needResize = NO;
+/* Flag optnoresize = NO; */
+int resize_h, resize_w; /* save new term w/h values */
+
+extern void ResizeWindows(int h, int w);
+
+
 /*************************/
 /* next OPT number is 47 */
 
@@ -266,6 +280,9 @@ extern int resetty();
 void highlightarea(Flag setmode, Flag redrawflg);
 extern Flag initCursesDone;
 #endif
+
+void debugAllWindows(void);
+int h_orig; /* starting term.tt_height value */
 
 #ifdef  NOCMDCMD
 Flag optnocmd;          /* YES = -nocmdcmd; <cmd><cmd> functions disabled */
@@ -682,6 +699,12 @@ dbgpr("main1, after infoinit, replaying=%d, recovering=%d\n",
     }
 
 #endif /* MOUSE_BUTTONS */
+
+    /* auto resize windows? */
+    if(needResize) {
+	needResize = NO;
+	ResizeWindows(resize_h, resize_w);
+    }
 
     return;
 }
@@ -1864,6 +1887,9 @@ gettermtype ()
 	borderbullets = optbullets;
     else if (borderbullets)
 	borderbullets = term.tt_bullets;
+
+    h_orig = term.tt_height;
+
     return;
 }
 
@@ -2147,6 +2173,7 @@ Delete it or give a filename after the %s command.",
 	nlin = getc (gbuf) & 0377;
 	ncol = getc (gbuf) & 0377;
 	if (nlin != term.tt_height || ncol != term.tt_width) {
+	  if(0) /* TODO: change to a new -noresize option */
 	    if (nlin > term.tt_height || ncol > term.tt_width) {
 		/*
 		 *  If not 'recovering' and not 'replaying', get rid of
@@ -2165,6 +2192,10 @@ Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 	    /*
 	     *  Can readjust screensize to statefile parameters.
 	     */
+	    needResize = YES;
+	    resize_w = term.tt_width;
+	    resize_h = term.tt_height;
+
 	    term.tt_width = (short)ncol;
 	    term.tt_height = (char)nlin;
 	    initwindows (YES);
@@ -2894,7 +2925,6 @@ initwindows (resizing)
 #ifdef MOUSE_BUTTONS
     if (optshowbuttons == YES) {
 
-
 	/* button window. */
 	setupwindow (&buttonwin, 0,
 		     term.tt_height - nButtonLines,
@@ -2906,21 +2936,29 @@ initwindows (resizing)
     curwin = &wholescreen;
 
 /** /
+dbgpr("initwindows(), enterwin.(tmarg=%d, bmarg=%d,ttext=%d,btext=%d) term.tt_height=%d\n",
+enterwin.tmarg, enterwin.bmarg, enterwin.ttext, enterwin.btext, term.tt_height);
 dbgpr("initwindows(), buttonwin.(tmarg=%d, bmarg=%d,ttext=%d,btext=%d) term.tt_height=%d\n",
 buttonwin.tmarg, buttonwin.bmarg, buttonwin.ttext, buttonwin.btext, term.tt_height);
+
+void debugAllWindows(void);
+
+debugAllWindows();
 / **/
+
     return;
 }
 
 
 /*
- * catch a resize window signal, let user
- * know resizing is not supported (yet)
+ * catch a resize window signal, and resize
+ * windows.
  */
+
+
 void
 resize_handler (int sig)
 {
-
     if (sig != SIGWINCH)
 	return;
 
@@ -2931,9 +2969,11 @@ resize_handler (int sig)
     if (ioctl(0, TIOCGWINSZ, (char *) &winsize) == 0) {
 	h = winsize.ws_row;
 	w = winsize.ws_col;
-     /**/ dbgpr("got SIGWINCH sig=%d, h=%d w=%d LINES=%d, COLS=%d\n", sig, h, w, LINES, COLS); /**/
+  /** / dbgpr("got SIGWINCH sig=%d, h=%d w=%d LINES=%d, COLS=%d\n",
+	   sig, h, w, LINES, COLS); / **/
     }
 
+#ifdef OUT
     /* if the window is smaller, advice how best to recover */
     char buf[128] = "";
     if (h < term.tt_height || w < term.tt_width) {
@@ -2944,8 +2984,30 @@ resize_handler (int sig)
 	mesg(ERRALL + 2, "Window size changes are not supported. ",  buf);
 	fflush(stdout);
     }
+#endif /* OUT */
+
+#ifdef OUT
+    if (nwinlist > 8) {
+	mesg(ERRALL + 1, "Win size changes are limited to 8 E windows.");
+	fflush(stdout);
+	signal(SIGWINCH, resize_handler);
+	return;
+    }
+#endif /* OUT */
+
+    if (nButtonLines) {
+	mesg(ERRALL + 1, "Win size changes are not allowed with -showbuttons.");
+	fflush(stdout);
+	signal(SIGWINCH, resize_handler);  /* is this ok here?? */
+	return;
+    }
+
+
+    /* see e.resize.c  */
+    ResizeWindows(h, w);
 
     signal(SIGWINCH, resize_handler);
+
 }
 
 #ifdef SHOWKEYS_INPLACE

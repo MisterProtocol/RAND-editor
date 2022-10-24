@@ -41,6 +41,8 @@ void testMouse(void);
 int toggle_mouse(char *);
 void doMouseEvent(void);
 
+extern void debugAllWindows (void);
+
 static const char *mouse_decode(MEVENT const *);
 Flag initMouseDone = NO;
 Flag initCursesDone = NO;
@@ -529,6 +531,17 @@ exitCurses()
 /** / dbgpr("exitCurses\n"); / **/
 
     endwin_done = 1;
+
+
+    /*  If the case of a resize, leave the cursor
+     *  at the bottom of the window.
+     */
+    extern int h_orig;
+    if (term.tt_height > h_orig) {
+	int n = term.tt_height - h_orig;
+	while (n--)
+	    printf("\r\n");
+    }
 
     return;
 }
@@ -1211,6 +1224,8 @@ dbgpr("doMouseReplay calling poscursor(%d,%d)\n",
 int
 toggle_mouse(char *opstr) {
 
+debugAllWindows ();
+
 #ifdef USE_MOUSE_POSITION
     mmask_t newmask = ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION;
 #else
@@ -1521,7 +1536,7 @@ dbgpr("row %d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
 
     tp->begx = (short)indent;
 
-    switchwindow (&buttonwin);
+    switchwindow(&buttonwin);
     for (i=0; i < tablesize; i++) {
 
 	w = (int)strlen((tp+i)->label);
@@ -2084,7 +2099,7 @@ beg_mark, mark_len, cursorcol, cursorline, from, to, miny, maxy);
 void
 doChgWin(int wn, int y, int x)
 {
-    poscursor(x - winlist[wn]->ltext, y - winlist[wn]->ltext);
+    poscursor(x - winlist[wn]->ltext, y - winlist[wn]->ttext);
     d_put(0);
     chgwindow(wn);
 

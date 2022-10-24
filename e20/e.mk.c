@@ -12,6 +12,7 @@ file e.mk.c
 #include "e.tt.h"
 #include "e.inf.h"
 #include "e.m.h"
+/* #include <stddef.h> */
 
 extern Uchar *image;
 
@@ -239,6 +240,10 @@ highlightarea(Flag setmode, Flag redrawflg)
     static int last_cursorline = -1;
 
     if (setmode == NO) {
+/** /
+dbgpr("clearing mark from last_top=%d to last_bot=%d\n",
+ last_top, last_bot);
+/ **/
 	for (i = last_top; i <= last_bot && i > 0; i++) {
 	    HiLightLine(i, NO);
 	}
@@ -265,7 +270,7 @@ if (prevmark) {
 / **/
 
 /** /
-dbgpr("topmark=%d marklines=%d markcols=%d cursorline=%d cursorcol=%d curwin->btext=%d\n",
+dbgpr("topmark()=%d marklines=%d markcols=%d cursorline=%d cursorcol=%d curwin->btext=%d\n",
 topmark(), marklines, markcols, cursorline, cursorcol, curwin->btext);
 dbgpr(" curwksp->wlin=(%d), curmark->mrkwinlin=(%d), mrklin=(%d)\n",
     curwksp->wlin, curmark->mrkwinlin, curmark->mrklin);
@@ -324,77 +329,50 @@ dbgpr("--before redraw=%d last_top=%d, last_bot=%d, last_col=%d, last_marklines=
 
     /*  clear previous mark, no need to clear entire window */
 /*  for (i = curwin->ttext; i < curwin->bmarg; i++) */
-/*dbgpr("--last_top=%d last_bot=%d\n", last_top, last_bot); */
-    for (i = last_top; i <= last_bot; i++)
+/** /
+dbgpr("-- clear last mark:  last_top=%d last_bot=%d ttext=%d bmarg-1=%d\n",
+last_top, last_bot, curwin->ttext, curwin->bmarg-1);
+/ **/
+    for (i = last_top; i <= last_bot; i++) {
        HiLightLine(i, NO);
+    }
 
-    /*   The cursor line is always either at the top or bottom
-     *   of a marked area
+    /*  If scrolling up from the top line in a window when the
+     *  mark began before the top line, set a flag to clear the
+     *  extra line.
+     */
+    int topmark_on_previous = 0;
+
+    /*  Determine the range to highlight, top_line -> bot_line.
+     *  There are 3 cases:
+     *    1.  marklines == 1, => current cursor line
+     *    2.  mark started on a screen before current screen
+     *    3.  mark started on the current screen
      */
 
     if (marklines == 1) {
 	top_line = bot_line = cursorline + curwin->ttext;
+    //  dbgpr("case 1:  marklines == 1, top_line=%d, bot_line=%d\n", top_line, bot_line);
     }
-	/* if cursor is at the bottom of a window */
-    else if (cursorline == curwin->btext) {
-	if (topmark() < curwksp->wlin) {
-	    top_line = curwin->ttext;
-	    /*bot_line = curwin->btext + 1;*/
-	    bot_line = curwin->ttext + curwin->btext;
-/** / dbgpr("1a: cursor=bottom, topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
-	}
-	else {
-	    top_line = (int)(curwin->ttext + topmark() - curwksp->wlin);
-	    /*bot_line = top_line + marklines - 1;*/
-	    /*bot_line = curwin->btext + 1; */
-	    bot_line = curwin->ttext + curwin->btext;
-	}
-/** /  dbgpr("1: cursorline == btext, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
-    }
-    else if (cursorline == 0) {    /* cursor at top of window */
+    else if (topmark() < curwksp->wlin) { /* mark started on a prev screen */
 	top_line = curwin->ttext;
-	/* if cursor at the bottom of a marked area, hilight 1 line */
-	if (topmark() + marklines == curwksp->wlin + 1 ) {
-	    bot_line = top_line;
-	}
-	else {
-	    bot_line = (int)(top_line + marklines - 1);
-	}
-	if (bot_line > curwin->ttext + curwin->btext) {
-	    bot_line = curwin->ttext + curwin->btext;
-	}
-/** / dbgpr("2:  cursorline == 0, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+	bot_line = top_line + cursorline; /* cursor is at bottom of the mark */
+    //  dbgpr("case 2, previous: topmark()=%d < curwksp->wlin=%d cursorline=%d ttext=%d\n",
+    //      topmark(), curwksp->wlin, cursorline, curwin->ttext);
+	topmark_on_previous++;
     }
-    else {  /* not top or bottom, and marklines > 1 */
-	/* if topmark() is on previous page... */
-	if (topmark() < curwksp->wlin) {
-	    top_line = curwin->ttext;
-	    bot_line = top_line + cursorline;
-/** / dbgpr("3: topmark() on prev page, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
+    else {  /* topmark() started on current screen */
+	top_line = (int) (topmark() - curwksp->wlin);
+	top_line += curwin->ttext;
+	bot_line = (int) (top_line + marklines - 1);
+	if (bot_line >= curwin->bmarg) {
+	    dbgpr("bot_line(%d) >= bmarg(%d)\n", bot_line, curwin->bmarg);
+	    bot_line = curwin->bmarg - 1;
 	}
-	else if (curmark->mrkwinlin == curwksp->wlin) {
-	    if (cursorline > curmark->mrklin) {
-		top_line = curwin->ttext + curmark->mrklin;
-		bot_line = (int)(top_line + marklines - 1);
-	    }
-	    else {
-		top_line = curwin->ttext + cursorline;
-		bot_line = (int)(top_line + marklines - 1);
-	    }
-/** / dbgpr("4: mrkwinlin = wlin, top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
-	}
-	/* topmark() on current screen */
-	else if (curwksp->wlin < topmark()) {
-	    top_line = (int)(curwin->ttext + topmark() - curwksp->wlin);
-	    bot_line = (int)(top_line + marklines - 1);
-	    if (bot_line > curwin->ttext + curwin->btext)
-		bot_line = curwin->ttext + curwin->btext;
-/** / dbgpr("5: wlin < topmark(), top_line=%d, bot_line=%d\n", top_line, bot_line); / **/
-	}
-	else {
-/** / dbgpr("6: XXXXX shouldn't see this\n"); / **/
-	}
+	//dbgpr("case 3, curwin:  topmark()=%d >= curwksp->wlin=%d\n", topmark(), curwksp->wlin);
     }
+//  dbgpr("top_line=%d bot_line=%d cursorline=%d marklines=%d ttext=%d bmarg=%d\n",
+//      top_line, bot_line, cursorline, marklines, curwin->ttext, curwin->bmarg);
 
 /** /
 dbgpr("top_line=%d last_top=%d, bot_line=%d, last_bot=%d, last_col=%d, firsttime=%d infoline=%d\n",
@@ -403,7 +381,7 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n\n",
     marklines, last_marklines, cursorline, last_cursorline);
 / **/
 
-    /*
+    /*  10/2022:  Old Message:
      *  The above code sometimes generates values for top_line and bot_line
      *  that are outside the page boundaries (seen after many +pages,
      *  jumps to EOF and paging back).  The variables curwksp->wlin and
@@ -412,15 +390,15 @@ dbgpr("marklines=%d last_marklines=%d cursorline=%d, last_cursorline=%d\n\n",
      *  size when moving several pages.  Todo, rethink this...
      */
 
-    if (bot_line > curwin->ttext + curwin->btext) {
-/** / dbgpr("***bot_line out of range (%d), btext=%d ttext=%d\n",
-	bot_line, curwin->btext, curwin->btext);
-/ **/
-	bot_line = curwin->ttext + curwin->btext + 1;
+    if (bot_line >= curwin->bmarg) {
+/**/ dbgpr("***bot_line out of range (%d), bmarg=%d\n",
+	bot_line, curwin->bmarg);
+/**/
+	bot_line = curwin->bmarg - 1;
     }
 
     if (top_line <= 0) {
-/** /dbgpr("*** top_line out of range (%d)\n", top_line); / **/
+/**/dbgpr("*** top_line out of range (%d)\n", top_line); /**/
 	top_line = curwin->ttext;
     }
 
@@ -444,12 +422,14 @@ top_line, bot_line, last_top, last_bot);
 
     last_top = top_line;
     last_bot = bot_line;;
+    if (cursorline == 0 && topmark_on_previous)
+	last_bot++; /* need to clear one more line if user scrolls up */
     last_marklines = (int)marklines;
     last_cursorline = cursorline;
     last_col = cursorcol;
 
 /** /
-dbgpr("setting last_top=top_line = %d, last_bot=bot_line = %d\n",
+dbgpr("setting last_top=top_line = %d, last_bot=bot_line = %d\n----\n",
 top_line, bot_line );
 / **/
 
@@ -477,6 +457,7 @@ HiLightLine(int line, Flag setmode)
     if (line < 0)
 	return;
 
+
     char *cp = (char *)image + w*line;
 
     /*  use curwin->lmarg and curwin->rtext to account for any windows,
@@ -485,7 +466,7 @@ HiLightLine(int line, Flag setmode)
     int wid = curwin->rmarg - curwin->lmarg;
 
 /** /
-if (1 || setmode == YES)
+if (setmode == YES)
 dbgpr("HiLightLine: setmode=%d line=%d wid=%d lmarg=%d ltext=%d, rmarg=%d, rtext=%d mrkwincol=%d mrkcol=%d wksp->wcol=%d wksp->wlin=%d\n",
 setmode, line, wid, curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext,
 curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
@@ -493,6 +474,7 @@ curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
 
     snprintf(buf, (size_t)wid, "%s", cp+curwin->ltext);
     mvcur(-1,-1, line, curwin->ltext);
+
 
 #ifdef OLD
     snprintf(buf, w-1, "%s", cp+1); /* omit left/rt border chars */
@@ -509,6 +491,9 @@ curmark->mrkwincol, curmark->mrkcol, curwksp->wcol, curwksp->wlin);
 	puts(buf);
     }
     fflush(stdout);
+
+/** / dbgpr("buf=(%s)\n", buf);  / **/
+
 
 /** /
 if (setmode == YES)

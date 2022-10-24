@@ -150,29 +150,6 @@ extern char *sprintf ();
 
 #define Z 0  /* define to "zero" for the VAX compiler bug if Char and Short */
 	     /* above aren't both defined to int */
-
-/* begin section moved from e.t.h */
-
-/* MAXWIDTH is the maximum of all defined widths in e.tt.h */
-/*#define MAXWIDTH 260            / * length of longest possible screen line */
-#define MAXWIDTH 223            /* length of longest possible screen line */
-/* if (MAXWIDTH > 127)  then you must define WIDE
- **/
-/* #undef  WIDE   */
-#define WIDE
-#ifdef WIDE
-typedef Short Scols;            /* number of columns on the screen */
-typedef short AScols;           /* number of columns on the screen */
-#else
-/* unfortunately, these cannot be unsigned chars */
-typedef Char Scols;
-typedef char AScols;
-#endif
-typedef Char Slines;            /* number of lines on the screen */
-typedef short ASlines;          /* number of lines on the screen */
-
-/* end section moved from e.t.h */
-
 #include "e.t.h"
 
 /* For each type there is Type and Atype.

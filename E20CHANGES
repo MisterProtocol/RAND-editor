@@ -1,5 +1,6 @@
 
 Sep. 17, 2021
+Pandemic Edition
 E20 Changes:
 
 -   Major code cleanup eliminating compiler warnings; bug fixes.
@@ -164,3 +165,83 @@ E20 Changes:
 -   See the examples/ directory for samples of keyboard files and
     .e_profile files.  E20 is compatable with E19 startup and
     keyboard files, but not vice versa.
+
+
+Oct 21, 2022
+E20 Changes:
+
+-   Many, many bugs fixed.  Some were present all along but only caused
+    problems when running on Apple silicon (M1).
+
+-   Buttons, if used, may be customized in a button file.  You can
+    pick which buttons you wish to use.  There are example button
+    files in the distribution.
+
+-   When running "e" in a terminal window on Linux or MacOS, the
+    terminal window may now be resized.  "e" will adjust its own
+    open windows to fit, unless the containing window is shrunk
+    to a size too small to fit the "e" windows.  If "e" is started
+    with no arguments, it will recreate the previous edit session,
+    as it usually does, and if the new session is in a terminal
+    terminal window is of a different size than that in which
+    the previous session ended, the "e" windows will be appropriately
+    resized.
+
+-   Maximum line length and maximum file size greatly increased.  This took
+    a very long time, due to the complexity of the original code in the
+    la1/ directory.  WARNING:  Do not attempt to read this code if you
+    value your sanity.  It was originally written under a regime that
+    conserved every last byte of in-memory storage.  The code maintains
+    its old structure but uses larger variables to hold the length of a
+    line and the number of lines in a file.
+
+-   Compilation now uses much more strict compiler warning detection.
+    This resulted in many, many type casts being introduced, and some
+    types being changed, to be more consistent.
+
+-   Changes to how the manual page is built in its various formats.
+    There are still problems with the on-screen "man" command because
+    the modern "man" command typically uses the new program "mandoc"
+    which implements much, but not all, of the nroff/troff command set.
+    In particular it does not support diversions, which the "e" man
+    page is full of.  In fact the Apple MacOS "man" command is hard-coded
+    to use "mandoc" for on-screen display no matter what.  The only
+    solutions are to either ignore the errors, which do not appear to
+    affect the formatting, or install and use the "gman" command, which
+    uses groff for its output, supporting all diversions, as God intended.
+
+-   Macro recording has been cleaned up.  These cleanups have been applied
+    to both the "original" and "main" (i.e. non-mouse and mouse-supported)
+    versions of the editor.
+
+-   Very nasty bug fixed having to do with reading input characters.  The
+    "main" branch of the editor has been changed not to use "select()".
+    It now uses facilities present in the "ncurses" library.
+    The original editor code didn't have third-party libraries to rely on.
+    Hence it used low-level system calls for everything, relying only on
+    home-brewed (not Homebrew!) libraries, lib/, ff3/, and la1/.  The
+    low-level use of "select()" apparently collided with the way "ncurses"
+    does business in a fairly nasty way.
+
+-   Early "e20" versions used the ncurses standard input routines for all
+    input except keyboard mapping.  This resulted in some F(n) keys
+    sending a single code to E, while others would send a byte stream
+    (example: <esc>"O1;2P":<+page>).  Keyboard mapping was changed to use
+    the ncurses define_key() routine, so that "e" now receives a single
+    code for all keys.  This fixed a bug in catching the interrupt key,
+    which is used to abort a "<cmd>run program" command. This is important
+    information if you are editing "e" keyboard description files to
+    customize the keyboard.
+
+-   The "-bullets" option has been broken since 2006.  We were thinking of
+    just taking it out but wound up fixing it instead.  The test against
+    line speed is still in there, though it's doubtful that code will ever
+    be executed again.  Using highlight colors in the "main" branch,
+    border bullets might actually be moderately useful again.  (N.B.: this
+    does not refer to the border characters around windows in "e".  It refers
+    to a single character in the top, bottom, and side borders of the current
+    "e" window, indicating like a crosshairs the current location of the cursor.
+
+-   The "make depend" option in the e20/Makefile has been broken for some time.
+    This has now been fixed.  There are options for both platforms: "make depend.sys5"
+    for Linux and "make depend.bsd" for MacOS.

@@ -14,7 +14,6 @@ file e.wi.c
 #include "e.tt.h"
 #include "e.wi.h"
 
-
 /* defined in e.t.c, set outside putup (), looked at by putup () */
 extern Flag entfstline;     /* says write out entire first line */
 
@@ -239,6 +238,16 @@ Flag    editflg;
 	if ((win->altwksp = (S_wksp *) okalloc (sizeof (S_wksp)))) Block {
 	    Reg2 Slines size;
 	    size = term.tt_height - NINFOLINES - NENTERLINES - NHORIZBORDERS;
+
+	    /*  10/2022:  With the addition of window resizing, the window arrays
+	     *  arrays (lmchars, rmchars, firstcol, and lastcol) could be too small
+	     *  when a window is enlarged.  For now, just initialize the array
+	     *  sizes to accommmodate a large window height.  This only applies
+	     *  to edit windows.
+	     */
+	    size = max(MAXWINLINES, size); /* default 80 */
+    /** /   dbgpr("setupwindow: size=%d, tt_height=%d\n", size, term.tt_height); / **/
+
 	    if ((win->firstcol = (AScols *) okalloc (2 * size * ((int)sizeof *win->firstcol)))) {
 		win->lastcol = &win->firstcol[size];
 		if ((win->lmchars
@@ -394,7 +403,11 @@ Small how;
     switchwindow (&wholescreen);
 
     j = window->rmarg;
+
     poscursor (i = window->lmarg, window->tmarg);
+
+/** /dbgpr("drawborders:  lm=%d, rm=%d\n", i, j);  / **/
+
 #ifdef LMCMARG
     for (k=Z; k < ntabs && tabs[k] < window->wksp->wcol; k++)
 	{}

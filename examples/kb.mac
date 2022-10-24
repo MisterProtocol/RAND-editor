@@ -137,8 +137,8 @@
 # del
 <esc>"[249z":<dchar>
 # ins
-<esc>"[247z":<insm>
-<esc>"[2z":<insm>
+<esc>"[247z":<insmd>
+<esc>"[2z":<insmd>
 # ----------------
 # X11-Windows
 <esc>"[11~":<wleft>
