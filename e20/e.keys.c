@@ -142,6 +142,8 @@ dbgpr("MapCursesKey: c=%04o, idx=%d, .keycode=%04o\n",
 	    return CCMIPAGE;
 	case KEY_IC:                /* insert key */
 	    return CCINSMODE;
+	case KEY_RESIZE:            /* ncurses SIGWINCH event */
+	    return CCNULL;          /* sent by older versions */
 
 #ifdef OUT
 	/*  We could provide defaults for various
@@ -342,7 +344,7 @@ getFkeychar() {
 	    FKey_p = FKey_end = NULL;
 	    pendFKeys = 0;
 	}
-    /*  dbgpr("FKey_p, c=(%03o)\n", c); */
+    /** /dbgpr("FKey_p, c=(%03o)\n", c); / **/
 	return c;
     }
     return NOCHAR;

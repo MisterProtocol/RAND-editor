@@ -289,6 +289,15 @@ The current version of the editor shifts the new window down by one line,
 to allow all of the text in the file to be visible in one window or the
 other.
 Option \-nowinshift causes the editor to revert to the old behavior.
+.TP
+.B \-noresize
+The editor now supports resizing of the terminal window in which it's
+running.
+It will resize its own windows to match.
+There are a few situations in which this adaptive behavior is
+undesirable.
+This option prevents the editor from resizing its own windows
+when the terminal window in which it's running is resized.
 .PP
 These next four options control the foreground and background colors
 used to highlight the areas selected by the

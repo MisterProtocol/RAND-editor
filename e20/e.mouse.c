@@ -430,6 +430,14 @@ if (n_colors) {
   dbgpr("hilite_str=%s brace_p=%s\n", hilite_str+1, brace_p+1);
 }
 / **/
+
+    /* 10/2022:  the resizeterm() call, added
+     * for window resizing, seems to switch to
+     * white on a black background mode.
+     * This avoids the switch.
+     */
+    use_default_colors();
+
     return;
 }
 
@@ -680,10 +688,10 @@ doMouseEvent()
     /* ignore motion w/o a prior press event */
 
     if (ev->bstate & REPORT_MOUSE_POSITION) {
-/** /
+/**/
 dbgpr("doMouseEvent: ignore initial mouse moves (%d,%d) bstate=0x%08lx\n",
     ev->y, ev->x, (long)ev->bstate);
-/ **/
+/**/
 	return;
     }
 
@@ -1481,12 +1489,14 @@ initButtonRow (int row, int tablesize, mouse_button_table *tp)
     if (row == 1) {
 //      tablesize = sizeof(button_table_row1) / sizeof(button_table_row1[0]);
 //      tp = &button_table_row1[0];
-	row_y = buttonwin.btext - 2;
+//      row_y = buttonwin.btext - 2;
+	row_y = buttonwin.bmarg - 2;
     }
     else {
 //      tablesize = sizeof(button_table_row2) / sizeof(button_table_row2[0]);
 //      tp = &button_table_row2[0];
-	row_y = buttonwin.btext;
+//      row_y = buttonwin.btext;
+	row_y = buttonwin.bmarg;
     }
 
 
@@ -1530,13 +1540,13 @@ initButtonRow (int row, int tablesize, mouse_button_table *tp)
     indent = ((int)term.tt_width - totw) / 2;
 
 /** /
-dbgpr("row %d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
-    row, n_labels, nslots, label_widths, indent);
+dbgpr("labels: row %d row_y=%d: n_labels=%d nslots=%d label_widths=%d indent=%d\n",
+    row, row_y, n_labels, nslots, label_widths, indent);
 / **/
 
     tp->begx = (short)indent;
 
-    switchwindow(&buttonwin);
+    switchwindow (&buttonwin);
     for (i=0; i < tablesize; i++) {
 
 	w = (int)strlen((tp+i)->label);
@@ -1572,7 +1582,7 @@ dbgpr("buttoninit: i=%d beg=%d end=%d label=%s\n",
     }
 
 #ifdef OUT
-/* add . temp to end row */
+/* add . temp to end row to see where we are... */
 poscursor(cursorcol+1, cursorline);
 putch('.', NO);
 #endif /* OUT */
@@ -1585,8 +1595,6 @@ putch('.', NO);
 #ifdef BUTTON_FONT
     makeButtonOverlayB(row, nspaces, indent);
 #endif /* BUTTON_FONT */
-
-
 
     fflush(stdout);
 
@@ -2180,23 +2188,53 @@ static char button_line2[512];
 void
 overlayButtons()
 {
+    //int h;
 
+
+    /* can't use mvcur() as ncurses doesn't know about winsize change */
+    /*mvcur(-1, -1, buttonwin.bmarg - 2 , 0); */
 
     /* row 1 buttons */
+    //h = buttonwin.tmarg + 1;
+    //(*term.tt_addr) (h, 0);
     mvcur(-1, -1, buttonwin.bmarg - 2 , 0);
     tputs(button_line1, 1, Pch);
     fflush(stdout);
+    //dbgpr("overlayButtons:  row1 at %d ", h);
 
     /* row 2 buttons */
+    //h += 2;
+    //(*term.tt_addr) (h, 0);
     mvcur(-1, -1, buttonwin.bmarg, 0);
     tputs(button_line2, 1, Pch);
     fflush(stdout);
+    //dbgpr("  row2 at %d\n", h);
 
     int c = cursorcol;
     int l = cursorline;
     cursorcol = cursorline = -1;
     poscursor(c, l);
     d_put(0);
+
+
+#ifdef OUT
+int i;
+dbgpr("button_line1:\n");
+for(i=0; i<75; i++) {
+ c = button_line1[i];
+ if (c < ' ') dbgpr("(%o)", c);
+ else dbgpr("%c", c);
+}
+dbgpr("\n");
+
+dbgpr("button_line2:\n");
+for(i=0; i<75; i++) {
+ c = button_line2[i];
+ if (c < ' ') dbgpr("(%o)", c);
+ else dbgpr("%c", c);
+}
+dbgpr("\n");
+#endif /* OUT */
 
 /** /
 dbgpr("row1:%s\n", button_line1);
@@ -2245,7 +2283,7 @@ int wid = term.tt_width;
 	    tp = &button_table_row1[0];
 	}
 	s = button_line1;
-/** /   cp_orig = (char *)image + wid * (buttonwin.bmarg-2);  / * dbg */
+/** /   cp_orig = (char *)image + wid * (buttonwin.bmarg-2);  / **/
     }
     else {
 	if (useMyButtons) {
@@ -2257,12 +2295,15 @@ int wid = term.tt_width;
 	    tp = &button_table_row2[0];
 	}
 	s = button_line2;
-/** /   cp_orig = (char *)image + wid * buttonwin.bmarg;  / * dbg */
+/** /    cp_orig = (char *)image + wid * buttonwin.bmarg;  / *dbg */
     }
-/* b_line = s; */
+//b_line = s; /*dbg*/
     char *gap;
     int ind=0;
     size_t len_gap;
+
+    /* clear button_line */
+    strncpy(s, blanks, (size_t) term.tt_width);
 
     /* between each label:  <label><font_off><sp><sp><font_on><label>*/
     if (spaces == 2) {
@@ -2330,14 +2371,17 @@ dbgpr("makeB:  row=%d indent=%d ind=%d spaces=%d gap=(%s) len_gap=%d\n",
 
     }
 
+    *s++ = ' ';
+    *s = '\0';
+
 /*  sprintf(s, "%s", font_off); */
 
 /** /
-dbgpr("makeB: indent=%d spaces=%d len_gap=%d\n",
-  indent, spaces, len_gap);
+dbgpr("makeB: indent=%d spaces=%d len_gap=%d\n", indent, spaces, len_gap);
 cp_orig[wid-1] = '\0';
-dbgpr("row%d:(%s)\n",row, cp_orig);
-dbgpr("row%d:(%s)\n", row, b_line);
+b_line[wid-1] = '\0';
+dbgpr("row%d:(%s)\n", row, cp_orig);
+//dbgpr("row%d:(%s)\n", row, b_line);
 / **/
 
     return;

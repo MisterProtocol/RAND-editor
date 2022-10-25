@@ -7,25 +7,6 @@
 	Copyright abandoned, 1983, The Rand Corporation
 #endif
 
-/* MAXWIDTH is the maximum of all defined widths in e.tt.h */
-/*#define MAXWIDTH 260            / * length of longest possible screen line */
-#define MAXWIDTH 223            /* length of longest possible screen line */
-/* if (MAXWIDTH > 127)  then you must define WIDE
- **/
-/* #undef  WIDE   */
-#define WIDE
-#ifdef WIDE
-typedef Short Scols;            /* number of columns on the screen */
-typedef short AScols;           /* number of columns on the screen */
-#else
-/* unfortunately, these cannot be unsigned chars */
-typedef Char Scols;
-typedef char AScols;
-#endif
-typedef Char Slines;            /* number of lines on the screen */
-/*typedef char ASlines; */          /* number of lines on the screen */
-typedef Uchar ASlines;           /* number of lines on the screen */
-
 #ifdef OUT
 /* margin characters and others */
 #define FIRSTSPCL  127
@@ -56,7 +37,7 @@ typedef Uchar ASlines;           /* number of lines on the screen */
 /* margin characters and others */
 #define FIRSTSPCL  (Uchar)127
 #define ESCCHAR    (Uchar)127  /* escape character */
-#define BULCHAR    (Uchar)42   /* bullet character */
+#define BULCHAR    (Uchar)128  /* bullet character */
 #define FIRSTMCH   (Uchar)129
 #define LMCH       (Uchar)129  /* left */
 #define RMCH       (Uchar)130  /* right */

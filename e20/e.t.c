@@ -1223,7 +1223,7 @@ Reg2 Slines lin;
 {
 
 /** /
-if( DebugVal ) {
+if( 1 || DebugVal ) {
    dbgpr("poscursor, beg: col=%d lin=%d cursorline=%d cursorcol=%d, ltext=%d, ttext=%d curwin=(%o)\n",
      col,lin,cursorline,cursorcol,curwin->ltext, curwin->ttext,curwin);
 }
@@ -1260,6 +1260,7 @@ if( DebugVal ) {
     cursorline = lin;
 
     /* the 041 below is for the terminal simulator cursor addressing */
+    /*dbgpr("poscursor:  make VCCAAD with col=%d lin=%d\n", col, lin); */
     putscbuf[0] = VCCAAD;
     putscbuf[1] = (Uchar) (041 + curwin->ltext + col);
     putscbuf[2] = (Uchar) (041 + curwin->ttext + lin);
@@ -2934,6 +2935,11 @@ Flag mainwin;
 {
     Reg5 S_wksp *cwksp = curwksp;
 
+/** /
+dbgpr("vinsdel(): start=%d, delta=%d, mainwin=%d\n",
+    start, delta, mainwin);
+/ **/
+
     if (mainwin) {
 	clrbul ();
 	offbullets ();
@@ -2950,6 +2956,7 @@ Flag mainwin;
 			   curwin->rmarg + 1 - curwin->lmarg,
 			   delta,
 			   YES);
+
 	    if (num <= 0) {
  doputup:
 		savecurs ();
@@ -3249,8 +3256,10 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 
 	    while((c = wgetch(stdscr)) == KEY_MOUSE) {
 		getmouse(&evt);
-		if (evt.bstate & REPORT_MOUSE_POSITION)
+		if (evt.bstate & REPORT_MOUSE_POSITION) {
+		//  dbgpr("e.t.c, skipping REPORT_MOUSE_POSITION\n");
 		    continue;
+		}
 		ungetmouse(&evt);   /* push back the event */
 		c = wgetch(stdscr);
 		break;
@@ -3586,7 +3595,7 @@ mapInputCh(int c)
     }
 
 /* DEBUG */
-/*
+/** /
     char tmp[32];
     if (c1 < 040 || c1 > 0177) {
 	snprintf(tmp, sizeof(tmp), "%s", getEkeyname(c1));
@@ -3596,7 +3605,7 @@ mapInputCh(int c)
 	tmp[1] = '\0';
     }
     dbgpr("mapInputCh, c=(%04o) maps to (%04o) (%s)\n", c, c1, tmp);
-*/
+/ **/
 
     return c1;
 }

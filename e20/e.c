@@ -130,7 +130,6 @@ char error_buf[256];
 
 int nButtonLines = 0;  /* number of BUTTON lines on screen      */
 
-#define OPTNOWINSHIFT 44
 
 #ifdef NCURSES
 #define OPTEXTNAMES  41   /* enable use of extended names in terminfo entries */
@@ -138,8 +137,10 @@ int nButtonLines = 0;  /* number of BUTTON lines on screen      */
 #ifdef NCURSES_MOUSE
 #define OPTMOUSEINIT 42   /* eg, -mouseinit="E[?1006;1002h" */
 #define OPTMOUSESTOP 43   /* eg, -mousestop="E[?1006;1002l" */
+#define OPTNOWINSHIFT 44
 #define OPTBTNFONT    45  /* eg, -buttonfont=N (1-255) */
 #define OPTBTNFILE    46  /* eg, -buttonfile=filename */
+#define OPTNORESIZE   47  /* eg, -noresize, don't auto-resize windows  */
 
 char *optmouse_init;
 char *optmouse_stop;
@@ -151,18 +152,17 @@ char *optmouse_stop;
  * When startup occurs via "e<CR>", by default we now override
  * the window size values (if they differ from those) in the ".esXXX"
  * state file, and resize the windows to match the current screen size.
- *
- * TODO:  add an option -noresize to override the auto-resize.
+ * The -noresize option prevents the auto-resizing.
  */
 Flag needResize = NO;
-/* Flag optnoresize = NO; */
+Flag optnoresize = NO;
 int resize_h, resize_w; /* save new term w/h values */
 
 extern void ResizeWindows(int h, int w);
 
 
 /*************************/
-/* next OPT number is 47 */
+/* next OPT number is 48 */
 
 /* Don't read the profile if E is entered w/o a filename to edit, but reenable it
  * if E is entered w/o a filename and no state file exists.
@@ -219,6 +219,7 @@ S_looktbl opttable[] = {
 #endif /* STARTUPFILE */
    {"noreadonly",OPTNOREADONLY}, /* no auto 'readonly' mode for '444' files*/
    {"norecover", OPTNORECOVER},
+   {"noresize" , OPTNORESIZE },
    {"nostick"  , OPTNOSTICK  },
    {"nostrip"  , OPTNOSTRIP  },  /* don't strip blanks at end of line */
    {"notracks" , OPTNOTRACKS },
@@ -864,6 +865,10 @@ checkargs ()
 
 	case OPTNORECOVER:
 	    norecover = YES;
+	    break;
+
+	case OPTNORESIZE:
+	    optnoresize = YES;
 	    break;
 
 	case OPTNOTRACKS:
@@ -1554,6 +1559,9 @@ options are:\n", progname);
 %c -norecover\n", norecover ? '*' : ' ');
 
     printf ("\
+%c -noresize\n", optnoresize == YES ? '*' : ' ');
+
+    printf ("\
 %c -nostick\n", optstick == NO ? '*' : ' ');
 
     printf ("\
@@ -2173,7 +2181,7 @@ Delete it or give a filename after the %s command.",
 	nlin = getc (gbuf) & 0377;
 	ncol = getc (gbuf) & 0377;
 	if (nlin != term.tt_height || ncol != term.tt_width) {
-	  if(0) /* TODO: change to a new -noresize option */
+	  if(optnoresize) {
 	    if (nlin > term.tt_height || ncol > term.tt_width) {
 		/*
 		 *  If not 'recovering' and not 'replaying', get rid of
@@ -2188,13 +2196,16 @@ Delete it or give a filename after the %s command.",
 Startup file: \"%s\" was made for a terminal with a different screen size. \n\
 (%d h X %d w).  Delete it or give a filename after the %s command.\n",
 		    rfile, nlin, ncol, progname);
+	      }
 	    }
 	    /*
 	     *  Can readjust screensize to statefile parameters.
 	     */
-	    needResize = YES;
-	    resize_w = term.tt_width;
-	    resize_h = term.tt_height;
+	    if (!optnoresize ) {
+		needResize = YES;
+		resize_w = term.tt_width;
+		resize_h = term.tt_height;
+	    }
 
 	    term.tt_width = (short)ncol;
 	    term.tt_height = (char)nlin;
@@ -2993,7 +3004,6 @@ resize_handler (int sig)
 	signal(SIGWINCH, resize_handler);
 	return;
     }
-#endif /* OUT */
 
     if (nButtonLines) {
 	mesg(ERRALL + 1, "Win size changes are not allowed with -showbuttons.");
@@ -3001,6 +3011,7 @@ resize_handler (int sig)
 	signal(SIGWINCH, resize_handler);  /* is this ok here?? */
 	return;
     }
+#endif /* OUT */
 
 
     /* see e.resize.c  */
