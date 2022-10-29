@@ -1137,3 +1137,5 @@ extern char *keytmp;
 
 extern char *my_move (char *, char *, unsigned long);
 
+extern Flag noresizeall;
+

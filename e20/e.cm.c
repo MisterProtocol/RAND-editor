@@ -503,6 +503,7 @@ command (forcecmd, forceopt)
 	fresh ();
 	retval = CROK;
 	redrawflg = YES;
+	/* dbgpr("e.cm.c:  got CMDREDRAW\n");*/
 	break;
 
     case CMDSPLIT:
@@ -595,6 +596,14 @@ command (forcecmd, forceopt)
 	    break;
 	}
 	removewindow ();
+#ifdef OUT
+limitcursor();
+poscursor(cursorcol, cursorline);
+putupwin();
+drawborders(curwin, WIN_ACTIVE | WIN_DRAWSIDES);
+d_put(0);
+fresh();
+#endif
 	retval = CROK;
 	break;
 
@@ -912,6 +921,8 @@ Flag on;
 
 #define SET_BRACEMATCH  28
 
+#define SET_NORESIZE    29
+
 #ifdef COMMENT
 Cmdret
 setoption( showflag )
@@ -954,6 +965,7 @@ setoption( showflag )
 	   {"nofilldot",    SET_NOFILLDOT},/* fill stops at ^. */
 	   {"nohighlight",  SET_NOHIGHLIGHT},/* marked areas are highlighted */
 	   {"nohy",         SET_NOHY},     /* fill: don't split hy-words */
+	   {"noresizeall",  SET_NORESIZE}, /* limits resizing to border windows */
 	   {"nostick",      SET_RMNOSTICK},/* auto scroll past rt edge */
 	   {"page",         SET_PAGE},     /* defmipage and defplpage */
 
@@ -1198,6 +1210,11 @@ bell %s, vb %s, hy %s",
 
 	    case SET_MOUSE:
 		toggle_mouse(arg);
+		break;
+
+	    case SET_NORESIZE:  /* toggle variable */
+		noresizeall ^= 1;
+		dbgpr("set noresize:  noresizeall=%d\n", noresizeall);
 		break;
 
 	    case SET_NOFILLDOT:

@@ -2251,6 +2251,11 @@ void
 makeButtonOverlayB (int row, int spaces, int indent)
 {
 
+    if (term.tt_width < 80) {
+	mesg(ERRALL+1, "Need at least 80 chars for -showbuttons.");
+	return;
+    }
+
     char *s;
     char *font_on, *font_off;
 

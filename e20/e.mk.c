@@ -12,7 +12,7 @@ file e.mk.c
 #include "e.tt.h"
 #include "e.inf.h"
 #include "e.m.h"
-/* #include <stddef.h> */
+#include <stddef.h>
 
 extern Uchar *image;
 
@@ -619,7 +619,7 @@ beg_mark, markcols, curcol, adj_markcol, from, to);
 
 
 /*
- *   visually mark matching {} pairs
+ *   visually mark matching pairs: {}, [], ()
  */
 void
 HiLightBracePairs(Flag set)      /* 0 when we're only clearing a mark */
@@ -669,6 +669,12 @@ dbgpr("curwksp->wlin=%d, curwksp->wcol=%d cursorline=%d cursorcol=%d\n\n",
     int cursor_screenline = cursorline + curwin->ttext;
     from = cursor_screenline;
     int cursor_screencol = cursorcol + lcol;
+
+/* Try removing "simple" C-style  slash-* comments
+ * and by simple, only current screen is examined and, as yet
+ * only in the forward direction
+ */
+int inComment = 0;
 
 /** /
 dbgpr("cursorline=%d cursor_screenline=%d cursorcol=%d cursor_screencol=%d\n",
@@ -789,6 +795,8 @@ dbgpr("after unmark, cursorline,cursorcol=(%d,%d) cursor_screenline,cursor_scree
     fflush(stdout);
 #endif
 
+    /* First search the current screen */
+
     /*  Keep a tally of left braces found before an ending one.
      *  Have a match when we find an end brace and cnt returns to 0.
      */
@@ -812,9 +820,27 @@ from, to, ln_eof, curwksp->wlin, lcol, cursor_screencol);
 		return;     /* NOT FOUND */
 	    }
 
-       /** / dbgpr("checking line %d for }, cnt=%d\n", line, cnt); / **/
 	    cp = (char *)image + w*line;
+
 	    for (i=lcol; i<=rcol; i++) {
+
+		/* skip simple comment style:  // */
+		if (bracematchCoding && cp[i] == '/' && cp[i+1] == '/') {
+		//  dbgpr("skip comment\n");
+		    break;
+		}
+
+		// skip simple /* */ comments
+		if (bracematchCoding && cp[i] == '/' && cp[i+1] == '*') {
+		    inComment++;
+		    continue;
+		}
+		if (inComment) {
+		    if (cp[i] == '*' && cp[i+1] == '/')
+			inComment = 0;
+		    continue;
+		}
+
 		if (*(cp+i) == cursor_ch) {
 		    /* omit chars left of cursor or the one cursor is at */
 		    if (line == cursor_screenline && i <= (cursor_screencol))
@@ -942,7 +968,21 @@ from, to, ln_eof, curwksp->wlin, lcol, cursor_screencol);
 	    dbgpr("checking line (reverse) %d for %c, cnt=%d\n", line, end_ch, cnt);
 	    / **/
 	    cp = (char *)image + w*line;
-	    for (i=rcol; i>=lcol; i--) {
+
+	    int beg = rcol;
+
+	    /* skip simple comment style:  // */
+	    if (bracematchCoding) {
+		for (i=lcol; i<rcol; i++) {
+		    if (cp[i] == '/' && cp[i+1] == '/') {
+			beg = i - 1;
+		    //  dbgpr("skip comment, back srch\n");
+			break;
+		    }
+		}
+	    }
+
+	    for (i=beg; i>=lcol; i--) {
 		if (*(cp+i) == cursor_ch) {
 		    /* don't include the chars right of cursor, or the one
 		     * cursor is pointing at
@@ -983,7 +1023,7 @@ dbgpr("  lcol=%d cursor_screencol=%d\n", lcol, cursor_screencol);
 / **/
 
 			if (i == lcol && cnt == 0 && cursor_screencol == lcol) {
-			    dbgpr("x1 found match\n");
+			/*  dbgpr("x1 found match\n"); */
 			    found_match = 1;
 			    break;
 			}
@@ -1197,7 +1237,20 @@ ttext=%d nextline=%d braceRange=%d\n",
 	dbgpr("(%s)\n", buf);
 #endif
 
-	for (i=ncline+1; i >= 0; i--) {
+	int beg = (int) (ncline+1);
+
+	/* skip simple comment style:  // */
+
+	if (bracematchCoding) {
+	    for (i=0; i<ncline; i++) {
+		if (cline[i] == '/' && cline[i+1] == '/') {
+		    beg = (int) (i - 1);
+		//  dbgpr("FindBack,skip comment, set beg=%d\n", beg);
+		}
+	    }
+	}
+
+	for (i=beg; i >= 0; i--) {
 	    if (cline[i] == end_ch) {
 		if (cnt <= 0) {
 		    *lnum = ln; *cnum = (int)i;
@@ -1265,6 +1318,16 @@ curwin->ttext, nextline, lastline, braceRange);
 #endif
 
 	for (i=0; i <= ncline; i++) {
+
+/** /
+dbgpr("FindForward: chk (%c) mode=%d\n", cline[i], bracematchCoding);
+/ **/
+
+	    /* skip simple comment style:  //  */
+	    if (bracematchCoding && cline[i] == '/' && cline[i+1] == '/') {
+	    //  dbgpr("FindForw, skip comment\n");
+		break;
+	    }
 
 	    if (cline[i] == end_ch) {
 
