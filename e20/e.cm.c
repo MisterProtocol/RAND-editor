@@ -43,6 +43,7 @@ extern char *fgbg_pair;
 int doSetHighlight(char *arg);
 char *highlight_info_str;
 extern int n_colors;
+int noresizeall;    /******/
 
 /* brace matching/hilighting */
 int braceRange = 100;           /* match to +/- braceRange lines */

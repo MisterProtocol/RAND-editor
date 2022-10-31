@@ -55,16 +55,9 @@ KEY_C3 unchanged
 Keycode 1023 is not bound
 \EO conflicts with longer strings
 Keycode 1023 unchanged
-Keycode 276, name KEY_F(12)
-Keycode 262, name KEY_HOME
-Keycode 262, name KEY_HOME
-Keycode 262, name KEY_HOME
-Keycode 262, name KEY_HOME
-Keycode 262, name KEY_HOME
-Keycode 275, name KEY_F(11)
-Keycode 274, name KEY_F(10)
-Keycode 269, name KEY_F(5)
-Keycode 55, name 7
-Keycode 56, name 8
-Keycode 57, name 9
+Keycode 127, name ^?
+Keycode 127, name ^?
+Keycode 127, name ^?
+Keycode 127, name ^?
+Keycode 127, name ^?
 Keycode 113, name q
