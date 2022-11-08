@@ -226,7 +226,7 @@ E20 Changes:
 -   Early "e20" versions used the ncurses standard input routines for all
     input except keyboard mapping.  This resulted in some F(n) keys
     sending a single code to E, while others would send a byte stream
-    (example: <esc>"O1;2P":<+page>).  Keyboard mapping was changed to use
+    (example: <esc>"O2;2P":<+page>).  Keyboard mapping was changed to use
     the ncurses define_key() routine, so that "e" now receives a single
     code for all keys.  This fixed a bug in catching the interrupt key,
     which is used to abort a "<cmd>run program" command. This is important
@@ -245,3 +245,9 @@ E20 Changes:
 -   The "make depend" option in the e20/Makefile has been broken for some time.
     This has now been fixed.  There are options for both platforms: "make depend.sys5"
     for Linux and "make depend.bsd" for MacOS.
+
+-   The containing terminal window can now be resized, and "e" will resize its
+    own windows in response.  Also, if the current session has multiple "e"
+    windows, the borders between these windows may be dragged with the mouse to
+    resize the "e" windows.  There are limits to this: up to three windows should
+    work, more than that may not.

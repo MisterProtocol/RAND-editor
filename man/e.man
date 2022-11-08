@@ -552,6 +552,12 @@ for sites using both e19 and e20.
 Note that some terminal emulators use a few function keys for their
 own purposes, eg: gnome-terminal uses F1 for a Help menu, and F11 to
 toggle full screen mode.
+.bu
+The containing terminal windows can now be resized, and "e" will resize
+its own windows in response.  Also, if the current session has multiple "e"
+windows, the borders between those windows may be dragged with the mouse to
+resize the windows within "e".  There are limits to this: two or three windows
+will work; more than that may not.
 .PP
 E19+ changes include:
 .bu
