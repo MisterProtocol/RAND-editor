@@ -1222,6 +1222,7 @@ Reg1 Scols  col;
 Reg2 Slines lin;
 {
 
+
 /** /
 if( 1 || DebugVal ) {
    dbgpr("poscursor, beg: col=%d lin=%d cursorline=%d cursorcol=%d, ltext=%d, ttext=%d curwin=(%o)\n",
@@ -1256,15 +1257,56 @@ if( 1 || DebugVal ) {
 	    return;
 	}
     }
+
     cursorcol = col;
     cursorline = lin;
 
     /* the 041 below is for the terminal simulator cursor addressing */
-    /*dbgpr("poscursor:  make VCCAAD with col=%d lin=%d\n", col, lin); */
+
+//  dbgpr("poscursor, VCCAAD: col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
+//       col, lin, col+curwin->ltext, lin+curwin->ttext);
+
     putscbuf[0] = VCCAAD;
     putscbuf[1] = (Uchar) (041 + curwin->ltext + col);
     putscbuf[2] = (Uchar) (041 + curwin->ttext + lin);
     d_write (putscbuf, 3);
+
+#ifdef OUT
+/*
+ * The above method sends the col and lin values encoded
+ * in a byte, where the max "usable" value is 223
+ * In order to have a wider screen, the below method
+ * could be used to encode the short value (e.d.c has
+ * new code commented out to handle this if we so choose...).
+ *
+ * But I think it's better to simply create two global variables
+ * (say, d_col and d_lin) and in e.d.c have VCCAAD use them.
+ * Will discuss with mob.
+ */
+    unsigned short i2 = (unsigned short) (curwin->ltext + col);
+    putscbuf[0] = VCCAAD1;
+    memmove(&putscbuf[1], &i2, sizeof i2);
+    putscbuf[3] = (Uchar) (041 + curwin->ttext + lin);
+
+//    dbgpr("poscursor, VCCAAD1: with i2=%d col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
+//         i2, col, lin, col+curwin->ltext, lin+curwin->ttext);
+
+// dbgpr("poscursor, i2=%d\n", i2);
+
+    d_write (putscbuf, 4);
+#endif /* OUT */
+
+#ifdef OUT
+    i2 = 1946;
+    putscbuf[0] = VCCAAD1;
+    memmove(&putscbuf[1], &i2, sizeof i2);
+    putscbuf[3] = (Uchar) (041 + curwin->ttext + lin);
+
+    dbgpr("poscursor, i2=%d\n", i2);
+
+//    dbgpr("poscursor:  make VCCAAD with i2=%d col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
+//         i2, col, lin, col+curwin->ltext, lin+curwin->ttext);
+#endif /* OUT */
 
     return;
 }
@@ -2729,10 +2771,10 @@ Flag    cwkspflg;
     Reg6 Slines first;      /* first line of area in window to be changed */
     Reg2 Slines endwin;     /* height of window -1 */
 
-/** /
+/**/
 dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
   fn,from,num,delta,cwkspflg);
-/ **/
+/**/
     for (win = Z; win < nwinlist; win++) {
 	if ((tw = winlist[win]->altwksp)->wfile == fn)
 	    /* tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1); */
@@ -2935,11 +2977,6 @@ Flag mainwin;
 {
     Reg5 S_wksp *cwksp = curwksp;
 
-/** /
-dbgpr("vinsdel(): start=%d, delta=%d, mainwin=%d\n",
-    start, delta, mainwin);
-/ **/
-
     if (mainwin) {
 	clrbul ();
 	offbullets ();
@@ -2956,7 +2993,6 @@ dbgpr("vinsdel(): start=%d, delta=%d, mainwin=%d\n",
 			   curwin->rmarg + 1 - curwin->lmarg,
 			   delta,
 			   YES);
-
 	    if (num <= 0) {
  doputup:
 		savecurs ();
@@ -3273,7 +3309,7 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 
 #endif /* USE_MOUSE_POSITION */
 
-	    /** /dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c); / **/
+	    //  dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c);
 
 	    if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 

@@ -9,10 +9,10 @@ file e.mouse.c
 #include "e.m.h"
 #include "e.cm.h"
 #include "e.tt.h"
+#include "e.wi.h"
 #include <ctype.h>
 #include <string.h>
 
-#ifdef NCURSES
 
 extern Flag optuseextnames;
 extern Flag optskipmouse;
@@ -43,7 +43,9 @@ void doMouseEvent(void);
 
 extern void debugAllWindows (void);
 
-static const char *mouse_decode(MEVENT const *);
+//static const char *mouse_decode(MEVENT const *);
+//char *mouse_decode(MEVENT const *);
+char *mouse_decode(MEVENT *);
 Flag initMouseDone = NO;
 Flag initCursesDone = NO;
 Flag bs_flag = NO;
@@ -89,6 +91,8 @@ int btn_font_n = 0;     /* -buttonfont=N (1-255) */
 int doMotion (MEVENT *, int, int);
 int endMotion (int, int);
 void doDragHiLite (int, int, int, int);
+extern int moveBorder(MEVENT *);
+extern Flag atMoveableBorder(int, int);
 int miny, maxy;
 extern Uchar *image;
 
@@ -445,8 +449,10 @@ if (n_colors) {
 
 
 
-static const char *
-mouse_decode(MEVENT const *ep)
+//static const char *
+char *
+//mouse_decode(MEVENT const *ep)
+mouse_decode(MEVENT *ep)
 {
     static char buf[80];
 
@@ -456,7 +462,7 @@ mouse_decode(MEVENT const *ep)
     /* manual says only one bit is set in bstate */
 
     if (ep->bstate & REPORT_MOUSE_POSITION) {
-	strcat(buf, "moved");
+	strcat(buf, "position");
     }
     else if (ep->bstate & BUTTON1_RELEASED) {
 	strcat(buf, "release-1");
@@ -483,10 +489,10 @@ mouse_decode(MEVENT const *ep)
 	strcat(buf, "double-click-2");
     }
     else if (ep->bstate & BUTTON4_RELEASED) {
-	strcat(buf, "release-2");
+	strcat(buf, "release-4");
     }
     else if (ep->bstate & BUTTON4_PRESSED) {
-	strcat(buf, "press-2");
+	strcat(buf, "press-4");
     }
     else {
 	strcat(buf, "other mouse event");
@@ -812,6 +818,23 @@ curwin->ttext+cursorline-1, curwin->ltext+cursorcol);
 	    event.y, event.x, curwin->tmarg, curwin->lmarg, curwin->rmarg, curwin->bmarg);
 	/ **/
 
+    /*
+     * 10/2022, drag window border to increase/decrease the
+     * size of two adjacent windows. A return of 1 from moveBorder()
+     * means the move was handled, or that no further action
+     * is required below, (like a release on a border,
+     * ie, no change in border position).
+     */
+
+    if ((nwinlist > 1) && !curmark && atMoveableBorder(event.y, event.x)) {
+	    /* moveBorder returns 1 if the move was handled;
+	     * otherwise, flow proceeds below to handle the mouse event.
+	     */
+	if (moveBorder(&event)) {
+	    return;
+	}
+    }
+
 #ifdef MOUSE_BUTTONS
     /*  if (optshowbuttons && event.y == buttonwin.bmarg) {  */
 	if (optshowbuttons && inButtonRow(event.y)) {
@@ -1123,23 +1146,33 @@ cursorline=%d, oldcursorline=%d\n",
     }
     else {
 	if (need2chgwin) {  /* win chg w/o mouse movement */
+	 // dbgpr("win chg w/o mouse movement\n");
 	    doChgWin(newwin_n, ev->y, ev->x);
 	    need2chgwin = 0;
 	    winChanged++;
 	}
     }
 
+
+    /* we're off when a click on a top margin occurs */
+    int ccol, clin;
+    ccol = ev->x - curwin->ltext;
+    clin = ev->y - curwin->ttext;
+    if(clin <0) clin = 0;
 /** /
-dbgpr("doMouse, end calling poscursor(%d,%d)\n",
-ev->x - curwin->ltext, ev->y - curwin->ttext);
+dbgpr("doMouse, end calling poscursor(%d,%d) x=%d y=%d ltext=%d ttext=%d\n",
+  ccol, clin, ev->x, ev->y, curwin->ltext, curwin->ttext);
+if (ev->y - curwin->ttext < 0)
 / **/
-    poscursor(ev->x - curwin->ltext, ev->y - curwin->ttext);
+
+    poscursor(ccol, clin);
     d_put(0);
 
     /* shouldn't be needed, but we're off by one in certain instances */
     mvcur(-1, -1, ev->y, ev->x);
 
     if (!winChanged) {
+
 	/* set/unset a MARK  */
     /*  if ((ev->bstate & BUTTON2_CLICKED) || (ev->bstate & BUTTON2_PRESSED)) { */
 	if (ev->bstate & BUTTON2_RELEASED) {
@@ -1893,12 +1926,12 @@ getyx(stdscr, y, x);
 	sprintf(buf, "%d", nlines);
     }
     else {
-	int nc = (ev->x > begx) ? ev->x - begx : begx - ev->x;
-	ncols = 1 + nc - curwin->ltext;
+	int nc = abs(ev->x - begx);
+	ncols = 1 + nc - (curwin->ltext - curwin->lmarg);
 	sprintf(buf, "%dx%d", nlines, ncols);
     }
 
-    /* pad with spaces, length of inf_area is 9 */
+    /* pad with spaces, length of inf_area is 9, see e.c */
     char ibuf[10];
     int i;
 
@@ -2107,9 +2140,28 @@ beg_mark, mark_len, cursorcol, cursorline, from, to, miny, maxy);
 void
 doChgWin(int wn, int y, int x)
 {
-    poscursor(x - winlist[wn]->ltext, y - winlist[wn]->ttext);
+
+    int col = x - winlist[wn]->ltext;
+    int lin = y - winlist[wn]->ttext;
+
+    if (lin < 0) {
+	lin = 0;
+	cursorline = 0;
+    }
+
+/** /
+dbgpr("doChgWin: y=%d x=%d, lin=%d col=%d\n", y,x, lin,col);
+/ **/
+
+    poscursor(col, lin);
     d_put(0);
     chgwindow(wn);
+    limitcursor();
+
+/*
+    poscursor(col, lin);
+    d_put(0);
+*/
 
     /* used in calcRange2Clear() */
     from_topline = curwin->ttext;
@@ -2118,7 +2170,6 @@ doChgWin(int wn, int y, int x)
     /* check these ... */
     fprintf(keyfile, "%c%c%c", CCCMD, wn,CCCHWINDOW);
     fflush(keyfile);
-
 }
 
 
@@ -2321,7 +2372,7 @@ int wid = term.tt_width;
 	ind = indent - 1;
     }
     /* between each label:  <label><sp><font_off><sp><sp><font_on><sp><label> */
-    else if (spaces == 4) {
+    else /*if (spaces == 4)*/ {
 	gap = "  ";
 	ind = indent - 1;
     }
@@ -2580,4 +2631,4 @@ dbgpr("row2_width=%d r2_slashes=%d r2_cnt=%d COLS=%d\n",
     return 1;
 }
 
-#endif /* NCURSES */
+

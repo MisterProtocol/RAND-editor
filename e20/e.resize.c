@@ -7,13 +7,28 @@
 #include "e.wi.h"
 #include "e.m.h"
 
-extern S_term term;
+/*  Note: some coding in this file may seem to include
+ *  unnecessary casts, but an oldish compiler was
+ *  generating warnings for statements like "a += b"
+ *  when both are of type short.
+ */
+
+void hiliteactive(void);
 
 void ResizeWindows (int h, int w);
 void debugWindow (S_window *, char *);
 void debugAllWindows (void);
 void ClearUtilityWindows(void);
+void debugLMchars(S_window *wp);
+void debugMrk(void);
+int  CheckWindowValues(void);
+void adj_h_borders(ASlines bm_orig, ASlines h_chg);
+void adj_w_borders(AScols rm_orig, AScols w_chg);
+void alt_h_winresize(ASlines bm_orig, ASlines h_chg, int adjwin);
+void alt_w_winresize(AScols rm_orig, AScols w_chg, int adjwin);
+Flag atMoveableBorder(int, int);
 
+extern S_term term;
 extern Flag optshowbuttons;
 extern int nButtonLines;
 extern void initwindows(Flag);
@@ -21,26 +36,66 @@ extern void buttoninit();
 extern Uchar *image;
 extern void infoinit(void);
 extern Flag freshputup;
-void debugLMchars(S_window *wp);
-void debugMrk(void);
 extern Nlines marklines;
+Flag noresizeall = NO;
 
+int AllVertWins(void);
+int AllHorWins(void);
+
+void MoveHorBorder (S_window *, S_window *, ASlines);
+void MoveVerBorder (S_window *, S_window *, AScols);
+int CheckWindowValues(void);
+void clearImageArray(int, int, int);
+int xlateBorderChar(int);
+int adjCursor(S_window *, Nlines, int, int);
+extern int moveBorder(MEVENT *);
+extern int doHborder(MEVENT *ev, S_window *, S_window *);
+extern int doVborder(MEVENT *ev, S_window *, S_window *);
+
+extern char *hilite_str;
+extern char *bold_str;
+extern char *sgr0;       /* reset all modes */
+
+extern char *mouse_decode(MEVENT *ep);
+extern int WinNumber(S_window *);
 
 void
 ResizeWindows (int h, int w)
 {
     int h_chg = (h - term.tt_height);
     int w_chg = (w - term.tt_width);
-    int i, n;
+    int i;
+
+    /* Skip change if it ends up below overall minimum window size:
+     *   top + bot borders, plus
+     *   size of enter, info and button windows, plus
+     *   2 lines for each window that have margin of 0
+     */
+    if( h_chg < 0) {
+	int h_min = NPARAMLINES + nButtonLines + 2;  /* 2 for top/bottom borders*/
+	for (i=0; i<nwinlist; i++) {
+	    if (winlist[i]->lmarg == 0)
+		h_min += 2; /* 1 line of text plus bottom border */
+	}
+	// dbgpr("h_min=%d, nwinlist=%d\n", h_min, nwinlist);
+	if (h_min >= term.tt_height)
+	    return;
+    }
+
     S_window *oldwin = curwin;
+    S_wksp *wksp_old = curwksp;
 
     int ccol = cursorcol;
     int clin = cursorline;
 
-//  dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d term(h=%d,w=%d)\n",
-//      h, w, LINES, COLS, h_chg, w_chg, term.tt_height, term.tt_width);
+    static int cnt = 0;
 
-//  debugAllWindows();
+    cnt++;
+    dbgpr("%03d -----------\n", cnt);
+    dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d term(h=%d,w=%d)\n",
+	h, w, LINES, COLS, h_chg, w_chg, term.tt_height, term.tt_width);
+
+    debugAllWindows();
 
     blanks = realloc (blanks, (size_t)w);
     fill (blanks, (Uint) w, ' ');
@@ -57,30 +112,67 @@ ResizeWindows (int h, int w)
 
 //dbgpr("After resizeterm: COLS=%d, LINES=%d\n", COLS, LINES);
 
-
-    /* these 2 are for debugging in e.mk.c */
     extern Short screensize;
-    int __attribute__((unused)) oldscreensize = screensize;
-
-// dbgpr("screensize=%d\n", screensize);
-
     extern Uchar *image;
     if (screensize) sfree (image);
     image = (Uchar *)NULL;
 
     d_init(YES,NO);     /* YES for clearmem, NO clearscr */
 
+    /* Determine if all windows have the same orientation, eg:
+     * all touch the bottom margin or all touch the right margin.
+     * If so, adjust the space alternatively between them.
+     * Otherwise, adjust only window touching the border.
+     */
+    int alternate_h = 0;    /* alternate vertical windows */
+    int alternate_w = 0;    /* alternate horizontal windows */
+
+    int adj_winnum = cnt % nwinlist;  /* which win num to adjust */
+
+    /* -noresizeall:  option specifes only adjust border windows */
+    if (nwinlist > 1 && !noresizeall) {
+	if (h_chg) {
+	    int rm = winlist[0]->rmarg;
+	    /* are all windows horizontal? */
+	    alternate_h = 1;  /* assume they are */
+	    for (i=1; i<nwinlist; i++) {
+		if (winlist[i]->rmarg != rm) {
+		    alternate_h = 0;    /* no, not all horizontal */
+		    break;
+		}
+	    }
+	}
+	if (w_chg) {
+	    int bm = winlist[0]->bmarg;
+	    /* are all windows vertical? */
+	    alternate_w = 1;  /* assume they are */
+	    for (i=1; i<nwinlist; i++) {
+		if (winlist[i]->bmarg != bm) {
+		    alternate_w = 0;    /* no, not all vertical */
+		    break;
+		}
+	    }
+	}
+    }
+
 /** /
-    dbgpr("after d_init, screensize=%d vs old=%d\n", screensize, oldscreensize);
+dbgpr("adj_winnum=%d, alt_w=%d alt_h=%d\n",
+adj_winnum, alternate_w, alternate_h);
 / **/
 
+    /* Adjust the sizes */
+
+
     if (h_chg) {
+	Nlines wlin_orig = -1;
+	S_window *botw;
+
 	ASlines bmarg;
 	bmarg = (ASlines) (wholescreen.bmarg + h_chg);
 
 	int bm_orig = wholescreen.bmarg - NPARAMLINES - nButtonLines;
 
-  /* dbgpr("bm_orig=%d\n", bm_orig); */
+     /* dbgpr("bm_orig=%d\n", bm_orig); */
 
 	wholescreen.bmarg = bmarg;
 	wholescreen.btext = bmarg;
@@ -97,30 +189,43 @@ ResizeWindows (int h, int w)
 	if (nButtonLines) {
 	    buttonwin.tmarg = (ASlines) (buttonwin.tmarg + h_chg);
 	    buttonwin.ttext = buttonwin.tmarg;
-	    buttonwin.tedit = buttonwin.tmarg;
 	    buttonwin.bmarg = (ASlines) (buttonwin.bmarg + h_chg);
 	    buttonwin.btext = buttonwin.bmarg; /* not used */
 	}
 
-	/* now adjust vertical size of edit widnows */
-	for (i=0; i<nwinlist; i++) {
-		/* for now, only adjust windows touching bmarg */
-	    if (bm_orig == winlist[i]->bmarg) {
-		bmarg = (ASlines) (winlist[i]->bmarg + h_chg);
-		winlist[i]->bmarg = bmarg;
-		n = bmarg - winlist[i]->ttext - 1;
-		winlist[i]->btext = (ASlines) n;
-		winlist[i]->bedit = (ASlines) n;
-	   /** /dbgpr("win[%d], bm goes from %d to %d\n",
-		    i, bm_orig, bmarg); / **/
+//#ifdef OUT
+	/* may need to adjust cursor if bottom win top line changed */
+
+	if (h_chg > 0) {
+	    for (i=0; i<nwinlist; i++) {
+		if (winlist[i]->bmarg == (ASlines) bm_orig) {
+		    botw = winlist[i];
+		    wlin_orig = botw->wksp->wlin;
+		}
 	    }
-	    /*
-	    else {
-		dbgpr("win[%d], not at bottom, bmarg=%d\n",
-		    i, winlist[i]->bmarg);
-	    }
-	    */
 	}
+//#endif
+
+	if (alternate_h) {
+	    /* todo: alternate which window to adjust */
+	    alt_h_winresize((ASlines) bm_orig, (ASlines) h_chg, adj_winnum);
+	    // adj_h_borders (bm_orig, h_chg);
+	}
+	else {
+	    /* adj windows touching bottom margin */
+	    adj_h_borders ((ASlines) bm_orig, (ASlines) h_chg);
+	}
+
+//#ifdef OUT
+	if (h_chg > 0) {
+	    //dbgpr("wlin_orig=%d after=%d\n", wlin_orig, botw->wksp->wlin);
+	    if (wlin_orig >0 && (wlin_orig != botw->wksp->wlin)) {
+		//dbgpr("need to adj cursor: %d\n", wlin_orig - botw->wksp->wlin);
+		clin += (int)(wlin_orig - botw->wksp->wlin);
+	    }
+	}
+//#endif
+
     }
     if (w_chg) {
 	AScols rmarg;
@@ -144,35 +249,24 @@ ResizeWindows (int h, int w)
 	if (nButtonLines) {
 	    buttonwin.rmarg = rmarg;
 	    buttonwin.rtext = rmarg;
-	    buttonwin.tedit = rmarg;
+	    buttonwin.tedit = 0;
 	}
 
-	/* now adjust horizontal size of edit widnows */
-	for (i=0; i<nwinlist; i++) {
-		/* for now, only adjust windows touching rmarg */
-	    if (rm_orig == winlist[i]->rmarg) {
-		rmarg = (AScols) (winlist[i]->rmarg + w_chg);
-		winlist[i]->rmarg = rmarg;
-		n = rmarg - winlist[i]->ltext - 1;
-		winlist[i]->rtext = (AScols) n;
-		winlist[i]->redit = (AScols) n;
-	  /** / dbgpr("win[%d], rm goes from %d to %d\n",
-		    i, rm_orig, rmarg); / **/
-	    }
-	    /*
-	    else {
-		dbgpr("win[%d], not at right margin, rmarg=%d\n",
-		    i, winlist[i]->rmarg);
-	    }
-	    */
+	if (alternate_w) {
+	    /* todo: alternate which window to adjust */
+	    alt_w_winresize((AScols) rm_orig, (AScols) w_chg, adj_winnum);
+	    // adj_w_borders (rm_orig, w_chg);
+	}
+	else {
+	    /* adj windows touching right margin */
+	    adj_w_borders ((AScols) rm_orig, (AScols) w_chg);
 	}
     }
 
-/** /
+/**/
 dbgpr("after\n");
     debugAllWindows();
-/ **/
-    /* ??? todo, make sure curwin is winlist[0] */
+/**/
 
     infoinit(); /* redraw the info line */
 
@@ -186,6 +280,7 @@ dbgpr("after\n");
 	switchwindow(winlist[i]);
 	limitcursor();  /* see e.t.c */
 	poscursor(0, 0);
+
 	putupwin();
 	if (curwin == winlist[i]) {
 	    //chgborders = 1;
@@ -203,14 +298,9 @@ dbgpr("after\n");
     chgborders = chgborders_save;
     drawborders (curwin, WIN_ACTIVE | WIN_DRAWSIDES);
 
-#ifdef xxMOUSE_BUTTONS
-    buttoninit();
-#endif
-
     fresh();
     d_put (0);
 
-ungetch(0631);
     ungetch('\015');    /* force redraw */
     ungetch('d');
     ungetch('e');
@@ -235,13 +325,30 @@ ungetch(0631);
      */
     if (ccol > curwin->rtext) ccol = curwin->rtext;
     if (clin > curwin->btext) clin = curwin->btext;
+
     poscursor(ccol, clin);
     d_put(0);
+
+    if( curwksp != wksp_old)
+      dbgpr("curwksp != wksp_old\n");
+
+    /* as per limitcursor() in e.t.c */
+    for (i=0; i<nwinlist; i++) {
+	winlist[i]->wksp->ccol = min (winlist[i]->wksp->ccol, winlist[i]->rtext);
+	winlist[i]->wksp->clin = min (winlist[i]->wksp->clin, winlist[i]->btext);
+	winlist[i]->altwksp->ccol = min (winlist[i]->altwksp->ccol, winlist[i]->rtext);
+	winlist[i]->altwksp->clin = min (winlist[i]->altwksp->clin, winlist[i]->btext);
+    }
+
+/*  todo:  if marked area is no longer visible,
+ *  call unmark();
+ */
 
     return;
 }
 
-void debugWindow(S_window *w, char *winname)
+void
+debugWindow(S_window *w, char *winname)
 {
     dbgpr("%12s lmarg=%3d tmarg=%3d rmarg=%3d bmarg=%3d\n",
 	winname, w->lmarg, w->tmarg, w->rmarg, w->bmarg);
@@ -249,6 +356,8 @@ void debugWindow(S_window *w, char *winname)
 	" ", w->ltext, w->ttext, w->rtext, w->btext);
     dbgpr("%12s ledit=%3d tedit=%3d redit=%3d bedit=%3d\n",
 	" ", w->ledit, w->tedit, w->redit, w->bedit);
+
+    return;
 }
 
 
@@ -256,18 +365,17 @@ void debugWindow(S_window *w, char *winname)
 void
 debugAllWindows()
 {
-    static int n=1;
-
     /** /
     time_t tm;
     time(&tm);
     dbgpr("%s", ctime(&tm));  // debug
     / **/
 
-    dbgpr("utility windows: COLS=%d LINES=%d\n", COLS, LINES);
+    dbgpr("utility windows: COLS=%d LINES=%d, cursorcol=%d cursorline=%d\n",
+      COLS, LINES, cursorcol, cursorline);
     debugWindow (&wholescreen, "wholescreen");
-    debugWindow (&enterwin, "enterwin");
-    debugWindow (&infowin, "infowin");
+//  debugWindow (&enterwin, "enterwin");
+//  debugWindow (&infowin, "infowin");
 #ifdef MOUSE_BUTTONS
     if (optshowbuttons == YES) {
       debugWindow (&buttonwin, "buttonwin");
@@ -276,27 +384,53 @@ debugAllWindows()
 
     /* edit windows */
     int i;
+    int w, h;
     char tmp[16];
+    Nlines ln_eof;
+    S_window *wp;
+    Flag fit_inwin = 0;
     for (i=0; i<nwinlist; i++) {
 	sprintf(tmp, "win %d", i);
-	debugWindow(winlist[i], tmp);
+	wp = winlist[i];
+	debugWindow(wp, tmp);
 	dbgpr("%12s wksp: clin=%d  ccol=%d  wlin=%d, wcol=%d\n",
 	    " ",
-	    winlist[i]->wksp->clin,
-	    winlist[i]->wksp->ccol,
-	    winlist[i]->wksp->wlin,
-	    winlist[i]->wksp->wcol);
+	    wp->wksp->clin,
+	    wp->wksp->ccol,
+	    wp->wksp->wlin,
+	    wp->wksp->wcol);
 
-	if (curwin == winlist[i])
+	if (curwin == wp)
 	    dbgpr("%12s curwin = winlist[%d]\n", " ", i);
 
-	dbgpr("%12s file: %s\n", " ", names[winlist[i]->wksp->wfile]);
+	w = wp->rmarg - wp->lmarg;
+	h = wp->bmarg - wp->tmarg;
+	ln_eof = la_lsize(&wp->wksp->las);
+	fit_inwin = (ln_eof < (wp->bmarg - wp->tmarg)) ? 1 : 0;
 
-	/*debugLMchars(winlist[i]);*/
+	dbgpr("%12s file: %s lines=%d w=%d h=%d fit_inwin=%d\n", " ",
+	   names[wp->wksp->wfile], ln_eof, w,h, fit_inwin);
+
+	/*debugLMchars(wp);*/
 	/*debugMrk();*/
     }
-/*    dbgpr("curwin=(%o) winlist[%d]=(%o)\n", curwin, --i, winlist[0]); */
-    dbgpr("%d------\n", n++);
+    dbgpr("%12s ", "w");
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	dbgpr(" %d", (int) (wp->rmarg - wp->lmarg));
+    }
+    dbgpr("\n");
+
+    dbgpr("%12s ", "h");
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	dbgpr(" %d", (int) (wp->bmarg - wp->tmarg));
+    }
+    dbgpr("\n");
+
+    dbgpr("%12s %s\n", "win values", CheckWindowValues() ? "errors" : "ok");
+
+    dbgpr("------\n");
 }
 
 
@@ -376,5 +510,1246 @@ ClearUtilityWindows ()
 	fflush(stdout);
 
     }
+
+    // They don't appear to need it, but
+    // todo, also clear the enter and info wins
+
     return;
 }
+
+
+/*
+ * adjust windows touching bottom margin
+ */
+void
+adj_h_borders(ASlines bm_orig, ASlines h_chg)
+{
+    int i;
+    S_window *wp;
+
+    /* adjust vertical size of edit windows touching bmarg */
+
+    Nlines ln_eof;
+    Flag fit_inwin;
+
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	if (bm_orig == wp->bmarg) {
+	    if (wp->btext == 0 && h_chg < 0)  /* maintain at least 1 line in window */
+		continue;
+
+	      /* number of lines in file */
+	    ln_eof = la_lsize(&wp->wksp->las);
+	      /* did eof fit in the original window */
+	    fit_inwin = (ln_eof < (wp->bmarg - wp->tmarg)) ? 1 : 0;
+
+	    wp->bmarg = (ASlines) (wp->bmarg + h_chg);
+	    wp->btext = (ASlines) (wp->bmarg - wp->tmarg - 2);
+	    wp->bedit = wp->btext;
+
+	    /* if file line 1 is not window line 1, and
+	     * the file did not originally fit in the window
+	     * but now does, move file line 1 to window line 1.
+	     */
+	    if (h_chg > 0 && !fit_inwin && wp->wksp->wlin > 0 &&
+		    (ln_eof < (wp->bmarg - wp->tmarg))) {
+		wp->wksp->wlin = 0;
+		//dbgpr("moved line 1 to win line 1\n");
+	    }
+
+	// dbgpr("win[%d], bm goes from %d to %d\n", i, bm_orig, wp->bmarg);
+	}
+    }
+
+    /* BTW, don't ever change the wp->tedit field.  Doing so,
+     * leaves the cursor "stuck" on the last line of the window!
+     */
+
+    return;
+}
+
+/*
+ * adjust width of windows touching right margin
+ */
+void
+adj_w_borders(AScols rm_orig, AScols w_chg)
+{
+    int i;
+    S_window *wp;
+
+
+    /* adjust width */
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	/* adjust windows touching rmarg */
+	if (rm_orig == wp->rmarg) {
+	    if (w_chg < 0 && ((wp->rmarg - wp->lmarg) < 4))
+		continue;
+	    wp->rmarg = (AScols) (wp->rmarg + w_chg);
+	    wp->rtext = (AScols) (wp->rmarg - wp->lmarg - 2);
+	    wp->redit = wp->rtext;
+	// dbgpr("win[%d], rm goes from %d to %d\n", i, rm_orig, wp->rmarg);
+	}
+    }
+    return;
+}
+
+/*
+ *   alternate which window to adjust
+ */
+void
+alt_h_winresize(ASlines bm_orig, ASlines h_chg, int adjwin)
+{
+    int i;
+    int bottommost_win;
+    S_window *wp;
+
+    /* the bottommost window changes in all cases */
+    for (i=0; i<nwinlist; i++) {
+	if (winlist[i]->bmarg == bm_orig) {
+	    adj_h_borders(bm_orig, h_chg);
+	    if (i == adjwin) {  /* we're done */
+	    //  dbgpr("alt_h no=%d:  case: bottommost win\n", adjwin);
+		return;
+	    }
+	    bottommost_win = i;
+	    break;
+	}
+    }
+
+    /*  Case N windows:
+     *     change bm of adjwin
+     *     change tm and bm of each win below
+     *       except for bm of bottommost_win
+     */
+
+//  ASlines tm_old, bm_old;
+    ASlines bm_alt;
+
+    /* adjust bm of adj window */
+    wp = winlist[adjwin];
+    bm_alt = wp->bmarg;
+
+    /* Don't allow a window to be less than 1 line in height */
+    if (wp->bedit < 1 && h_chg < 0)
+	return;
+
+    wp->bmarg = (ASlines) (wp->bmarg + h_chg);
+    wp->btext = (ASlines) (wp->bmarg - wp->tmarg - 2);
+    wp->bedit = wp->btext;
+
+// dbgpr("\nalt_h, adj win[%d], bm goes from %d to %d\n", i, bm_alt, wp->bmarg );
+
+    /* change each win below adjwin */
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	if (bm_alt <= wp->tmarg) {
+
+	//  tm_old = wp->tmarg;
+	    wp->tmarg = (ASlines) (wp->tmarg + h_chg);
+	    wp->ttext = (ASlines) (wp->tmarg + 1);
+	    wp->tedit = 0;
+
+	//  dbgpr("alt_h, win[%d], tm goes from %d to %d\n\n", i, tm_old, wp->tmarg);
+	    if (i != bottommost_win) {
+	    //  bm_old = wp->bmarg;
+		wp->bmarg = (ASlines) (wp->bmarg + h_chg);
+		wp->btext = (ASlines) (wp->bmarg - wp->tmarg - 2);
+		wp->bedit = wp->btext;
+	    //  dbgpr("alt_h, win[%d], bm goes from %d to %d\n\n", i, bm_old, wp->bmarg);
+	    }
+	    else {
+		wp->btext = (ASlines) (wp->bmarg - wp->tmarg - 2);
+		wp->bedit = wp->btext;
+	    //  dbgpr("no bmarg change to bottommost win=%d\n", i);
+	    }
+	}
+    }
+
+    return;
+}
+
+/*
+ *   alternate which window to adjust
+ */
+void
+alt_w_winresize(AScols rm_orig, AScols w_chg, int adjwin)
+{
+    int i;
+    int rightmost_win;
+    S_window *wp;
+
+    /* the rightmost window changes in all cases */
+    for (i=0; i<nwinlist; i++) {
+	if (winlist[i]->rmarg == rm_orig) {
+	    adj_w_borders(rm_orig, w_chg);
+	    if (i == adjwin) {  /* we're done */
+	    //  dbgpr("alt_w no=%d:  case: rightmost win\n", adjwin);
+		return;
+	    }
+	    rightmost_win = i;
+	    break;
+	}
+    }
+
+    /*  Case N windows:
+     *     change rm of adjwin
+     *     change lm and rm of each win to the right
+     *       except for rm of rightmost_win (done above)
+     */
+
+//  AScols lm_old, rt_old;
+    AScols rm_old;
+
+    /* adjust rm of adj window */
+    wp = winlist[adjwin];
+
+    rm_old = wp->rmarg;
+//  rt_old = wp->rtext;
+
+    wp->rmarg = (AScols) (wp->rmarg + w_chg);
+    wp->rtext = (AScols) (wp->rmarg - wp->lmarg - 2);
+    wp->redit = wp->rtext;
+
+/** /
+dbgpr("\nalt_w, adj win[%d], rm goes from %d to %d\n", i, rm_old, wp->rmarg );
+dbgpr("\nalt_w, adj win[%d], rt goes from %d to %d\n", i, rt_old, wp->rtext );
+/ **/
+
+    /* change each win to right of adjwin */
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	if (rm_old <= wp->lmarg) {
+	//  lm_old = wp->lmarg;
+	    wp->lmarg = (AScols) (wp->lmarg + w_chg);
+	    wp->ltext = (AScols) (wp->lmarg + 1);
+	//  dbgpr("alt_w, win[%d], lm goes from %d to %d\n\n", i, lm_old, wp->lmarg);
+
+	    if (i != rightmost_win) {
+	    //  rm_old = wp->rmarg;
+	    //  rt_old = wp->rtext;
+		wp->rmarg = (AScols) (wp->rmarg + w_chg);
+		wp->rtext = (AScols) (wp->rmarg - wp->lmarg - 2);
+	    //  dbgpr("alt_w, win[%d], rm goes from %d to %d\n\n", i, rm_old, wp->rmarg);
+	    //  dbgpr("alt_w, win[%d], rt goes from %d to %d\n\n", i, rt_old, wp->rtext);
+	    }
+	    else {
+		wp->rtext = (AScols) (wp->rmarg - wp->lmarg - 2);
+		wp->redit = wp->rtext;
+	    //  dbgpr("no rmarg change to rightmost win=%d, rtext=%d\n", i, wp->rtext );
+	    }
+	}
+    }
+
+    return;
+}
+
+
+int
+CheckWindowValues()
+{
+    S_window *wp;
+    int rc = 0;
+    int i;
+
+    /* check for valid entries */
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	if (wp->ltext != wp->lmarg + 1) {
+	    dbgpr("win %d bad ltext=%d should be %d\n",
+		i, wp->ltext, wp->lmarg + 1);
+	    rc = 1;
+	}
+
+	if (wp->ttext != wp->tmarg + 1) {
+	    dbgpr("win %d bad ttext=%d should be %d\n",
+		i, wp->ttext, wp->tmarg + 1);
+	    rc = 1;
+	}
+
+	if (wp->rtext != (wp->rmarg - wp->lmarg - 2)) {
+	    dbgpr("win %d bad rtext=%d should be %d\n",
+		i, wp->rtext,  (wp->rmarg - wp->lmarg - 2));
+	    rc = 1;
+	}
+
+	if (wp->btext != (wp->bmarg - wp->tmarg - 2)) {
+	    dbgpr("win %d bad btext=%d should be %d\n",
+		i, wp->btext,  (wp->bmarg - wp->tmarg - 2));
+	    rc = 1;
+	}
+    }
+
+    return rc;
+}
+
+/*
+ *   Handle drag on a top margin or left margin of curwin.
+ *   We know Button1 was pressed, we have
+ *   multiple windows, and press occurred either
+ *   on curwin.tmarg or curwin.lmarg
+ */
+int
+moveBorder(MEVENT *ev)
+{
+
+/** /
+dbgpr("moveBorder y:  ev=(%d,%d) cursorline=%d cursorcol=%d \
+tmarg=%d, ttext=%d, bmarg=%d, btext=%d\n",
+  ev->y, ev->x, cursorline, cursorcol,
+  curwin->tmarg, curwin->ttext, curwin->bmarg, curwin->btext);
+/ **/
+
+/** /
+dbgpr("moveBorder x:  ev=(%d,%d) cursorline=%d cursorcol=%d \
+lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
+  ev->y, ev->x, cursorline, cursorcol,
+  curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext);
+/ **/
+
+    /* are the boundaries ok */
+    {
+	if (ev->y < 2)  return 0;
+	if (ev->y >= curwin->bmarg) return 0;
+	if (ev->x  < curwin->lmarg) return 0;
+	if (ev->x  > curwin->rmarg) return 0;
+	// dbgpr("movingBorder:  boudaries ok\n");
+    }
+
+    S_window __attribute__((unused)) *wp;
+    int i;
+    int rc = 1;     /* Yes, we have a border move */
+    int w_no = -1;
+
+
+    /* do we have all hor or vert windows */
+    int allHorWins = AllHorWins();
+    int allVertWins = AllVertWins();
+
+    /*  TODO: may not need to require all horiz or all vert windows.
+     *  It should be ok if:
+     *
+     *  The top/bot windows share the same border and
+     *  have the same left and right margins.
+     *
+     *  The left/right windows share the same border and
+     *  have the same top and bottom margins.
+     */
+
+    S_window *twin, *bwin, *lwin, *rwin, *savwin;
+
+    savwin = curwin;   /* restore on any return() if changed */
+
+    if (!allHorWins && !allVertWins) {
+    //  dbgpr("No border moves with both horizontal and vertical windows.\n");
+	mesg(ERRALL+1, "No border moves with both horizontal and vertical windows.");
+	return 0;
+    }
+
+    int ccol = cursorcol;
+    int clin = cursorline;
+
+    /* find a win whose bmarg equals the tmarg of curwin */
+    if (allHorWins) {
+	if (ev->y == curwin->tmarg) {
+	    for (i=0; i<nwinlist; i++) {
+		if (winlist[i]->bmarg == curwin->tmarg) {
+		    wp = winlist[i];
+		//  dbgpr("Window above curwin at %d\n", wp->bmarg);
+		    w_no = i;
+		    rc = 0;
+		    bwin = curwin;
+		    twin = wp;
+		    break;
+		}
+	    }
+	}
+
+    }
+    else {   /* or one whose lm matches the lm of curwin */
+	if (ev->x == curwin->lmarg && (ev->x >= 2) ) {
+	    for (i=0; i<nwinlist; i++) {
+		if (winlist[i]->rmarg == curwin->lmarg) {
+		    wp = winlist[i];
+		//  dbgpr("Window left of curwin at %d\n", wp->rmarg);
+		    w_no = i;
+		    rc = 0;
+		    rwin = curwin;
+		    lwin = wp;
+		    break;
+		}
+	    }
+	}
+    }
+
+    if (w_no == -1) {
+	dbgpr("No windows found with matching borders ev->(y,x)=(%d,%d)\n",ev->y, ev->x);
+	return 0;
+    }
+
+
+    int rc1;
+
+    if (allHorWins) {
+	Nlines __attribute__((unused)) wlin_orig = bwin->wksp->wlin;
+	int begy = ev->y;
+
+	rc1 = doHborder(ev, bwin, twin);
+
+	//dbgpr("rc1=%d from doHborder()\n", rc1);
+
+	/* may need to adjust cursor if line 1 was moved */
+	if (rc1 && (wlin_orig != bwin->wksp->wlin)) {
+	    clin = adjCursor(bwin, wlin_orig, clin, begy);
+	}
+    }
+    else {
+	rc1 = doVborder(ev, rwin, lwin);
+	//dbgpr("rc1=%d from doVborder()\n", rc1);
+    }
+
+    if (rc1 == 0) return 0;   /* no move occurred */
+
+    /*  A border has moved and the windows have been resized,
+     *  now redraw the windows and borders.
+     */
+
+#ifdef OUT
+    /* for short files, don't leave cursor past last line */
+    Nlines __attribute__((unused)) ll = la_lsize(curlas);
+    //dbgpr("clin=%d lastl=%d\n", clin, ll);
+    clin = max(0, clin);
+#endif
+
+    /*
+     *  Without doubt there are extra fresh(), putup(), and drawborder()
+     *  calls below.  The exact "abracadabra" to only call them once
+     *  is still a work in progress....
+     */
+
+    /* restore the curwin variable before redrawing borders */
+    curwin = savwin;
+
+    for (i=0; i<nwinlist; i++) {
+	switchwindow (winlist[i]);
+	limitcursor();
+	poscursor(0, 0);
+	putupwin();
+	if (winlist[i] != curwin)
+	    drawborders (winlist[i], WIN_INACTIVE | WIN_DRAWSIDES);
+	else
+	    drawborders (winlist[i], WIN_ACTIVE | WIN_DRAWSIDES);
+	fresh();
+	d_put(0);
+    }
+
+    /* seems we need to redraw borders again */
+    for (i=0; i<nwinlist; i++) {
+	if (curwin != winlist[i]) {
+	    switchwindow(winlist[i]);
+	    poscursor(0,0);
+	    putupwin();
+	    drawborders (winlist[i], WIN_INACTIVE | WIN_DRAWSIDES);
+	}
+	d_put(0);
+	fresh();
+	fflush(stdout);
+    }
+
+    //dbgpr("curwin=%d savwin=%d\n", WinNumber(curwin), WinNumber(savwin));
+
+    curwin = savwin;
+    switchwindow(curwin);
+    poscursor(0,0);
+    limitcursor();
+    putupwin();
+    drawborders (curwin, WIN_ACTIVE | WIN_DRAWSIDES);
+    //fresh();
+    //d_put(0);
+    fflush(stdout);
+
+    //  switchwindow(curwin);
+
+    //dbgpr("ccol=%d vs rtext=%d, clin=%d vs btext=%d ttext=%d\n",
+    //ccol, curwin->rtext, clin, curwin->btext, curwin->ttext);
+
+    if (ccol > curwin->rtext) ccol = curwin->rtext;
+    if (clin > curwin->btext) clin = curwin->btext;
+    poscursor(ccol, clin);
+    d_put(0);
+    fresh();
+    fflush(stdout);
+
+    /* as per limitcursor() in e.t.c */
+    for (i=0; i<nwinlist; i++) {
+	winlist[i]->wksp->ccol = min (winlist[i]->wksp->ccol, winlist[i]->rtext);
+	winlist[i]->wksp->clin = min (winlist[i]->wksp->clin, winlist[i]->btext);
+	winlist[i]->altwksp->ccol = min (winlist[i]->altwksp->ccol, winlist[i]->rtext);
+	winlist[i]->altwksp->clin = min (winlist[i]->altwksp->clin, winlist[i]->btext);
+    }
+
+    /* need a redraw */
+    ungetch('\015');
+    ungetch('d');
+    ungetch('e');
+    ungetch('r');
+    ungetch(CCCMD);
+
+    rc = 1;     /* a redraw occurred */
+
+    infoinit();
+    unmark();
+
+    return rc;
+
+}
+
+/*
+ * adjust windows touching top/bottom margins
+ */
+void
+MoveHorBorder (S_window *botw, S_window *topw, ASlines y_new)
+{
+    /* adjust borders of top and bot windows */
+
+//  S_window *topw;
+    ASlines h_chg;
+    h_chg = (ASlines) (y_new - botw->tmarg);
+
+//    topw = winlist[w_no];
+
+//  ASlines bm_top = topw->bmarg;
+//  ASlines owlin = (ASlines) botw->wksp->wlin;
+
+    /* Don't allow a window to be less than 1 line in height */
+//  if (topw->bmarg < 3 && h_chg < 0)
+//      return;
+
+    topw->bmarg = (ASlines) (topw->bmarg + h_chg);
+    topw->btext = (ASlines) (topw->bmarg - topw->tmarg - 2);
+    topw->bedit = topw->btext;
+
+    botw->tmarg = (ASlines) (botw->tmarg + h_chg);
+    botw->ttext = (ASlines) (botw->tmarg + 1);
+    botw->btext = (ASlines) (botw->bmarg - botw->tmarg - 2);
+    botw->bedit = botw->btext;
+    botw->tedit = 0;
+
+//  botw->wksp->wlin += h_chg;
+//  if (botw->wksp->wlin < 0) botw->wksp->wlin = 0;
+
+    Nlines ln_eof = la_lsize(&botw->wksp->las);
+    if (botw->wksp->wlin > ln_eof) {
+	//dbgpr("wlin > ln_eof, wlin set to 0\n";
+	botw->wksp->wlin = 0;
+    }
+
+    /*  if a small file fits in the bottom window and
+     *  the top border has been moved so that line 1 is
+     *  no longer visible, adjust wlin so the window
+     *  starts with line 1
+     */
+    if (botw->wksp->wlin > 0) {
+	//dbgpr("cmp ln_eof %d vs %d\n", ln_eof, (botw->bmarg - botw->tmarg));
+	if (ln_eof < (Nlines) (botw->bmarg - botw->tmarg)) {
+	    botw->wksp->wlin = 0;
+	    //dbgpr("--file fits in botw, setting wlin to 0\n");
+	}
+    }
+
+//  botw->wksp->clin = (ASlines) (botw->wksp->clin + h_chg);
+
+// dbgpr("\nbot win, wlin goes from  %d to %d\n", owlin, botw->wksp->wlin );
+
+    return;
+}
+
+/*
+ * adjust borders of left and right touching windows
+ */
+void
+MoveVerBorder (S_window *rwin, S_window *lwin, AScols x_new)
+{
+
+    Scols w_chg;
+
+    w_chg = x_new - rwin->lmarg;
+
+    rwin->lmarg = (AScols) (rwin->lmarg + w_chg);
+    rwin->ltext = (AScols) (rwin->lmarg + 1);
+    rwin->rtext = (AScols) (rwin->rmarg - rwin->lmarg - 2);
+
+    lwin->rmarg = (AScols) (lwin->rmarg + w_chg);
+    lwin->rtext = (AScols) (lwin->rmarg - lwin->lmarg - 2);
+    lwin->redit = lwin->rtext;
+
+  //dbgpr("\ntop rwin, lm goes from %d to %d\n", i, lmarg, rwin->lmarg );
+
+    return;
+}
+
+int
+AllVertWins()
+{
+    int rc = 1;     /* assume yes, all vertical */
+    int i;
+
+    for (i=1; i<nwinlist; i++) {
+	if (winlist[i]->tmarg != winlist[0]->tmarg) {
+	    rc = 0; /* nope */
+	    break;
+	}
+    }
+    return rc;
+}
+
+int
+AllHorWins()
+{
+    int rc = 1;     /* assume yes, all horizontal */
+    int i;
+
+    for (i=1; i<nwinlist; i++) {
+	if (winlist[i]->lmarg != winlist[0]->lmarg) {
+	    rc = 0; /* nope */
+	    break;
+	}
+    }
+    return rc;
+}
+
+
+void
+clearImageArray (int beg_l, int end_l, int wid)
+{
+    char *cp0, *cp1;
+    Uint cnt;
+
+    /* fill the contents of image[] with blanks
+     * from beg_l to end_l
+     */
+
+    /* determine how many bytes to clear */
+
+    cp0 = (char *)image + wid * beg_l;
+    cp1 = (char *)image + wid * end_l;
+    cnt = (Uint) (cp1 - cp0);
+
+    fill (cp0, cnt, ' ');
+
+//dbgpr("clearImageArray:  beg_l=%d end_l=%d wid=%d cnt=%d\n",
+//beg_l, end_l, wid, cnt);
+
+    return;
+}
+
+
+int
+xlateBorderChar(int border_ch)      /* 129-142, see e.t.h */
+{
+    switch (border_ch) {
+	case LMCH:
+	case RMCH:
+	    return '|';
+	case MLMCH:
+	    return '<';
+	case MRMCH:
+	    return '>';
+	case TMCH:
+	case BMCH:
+	    return '-';
+	case TLCMCH:
+	case TRCMCH:
+	case BLCMCH:
+	case BRCMCH:
+	case TTMCH:
+	case BTMCH:
+	    return '+';
+	case ELMCH:
+	    return ';';
+	case INMCH:
+	    return '.';
+
+	default:
+	    break;
+    }
+
+    dbgpr("xlate: unknown %d\n", border_ch);
+
+    return '?';
+}
+
+
+void
+hiliteactive()
+{
+    int i;
+    int w = term.tt_width;
+    Uchar border[w];
+    Uchar *cp = (Uchar *)image + w * curwin->tmarg;
+
+//  int clin = cursorline;
+//  int ccol = cursorcol;
+
+    for (i=1; i<w; i++) {
+	border[i] = (Uchar) xlateBorderChar(cp[i]);
+    }
+    border[i] = '\0';
+//dbgpr("border:(%s)\n", border+1);
+
+    int len = curwin->rmarg - curwin->lmarg - 1;
+    mvcur(-1,-1, curwin->tmarg, curwin->lmarg+1);
+//  mvcur(-1,-1, 0, 0);
+//  tputs(bold_str, 1, Pch);
+    tputs(hilite_str, 1, Pch);
+    fwrite(border+1, sizeof (char), (size_t) len, stdout);
+    tputs(sgr0, 1, Pch);
+    fflush(stdout);
+
+    return;
+}
+
+
+/*  doHborder - move a horizontal border between top/bot windows
+ *
+ *  returns 1 if a move occurred, caller must redraw windows
+ *  returns 0 on err, no further action required concerning border moves.
+ */
+
+int
+doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
+{
+
+    //dbgpr("doHborder, ev->x=%d ev->y=%d\n", ev->x, ev->y);
+
+    int __attribute__((unused)) allHorWins = 1;
+    int __attribute__((unused)) allVertWins = 0;
+
+    S_window __attribute__((unused)) *wp, *savwin;
+
+    /* nxt two are temp */
+    S_window __attribute__((unused)) *rwin;
+    S_window __attribute__((unused)) *lwin;
+
+    int i;
+    int rc = 1;     /* Yes, we have a border move */
+    //int __attribute__((unused)) w_no;
+
+    //int __attribute__((unused)) ccol = cursorcol;
+    //int __attribute__((unused)) clin = cursorline;
+
+    MEVENT evt;
+    int c, begy, begx;
+    begy = ev->y;   /* same as bwin->tmarg */
+    begx = ev->x;   /* same as bwin->lmarg */
+    int y_new /*x_new*/;
+    int y_last, __attribute__((unused)) x_last;
+    y_last = begy;
+    x_last = begx;
+
+    int w = term.tt_width;
+    int __attribute__((unused)) h = term.tt_height;
+//  Uchar __attribute__((unused)) buf[w+1];
+    Uchar *cp;
+    int bline = ev->y;      /* border line */
+
+    cp = (Uchar *)image + w * bline;
+    Uchar h_border[w];
+
+    /* make a copy of the topmost border, which are '+' and '-' chars */
+    for (i=0; i < w; i++) {     /* omit margin tics, '-' and '+'  */
+	h_border[i] = cp[i+1] == TMCH ? '-' : '+';  /* see e.t.h */
+    }
+    h_border[--i] = '\0';
+    //dbgpr("h_border: %s\n", h_border);
+
+    /*  Restrict motion to exclude screen borders, and
+     *  moving past the top/left edge of the adjacent window.
+     *  Also, the resize needs to leave at least 1 line in a window.
+     */
+    int ymin, ymax;
+
+    /* leave at least 1 line of top and bot win */
+    ymin = twin->ttext;
+    ymax = bwin->ttext + bwin->btext;
+
+    /* highlight the current border */
+    mvcur(-1, -1, ev->y, 1);
+    tputs(bold_str,1,Pch);
+    fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+    tputs(sgr0, 1, Pch);
+    mvcur(-1, -1, ev->y, ev->x);
+    fflush(stdout);
+
+    //dbgpr("ymin=%d ymax=%d\n", ymin, ymax);
+
+    /* for highlighting horizontal tics as
+     * border is moved up/down
+     */
+    char h_tics[w+1];   /* may not need full width */
+    for (i=0; i<w-2; i++) h_tics[i] = '-';
+    h_tics[i] = '\0';
+    int h_len = (int) strlen(h_tics);
+    char row_buf[w+1], *hbuf;
+
+    int firsttime = 1;
+
+    /* collect mouse move events, already have a press-1 */
+    while(1) {
+	c = wgetch(stdscr);
+	//dbgpr("doHborder: got (%03o)\n", c);
+	switch(c) {
+	    case KEY_MOUSE:
+		break;
+	    case ERR:
+	    case 'q':       /* esc from loop from any bad coding below */
+		return 0;
+	    default:  /* some other char */
+		ungetch(c);
+		return 0;
+	}
+
+	if (getmouse(&evt) != OK) {
+	    dbgpr("doHborder:  getmouse err waiting for release event\n");
+	    return 0;
+	}
+
+	//dbgpr("event: %s\n", mouse_decode(&evt));
+
+#if NCURSES_MOUSE_VERSION == 1
+	if (evt.bstate & BUTTON1_RELEASED) {
+	    /* a click on the original border w/o movement */
+	    /* restore original horizontal border */
+	    mvcur(-1, -1, evt.y, 1);
+	    fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+	    mvcur(-1, -1, evt.y, evt.x);
+	    dbgpr("click w/o move at (%d,%d)\n", evt.y, evt.x);
+	    fflush(stdout);
+	    return 0;
+	}
+#endif
+
+#if NCURSES_MOUSE_VERSION > 1
+	if (evt.bstate & REPORT_MOUSE_POSITION) {
+#else
+	if (evt.bstate & BUTTON4_PRESSED) {
+#endif
+	    if (evt.y <= ymin || evt.y >= ymax) {
+		//dbgpr("evt.y(%d) <= ymin(%d) or >= ymax(%d), continue\n",
+		//evt.y, ymin, ymax);
+		continue;
+	    }
+
+	    if (firsttime) {
+		hbuf = (char *)image + w * evt.y;
+		snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+1);
+	    //  dbgpr("row_buf: (%s)\n", row_buf);
+		firsttime = 0;
+	    }
+	    else {  /* repaint saved text */
+		mvcur(-1, -1, y_last, 1);
+		//tputs(row_buf, 1, Pch);
+		if (y_last != begy) {
+		    fwrite(row_buf, sizeof(char), (size_t) w-2, stdout);
+		}
+		else {  /* rewrite original border line in bold */
+		    tputs(bold_str,1,Pch);
+		    fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+		    tputs(sgr0, 1, Pch);
+		}
+		//fflush(stdout);
+	    }
+
+	    hbuf = (char *)image + w * evt.y;
+	    snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+1);
+	 // dbgpr("row_buf: (%s)\n", row_buf);
+
+	    mvcur(-1, -1, evt.y, 1);
+	    //tputs(brace_p,1,Pch);
+	    tputs(hilite_str,1,Pch);
+	    //tputs(h_tics, 1, Pch);
+	    fwrite(h_tics, sizeof (char), (size_t) w-2, stdout);
+	    tputs(sgr0, 1, Pch);
+	    mvcur(-1, -1, evt.y, evt.x); /* back to mouse orig x */
+	    fflush(stdout);
+	    y_last = evt.y;
+
+	//  dbgpr("button4_pressed, y_new is %d\n", evt.y);
+
+	    continue;
+	}
+
+#if NCURSES_MOUSE_VERSION > 1
+	if (evt.bstate & BUTTON1_RELEASED) {
+	    break;
+	}
+#else
+	if (evt.bstate & BUTTON4_RELEASED) {
+	    break;
+	}
+#endif
+    }
+
+    //dbgpr("button release, move hor border to %d\n", evt.y);
+
+    if (evt.y <= (twin->tmarg+1) ) {
+	dbgpr("Can't move past top margin of the adjacent window\n");
+	mesg(ERRALL+1, "Can't move past the top margin of the adjacent window");
+	rc = 0;
+	return 0;
+    }
+
+    if (evt.y == bwin->tmarg) {
+	dbgpr("no change in border position\n");
+	/* rewrite original border */
+	mvcur(-1, -1, evt.y, 1);
+	fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+	return 0;
+    }
+
+    /* shouldn't need this... */
+    if (evt.y >= ymax) evt.y = ymax - 1;
+
+    y_new = evt.y;
+    //dbgpr("release:  y_new=%d, ymax=%d\n", y_new, ymax);
+
+//  Nlines wlin_orig = bwin->wksp->wlin;
+    MoveHorBorder(bwin, twin, (ASlines) y_new);
+
+    if (!CheckWindowValues()) {
+    //  dbgpr("window parameters ok\n");
+	;
+    }
+
+    /*  Fill the contents of image[] with blanks from the
+     *  topmost change to the bmarg of the bottom window.
+     *  If border moved down, start at begy.
+     */
+    int from = begy < evt.y ? begy : evt.y;
+    clearImageArray(from, (int)bwin->bmarg, w);
+
+    //dbgpr("doHborder, end, rc=%d\n");
+
+    return rc;
+
+}
+
+/*  doVborder - move a vertical border between left/rt windows
+ *
+ *  returns 1 if a move occurred, caller must redraw windows
+ *  returns 0 on err, no further action required concerning border moves.
+ */
+
+int
+doVborder(MEVENT *ev, S_window *rwin, S_window *lwin)
+{
+
+    int __attribute__((unused)) allHorWins = 0;
+    int __attribute__((unused)) allVertWins = 1;
+
+    S_window __attribute__((unused)) *wp, *savwin;
+
+    /* nxt two are temp */
+    S_window __attribute__((unused)) *twin;
+    S_window __attribute__((unused)) *bwin;
+
+    int i;
+    int rc = 1;     /* Yes, we have a border move */
+    int __attribute__((unused)) w_no;
+
+    int __attribute__((unused)) ccol = cursorcol;
+    int __attribute__((unused)) clin = cursorline;
+
+    /*  twin and bwin or lwin and rwin are set
+     *  to the correct windows
+     */
+
+    MEVENT evt;
+    int c, begy, begx;
+    begy = ev->y;   /* same as curwin->tmarg */
+    begx = ev->x;   /* same as curwin->lmarg */
+    int __attribute__((unused)) y_new, x_new;
+    int __attribute__((unused)) y_last, x_last;
+    y_last = begy;
+    x_last = begx;
+
+    int w = term.tt_width;
+    int h = term.tt_height;
+//  Uchar __attribute__((unused)) buf[w+1];
+    Uchar *cp;
+    int bline = ev->y;      /* border line */
+
+    cp = (Uchar *)image + w * bline;
+//  Uchar __attribute__((unused)) h_border[w];
+
+    Uchar v_border[h];
+
+    for (i=rwin->ttext; i < rwin->bmarg; i++) {     /* omit top/bot tics */
+	/* v_border[0] not used */
+	cp = (Uchar *)image + w * i;
+	v_border[i] = (Uchar) xlateBorderChar(cp[ev->x]);
+    }
+    v_border[i] = '\0';
+    //dbgpr("v_border: %s\n", v_border+1);
+
+    /*  Restrict motion to exclude screen borders, and
+     *  moving past the top/left edge of the adjacent window.
+     *  Also, the resize needs to leave at least 1 line in a window.
+     */
+    int xmin, xmax;
+
+    /* leave at least 1 column of rwin and lwin */
+    xmax = rwin->ltext + rwin->rtext;
+    xmin = lwin->ltext + 1;   /* start of left window */
+
+    /* highlight the current vertical column */
+    for (i=rwin->ttext; i<rwin->bmarg; i++) {
+	mvcur(-1, -1, i, ev->x);
+	//futs(hilite_str,1,Pch);
+	tputs(bold_str,1,Pch);
+	fputc('|', stdout);
+	tputs(sgr0, 1, Pch);
+    }
+    mvcur(-1, -1, ev->y, ev->x);
+    fflush(stdout);
+
+//  dbgpr("xmin=%d xmax=%d\n", xmin, xmax);
+
+    /* for highlighting vertical tics as
+     * border is moved left/right
+     */
+    char v_tics[h+1];
+    for (i=0; i<h-2; i++) v_tics[i] = '|';
+    v_tics[i] = '\0';
+
+    Uchar col_buf[h+1];
+
+    int firsttime = 1;
+
+    /* collect mouse move events, already have a press-1 */
+    while(1) {
+	c = wgetch(stdscr);
+	//dbgpr("moveBorder: got (%03o)\n", c);
+
+	switch(c) {
+	    case KEY_MOUSE: /* what we expect */
+		break;
+	    case ERR:
+	    case 'q':       /* esc from loop from any bad coding below */
+		return 0;
+	    default:  /* some other char */
+		ungetch(c);
+		return 0;
+	}
+
+	if (getmouse(&evt) != OK) {
+	    dbgpr("doVborder:  getmouse err waiting for release event\n");
+	    return 0;
+	}
+
+	//dbgpr("event: %s\n", mouse_decode(&evt));
+
+
+#if NCURSES_MOUSE_VERSION == 1
+	if (evt.bstate & BUTTON1_RELEASED) {
+	    /* a click on the original border w/no movement */
+
+	    /* restore original vertical border */
+	    for (i=rwin->ttext; i<rwin->bmarg; i++) {
+		mvcur(-1, -1, i, evt.x);
+		fputc(v_border[i], stdout);
+	    }
+
+	    mvcur(-1, -1, evt.y, evt.x);
+	    dbgpr("click w/o move at (%d,%d)\n", evt.y, evt.x);
+	    fflush(stdout);
+	    return 0;
+	}
+#endif
+	if (evt.bstate & BUTTON1_CLICKED) /* not possible ? */
+	    return 1;
+
+#if NCURSES_MOUSE_VERSION > 1
+	if (evt.bstate & REPORT_MOUSE_POSITION) {
+#else
+	if (evt.bstate & BUTTON4_PRESSED) {
+#endif
+
+	    if (evt.x < xmin || evt.x >= xmax)
+		continue;
+
+		/*  As the border is moved left or right, save
+		 *  the chars pointed at by the cursor (evt.x) from
+		 *  line 1 to the window bottom.  This 1-char wide column
+		 *  will be re-written as the cursor moves.
+		 */
+	    if (firsttime) {
+		    /* note: col_buf[0] is not used */
+		for (i=rwin->ttext; i<rwin->bmarg; i++) {
+		    cp = (Uchar *)image + w * i;
+		    col_buf[i] = cp[evt.x];
+		}
+		col_buf[i] = '\0';
+		//dbgpr("col_buf=(%s) firsttime\n", col_buf+1);
+		firsttime = 0;
+	    }
+	    else {  /* rewrite saved column of chars */
+		if (evt.x != begx) {
+		    if (x_last != begx) { /* not at orig border */
+			for (i=rwin->ttext; i<rwin->bmarg; i++) {
+			    mvcur(-1, -1, i, x_last);
+			    fputc(col_buf[i], stdout);
+			}
+		    }
+		    else {
+			for (i=rwin->ttext; i<rwin->bmarg; i++) {
+			    mvcur(-1, -1, i, begx);
+			    //fputs(hilite_str,1,Pch);
+			    tputs(bold_str,1,Pch);
+			    fputc('|', stdout);
+			    //fputc(v_tics[i], stdout);
+			    tputs(sgr0, 1, Pch);
+			}
+		    }
+		    mvcur(-1, -1, evt.y, evt.x); /* restore yx position */
+		}
+		else {  /* hilite the original vert border */
+		    for (i=rwin->ttext; i<rwin->bmarg; i++) {
+			mvcur(-1, -1, i, x_last);
+			fputc(col_buf[i], stdout);
+		    }
+
+		    mvcur(-1, -1, evt.y, begx); /* restore yx position */
+
+		    for (i=rwin->ttext; i<rwin->bmarg; i++) {
+			mvcur(-1, -1, i, begx);
+			//fputs(hilite_str,1,Pch);
+			tputs(bold_str,1,Pch);
+			//fputc('|', stdout);
+			fputc(v_tics[i], stdout);
+			tputs(sgr0, 1, Pch);
+		    }
+		    mvcur(-1, -1, evt.y, begx); /* restore y position */
+		    fflush(stdout);
+		}
+	    }
+
+	    /* save 1 char from each line, top to bottom */
+	    if (evt.x != begx) {    /* unless x = original vert border */
+		for (i=rwin->ttext; i<rwin->bmarg; i++) {
+		    cp = (Uchar *)image + w * i;
+		    col_buf[i] = cp[evt.x];
+		}
+	    }
+	    col_buf[i] = '\0';
+	    //dbgpr("col_buf=(%s)\n", col_buf+1);
+
+	    /* hilite the x position, top to bottom */
+	    for (i=rwin->ttext; i<rwin->bmarg; i++) {
+		mvcur(-1, -1, i, evt.x);
+		tputs(hilite_str,1,Pch);
+		fputc('|', stdout);
+		//fputc(v_tics[i], stdout);
+		tputs(sgr0, 1, Pch);
+	    }
+
+	    x_last = evt.x;
+	    mvcur(-1, -1, evt.y, evt.x);
+	    fflush(stdout);
+	    //  dbgpr("button4_pressed, x_new is %d\n", evt.x);
+	    continue;
+	}
+
+#if NCURSES_MOUSE_VERSION > 1
+	if (evt.bstate & BUTTON1_RELEASED) {
+	    break;
+	}
+#else
+	if (evt.bstate & BUTTON4_RELEASED) {
+	    break;
+	}
+#endif
+    }
+
+    //dbgpr("button release, move vert border to %d\n", evt.x);
+
+    /* need this??? */
+    if (evt.x < xmin) evt.x = xmin;
+    if (evt.x >= xmax) evt.x = xmax-1;
+
+    if (evt.x <= (lwin->lmarg+1) ) {
+	dbgpr("Can't move past left margin of the adjacent window\n");
+	mesg(ERRALL+1, "Can't move past the left margin of the adjacent window");
+	return 1;
+    }
+
+    if (evt.x == begx) {
+	/* restore original vertical border */
+	for (i=rwin->ttext; i<rwin->bmarg; i++) {
+	    mvcur(-1, -1, i, evt.x);
+	    fputc(v_border[i], stdout);
+	}
+	dbgpr("no change in horizontal border position\n");
+	mvcur(-1, -1, begy, begx);
+	fflush(stdout);
+	return 1;
+    }
+
+    x_new = evt.x;
+
+    MoveVerBorder(rwin, lwin, (AScols) x_new);
+
+    if (!CheckWindowValues()) {
+    //  dbgpr("window parameters ok\n");
+	;
+    }
+
+    clearImageArray(1, rwin->bmarg, w);
+
+    //dbgpr("doVborder, end, rc=%d\n");
+
+    return rc;
+}
+
+
+/* returns 1 if cursor is positioned on a "movable" border.
+ *
+ */
+
+Flag
+atMoveableBorder(int y, int x)
+{
+       /* todo, more conditions apply */
+    if ((y == curwin->tmarg && y > 0) || (x == curwin->lmarg && x > 0)) {
+	return 1;
+    }
+
+    return 0;
+}
+
+
+int
+adjCursor (S_window *bwin, Nlines wlin_orig, int clin, int begy)
+{
+
+    int y_new = bwin->tmarg;
+
+    /* adjust cursor to remain on original line */
+
+    //dbgpr("wlin=(%d) clin=%d begy=%d y_new=%d tmarg=%d, wlin_orig=%d\n",
+    //    curwksp->wlin, clin, begy, y_new, curwin->tmarg, wlin_orig);
+
+    if (wlin_orig != bwin->wksp->wlin) {
+	int h_chg = abs( (int)(wlin_orig - bwin->wksp->wlin) );
+	//int  clin_old = clin;  /* dbg */
+	if (y_new < begy)
+	    clin += h_chg;
+	else
+	    clin -= h_chg;
+	//dbgpr(" cursor fix:, clin changed from %d to %d\n", clin_old, clin);
+    }
+
+    return clin;
+}
+
+

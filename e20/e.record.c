@@ -239,7 +239,7 @@ Flag peekflg;
 
 Cmdret
 DoMacro(name, arg)
-char *name;
+char *name;   /* starts with $name */
 char *arg;
 {
     char tmp[50];
@@ -447,7 +447,7 @@ ReadMacroFile()
     }
 
     if( !macfile ) {
-	dbgpr("ReadMacroFile:  no file to process\n");
+    /*  dbgpr("ReadMacroFile:  no file to process\n"); */
 	return;
     }
 

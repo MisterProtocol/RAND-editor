@@ -157,7 +157,7 @@ extern char *sprintf ();
 
 /* MAXWIDTH is the maximum of all defined widths in e.tt.h */
 /*#define MAXWIDTH 260            / * length of longest possible screen line */
-#define MAXWIDTH 223              /* length of longest possible screen line */
+#define MAXWIDTH 255 /*223*/              /* length of longest possible screen line */
 /* if (MAXWIDTH > 127)  then you must define WIDE
  **/
 /* #undef  WIDE   */
@@ -933,8 +933,8 @@ extern Flag gtumark (Flag);
 extern Small exchmark (Flag);
 extern int Pch(int);
 extern void markprev (void);
-extern int FindBraceBack(int, int, int, long *, int *);
-extern int FindBraceForw(int, int, int, long *, int *);
+extern int FindBraceBack(int, int, int, long *, int *, Flag);
+extern int FindBraceForw(int, int, int, long *, int *, Flag);
 extern int win_has_eof(void);
 /* e.nm.c */
 extern Cmdret name (void);

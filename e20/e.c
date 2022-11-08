@@ -157,6 +157,7 @@ char *optmouse_stop;
 Flag needResize = NO;
 Flag optnoresize = NO;
 int resize_h, resize_w; /* save new term w/h values */
+extern Flag noresizeall;
 
 extern void ResizeWindows(int h, int w);
 
@@ -869,6 +870,7 @@ checkargs ()
 
 	case OPTNORESIZE:
 	    optnoresize = YES;
+	    noresizeall = YES;
 	    break;
 
 	case OPTNOTRACKS:
@@ -3024,3 +3026,4 @@ resize_handler (int sig)
 #ifdef SHOWKEYS_INPLACE
 #include "e.showkeys.c"
 #endif /* SHOWKEYS_INPLACE */
+

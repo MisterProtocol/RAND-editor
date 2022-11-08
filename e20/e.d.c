@@ -97,8 +97,9 @@ extern Flag NoBell;
 extern Flag VBell;
 #endif /* LMCVBELL */
 extern int kill();
+extern char *getVCCname(int);
 
-
+unsigned short i2;  /* testing */
 
 #ifdef OUT
 /* debug */
@@ -231,12 +232,12 @@ Short count;
     register int chr;
 
 /*debug*/
-#ifdef DBGPR
+#if 0
 char *vccname;
 int vcc_arg1 = -1;
 int vcc_arg2 = -1;
 
-if( 0 || debug_d_write ) {
+if( 1 || debug_d_write ) {
   if( *chp < ' ' ) {
     vccname = getVCCname(*chp);
     if( count == 3 ) {
@@ -312,6 +313,23 @@ if( 0 || debug_d_write ) {
 		case VCCAAD:
 		    state = 3;
 		    break;
+
+		/*  this is a test of passing a 2-byte address
+		 *  for a column width > 223
+		 */
+		case VCCAAD1:   /* get 2-byte column addr */
+		    memmove(&i2, &chp[1], sizeof i2);
+	       /*   dbgpr("VCCAAD1, &chp[1]: i2=%d\n", i2); */
+		    chp ++;
+		    count--;
+		    icursor = lincurs + min (i2, term.tt_width);
+		    state = 5;
+/** /
+dbgpr("VCCAAD1:  i2=%d icursor=%d lincurs=%d ilin=%d icol=%d chr=(%d) winl=%d winr=%d\n",
+i2, icursor, lincurs, ilin, icol, chr, winl, winr);
+/ **/
+
+		    goto nextchar;
 
 		case VCCINI:
 		    MINI0 ();
@@ -606,6 +624,10 @@ if( 0 || debug_d_write ) {
 		if (chr > 040) {
 		    icursor = lincurs + min (chr - 040, term.tt_width) - 1;
 		    state = 5;
+/** /
+dbgpr("case 3:  icursor=%d lincurs=%d ilin=%d icol=%d chr=(%d) winl=%d winr=%d\n",
+icursor, lincurs, ilin, icol, chr, winl, winr);
+/ **/
 		}
 		else if (chr == 040)
 		    state = 5;
@@ -619,6 +641,7 @@ if( 0 || debug_d_write ) {
 
 	    case 4:                         /* get oversize column addr */
 		icursor = lincurs + min (127 - 040 + chr - 040, term.tt_width) -1;
+/*dbgpr("case 4: (border characters)  icursor=%d lincurs=%d\n", icursor, lincurs); */
 		state = 5;
 		goto nextchar;
 
@@ -628,6 +651,10 @@ if( 0 || debug_d_write ) {
 		    ilin = min (chr - 040, term.tt_height) - 1;
 		    lincurs = (Short) ilin * (Short) term.tt_width;
 		    icursor = lincurs + icol;
+/*
+dbgpr("case 5:  icursor=%d lincurs=%d ilin=%d icol=%d chr=(%d)\n",
+icursor, lincurs, ilin, icol, chr);
+*/
 		}
 		else if (chr < 040)
 		    break;
@@ -1736,19 +1763,21 @@ fresh ()
     redraw = NO;
     restcurs ();
 
+//#ifdef OUT
 #ifdef MOUSE_BUTTONS
 #ifdef BUTTON_FONT
     if (optshowbuttons)
 	overlayButtons();
 #endif
 #endif /* MOUSE_BUTTONS */
+//#endif /* OUT */
 
     return;
 }
 
 /* debug */
 
-#ifdef DBGPR
+#if 0
 /*
  *   Lookup the name of a VCC command
  *   eg, for 0402 return "KEY_DOWN"

@@ -19,5 +19,4 @@
 /*  Added to facilitate window resizing,
  *  see comments in e.wi.c:  setupwindow()
  */
-#define MAXWINLINES 80
-
+#define MAXWINLINES 256

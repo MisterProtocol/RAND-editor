@@ -132,6 +132,10 @@ extern S_kbd  *tkbd[];
 #define VCCARG 021 /* q arg or qualification key			*/
 #define VCCDWN 022 /* r down arrow					*/
 #define VCCAAD 024 /* t absolute cursor address 			*/
+
+/* 7/2022, test widths > 0377, see also MAXWIDTH in e.h   */
+#define VCCAAD1  023 /* t absolute cursor address, send 2-byte integer  */
+
 #define VCCBKS 036 /* ^ backspace					*/
 #define VCCRIT 037 /* _ right arrow					*/
 /* fine VCCWIN 025 / *   define window */

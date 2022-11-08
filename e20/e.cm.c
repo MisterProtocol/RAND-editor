@@ -43,7 +43,6 @@ extern char *fgbg_pair;
 int doSetHighlight(char *arg);
 char *highlight_info_str;
 extern int n_colors;
-int noresizeall;    /******/
 
 /* brace matching/hilighting */
 int braceRange = 100;           /* match to +/- braceRange lines */
@@ -504,7 +503,6 @@ command (forcecmd, forceopt)
 	fresh ();
 	retval = CROK;
 	redrawflg = YES;
-	/* dbgpr("e.cm.c:  got CMDREDRAW\n");*/
 	break;
 
     case CMDSPLIT:
@@ -597,14 +595,6 @@ command (forcecmd, forceopt)
 	    break;
 	}
 	removewindow ();
-#ifdef OUT
-limitcursor();
-poscursor(cursorcol, cursorline);
-putupwin();
-drawborders(curwin, WIN_ACTIVE | WIN_DRAWSIDES);
-d_put(0);
-fresh();
-#endif
 	retval = CROK;
 	break;
 
