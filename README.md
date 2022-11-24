@@ -40,21 +40,15 @@ After you have some text entered, start clicking the buttons at the
 bottom of the screen with the mouse to see what various editor commands
 do.
 
-N.b.: The editor does not support having its window resized. You must
-exit the editor, resize the window, and restart the editor.
-This feature is undergoing current development and will be supported
-in a future release.
-
 You can start the editor in two ways:
 
 1) `e filename` will edit the named file, or, if it does not exist,
 will ask you if you want to create it.
 
 2) `e` with no arguments will start up editing the last file you
-edited in the current directory, at the place in the file where you
-exited the editor.
-If you have not previously run the editor in the current directory,
-it will open a new file called `scratch`.
+edited in the current directory, at the place in the file where you exited
+the editor.  If you have not previously run the editor in the current
+directory, it will open a new file called `scratch`.
 
 The files in the "man" directory will give you much more extensive
 documentation on how the editor works.
@@ -313,7 +307,7 @@ The second Makefile, in `e20/Makefile`, contains the information necessary to
 actually compile the editor, including termcap compilation options, the
 locations of `#include` files, and so forth.  Both Makefiles should be read
 carefully and changed as necessary for the local environment.  "e" missed
-out on the whole `config` thing by quite a few decades.  (Personal note: 
+out on the whole `config` thing by quite a few decades.  (Personal note:
 Frankly, I'm surprised it even uses `make`.  It didn't used to.  In the
 old days it was compiled by a shell script. --MOB)
 
@@ -347,6 +341,43 @@ a call to "mandoc" into the binary.  (Apple claims to have done this because
 Darwin OS does not have "roff".  It has "nroff" and "troff" both, so
 this is jejune and stupid.)  The "gman" command renders regular man pages
 as well as the "e" man page without muss, fuss or bother.
+
+### Extensions - Window resizing
+
+The editor now supports resizing of both the containing terminal
+window, and the editor's own internal windows.
+Either type may be resized by the usual method of dragging a
+border.  This is a very new feature, as originally the editor
+ran on hardware terminals, where resizing the screen was
+not possible.
+
+### Extensions - `ctags` and `tags` files
+
+Editors such as `vi/vim` and `emacs` have the ability to use
+`tags` files, created by external programs such as `ctags`.
+When an editor supporting the use of tags first starts, it looks
+in the current directory for a file named `tags`.
+If present, this file contains an index of the definition of
+every function defined in every source code file in the
+directory.
+This allows the programmer to quickly find the definition
+of any function referred to in the code.
+
+The RAND editor now supports the use of `tags` files.
+A **tag** command has been introduced which will use the
+`tags` file to find the definition of the function whose
+name is under the cursor.
+
+Because of the age of the editor's code, it uses comment blocks
+which confuse the `ctags` utility.
+Therefore, to generate a `tags` file for use with the
+editor's source code, a helper shell script, `ctags.sh`,
+is used by the top-level `Makefile` to create the `tags`
+file for the editor source.
+Because most editing is expected to be done in the
+subdirectory containing the bulk of the editor's
+source code, the `tags` file is not built at the top
+level, but is placed in the `e20/` directory.
 
 ### Shell files for Macs
 

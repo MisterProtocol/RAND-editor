@@ -2986,36 +2986,6 @@ resize_handler (int sig)
 	   sig, h, w, LINES, COLS); / **/
     }
 
-#ifdef OUT
-    /* if the window is smaller, advice how best to recover */
-    char buf[128] = "";
-    if (h < term.tt_height || w < term.tt_width) {
-	snprintf(buf, 80, "Enlarge to at least %d x %d, then <cmd>redraw to recover.",
-	   term.tt_height, term.tt_width);
-    }
-    if (h != term.tt_height || w != term.tt_width) {
-	mesg(ERRALL + 2, "Window size changes are not supported. ",  buf);
-	fflush(stdout);
-    }
-#endif /* OUT */
-
-#ifdef OUT
-    if (nwinlist > 8) {
-	mesg(ERRALL + 1, "Win size changes are limited to 8 E windows.");
-	fflush(stdout);
-	signal(SIGWINCH, resize_handler);
-	return;
-    }
-
-    if (nButtonLines) {
-	mesg(ERRALL + 1, "Win size changes are not allowed with -showbuttons.");
-	fflush(stdout);
-	signal(SIGWINCH, resize_handler);  /* is this ok here?? */
-	return;
-    }
-#endif /* OUT */
-
-
     /* see e.resize.c  */
     ResizeWindows(h, w);
 

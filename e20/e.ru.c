@@ -536,10 +536,11 @@ Flag    safe;       /* OK for program to write directly on changes file */
 	intok = YES;
 #ifdef RUNSAFE
 	if (la_lflush (curlas, from, number, pipe1[1], YES, EXECTIM)
+	    < number) {
 #else
 	if (la_lflush (curlas, from, number, output, YES, EXECTIM)
-#endif
 	    < number) {
+#endif
 	    intok = NO;
 	    execabortmesg (funcnm);
 	    return CROK;
@@ -554,11 +555,13 @@ Flag    safe;       /* OK for program to write directly on changes file */
 
 #ifdef RUNSAFE
     if (   dowait (child1) == 1
-#else
-    if (   dowait (progid, child1, child2) == 1
-#endif
 	&& receive (chgend, from, closeflg ? number : 0, iqbuf, puflg)
        )
+#else
+    if (   dowait (progid, child1, child2) == 1
+	&& receive (chgend, from, closeflg ? number : 0, iqbuf, puflg)
+       )
+#endif
 	return CROK;
 
     /*  10/2022:  run cmd was either aborted or not found.

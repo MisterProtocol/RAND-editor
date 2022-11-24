@@ -14,7 +14,7 @@ file e.m.c
 #include "e.m.h"
 #include "e.tt.h"
 #include "e.e.h"
-
+#include <ctype.h>
 
 Cmdret edkey (Char, Flag);
 extern Cmdret chgcase (Flag);
@@ -35,11 +35,20 @@ extern void highlightarea(Flag, Flag);
 extern void HiLightBracePairs(Flag);
 extern int bracematching;
 extern int brace_marked;
+extern void hiliteTopBorder(S_window *);
+extern void hiliteLeftBorder(S_window *);
+extern Flag borderChanged;
 
 #ifdef MOUSE_BUTTONS
 extern int mouseFuncKey;
 extern void getMouseButtonEvent(void);
 extern void doMouseEvent(void);
+#endif
+
+#ifdef TAGS
+extern int dotag(char *);
+extern void PushTagCmds(void);
+extern Flag editTagFile;
 #endif
 
 #endif /* NCURSES */
@@ -175,13 +184,20 @@ marklines, markcols, mklinstr, mkcolstr);
 	else if (bracematching || brace_marked) {
 	    HiLightBracePairs(YES);
 	}
-	redrawflg = 0;  /* set in e.cm.c, case CMDREDRAW */
 
 	if (borderbullets) {
 	    dobullets (loopflags.bullet, loopflags.clear);
 	    loopflags.bullet = NO;
 	}
 	loopflags.clear = NO;
+
+/* test, show a little hilite on active border margin */
+if (borderChanged || redrawflg) {
+    hiliteTopBorder(curwin);  /* testing */
+    hiliteLeftBorder(curwin);  /* testing */
+    borderChanged = 0;
+}
+	redrawflg = 0;  /* set in e.cm.c, case CMDREDRAW */
 
 	if (cmdmode) {
 	    loopflags.hold = NO;
@@ -341,6 +357,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 
 	    switch (key) {
 		case CCCMD:
+		case CCCMD0:
 		    keyused = YES;
 		    goto gotcmd;
 
@@ -373,6 +390,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 		    donetype = edkey (key, NO);
 		    goto doneswitch;
 
+
 		case CCMISRCH:
 		case CCPLSRCH:
 		    dosearch (key == CCPLSRCH ? 1 : -1);
@@ -381,6 +399,15 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 		case CCINSMODE:
 		    tglinsmode ();
 		    goto funcdone;
+
+#ifdef TAGS
+		case CCTAG:
+		    //dbgpr("key CCTAG, calling dotag(NULL)\n");
+		    dotag(NULL);
+		    if (editTagFile)
+			PushTagCmds();
+		    goto funcdone;
+#endif
 
 		case CCBRACE:
 		    opstr = ""; /* for dbg in doSetBraceMode() */
@@ -452,6 +479,7 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 		case CCTABS:
 		    sctab (curwksp->wcol + cursorcol, YES);
 		    goto funcdone;
+
 
 		case CCMARK:
 		    mark ();
@@ -600,7 +628,8 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 gotcmd:
 	    param ();
 /** /
-dbgpr("after param(): key=%o cmdmode=%d, paramv=(%s)\n", key, cmdmode, paramv);
+dbgpr("after param(): key=(%03o)(%d)(%c) cmdmode=%d,paramtype=%d paramv=(%s)\n",
+key, key, key, cmdmode, paramtype, paramv);
 / **/
 	    if (cmdmode && key != CCRETURN)
 		goto notcmderr;
@@ -623,6 +652,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 
 	    switch (key) {
 		case CCCMD:
+		case CCCMD0:
 		    goto funcdone;
 
 		case CCLWINDOW:
@@ -674,6 +704,11 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 
 		case CCMISRCH:
 		case CCPLSRCH:
+	/*      case CCTAGSRCH:  */
+
+//dbgpr("e.m.c: got (%o)=CC{PL,MI,TAG}SRCH paramtype=%d paramv=(%s)\n",
+//key, paramtype, paramv);
+
 		    if (paramtype == 0)
 			getarg ();
 		    if (*paramv == 0)
@@ -709,6 +744,19 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		    if (searchkey)
 			sfree (searchkey);
 		    searchkey = append (paramv, "");
+#ifdef OUT
+		    { int i;
+		      int len = (int)strlen(searchkey);
+		      dbgpr("srch,len=%d:");
+		      for(i=0; i<len;i++) {
+			if (isprint(searchkey[i]))
+			  dbgpr("%c", searchkey[i]);
+			else
+			  dbgpr("(%o)", searchkey[i]);
+		      }
+		      dbgpr("\n");
+		    }
+#endif /* OUT */
 		    dosearch (key == CCPLSRCH ? 1 : -1);
 		    goto funcdone;
 
@@ -985,6 +1033,14 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		case CCRANGE:
 		    donetype = command (CMDQRANGE, nix);
 		    goto doneswitch;
+#ifdef TAGS
+		case CCTAG:
+//dbgpr("e.m.c: calling command(CMDTAG, nix) from <cmd>tag xxx\n");
+		    command (CMDTAG, nix);
+		    //if (editTagFile)
+		    //    PushTagCmds();
+		    goto funcdone;
+#endif
 
 		case CCREDRAW:
 		case CCBOX:
@@ -999,8 +1055,8 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		case CCREPLACE:
 		case CCDEL:
 		default:
-		    dbgpr("key=(%03o)(%d) not implemented, entering=%d cmdmode=%d\n",
-			key,key,entering,cmdmode);
+		//  dbgpr("key=(%03o)(%d) not implemented, entering=%d cmdmode=%d\n",
+		//      key,key,entering,cmdmode);
 		    goto notimperr;
 	    }
 
@@ -1096,6 +1152,7 @@ doneswitch:
 	    continue;
 
 	    badkeyerr:
+	//  dbgpr("bad key error: key=(%o)(%d)\n", key, key);
 	    mesg (ERRALL + 1, "Bad key error - editor error");
 	    continue;
 	}

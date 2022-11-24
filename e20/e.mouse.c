@@ -41,7 +41,9 @@ void testMouse(void);
 int toggle_mouse(char *);
 void doMouseEvent(void);
 
+/* these are located in e.resize.c */
 extern void debugAllWindows (void);
+/*void debug_fileflags(void);*/
 
 //static const char *mouse_decode(MEVENT const *);
 //char *mouse_decode(MEVENT const *);
@@ -153,6 +155,7 @@ int  n_colors;    /* terminal colors */
 char *hilite_str; /* set to a standout mode, bold, bgcolor, rev vid */
 char *brace_p;    /* color for bracket matching */
 char *font_red;   /* to highlight errors */
+char *gray255;    /* to highlight moveable borders */
 
 
 #ifdef OUT
@@ -397,8 +400,10 @@ initCursesColor()
 	setab_p = strdup(tparm(setab,bg_idx));
 	setaf_p = strdup(tparm(setaf,fg_idx));
 
-/*      brace_p= strdup(tparm(setab,6));  */
-	brace_p= strdup(tparm(setab,COLOR_CYAN));  /* for bracket matching */
+/*      brace_p = strdup(tparm(setab,6));  */
+	brace_p = strdup(tparm(setab,COLOR_CYAN));  /* for bracket matching */
+
+	gray255 = strdup(tparm(setab,255));
 
 	/* todo, best to learn how to use sgr to set both fg/bg colors in one 'call' */
 
@@ -1265,7 +1270,8 @@ dbgpr("doMouseReplay calling poscursor(%d,%d)\n",
 int
 toggle_mouse(char *opstr) {
 
-debugAllWindows ();
+//debugAllWindows ();
+//debug_fileflags();
 
 #ifdef USE_MOUSE_POSITION
     mmask_t newmask = ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION;

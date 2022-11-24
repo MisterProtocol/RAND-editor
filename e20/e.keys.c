@@ -105,7 +105,7 @@ dbgpr("MapCursesKey: c=%04o, idx=%d, .keycode=%04o\n",
 	     */
 	    FKey_p = Key2Ecode[idx].ecmdstr;
 	    FKey_end = FKey_p + Key2Ecode[idx].len - 1;
-	/*  dbgpr("setting FKey_end to FKey_p + %d\n", Key2Ecode[idx].len-1); */
+	//  dbgpr("setting FKey_end to FKey_p + %d\n", Key2Ecode[idx].len-1);
 	    pendFKeys = 1;
 	    return( (int) Key2Ecode[idx].ecmd1 );
 	}
@@ -389,7 +389,7 @@ dbgpr("MapCtrlKey, idx=%d, returning (%03o)(%s) for key=(%03o)\n",
 	 */
 	FKey_p = KeyCtrl[idx].ecmdstr;
 	FKey_end = FKey_p + KeyCtrl[idx].len - 1;
-    /*  dbgpr("setting FKey_end to FKey_p + %d\n", KeyCtrl[idx].len-1); */
+    //  dbgpr("setting FKey_end to FKey_p + %d\n", KeyCtrl[idx].len-1);
 	pendFKeys = 1;
     }
 

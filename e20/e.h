@@ -27,6 +27,8 @@
 /* various options.  All should be turned on. */
 
 /* for a recovery, show places in keystroke file to halt replay */
+
+#define TAGS
 #define SHOWKEYS_INPLACE
 
 #define RECORDING       /* simple record/playback facility */
@@ -525,8 +527,10 @@ typedef struct savebuf {
 
 /* input control character assignments */
 
-#define CCCMD           000 /* ^@ enter parameter       */
-#define CCLWINDOW       001 /* ^A window left           */
+#define CCCMD0          000 /* ^@ enter parameter       */
+#define CCCMD           001 /* ^A easier to use in str functions */
+// every kb_file defines ^A as <cmd>
+//#define CCLWINDOW       001 /* ^A window left, use ^X^L or <esc>"l":<wleft> */
 #define CCSETFILE       002 /* ^B set file              */
 #define CCINT           003 /* ^C interrupt         *** was chgwin */
 #define CCOPEN          004 /* ^D insert                */
@@ -626,7 +630,14 @@ typedef struct savebuf {
 #define CCMIERASE      0247     /* -er    (for button function) */
 #define CCMIRECORD     0250     /* -record (for button function) */
 
-#define CCHIGHEST      0250 /* nxt is 0251 */
+#ifdef TAGS
+#define CCTAG          0251     /* tag cmd */
+/*#define CCTAGSRCH      0253   don't need this afterall */
+#endif
+
+#define CCLWINDOW      0252 /*  window left, use ^X^L or <esc>"l":<wleft> */
+
+#define CCHIGHEST      0252     /* nxt is 0253 */
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */

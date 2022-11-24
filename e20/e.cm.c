@@ -8,6 +8,7 @@ file e.cm.c
 	Copyright abandoned, 1983, The Rand Corporation
 #endif
 
+
 #ifdef UNIXV7
 #include <ctype.h>
 #endif
@@ -45,10 +46,21 @@ char *highlight_info_str;
 extern int n_colors;
 
 /* brace matching/hilighting */
-int braceRange = 100;           /* match to +/- braceRange lines */
+int braceRange = 500;           /* match to +/- braceRange lines */
 Flag bracematchCoding = YES;    /* stop srch at beg/end of a function */
 extern int bracematching;
 #endif
+
+#ifdef NOTYET
+void hiliteactive(void);
+#endif
+
+#ifdef TAGS
+extern Cmdret dotag (char *);
+extern void PushTagCmds(void);
+extern Flag editTagFile;
+#endif
+
 
 char *exitmessage;  /* for new 'unsafe' option to eexit() */
 
@@ -179,6 +191,9 @@ S_looktbl cmdtable[] = {
    {"tab"     , CMDTAB      },
    {"tabfile" , CMDTABFILE  },
    {"tabs"    , CMDTABS     },
+#ifdef TAGS
+   {"tag"     , CMDTAG      },
+#endif
    {"track"   , CMDTRACK    },
 #ifdef RECORDING
    {"undefine", CMDUNDEFINE },
@@ -267,7 +282,7 @@ command (forcecmd, forceopt)
     cmdopstr = nxtop;
     opstr = getword (&nxtop);
     cmdname = cmdtable[cmdtblind].str;
-/*dbgpr("command: cmdname=%s cmdval=(%o)\n", cmdname, cmdval);*/
+//  dbgpr("command: cmdname=%s cmdval=(%o)\n", cmdname, cmdval);
     switch (cmdval) {
 
     case CMDRANGE:
@@ -326,6 +341,15 @@ command (forcecmd, forceopt)
     case CMD_TABFILE:
 	retval = tabfile (NO);
 	break;
+
+#ifdef TAGS
+    case CMDTAG:
+	//dbgpr("CMDTAG: calling dotag with opstr=(%s)\n", opstr);
+	retval = dotag (opstr);
+	if (editTagFile)
+	    PushTagCmds();
+	break;
+#endif
 
     case CMDREPLACE:
     case CMD_REPLACE:
@@ -503,6 +527,9 @@ command (forcecmd, forceopt)
 	fresh ();
 	retval = CROK;
 	redrawflg = YES;
+#ifdef NOTYET
+hiliteactive();
+#endif
 	break;
 
     case CMDSPLIT:
@@ -1205,7 +1232,7 @@ bell %s, vb %s, hy %s",
 
 	    case SET_NORESIZE:  /* toggle variable */
 		noresizeall ^= 1;
-		dbgpr("set noresize:  noresizeall=%d\n", noresizeall);
+	    //  dbgpr("set noresize:  noresizeall=%d\n", noresizeall);
 		break;
 
 	    case SET_NOFILLDOT:

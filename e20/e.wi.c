@@ -30,6 +30,8 @@ extern void draw1side (S_window *, Scols, Small);
 extern Flag winshift;
 Cmdret makewindow (char *);
 
+Flag borderChanged;
+
 
 #ifdef COMMENT
 Cmdret
@@ -398,6 +400,8 @@ Small how;
 /*  Ncols k, k1; */
     Ncols k;
 #endif /* LMCMARG */
+
+    borderChanged = 1;  /* for e.m.c */
 
     oldwin = curwin;
     switchwindow (&wholescreen);

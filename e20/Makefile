@@ -80,11 +80,11 @@ RM      = rm -f
 
 HFILES  =  e.cm.h e.e.h e.fn.h e.func.h \
 	e.h e.inf.h e.m.h e.ru.h e.se.h \
-	e.sg.h e.t.h e.tt.h e.wi.h
+	e.sg.h e.t.h e.tt.h e.wi.h e.keys.h
 
 OFILES  = \
 	$(O)e.o $(O)e.cm.o $(O)e.d.o $(O)e.dif.o $(O)e.e.o \
-	$(O)e.f.o $(O)e.fi.o $(O)e.h.o $(O)e.iit.o \
+	$(O)e.f.o $(O)e.h.o $(O)e.iit.o \
 	$(O)e.it.o $(O)e.keys.o $(O)e.la.o $(O)e.m.o $(O)e.main.o \
 	$(O)e.mk.o $(O)e.nm.o $(O)e.p.o $(O)e.pa.o \
 	$(O)e.profile.o $(O)e.put.o $(O)e.q.o $(O)e.r.o \
@@ -93,16 +93,18 @@ OFILES  = \
 	$(O)e.u.o $(O)e.wi.o $(O)e.wk.o $(O)e.x.o \
 	$(O)e.mouse.o \
 	$(O)e.resize.o \
+	$(O)e.tag.o \
+	$(O)e.brace.o \
 	$(CHKMALLOC)
 
 CFILES  = \
+	e.brace.c \
 	e.c \
 	e.cm.c \
 	e.d.c \
 	e.dif.c \
 	e.e.c \
 	e.f.c \
-	e.fi.c \
 	e.h.c \
 	e.iit.c \
 	e.it.c \
@@ -122,13 +124,14 @@ CFILES  = \
 	e.ra.c \
 	e.re.c \
 	e.record.c \
-	e.resize.o \
+	e.resize.c \
 	e.ru.c \
 	e.sb.c \
 	e.showkeys.c \
 	e.se.c \
 	e.sv.c \
 	e.t.c \
+	e.tag.c \
 	e.tb.c \
 	e.tt.c \
 	e.u.c \
@@ -151,7 +154,7 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 	   $(O)e.main.o $(O)e.o $(O)e.pa.o $(O)e.iit.o $(O)e.q.o \
 	   $(O)e.tb.o $(O)e.put.o $(O)e.nm.o $(O)e.sv.o \
 	   $(O)e.wi.o $(O)e.wk.o $(OLA)lalflush.o $(O)e.u.o \
-	   $(O)e.f.o $(O)e.fi.o $(OLA)laopen.o $(O)e.dif.o \
+	   $(O)e.f.o $(OLA)laopen.o $(O)e.dif.o \
 	   $(O)e.h.o $(O)e.se.o $(O)e.e.o $(O)e.mk.o \
 	   $(O)e.ra.o $(O)e.re.o $(O)e.record.o $(O)e.t.o \
 	   $(O)e.ru.o $(O)e.cm.o $(O)e.d.o $(O)e.it.o \
@@ -159,13 +162,18 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 	   $(O)e.tt.o $(O)e.x.o $(O)e.profile.o $(O)e.mouse.o \
 	   $(O)e.keys.o \
 	   $(O)e.resize.o \
+	   $(O)e.tag.o \
+	   $(O)e.brace.o \
 	$(LALIB) \
 	$(FFLIB) \
 	$(MISCLIB) \
 	$(TERMCAP) \
 	$(CHKMALLOC) \
 	$(LIBC)
-	-mv $(E) $(E).old
+#       -mv $(E) $(E).old
+	if [ -f "$(E)" ]; then \
+		mv $(E) $(E).old; \
+	fi
 	mv a.out $(E)
 
 #       $(MIS2LIB)
@@ -195,6 +203,7 @@ depend.bsd:
 	-ln Ifdefs.bsd Ifdefs
 	/bin/bash Makedep $(HFILES) $(CFILES)
 
+
 ### "Comments:" and "Calls:" depend on shell files that don't work any more and
 ### hence are not included.  Better tools are available externally.
 # Be sure the defs in "Ifdefs" agree with $(DEFS)
@@ -222,6 +231,10 @@ clean:
 	$(RM) $(OFILES) $(O)pres.o
 	$(RM) $(E) $(E).old pres pres.old e.r.c
 
+$(O)e.brace.o: e.brace.c
+	$(CC) $(CFLAGS) $(INCL) -c e.brace.c
+	mv e.brace.o $(O)e.brace.o
+
 $(O)e.cm.o: e.cm.c
 	$(CC) $(CFLAGS) $(INCL) -c e.cm.c
 	mv e.cm.o $(O)e.cm.o
@@ -241,10 +254,6 @@ $(O)e.e.o: e.e.c
 $(O)e.f.o: e.f.c
 	$(CC) $(CFLAGS) $(INCL) -c e.f.c
 	mv e.f.o $(O)e.f.o
-
-$(O)e.fi.o: e.fi.c
-	$(CC) $(CFLAGS) $(INCL) -c e.fi.c
-	mv e.fi.o $(O)e.fi.o
 
 $(O)e.h.o: e.h.c
 	$(CC) $(CFLAGS) $(INCL) -c e.h.c
@@ -350,6 +359,10 @@ $(O)e.t.o: e.t.c
 	$(CC) $(CFLAGS) $(INCL) -c e.t.c
 	mv e.t.o $(O)e.t.o
 
+$(O)e.tag.o: e.tag.c
+	$(CC) $(CFLAGS) $(INCL) -c e.tag.c
+	mv e.tag.o $(O)e.tag.o
+
 $(O)e.tt.o: e.tt.c term
 	$(CC) $(CFLAGS) $(INCL) $(TINFO) -c e.tt.c
 	mv e.tt.o $(O)e.tt.o
@@ -420,6 +433,8 @@ $(O)e.o: $(STD)$(SIG_INCL)
 $(O)e.o: $(STD)sys/resource.h
 $(O)e.o: e.showkeys.c
 $(O)e.o: e.showkeys.c
+$(O)e.brace.o: e.h
+$(O)e.brace.o: e.tt.h
 $(O)e.cm.o: $(STD)ctype.h
 $(O)e.cm.o: e.h
 $(O)e.cm.o: e.e.h
@@ -439,10 +454,6 @@ $(O)e.e.o: e.cm.h
 $(O)e.e.o: e.e.h
 $(O)e.f.o: e.h
 $(O)e.f.o: $(STD)sys/stat.h
-$(O)e.fi.o: $(STD)ctype.h
-$(O)e.fi.o: $(STD)sys/types.h
-$(O)e.fi.o: $(LOCALINCL)localenv.h
-$(O)e.fi.o: e.h
 $(O)e.h.o: e.h
 $(O)e.h.o: e.cm.h
 $(O)e.h.o: e.m.h
@@ -560,6 +571,9 @@ $(O)e.t.o: e.wi.h
 $(O)e.t.o: e.h.h
 $(O)e.t.o: $(STD)sys/time.h
 $(O)e.t.o: $(STD)fcntl.h
+$(O)e.tag.o: e.h
+$(O)e.tag.o: e.cm.h
+$(O)e.tag.o: e.tt.h
 $(O)e.tb.o: e.h
 $(O)e.tb.o: e.m.h
 $(O)e.tb.o: e.cm.h

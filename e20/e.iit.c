@@ -95,6 +95,9 @@ S_looktbl itsyms[] = {
     {"srtab",   CCTABS},
     {"stopx",   CCSTOPX},
     {"tab",     CCTAB},
+#ifdef TAGS
+    {"tag",     CCTAG},
+#endif
     {"track",   CCTRACK},
     {"undef",   CCUNAS1},
     {"up",      CCMOVEUP},

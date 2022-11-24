@@ -71,14 +71,14 @@ Flag tt_rt3;            /* 3 rights take fewer characters than an addr */
  **/
 /* fine T_2intext   11  / * intext2.c    INTERACTIVE Systems Intext2 */
 /* fine T_po        12  / * po.c         Perkin Elmer 1251 and Owl */
-#define T_vt100     13  /* vt100.c      DEC VT100 -- keyboard only */
+/* fine T_vt100     13  / * vt100.c      DEC VT100 -- keyboard only */
 /* fine T_sun       14  / * sun.c        Sun2 and Sun3's */
 /* fine T_vt52      15  / * vt52.c       DEC VT52 */
 /* fine T_mbee      16  / * mbee.c       Beehive Microbee */
 /* fine T_tv910     17  / * tv910.c      Televideo 910 - keyboard only */
 /* fine T_free100   18  / * free100.c    Freedom 100 -- keyboard only */
 /* fine T_wy50      19  / * wy50.c       Wyse 50 -- keyboard only */
-#define T_mac       20  /* mac.c        MacIntosh (modified vt100.c) */
+/* fine T_mac       20  / * mac.c        MacIntosh (modified vt100.c) */
 /* fine T_cue       21  / * cue.c        IBM PC -- T_a1 keyboard only */
 #define NTERMINALS  22
 

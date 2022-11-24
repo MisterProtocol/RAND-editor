@@ -34,7 +34,6 @@
 ^X^C:<cchar>
 ^X^D:<dword>
 ^X^E:<erase>
-#^X^E:<cmd>"exit"<ret>
 ^X^F:<redraw>
 ^X^H:<wleft>
 ^X^I:<-tab>
@@ -49,29 +48,36 @@
 ^X^W:<chwin>
 #^X^X:<cchar>
 #
-# raw xterm codes (0411-0454)
+# ncurses Fn key mapping:
 #
-KEY_F1:<cmd>
-KEY_F2:<redraw>
-KEY_F3:<+word>
-KEY_F4:<-word>
-KEY_F5:<replace>
-/* F6:  toggle mouse on/off */
-KEY_F6:<mouse>
-# etc.
+#KEY_F1:<cmd>
+#KEY_F2:<pick>
+#KEY_F3:<put>
+KEY_F1:<tag>
+KEY_F2:<cmd>"tag +"<ret>
+KEY_F3:<cmd>"tag -"<ret>
+KEY_F4:<+word>
+KEY_F5:<-word>
+KEY_F6:<replace>
+# toggle mouse on/off
+KEY_F7:<mouse>
+KEY_F12:<open>
 #
 SHIFT_F1:<+page>
 SHIFT_F2:<-page>
 SHIFT_F3:<caps>
 SHIFT_F4:<ccase>
 SHIFT_F5:<insmd>
-# etc
-#
+#  these CTRL keys may only work in "xterm"
 CTRL_F1:<split>
 CTRL_F2:<join>
 CTRL_F3:<mouse>
-CTRL_F4:<record>
-CTRL_F5:<play>
-# etc
-# ALT-m : toggle mouse on/off
+CTRL_F4:<close>
+CTRL_F5:<-close>
+# ALT-N
+<esc>"o":<open>
+<esc>"v":<close>
 <esc>"m":<mouse>
+<esc>"t":<tag>
+<esc>".":<cmd>"tag +"<ret>
+<esc>",":<cmd>"tag -"<ret>

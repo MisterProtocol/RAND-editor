@@ -45,7 +45,7 @@ E20 Changes:
     mode, where a match for a closing curly brace stops at the end of the
     current function() definition (which is assumed to be a "}" in column
     one).   If "coding" mode is disabled ("set brace coding off"), a default
-    of +/- 100 lines are searched.  Use "set brace range N" to change the
+    of +/- 500 lines are searched.  Use "set brace range N" to change the
     line limit, (N=0 or "off" to disable).  If the range is 0, the search will
     go to the end of file, or back to start of the file, unless a match is
     found earlier.  The search is forward if the cursor is on an opening brace,
@@ -83,11 +83,11 @@ E20 Changes:
 
     The following functions can appear in a button file:
 
-        <+line>, <+page>, <+sch>, <+win>, <+word>, <-close>, <-erase>,
-        <-line>, <-mark>, <-page>, <-sch>, <-tab>, <-win>, <-word>,
-        <brace>, <caps>, <cchar>, <chwin>, <close>, <cmd>, <dchar>,
-        <down>, <dword>, <erase>, <exit>, <insmd>, <join>, <mark>,
-        <mouse>, <open>, <pick>, <play>, <put>, <record>, <redraw>,
+	<+line>, <+page>, <+sch>, <+win>, <+word>, <-close>, <-erase>,
+	<-line>, <-mark>, <-page>, <-sch>, <-tab>, <-win>, <-word>,
+	<brace>, <caps>, <cchar>, <chwin>, <close>, <cmd>, <dchar>,
+	<down>, <dword>, <erase>, <exit>, <insmd>, <join>, <mark>,
+	<mouse>, <open>, <pick>, <play>, <put>, <record>, <redraw>,
 	<regex>, <replace>, <split>, <tab>, <up>, <wleft>, <wp>, <wright>
 
     Refer to the section FUNCTION KEYS in the man page for a description
@@ -248,6 +248,31 @@ E20 Changes:
 
 -   The containing terminal window can now be resized, and "e" will resize its
     own windows in response.  Also, if the current session has multiple "e"
-    windows, the borders between these windows may be dragged with the mouse to
-    resize the "e" windows.  There are limits to this: up to three windows should
-    work, more than that may not.
+    windows, with the mouse in the current window, the left and/or top border
+    between windows may be dragged to resize the "e" windows.
+
+Nov. 22, 2022
+E20 changes:
+
+-   The editor now supports the use of 'tags' files such as those used by
+    other editors such as 'vi/vim' and 'emacs'.  These files are created by
+    using the 'ctags' utility on Linux and MacOS.  However, due to limitations
+    on the rather ancient version of 'ctags' distributed with the Apple Command
+    Line Tools, MacOS users who wish to make use of this capability must
+    install the "exuberant ctags" version of 'ctags' via Homebrew or MacPorts.
+    Linux systems already install this version by default.
+
+    The top-level Makefile has new targets 'tags:', 'strtags:' and 'numtags'
+    depending on whether the user wishes to build the default format 'tags'
+    file, or one specified as containing search strings or line numbers.
+    This tags file will be placed in the 'e20/' directory, where most editing
+    is expected to be done.  The helper script 'ctags.sh' is used to actually
+    generate the file.
+
+    To use the tags capability, a new command, 'tag', has been added to the editor.
+    It may be bound to a key using the EKBFILE facility; the sample file
+    'kb_ncurses' contains an example.  See the man page for details.  In short:
+
+	<cmd>tag keyword<ret>   Switch to file containg "keyword"
+	<cmd>tag<ret>           Switch to file containg "keyword" cursor is on
+	<cmd>tag + or -         Move up/down the list, when there are multiple matches

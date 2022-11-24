@@ -251,6 +251,16 @@ s5.help: etc help
 bsd.help: etc help
 	chown $(OWNER) $(LIB)/*
 
+# We need to run a special shell script to create a "tags" file for
+# use in "e" and "vi/vim".  The shell file explains why.
+# "tags:" invokes ctags with no options, which defaults to string search.
+tags:
+	sh ctags.sh
+numtags:
+	sh ctags.sh number
+strtags:
+	sh ctags.sh string
+
 etc:
 	-mkdir $(LIB)
 	chown $(OWNER) $(LIB)

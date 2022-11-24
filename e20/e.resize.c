@@ -21,12 +21,21 @@ void debugAllWindows (void);
 void ClearUtilityWindows(void);
 void debugLMchars(S_window *wp);
 void debugMrk(void);
+void debug_fileflags(void);
+Flag isFdinWindow(int fd);
+
 int  CheckWindowValues(void);
 void adj_h_borders(ASlines bm_orig, ASlines h_chg);
 void adj_w_borders(AScols rm_orig, AScols w_chg);
 void alt_h_winresize(ASlines bm_orig, ASlines h_chg, int adjwin);
 void alt_w_winresize(AScols rm_orig, AScols w_chg, int adjwin);
 Flag atMoveableBorder(int, int);
+int isTMmoveable(S_window *);  /* top margin moveable */
+int isLMmoveable(S_window *);
+int isRMmoveable(S_window *);
+int isBMmoveable(S_window *);
+void hiliteTopBorder(S_window *);
+void hiliteLeftBorder(S_window *);
 
 extern S_term term;
 extern Flag optshowbuttons;
@@ -38,9 +47,6 @@ extern void infoinit(void);
 extern Flag freshputup;
 extern Nlines marklines;
 Flag noresizeall = NO;
-
-int AllVertWins(void);
-int AllHorWins(void);
 
 void MoveHorBorder (S_window *, S_window *, ASlines);
 void MoveVerBorder (S_window *, S_window *, AScols);
@@ -54,6 +60,7 @@ extern int doVborder(MEVENT *ev, S_window *, S_window *);
 
 extern char *hilite_str;
 extern char *bold_str;
+extern char *gray255;
 extern char *sgr0;       /* reset all modes */
 
 extern char *mouse_decode(MEVENT *ep);
@@ -816,81 +823,92 @@ lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
 	// dbgpr("movingBorder:  boudaries ok\n");
     }
 
-    S_window __attribute__((unused)) *wp;
+    //S_window __attribute__((unused)) *wp;
     int i;
     int rc = 1;     /* Yes, we have a border move */
-    int w_no = -1;
-
-
-    /* do we have all hor or vert windows */
-    int allHorWins = AllHorWins();
-    int allVertWins = AllVertWins();
-
-    /*  TODO: may not need to require all horiz or all vert windows.
-     *  It should be ok if:
-     *
-     *  The top/bot windows share the same border and
-     *  have the same left and right margins.
-     *
-     *  The left/right windows share the same border and
-     *  have the same top and bottom margins.
-     */
 
     S_window *twin, *bwin, *lwin, *rwin, *savwin;
-
     savwin = curwin;   /* restore on any return() if changed */
-
-    if (!allHorWins && !allVertWins) {
-    //  dbgpr("No border moves with both horizontal and vertical windows.\n");
-	mesg(ERRALL+1, "No border moves with both horizontal and vertical windows.");
-	return 0;
-    }
 
     int ccol = cursorcol;
     int clin = cursorline;
 
-    /* find a win whose bmarg equals the tmarg of curwin */
-    if (allHorWins) {
-	if (ev->y == curwin->tmarg) {
-	    for (i=0; i<nwinlist; i++) {
-		if (winlist[i]->bmarg == curwin->tmarg) {
-		    wp = winlist[i];
-		//  dbgpr("Window above curwin at %d\n", wp->bmarg);
-		    w_no = i;
-		    rc = 0;
-		    bwin = curwin;
-		    twin = wp;
-		    break;
-		}
+    /* moving a horizontal or vertical border */
+    int haveHmove = 0;
+    int haveVmove = 0;
+
+    if (ev->y == curwin->tmarg) {  /* a horizontal border */
+	if ((i = isTMmoveable(curwin)) >= 0) {
+	    twin = winlist[i];
+	    bwin = curwin;
+	    haveHmove = 1;
+	    rc = 0;
+	}
+    }
+
+#ifdef OUT
+    if (ev->y == curwin->tmarg) {  /* a horizontal border */
+	for (i=0; i<nwinlist; i++) {
+	    wp = winlist[i];
+		/* and share top/bot margin, and same width */
+	    if ((wp->bmarg == curwin->tmarg) &&
+		    (wp->lmarg == curwin->lmarg) &&
+		    (wp->rmarg == curwin->rmarg)) {
+	    //  dbgpr("Window above curwin at %d\n", wp->bmarg);
+		rc = 0;
+		bwin = curwin;
+		twin = wp;
+		haveHmove = 1;
+		break;
 	    }
 	}
-
     }
-    else {   /* or one whose lm matches the lm of curwin */
+#endif /* OUT */
+
+#ifdef OUT
+    if (!haveHmove ) {  /* not horiz, is it vert? */
+	 /* if press is on lm, find win whose rm matches the lm of curwin */
 	if (ev->x == curwin->lmarg && (ev->x >= 2) ) {
 	    for (i=0; i<nwinlist; i++) {
-		if (winlist[i]->rmarg == curwin->lmarg) {
-		    wp = winlist[i];
-		//  dbgpr("Window left of curwin at %d\n", wp->rmarg);
-		    w_no = i;
+		wp = winlist[i];
+		    /* and share top/bot margins, and same height */
+		if ((wp->rmarg == curwin->lmarg) &&
+			(wp->tmarg == curwin->tmarg) &&
+			(wp->bmarg == curwin->bmarg)) {
+
+		    //dbgpr("Window left of curwin at %d\n", wp->rmarg);
 		    rc = 0;
 		    rwin = curwin;
 		    lwin = wp;
+		    haveVmove = 1;
 		    break;
+
 		}
 	    }
 	}
     }
+#endif /* OUT */
 
-    if (w_no == -1) {
-	dbgpr("No windows found with matching borders ev->(y,x)=(%d,%d)\n",ev->y, ev->x);
+    if (!haveHmove ) {
+	 /* if press is on lm, find win whose rm matches the lm of curwin */
+	if (ev->x == curwin->lmarg && (ev->x >= 2) ) {
+	    if ((i = isLMmoveable(curwin)) >= 0 ) {
+		lwin = winlist[i];
+		rwin = curwin;
+		haveVmove = 1;
+		rc = 0;
+	    }
+	}
+    }
+
+    if (!haveHmove && !haveVmove) {
+	dbgpr("No windows found with movable borders ev->(y,x)=(%d,%d)\n",ev->y, ev->x);
 	return 0;
     }
 
-
     int rc1;
 
-    if (allHorWins) {
+    if (haveHmove) {
 	Nlines __attribute__((unused)) wlin_orig = bwin->wksp->wlin;
 	int begy = ev->y;
 
@@ -910,19 +928,8 @@ lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
 
     if (rc1 == 0) return 0;   /* no move occurred */
 
-    /*  A border has moved and the windows have been resized,
-     *  now redraw the windows and borders.
-     */
-
-#ifdef OUT
-    /* for short files, don't leave cursor past last line */
-    Nlines __attribute__((unused)) ll = la_lsize(curlas);
-    //dbgpr("clin=%d lastl=%d\n", clin, ll);
-    clin = max(0, clin);
-#endif
-
     /*
-     *  Without doubt there are extra fresh(), putup(), and drawborder()
+     *  Without a doubt there are extra fresh(), putup(), and drawborder()
      *  calls below.  The exact "abracadabra" to only call them once
      *  is still a work in progress....
      */
@@ -988,14 +995,14 @@ lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
 	winlist[i]->altwksp->clin = min (winlist[i]->altwksp->clin, winlist[i]->btext);
     }
 
-    /* need a redraw */
+    /* force a redraw */
     ungetch('\015');
     ungetch('d');
     ungetch('e');
     ungetch('r');
     ungetch(CCCMD);
 
-    rc = 1;     /* a redraw occurred */
+    rc = 1;     /* a border move occurred */
 
     infoinit();
     unmark();
@@ -1088,9 +1095,11 @@ MoveVerBorder (S_window *rwin, S_window *lwin, AScols x_new)
     return;
 }
 
+#ifdef OUT
 int
 AllVertWins()
 {
+return 1;
     int rc = 1;     /* assume yes, all vertical */
     int i;
 
@@ -1106,6 +1115,7 @@ AllVertWins()
 int
 AllHorWins()
 {
+return 0;
     int rc = 1;     /* assume yes, all horizontal */
     int i;
 
@@ -1117,7 +1127,7 @@ AllHorWins()
     }
     return rc;
 }
-
+#endif /* OUT */
 
 void
 clearImageArray (int beg_l, int end_l, int wid)
@@ -1147,6 +1157,9 @@ clearImageArray (int beg_l, int end_l, int wid)
 int
 xlateBorderChar(int border_ch)      /* 129-142, see e.t.h */
 {
+    if (border_ch < 127)
+	return border_ch;
+
     switch (border_ch) {
 	case LMCH:
 	case RMCH:
@@ -1173,6 +1186,7 @@ xlateBorderChar(int border_ch)      /* 129-142, see e.t.h */
 	default:
 	    break;
     }
+
 
     dbgpr("xlate: unknown %d\n", border_ch);
 
@@ -1222,21 +1236,8 @@ doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
 
     //dbgpr("doHborder, ev->x=%d ev->y=%d\n", ev->x, ev->y);
 
-    int __attribute__((unused)) allHorWins = 1;
-    int __attribute__((unused)) allVertWins = 0;
-
-    S_window __attribute__((unused)) *wp, *savwin;
-
-    /* nxt two are temp */
-    S_window __attribute__((unused)) *rwin;
-    S_window __attribute__((unused)) *lwin;
-
     int i;
     int rc = 1;     /* Yes, we have a border move */
-    //int __attribute__((unused)) w_no;
-
-    //int __attribute__((unused)) ccol = cursorcol;
-    //int __attribute__((unused)) clin = cursorline;
 
     MEVENT evt;
     int c, begy, begx;
@@ -1249,19 +1250,29 @@ doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
 
     int w = term.tt_width;
     int __attribute__((unused)) h = term.tt_height;
-//  Uchar __attribute__((unused)) buf[w+1];
     Uchar *cp;
     int bline = ev->y;      /* border line */
 
     cp = (Uchar *)image + w * bline;
     Uchar h_border[w];
 
+    /* curwin beg/end points */
+    int lm = (int) bwin->lmarg;
+    /* border width (bwin may not start at 0) */
+    int bwid = (int) (bwin->rmarg - bwin->lmarg - 1);
+
     /* make a copy of the topmost border, which are '+' and '-' chars */
-    for (i=0; i < w; i++) {     /* omit margin tics, '-' and '+'  */
-	h_border[i] = cp[i+1] == TMCH ? '-' : '+';  /* see e.t.h */
+    //for (i=0; i < w; i++) {     /* omit margin tics, '-' and '+'  */
+    for (i=0; i < bwid; i++) {     /* omit margin tics, '-' and '+'  */
+	//h_border[i] = cp[i+1] == TMCH ? '-' : '+';  /* see e.t.h */
+	h_border[i] = (Uchar) xlateBorderChar(cp[lm+i+1]);
     }
     h_border[--i] = '\0';
+
     //dbgpr("h_border: %s\n", h_border);
+    //for(i=0; i<15; i++)
+    //  dbgpr("(%o)(%c)\n", h_border[i], h_border[i]);
+
 
     /*  Restrict motion to exclude screen borders, and
      *  moving past the top/left edge of the adjacent window.
@@ -1274,9 +1285,10 @@ doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
     ymax = bwin->ttext + bwin->btext;
 
     /* highlight the current border */
-    mvcur(-1, -1, ev->y, 1);
+    mvcur(-1, -1, ev->y, lm+1);
     tputs(bold_str,1,Pch);
-    fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+//  fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+    fwrite(h_border, sizeof (char), (size_t) bwid, stdout);
     tputs(sgr0, 1, Pch);
     mvcur(-1, -1, ev->y, ev->x);
     fflush(stdout);
@@ -1320,8 +1332,10 @@ doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
 	if (evt.bstate & BUTTON1_RELEASED) {
 	    /* a click on the original border w/o movement */
 	    /* restore original horizontal border */
-	    mvcur(-1, -1, evt.y, 1);
-	    fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+	    //mvcur(-1, -1, evt.y, 1);
+	    //fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+	    mvcur(-1, -1, evt.y, lm+1);
+	    fwrite(h_border, sizeof (char), (size_t) bwid, stdout);
 	    mvcur(-1, -1, evt.y, evt.x);
 	    dbgpr("click w/o move at (%d,%d)\n", evt.y, evt.x);
 	    fflush(stdout);
@@ -1342,33 +1356,35 @@ doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
 
 	    if (firsttime) {
 		hbuf = (char *)image + w * evt.y;
+		//snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+lm+1);
 		snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+1);
 	    //  dbgpr("row_buf: (%s)\n", row_buf);
 		firsttime = 0;
 	    }
 	    else {  /* repaint saved text */
-		mvcur(-1, -1, y_last, 1);
+		mvcur(-1, -1, y_last, lm+1);
 		//tputs(row_buf, 1, Pch);
 		if (y_last != begy) {
-		    fwrite(row_buf, sizeof(char), (size_t) w-2, stdout);
+		    fwrite(row_buf, sizeof(char), (size_t) bwid, stdout);
 		}
 		else {  /* rewrite original border line in bold */
 		    tputs(bold_str,1,Pch);
-		    fwrite(h_border, sizeof (char), (size_t) w-2, stdout);
+		    fwrite(h_border, sizeof (char), (size_t) bwid, stdout);
 		    tputs(sgr0, 1, Pch);
 		}
 		//fflush(stdout);
 	    }
 
 	    hbuf = (char *)image + w * evt.y;
-	    snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+1);
+	    //snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+1);
+	    snprintf(row_buf, (size_t)h_len+1, "%s", hbuf+lm+1);
 	 // dbgpr("row_buf: (%s)\n", row_buf);
 
-	    mvcur(-1, -1, evt.y, 1);
+	    mvcur(-1, -1, evt.y, lm+1);
 	    //tputs(brace_p,1,Pch);
 	    tputs(hilite_str,1,Pch);
 	    //tputs(h_tics, 1, Pch);
-	    fwrite(h_tics, sizeof (char), (size_t) w-2, stdout);
+	    fwrite(h_tics, sizeof (char), (size_t) bwid, stdout);
 	    tputs(sgr0, 1, Pch);
 	    mvcur(-1, -1, evt.y, evt.x); /* back to mouse orig x */
 	    fflush(stdout);
@@ -1443,25 +1459,11 @@ doHborder(MEVENT *ev, S_window *bwin, S_window *twin)
 int
 doVborder(MEVENT *ev, S_window *rwin, S_window *lwin)
 {
-
-    int __attribute__((unused)) allHorWins = 0;
-    int __attribute__((unused)) allVertWins = 1;
-
-    S_window __attribute__((unused)) *wp, *savwin;
-
-    /* nxt two are temp */
-    S_window __attribute__((unused)) *twin;
-    S_window __attribute__((unused)) *bwin;
-
     int i;
     int rc = 1;     /* Yes, we have a border move */
-    int __attribute__((unused)) w_no;
+    //int __attribute__((unused)) w_no;
 
-    int __attribute__((unused)) ccol = cursorcol;
-    int __attribute__((unused)) clin = cursorline;
-
-    /*  twin and bwin or lwin and rwin are set
-     *  to the correct windows
+    /*  lwin and rwin point to adjacent windows
      */
 
     MEVENT evt;
@@ -1752,4 +1754,209 @@ adjCursor (S_window *bwin, Nlines wlin_orig, int clin, int begy)
     return clin;
 }
 
+
+
+void
+hiliteTopBorder(S_window *wp) /* active window */
+{
+
+    if (wp->tmarg == 0) return;
+    if (isTMmoveable(wp) < 0) return;
+
+    int w = (int) (wp->rmarg - wp->lmarg);
+    int x, y;
+
+    x = (int) (wp->lmarg + w/2);
+    y = (int) wp->tmarg;
+
+    //dbgpr("hiliteTopBorder:  x=%d y=%d\n", x, y);
+
+    mvcur(-1, -1, y, x);
+    //tputs(hilite_str,1,Pch);
+    tputs(gray255,1,Pch);
+    tputs("==", 1, Pch);
+    tputs(sgr0, 1, Pch);
+    mvcur(-1, 1, cursorline + wp->ltext, cursorcol + wp->ltext);
+    fflush(stdout);
+
+    return;
+}
+
+void
+hiliteLeftBorder(S_window *wp) /* active window */
+{
+
+    if (wp->lmarg == 0) return;
+    if (isLMmoveable(wp) < 0) return;
+
+    int x, y;
+
+    x = (int) (wp->lmarg);
+    y = (int) (wp->tmarg + (wp->bmarg - wp->tmarg) / 2);
+
+    //dbgpr("hiliteLeftBorder:  x=%d y=%d\n", x, y);
+
+    mvcur(-1, -1, y, x);
+    //tputs(hilite_str,1,Pch);
+    tputs(gray255,1,Pch);
+    /* two vertical bars */
+    fputc('|', stdout);
+    mvcur(-1, -1, y-1, x);
+    fputc('|', stdout);
+    tputs(sgr0, 1, Pch);
+    mvcur(-1, 1, cursorline + wp->ltext, cursorcol + wp->ltext);
+    fflush(stdout);
+
+    return;
+}
+
+
+/* returns -1 if win TM not moveable
+ * returns index into winlist[] if it is
+ */
+
+int
+isTMmoveable(S_window *win)
+{
+    int i;
+    S_window *wp;
+    int w_no = -1;
+
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	    /* share top/bot margins, and same width */
+	if ((wp->bmarg == win->tmarg) &&
+		(wp->lmarg == win->lmarg) &&
+		(wp->rmarg == win->rmarg)) {
+	    w_no = i;
+	    break;
+	}
+    }
+    //dbgpr("isTMmoveable: w_no=%d\n", w_no);
+
+    return w_no;
+}
+
+/* returns -1 if win LM not moveable
+ * returns index into winlist[] if it is
+ */
+
+int
+isLMmoveable(S_window *win)
+{
+    int i;
+    S_window *wp;
+    int w_no = -1;
+
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	    /* share lt/rt margins, and same height */
+	if ((wp->rmarg == win->lmarg) &&
+		(wp->tmarg == win->tmarg) &&
+		(wp->bmarg == win->bmarg)) {
+	    w_no = i;
+	    break;
+	}
+    }
+    //dbgpr("isLMmoveable: w_no=%d\n", w_no);
+
+    return w_no;
+}
+
+/* returns -1 if win RM not moveable
+ * returns index into winlist[] if it is
+ */
+int
+isRMmoveable(S_window __attribute__((unused)) *wp)
+{
+    return -1;
+}
+
+/* returns -1 if win BM not moveable
+ * returns index into winlist[] if it is
+ */
+
+int
+isBMmoveable(S_window __attribute__((unused)) *wp)
+{
+    return -1;
+}
+
+
+#ifdef OUT
+/* for tips on how to "release" an inactive file
+ * see dlfile() and the delete file command in e.nm.c
+ */
+
+void
+debug_fileflags()
+{
+    int i;
+
+    int first_user_fd = FIRSTFILE + NTMPFILES + 1;
+
+    dbgpr("first_user_fd=%d\n", first_user_fd);
+
+    for (i = FIRSTFILE + NTMPFILES; i < MAXFILES; i++) {
+	char bits[17];
+	if (names[i] == NULL || *names[i] == '\0')
+	    break;
+
+	int j;
+	short fflag = fileflags[i];
+
+	for (j=0; j<16; j++) {
+	    bits[16-j-1] = (fflag&1) ? '1' : '0';
+	    //fflag = (fflag>>1);
+	    fflag >>= 1;
+	}
+	bits[16] = '\0';
+	dbgpr("filename:  names[%d]=%s fileflags=%o bits=(%s)\n", i, names[i], fileflags[i], bits);
+	dbgpr("      INUSE=%d\n", (fileflags[i] & INUSE) ? 1:0);
+	dbgpr(" DWRITEABLE=%d\n", (fileflags[i] & DWRITEABLE) ? 1:0);
+	dbgpr(" FWRITEABLE=%d\n", (fileflags[i] & FWRITEABLE) ? 1:0);
+	dbgpr("  CANMODIFY=%d\n", (fileflags[i] & CANMODIFY) ? 1:0);
+	dbgpr("    INPLACE=%d\n", (fileflags[i] & INPLACE) ? 1:0);
+	dbgpr("      SAVED=%d\n", (fileflags[i] & SAVED) ? 1:0);
+	dbgpr("        NEW=%d\n", (fileflags[i] & NEW) ? 1:0);
+	dbgpr("    DELETED=%d\n", (fileflags[i] & DELETED) ? 1:0);
+	dbgpr("    RENAMED=%d\n", (fileflags[i] & RENAMED) ? 1:0);
+	dbgpr("     UPDATE=%d\n", (fileflags[i] & UPDATE) ? 1:0);
+	dbgpr("    SYMLINK=%d\n", (fileflags[i] & SYMLINK) ? 1:0);
+	dbgpr(" FILELOCKED=%d\n", (fileflags[i] & FILELOCKED) ? 1:0);
+	dbgpr("   CANTLOCK=%d\n", (fileflags[i] & CANTLOCK) ? 1:0);
+	dbgpr("   inWindow=%d\n", isFdinWindow(i));
+	if (fileflags[i] & INUSE)
+	    dbgpr("la_modified=%d\n", la_modified(&fnlas[i]));
+	if (!la_modified(&fnlas[i])
+		&& (i > first_user_fd)
+		&& (!isFdinWindow(i))
+		&& (fileflags[i] & UPDATE)
+		&& !(fileflags[i] & RENAMED)
+		&& !(fileflags[i] & FILELOCKED))
+	    dbgpr(" *could remove, not mod,first,inWin,and UPDATE set\n");
+    }
+
+    return;
+}
+
+/*  Is fd displayed in any window or the alt file
+ *  of any window
+ */
+
+Flag
+isFdinWindow(int fd)
+{
+    int i;
+    for (i=0; i<nwinlist; i++) {
+	if (winlist[i]->wksp->wfile == fd)
+	    return YES;
+	if (winlist[i]->altwksp && winlist[i]->altwksp->wfile == fd)
+	    return YES;
+    }
+
+    return NO;
+}
+
+#endif /* OUT */
 

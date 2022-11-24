@@ -4,7 +4,7 @@
 #define M1L -1L
 
 
-main()
+main()		/* This is to test how ctags handles embedded $ characters. */
 {
 	int i = abs(3 - 4)+1;
 	printf("i=%d\n", i);

@@ -22,6 +22,7 @@ main(int argc, char **argv)
 	int i = atoi(argv[1]);
 	printf ("i = %d\n", i);
 	makebuf (i);
+	system("echo hello there!");
 
 	exit(0);
 }

@@ -822,11 +822,13 @@ Flag puflg;
 
 #ifdef LMCCASE
     if (   (opc & (OPCLOSE | OPPICK | OPERASE | OPOPEN | OPINPLC))
-#else /* LMCCASE */
-    if (   (opc & (OPCLOSE | OPPICK | OPERASE | OPOPEN))
-#endif /* LMCCASE */
 	&& (ncols <= 0 || nlines <= 0)
        )
+#else /* LMCCASE */
+    if (   (opc & (OPCLOSE | OPPICK | OPERASE | OPOPEN))
+	&& (ncols <= 0 || nlines <= 0)
+       )
+#endif /* LMCCASE */
 	return CROK;
 
     if (!(opc & OPPICK))
@@ -1061,12 +1063,15 @@ Flag puflg;
 #ifdef LMCCASE
 	fnptr = (opc & OPINPLC) ? (La_stream *) 0 : &fnlas [OLDLFILE];
 	if ((itmp = la_lrcollect (curlas, &ndel, fnptr)) != nlines) {
-#else /* LMCCASE */
-	if ((itmp = la_lrcollect (curlas, &ndel, &fnlas[OLDLFILE])) != nlines) {
-#endif /* LMCCASE */
 	    nlines = 0;
 	    goto err2;
 	}
+#else /* LMCCASE */
+	if ((itmp = la_lrcollect (curlas, &ndel, &fnlas[OLDLFILE])) != nlines) {
+	    nlines = 0;
+	    goto err2;
+	}
+#endif /* LMCCASE */
 	else {
 	    /*? redisplay should take start and end col arguments */
 	    /** dbgpr("edrect:, line=(%d), nlines=(%d)\n", line, nlines);**/

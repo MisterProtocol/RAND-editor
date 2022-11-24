@@ -1,6 +1,6 @@
 /* useful for debugging */
 
-#define CCHIGHEST      0250
+#define CCHIGHEST      0252
 
 /* because we're inialized here,
  * don't #include in multiple files
@@ -14,7 +14,7 @@ typedef struct KeyNameTable {
 KeyNameTable E_Keys[] = {
 {0236,          "CCMOUSE"},
 {000,           "CCCMD"},
-{001,           "CCLWINDOW"},
+{001,           "CCCMD1"},
 {002,           "CCSETFILE"},
 {003,           "CCINT"},
 {004,           "CCOPEN"},
@@ -86,6 +86,9 @@ KeyNameTable E_Keys[] = {
 {0246,           "CCMICLOSE"},
 {0247,           "CCMIERASE"},
 {0250,           "CCMIRECORD"},
+{0251,           "CCTAG"},
+{0252,           "CCLWINDOW"},
+/*{0253,           "CCTAGSRCH"}, */
 {0400,           "NOCHAR"},
 {-1,             ""}
 };

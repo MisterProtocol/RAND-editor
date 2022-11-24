@@ -203,7 +203,7 @@ Flag in_std_p (ic, oc, n)
 		*(*oc)++ = (char)CCERASE;
 		break;
 	    case CTRL ('h'):
-		*(*oc)++ = CCLWINDOW;
+		*(*oc)++ = (char)CCLWINDOW;
 		break;
 	    case CTRL ('j'):
 		*(*oc)++ = (char)CCJOIN;

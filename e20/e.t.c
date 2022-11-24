@@ -135,6 +135,7 @@ extern Flag vinsdel (Slines, Slines, Flag);
 extern int get_profilekey (Flag);
 extern int d_vmove ();
 extern void doMouseReplay(int, int);
+extern int WinNumber(S_window *);
 
 /*void dbg_winlist();*/
 
@@ -206,6 +207,8 @@ Scols   ncols;      /* number of columns for partial line redraw */
     Flag    usecline;   /* ls was < 0, so use cline */
     Flag    offendflg;  /* off the end of the file */
 
+/* dbg, which win number */
+/*  int win_n = WinNumber(curwin);*/
 
     if (strtcol > (lcol = curwksp->wcol) + (rlimit = curwin->rtext + 1))
 	goto ret;
@@ -220,8 +223,9 @@ Scols   ncols;      /* number of columns for partial line redraw */
     }
 
 /** /
-dbgpr("putup0: ls=(%d) lf=(%d) strtcol=(%d) ncols=(%d), lcol=(%d), cursorcol=(%d) cursorlin=(%d) rlimit=(%d), \n",
-ls,lf,strtcol,ncols,lcol,cursorcol,cursorline,rlimit);
+dbgpr("-------\n");
+dbgpr("putup0: win_n=%d ls=(%d) lf=(%d) strtcol=(%d) ncols=(%d), lcol=(%d), cursorcol=(%d) cursorlin=(%d) rlimit=(%d), \n",
+win_n, ls,lf,strtcol,ncols,lcol,cursorcol,cursorline,rlimit);
 dbgpr("putup0a:  curwksp->wlin=%d\n", curwksp->wlin);
 / **/
 
@@ -314,20 +318,20 @@ lt, ln, strlen(curwin->lmchars), curwin, enterwin );
 	 **/
 
 	/*dbg*/
-	/*int fc_rval;*/
+	// int fc_rval;
 
 	if (   offendflg
 	    || (fc = fnbcol (cline, lcol, min (ncline, lcol + rlimit))) < lcol
 	   ) {
-	    /*fc_rval = fc;*/
+	    // fc_rval = fc;
 	    fc = rlimit;
 	}
 	else
 	    fc -= lcol;
 
-/* /
-dbgpr("putup1: rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncline=(%d)\n",
-       rlimit, fc, col, offendflg,fc_rval,ncline);
+/** /
+dbgpr("putup1(%d): rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncline=(%d)\n",
+    win_n, rlimit, fc, col, offendflg,fc_rval,ncline);
 / **/
 
 	/* how many leading blanks do we need to put out */
@@ -344,9 +348,9 @@ dbgpr("putup1: rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncline=
 	}
 	curwin->firstcol[ln] = (AScols) fc;
 	poscursor ((Scols) col, (Slines) ln);
-/* /
-dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);
-/ */
+/** /
+dbgpr("putup2(%d), leading blanks: rlimit=(%d) fc=(%d), col=(%d)\n", win_n,rlimit, fc, col);
+/ **/
 #ifdef OUT
 	if (stdout->_cnt < 100)   /* smooth any outputting breaks  */
 	    d_put (0);
@@ -354,6 +358,7 @@ dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);
 	Block {
 	    Reg1 Scols tmp;
 	    if ((tmp = (Scols)(fc - col)) > 0) {
+	    //  dbgpr("  num of leading blanks: %d\n", tmp);
 		multchar (' ', tmp);
 		col = fc;
 	    }
@@ -361,9 +366,9 @@ dbgpr("putup2: rlimit=(%d) fc=(%d), col=(%d)\n", rlimit, fc, col);
 
 	/* determine the rightmost col of the new text to put up */
 	/* this should do better on lines that go past right border */
-/* /
-dbgpr("putup3: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
-/ */
+/** /
+dbgpr("putup3(%d), rightmost col: rlimit=(%d) lstcol=(%d) col=(%d)\n", win_n, rlimit,lstcol,col);
+/ **/
 	if (offendflg)
 	    lstcol = 0;
 	else Block {
@@ -379,9 +384,9 @@ dbgpr("putup3: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
 	}
 	if (lstcol < (Scols) col)
 	    lstcol = (Scols) col;
-/* /
-dbgpr("putup4: rlimit=(%d) lstcol=(%d) col=(%d)\n", rlimit,lstcol,col);
-/ */
+/** /
+dbgpr("putup4(%d), 1scol is < col: rlimit=(%d) lstcol=(%d) col=(%d)\n", win_n,rlimit,lstcol,col);
+/ **/
 	Block {
 	    Reg1 Scols ricol;   /* rightmost col of text to put up */
 /* /
@@ -424,12 +429,12 @@ dbgpr("putup6: ricol=(%d), col=(%d) lcol=(%d)\n", ricol, col, lcol);
 		    || ln != newcurline
 		   )
 	       ) {
-/* /
+/** /
 dbgpr("(else) freshputup=%d, rmc=%d, curwin->rmchars[ln]=%d\n",
   freshputup,rmc,curwin->rmchars[ln]&CHARMASK);
 dbgpr(" chgborders=%d, borderbullets=%d, ln=%d, newcurline=%d\n",
   chgborders, borderbullets, ln, newcurline);
-/ */
+/ **/
 		poscursor (curwin->rmarg - curwin->ltext, (Slines)ln);
 		putch (chgborders == 1 ? rmc : INMCH, NO);
 	    }
@@ -440,6 +445,7 @@ ret:
     putupdelta = 0;
     newcurline = -1;
     newcurcol = -1;
+//  dbgpr("putup(%d), end\n", win_n);
     return;
 }
 
@@ -1225,6 +1231,7 @@ Reg2 Slines lin;
 
 /** /
 if( 1 || DebugVal ) {
+ if( curwin->ttext != curwin->tmarg)
    dbgpr("poscursor, beg: col=%d lin=%d cursorline=%d cursorcol=%d, ltext=%d, ttext=%d curwin=(%o)\n",
      col,lin,cursorline,cursorcol,curwin->ltext, curwin->ttext,curwin);
 }
@@ -1261,52 +1268,35 @@ if( 1 || DebugVal ) {
     cursorcol = col;
     cursorline = lin;
 
+
     /* the 041 below is for the terminal simulator cursor addressing */
 
-//  dbgpr("poscursor, VCCAAD: col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
-//       col, lin, col+curwin->ltext, lin+curwin->ttext);
+//if (curwin->tmarg != curwin->ttext) /* omit enter,info wins */
+//dbgpr("poscursor, VCCAAD: col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
+//     col, lin, col+curwin->ltext, lin+curwin->ttext);
 
+#ifdef OUT
     putscbuf[0] = VCCAAD;
     putscbuf[1] = (Uchar) (041 + curwin->ltext + col);
     putscbuf[2] = (Uchar) (041 + curwin->ttext + lin);
     d_write (putscbuf, 3);
+#endif
 
-#ifdef OUT
 /*
  * The above method sends the col and lin values encoded
- * in a byte, where the max "usable" value is 223
+ * in a byte, where the max "usable" value is 223 (0377-041)
  * In order to have a wider screen, the below method
- * could be used to encode the short value (e.d.c has
- * new code commented out to handle this if we so choose...).
- *
- * But I think it's better to simply create two global variables
- * (say, d_col and d_lin) and in e.d.c have VCCAAD use them.
- * Will discuss with mob.
+ * is used to encode the width.
+ *  e.d.c was modified to use VCCAAD1 in addition to VCCAAD.
  */
     unsigned short i2 = (unsigned short) (curwin->ltext + col);
     putscbuf[0] = VCCAAD1;
     memmove(&putscbuf[1], &i2, sizeof i2);
     putscbuf[3] = (Uchar) (041 + curwin->ttext + lin);
+    d_write (putscbuf, 4);
 
 //    dbgpr("poscursor, VCCAAD1: with i2=%d col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
 //         i2, col, lin, col+curwin->ltext, lin+curwin->ttext);
-
-// dbgpr("poscursor, i2=%d\n", i2);
-
-    d_write (putscbuf, 4);
-#endif /* OUT */
-
-#ifdef OUT
-    i2 = 1946;
-    putscbuf[0] = VCCAAD1;
-    memmove(&putscbuf[1], &i2, sizeof i2);
-    putscbuf[3] = (Uchar) (041 + curwin->ttext + lin);
-
-    dbgpr("poscursor, i2=%d\n", i2);
-
-//    dbgpr("poscursor:  make VCCAAD with i2=%d col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
-//         i2, col, lin, col+curwin->ltext, lin+curwin->ttext);
-#endif /* OUT */
 
     return;
 }
@@ -1383,6 +1373,8 @@ Reg4 Nlines cnt;
 
 /** /
 dbgpr("movecursor: func=%d [1=UP 2=DN 5=RT 6=LT] cnt=%d col=%d cursorcol=%d\n", func, cnt, col, cursorcol);
+dbgpr("  tedit=%d, ledit=%d, bedit=%d wlin=%d wcol=%d\n",
+    curwin->tedit, curwin->ledit, curwin->bedit, curwksp->wlin, curwksp->wcol);
 / **/
 
     Block {
@@ -1843,7 +1835,7 @@ rmcmd:
 	    mGetkey (WAIT_KEY, &k_timeval);
 	}
 
-/*dbgpr("param, checking key=%o\n", key);*/
+//dbgpr("param, checking key=%o\n", key);
 
 	switch (key) {
 	case CCDELCH:
@@ -1899,6 +1891,15 @@ else {
 	    /* make sure that all codes for which <CMD><key> is undefined
 	     * are ignored */
 	    switch ((unsigned) key) {
+
+#ifdef OUT
+	    /* not sure about this one... */
+	    case CCMOVEDOWN:    // ^J for tag srch
+		ccmdp[ppos++] = (char) key;
+		ccmdlen++;
+		break;
+#endif /* OUT */
+
 	    case CCBACKSPACE:
 		if (ppos) {
 		    if (cmdflg) {
@@ -2095,6 +2096,7 @@ else {
 		goto done;
 
 	    default:
+	    //dbgpr("param, case default: key=(%o)\n", key);
 		if (!cmdflg)
 		    goto done;
 	    }
@@ -2771,10 +2773,10 @@ Flag    cwkspflg;
     Reg6 Slines first;      /* first line of area in window to be changed */
     Reg2 Slines endwin;     /* height of window -1 */
 
-/**/
+/** /
 dbgpr("redisplay: fn=(%d) from=(%d) num=(%d), delta=(%d) cwkspflg=(%d)\n",
   fn,from,num,delta,cwkspflg);
-/**/
+/ **/
     for (win = Z; win < nwinlist; win++) {
 	if ((tw = winlist[win]->altwksp)->wfile == fn)
 	    /* tw->wlin += readjtop (tw->wlin, from, num, delta, winlist[win]->btext + 1); */
@@ -3177,7 +3179,7 @@ dbgpr("mGetkey: peekflg=%d keyused=%d (key=%03o) \n", peekflg, keyused, key);
 	}
     }
     key = (int)rkey;
-/** /dbgpr("mGetkey returning (%o)\n", rkey); / **/
+/** /dbgpr("mGetkey returning (%o)(%d)\n", rkey,rkey); / **/
     return rkey;
 }
 
@@ -3309,11 +3311,12 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 
 #endif /* USE_MOUSE_POSITION */
 
-	    //  dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c);
+	    //dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c);
 
 	    if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 
 	    c1 = mapInputCh(c);
+	    //dbgpr("e.t.c:  c = (%o)(%d),  after mapInputCh (%o)(%d)\n", c,c, c1,c1);
 	    return (Uint) c1;
 
 #ifdef OUT
@@ -3568,7 +3571,7 @@ pendINTkey()
     if (pendFKeys) {
 	char *cp;
 	for (cp = FKey_p; cp < FKey_end; cp++) {
-	    if (*cp == defINTchar || (altINTchar && (*cp == altINTchar))
+	    if (*cp == defINTchar || (altINTchar && (*cp == altINTchar)))
 		return 1;
 	}
     }
@@ -3644,4 +3647,21 @@ mapInputCh(int c)
 / **/
 
     return c1;
+}
+
+
+/*
+ * dbg, return window number in winlist[]
+ */
+int
+WinNumber(S_window *wp)
+{
+    int i = -1;
+
+    for (i=0; i<nwinlist; i++) {
+      if (wp == winlist[i]) {
+	break;
+      }
+    }
+    return i;
 }
