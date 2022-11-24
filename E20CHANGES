@@ -273,6 +273,6 @@ E20 changes:
     It may be bound to a key using the EKBFILE facility; the sample file
     'kb_ncurses' contains an example.  See the man page for details.  In short:
 
-	<cmd>tag keyword<ret>   Switch to file containg "keyword"
-	<cmd>tag<ret>           Switch to file containg "keyword" cursor is on
+	<cmd>tag keyword<ret>   Switch to file defining "keyword"
+	<cmd>tag<ret>           Switch to file defining "keyword" cursor is on
 	<cmd>tag + or -         Move up/down the list, when there are multiple matches
