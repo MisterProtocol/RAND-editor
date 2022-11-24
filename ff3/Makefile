@@ -150,9 +150,9 @@ $(O)sync.o: sync.c
 	$(CC) $(CFLAGS) $(DEFS) -I. -I$(LOCALINCL) -c sync.c
 	mv sync.o $(O)sync.o
 
-$(MOVE): move.c
-	$(CC) $(CFLAGS) $(DEFS) -I. -I$(LOCALINCL) -c move.c
-	mv move.o $(O)move.o
+#$(MOVE): move.c
+#	$(CC) $(CFLAGS) $(DEFS) -I. -I$(LOCALINCL) -c move.c
+#	mv move.o $(O)move.o
 
 $(FILL): fill.c
 	$(CC) $(CFLAGS) $(DEFS) -I. -I$(LOCALINCL) -c fill.c

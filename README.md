@@ -379,6 +379,25 @@ subdirectory containing the bulk of the editor's
 source code, the `tags` file is not built at the top
 level, but is placed in the `e20/` directory.
 
+The helper script `ctags.sh` will probably need to be edited for your
+system depending on whether your system runs Linux or MacOS,
+and where your `ctags` program is located.  There is an alternative
+version of the `ctags.sh` script, `ctags_trw.sh`, which you
+may wish to run instead.  It does the same thing as `ctags.sh`,
+except that instead of including all source files in the entire
+directory tree in the `tags` file, it indexes only a preselected
+subset of source files.  Which files are included are listed in
+the file `tagfiles` in each subdirectory.  Depending on whether or
+not you are editing test programs in the "e" source directory, you
+may wish to run this version instead, to avoid extraneous
+entries in the `tags` file.  Initial versions of the `tagfiles`
+files have been included in each subdirectory.
+
+N.B.: If you choose to run `ctags_trw.sh`, and if you then add
+a new source file to any of the directories, you will have to add
+that file to the local `tagfiles` file.  These tag files are
+constructed by hand, not automatically.
+
 ### Shell files for Macs
 
 Modern versions of MacOS hate like crazy to leave core dump files.  To get
@@ -413,3 +432,27 @@ such as `fill` and `man` for those. The top-level Makefile has
 additional targets "etc", "help", "clean", "bsd.man" and
 "s5.man" which will be useful. Finally, `make bsd.install` or
 `make s5.install` will install the editor on your system.
+
+### Final Secrets
+
+Adding a new source file to the editor is a complex process, due to
+the age of the editor source tree.
+
+For example, to  a file to the `e20/` directory, follow these
+instructions:
+
+* If it's a header file, add it to the HFILES definition in `e20/Makefile`.
+* If it's a C source file, add it to the OFILES (in .o form), CFILES (in .c form), and the E compilation target (in .o form).
+* Add a segment similar to the others in the section which gives build rules for each `.o` file individually.
+* Run `make depend` to pick up dependencies.
+
+The process is identical for adding source files to the `ff3` and `la1`
+directories, although this should not be necessary unless you are Very
+Far Into the Weeds.
+
+Adding a source file to the `lib` directory is simpler, but again,
+this should not be necessary.
+
+If you are using `ctags` with the `ctags_trw.sh` script, be sure to
+add the new file to the `tagfiles`file in the corresponding
+directory.
