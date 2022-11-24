@@ -11,7 +11,8 @@
 /* #define UNIXV6       / * if this is Version 6   */
 
 #ifndef _NFILE
-#define _NFILE 20
+//#define _NFILE 20
+#define _NFILE 256
 #endif /* _NFILE */
 
 extern int errno;
