@@ -1015,6 +1015,8 @@ checkargs ()
 		getout (YES, "Missing button filename");
 	    buttonfile = cp;
 	    mybuttons = YES;
+	    optshowbuttons = YES;
+	    nButtonLines = 4;
 	    break;
 
 #endif /* MOUSE_BUTTONS */

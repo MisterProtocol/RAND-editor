@@ -92,6 +92,7 @@ S_looktbl keysyms[] = {
     {"split",   CCSPLIT},
     {"srtab",   CCTABS},
     {"tab",     CCTAB},
+    {"tag",     CCTAG},
     {"undef",   CCUNAS1},
     {"up",      CCMOVEUP},
     {"wleft",   CCLWINDOW},

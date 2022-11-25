@@ -28,9 +28,23 @@
 # The second version may be used on Linux, where the version of "ctags"
 # is already new enough to work here.
 
-ctags=/usr/local/Cellar/ctags/5.8_2/bin/ctags
+#ctags=/usr/local/Cellar/ctags/5.8_2/bin/ctags
 #ctags=/usr/bin/ctags
 #ctags=/Library/Developer/CommandLineTools/usr/bin/ctags
+
+ctags=$(which ctags)
+if [[ $ctags == "" ]]; then
+    echo "Set the variable 'ctags' in 'ctags.sh' to"
+    echo "the location of the 'ctags' binary on your system."
+fi
+
+$($ctags -n e20/e.c > /dev/null)
+if [[ "$?" == 1 ]]; then
+    echo "This version of ctags is too old."
+    echo "You must install exuberant ctags."
+    echo "See the comments in 'ctags.sh' for details."
+    exit;
+fi
 
 if [ ! -d ctags.d ] ; then
     mkdir ctags.d
@@ -45,8 +59,8 @@ cd ctags.d
 for i in e20 ff3 la1; do
     cd $i
     for j in *.[ch]; do
-	sed -e 's/^#ifdef.*COMMENT/#if 0 &/' < $j > tmp
-	mv tmp $j
+	sed -e 's/^#ifdef.*COMMENT/#if 0 &/' < $j > tmp.$$
+	mv tmp.$$ $j
     done
     cd ..
 done
@@ -69,14 +83,6 @@ fi
 #type="-n"
 #fi
 
-$($ctags -n e.c > /dev/null)
-if [[ "$?" == 1 ]]; then
-    echo "This version of ctags is too old."
-    echo "You must install exuberant ctags."
-    echo "See the comments in 'ctags.sh' for details."
-    exit;
-fi
-
 # Actual ctags command.  Exclude "e" and "vi/vim" backup files, include
 # local variables, and include line numbers at the end.  The latter is to
 # force duplicates to be included in the tags file. Each "duplicate" represents
@@ -86,7 +92,7 @@ $ctags $type --exclude=',*' --exclude='*~' --C-kinds=+l --fields=+n *.[ch] ../ff
 
 mv tags ../../e20
 cd ../..
-rm -r ctags.d
+rm -rf ctags.d
 
 # Now, from the master tags file created in e20/, generate library-specific
 # tags files in each of ff3/, la1/, and lib/.
