@@ -59,7 +59,8 @@ cd ctags.d
 for i in e20 ff3 la1; do
     cd $i
     for j in *.[ch]; do
-	sed -e 's/^#ifdef.*COMMENT/#if 0 &/' < $j > tmp.$$
+	sed -e 's/^#ifdef.*COMMENT/#if 0 &/' \
+	    -e 's/^#ifdef.*OUT/#if 0 &/' < $j > tmp.$$
 	mv tmp.$$ $j
     done
     cd ..

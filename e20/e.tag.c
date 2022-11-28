@@ -94,7 +94,7 @@ dotag (char *str)
     editTagFile = 1;  /* assume ok */
 
     if ((numtags == 0) && (*tag == '+' || *tag == '-')) {
-	dbgpr("no tags matches\n");
+    //  dbgpr("no tags matches\n");
 	mesg(ERRALL + 1, "There are no tag matches to view.");
 	editTagFile = 0;
 	return CROK;
@@ -215,6 +215,7 @@ FindTag1(char *tag)
     char pattern[64], filename[64], srch_str[256];
     int line;
     char *t;
+    int taglen = (int) strlen(tag);
 
     fseek(tagfp, offset, SEEK_SET);
 
@@ -241,7 +242,7 @@ FindTag1(char *tag)
 	}
 
 	    /* save a strcmp below, 2nd char must match */
-	if (buf[1] != tag[1])
+	if (taglen > 1 && buf[1] != tag[1])
 	    continue;
 
 	buf[strlen(buf)-1] = '\0';
@@ -629,7 +630,7 @@ tagLineNo(int tagnum)
 	    if (n > 0 && !strcmp(TagMatches[n].fname, TagMatches[n-1].fname)
 		      && !strcmp(TagMatches[n].search_str, TagMatches[n-1].search_str)
 		      && (ln == TagMatches[n-1].lineno)) {
-		dbgpr("skipping duplicate match at ln=%d\n", ln);
+	      //dbgpr("skipping duplicate match at ln=%d\n", ln);
 		continue;
 	    }
 

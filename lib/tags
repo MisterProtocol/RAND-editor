@@ -1,0 +1,75 @@
+BOUND	../lib/fill.c	/^#define BOUND /;"	d	line:177	file:
+BOUND	../lib/fill.c	/^#define BOUND /;"	d	line:179	file:
+BOUND	../lib/move.old.c	/^#define BOUND /;"	d	line:104	file:
+BOUND	../lib/move.old.c	/^#define BOUND /;"	d	line:106	file:
+BSD	../lib/mygethostname.c	/^#undef BSD	/;"	d	line:5	file:
+_NFILE	../lib/tfopen.c	/^#define _NFILE /;"	d	line:8	file:
+alph	../lib/fill.c	/^char alph[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";$/;"	v	line:182
+alph	../lib/move.old.c	/^char alph[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";$/;"	v	line:109
+b	../lib/fill.c	/^    char         *b;$/;"	m	line:128	union:bw	file:
+b	../lib/fill.c	/^    char         *b;$/;"	m	line:70	union:bw	file:
+b	../lib/move.old.c	/^    char         *b;$/;"	m	line:36	union:bw	file:
+buf	../lib/intss.c	/^{   int buf[3];$/;"	l	line:17
+bw	../lib/fill.c	/^union bw {$/;"	u	line:127	file:
+bw	../lib/fill.c	/^union bw {$/;"	u	line:69	file:
+bw	../lib/move.old.c	/^union bw {$/;"	u	line:35	file:
+cnt	../lib/fill.c	/^    unsigned int cnt;$/;"	l	line:191
+cnt	../lib/move.old.c	/^    unsigned int cnt;$/;"	l	line:118
+count	../lib/empty.c	/^    long count;$/;"	l	line:19
+cp	../lib/getlong.c	/^    register char *cp;$/;"	l	line:12
+cp	../lib/getshort.c	/^    register char *cp;$/;"	l	line:12
+cp	../lib/putlong.c	/^    register char *cp;$/;"	l	line:12
+cp	../lib/putshort.c	/^    register char *cp;$/;"	l	line:12
+delay	../lib/delay.c	/^delay (ms)$/;"	f	line:21
+dest	../lib/fill.c	/^    char *dest;$/;"	l	line:190
+dest	../lib/move.old.c	/^    char *dest;$/;"	l	line:117
+empty	../lib/empty.c	/^empty (int fd)$/;"	f	line:17
+fatal	../lib/fatal.c	/^fatal ()$/;"	f	line:8
+fill	../lib/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:134
+fill	../lib/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:17
+fill	../lib/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:31
+fill	../lib/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:77
+fillchar	../lib/fill.c	/^    char fillchar;$/;"	l	line:189
+getlong	../lib/getlong.c	/^getlong (iop)$/;"	f	line:7
+getshort	../lib/getshort.c	/^getshort (iop)$/;"	f	line:7
+i	../lib/fill.c	/^    unsigned int  i;$/;"	m	line:130	union:bw	file:
+i	../lib/fill.c	/^    unsigned int  i;$/;"	m	line:73	union:bw	file:
+i	../lib/getlong.c	/^    long i;$/;"	l	line:10
+i	../lib/getshort.c	/^    short i;$/;"	l	line:10
+i	../lib/move.old.c	/^    unsigned int  i;$/;"	m	line:38	union:bw	file:
+intss	../lib/intss.c	/^intss()$/;"	f	line:16
+intss	../lib/intss.c	/^intss(void)$/;"	f	line:6
+iop	../lib/tfopen.c	/^    register FILE *iop;$/;"	l	line:19
+l	../lib/fill.c	/^    long         *l;$/;"	m	line:72	union:bw	file:
+main	../lib/fill.c	/^main (argc, argv)$/;"	f	line:185
+main	../lib/move.old.c	/^main (argc, argv)$/;"	f	line:112
+main	../lib/x.c	/^main()$/;"	f	line:6
+move	../lib/move.old.c	/^move (source, dest, count)$/;"	f	line:19
+move	../lib/move.old.c	/^move (source, dest, count)$/;"	f	line:42
+mspc10	../lib/delay.c	/^    register int mspc10;$/;"	l	line:24
+my_hostname	../lib/mygethostname.c	/^char my_hostname[MAXHOSTNAMELEN];$/;"	v	line:16
+my_move	../lib/move.c	/^my_move (source, dest, count)$/;"	f	line:14
+mygethostname	../lib/mygethostname.c	/^mygethostname()$/;"	f	line:19
+nsave	../lib/fill.c	/^    unsigned int nsave;$/;"	l	line:143
+nsave	../lib/fill.c	/^    unsigned int nsave;$/;"	l	line:86
+nsave	../lib/move.old.c	/^    unsigned int nsave;$/;"	l	line:51
+putlong	../lib/putlong.c	/^putlong (i, iop)$/;"	f	line:7
+putshort	../lib/putshort.c	/^putshort (i, iop)$/;"	f	line:7
+rcount	../lib/move.old.c	/^    register unsigned int rcount;$/;"	l	line:50
+read	../lib/tfopen.c	/^    int read = 0;$/;"	l	line:20
+retval	../lib/fill.c	/^    char *retval;$/;"	l	line:36
+scratch	../lib/tfopen.c	/^    struct stat scratch;$/;"	l	line:22
+source	../lib/move.old.c	/^    char *source;$/;"	l	line:116
+test	../lib/fill.c	/^char test[BOUND+500] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";$/;"	v	line:183
+test	../lib/move.old.c	/^char test[BOUND+500] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";$/;"	v	line:110
+tfopen	../lib/tfopen.c	/^tfopen (file, mode)$/;"	f	line:14
+tmp	../lib/getlong.c	/^    register size_t tmp;$/;"	l	line:11
+tmp	../lib/getshort.c	/^    register size_t tmp;$/;"	l	line:11
+tmp	../lib/putlong.c	/^    register size_t tmp;$/;"	l	line:11
+tmp	../lib/putshort.c	/^    register size_t tmp;$/;"	l	line:11
+tmspc10	../lib/delay.c	/^short	tmspc10[] = {$/;"	v	line:14	file:
+u	../lib/mygethostname.c	/^    static struct utsname u;$/;"	l	line:22	file:
+w	../lib/fill.c	/^    short        *w;$/;"	m	line:129	union:bw	file:
+w	../lib/fill.c	/^    short        *w;$/;"	m	line:71	union:bw	file:
+w	../lib/move.old.c	/^    short        *w;$/;"	m	line:37	union:bw	file:
+write	../lib/tfopen.c	/^    int write = 0;$/;"	l	line:21

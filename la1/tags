@@ -1,0 +1,527 @@
+BIGDADDR	../la1/la.h	/^#define BIGDADDR$/;"	d	line:5
+BIGDADDR	../la1/lalocal.h	/^#define BIGDADDR /;"	d	line:5
+BRK_AGAIN	../la1/lalocal.h	/^#define BRK_AGAIN /;"	d	line:42
+BRK_COPY	../la1/lalocal.h	/^#define BRK_COPY /;"	d	line:41
+BRK_REAL	../la1/lalocal.h	/^#define BRK_REAL /;"	d	line:40
+Block	../la1/lalocal.h	/^#define Block$/;"	d	line:26
+COLLECTING	../la1/lalcol.c	/^#define COLLECTING /;"	d	line:6	file:
+DORMANT	../la1/lalcol.c	/^#define DORMANT /;"	d	line:5	file:
+LA_ALLOCED	../la1/la.h	/^#define LA_ALLOCED /;"	d	line:108
+LA_BADBAD	../la1/la.h	/^#define LA_BADBAD /;"	d	line:188
+LA_BADCOLL	../la1/la.h	/^#define LA_BADCOLL /;"	d	line:206
+LA_BADSTREAM	../la1/la.h	/^#define LA_BADSTREAM /;"	d	line:200
+LA_BRKCOLL	../la1/la.h	/^#define LA_BRKCOLL /;"	d	line:207
+LA_EOF	../la1/la.h	/^#define LA_EOF /;"	d	line:190
+LA_ERRMAXL	../la1/la.h	/^#define LA_ERRMAXL /;"	d	line:191
+LA_FFERR	../la1/la.h	/^#define LA_FFERR /;"	d	line:201
+LA_FSDBMAX	../la1/lalocal.h	/^#define LA_FSDBMAX /;"	d	line:35
+LA_FSDLMAX	../la1/lalocal.h	/^#define LA_FSDLMAX /;"	d	line:31
+LA_FSDLMAX	../la1/lalocal.h	/^#define LA_FSDLMAX /;"	d	line:33
+LA_FSDNBMAX	../la1/lalocal.h	/^#define LA_FSDNBMAX /;"	d	line:36
+LA_FSDSIZE	../la1/lalocal.h	/^#define LA_FSDSIZE /;"	d	line:28
+LA_GETERR	../la1/la.h	/^#define LA_GETERR /;"	d	line:202
+LA_INT	../la1/la.h	/^#define LA_INT /;"	d	line:189
+LA_INVMODE	../la1/la.h	/^#define LA_INVMODE /;"	d	line:198
+LA_LLINE	../la1/la.h	/^#define LA_LLINE /;"	d	line:36
+LA_LONGFILES	../la1/la.h	/^#define LA_LONGFILES /;"	d	line:15
+LA_LONGLINES	../la1/la.h	/^#define LA_LONGLINES /;"	d	line:16
+LA_MAXLINE	../la1/la.h	/^# define LA_MAXLINE /;"	d	line:20
+LA_MAXLINE	../la1/la.h	/^# define LA_MAXLINE /;"	d	line:23
+LA_MAXNLINES	../la1/la.h	/^# define LA_MAXNLINES /;"	d	line:28
+LA_MAXNLINES	../la1/la.h	/^# define LA_MAXNLINES /;"	d	line:31
+LA_MAX_NON_SPECIAL_FSD	../la1/la.h	/^#define LA_MAX_NON_SPECIAL_FSD /;"	d	line:37
+LA_MODIFIED	../la1/la.h	/^#define LA_MODIFIED /;"	d	line:83
+LA_NEGCOUNT	../la1/la.h	/^#define LA_NEGCOUNT /;"	d	line:203
+LA_NEW	../la1/la.h	/^#define LA_NEW /;"	d	line:81
+LA_NEWLINE	../la1/la.h	/^#define LA_NEWLINE /;"	d	line:156
+LA_NLLINE	../la1/la.h	/^#define LA_NLLINE /;"	d	line:35
+LA_NOCHANS	../la1/la.h	/^#define LA_NOCHANS /;"	d	line:197
+LA_NOCHG	../la1/la.h	/^#define LA_NOCHG /;"	d	line:195
+LA_NOMEM	../la1/la.h	/^#define LA_NOMEM /;"	d	line:196
+LA_NONEWL	../la1/la.h	/^#define LA_NONEWL /;"	d	line:193
+LA_NOOPN	../la1/la.h	/^#define LA_NOOPN /;"	d	line:199
+LA_NOTSAME	../la1/la.h	/^#define LA_NOTSAME /;"	d	line:205
+LA_READERR	../la1/la.h	/^#define LA_READERR /;"	d	line:192
+LA_STAY	../la1/la.h	/^#define LA_STAY /;"	d	line:109
+LA_TMP	../la1/la.h	/^#define LA_TMP /;"	d	line:82
+LA_TOOLONG	../la1/la.h	/^#define LA_TOOLONG /;"	d	line:204
+LA_WRTERR	../la1/la.h	/^#define LA_WRTERR /;"	d	line:194
+La_bytepos	../la1/la.h	/^typedef long  La_bytepos;       \/* must not be unsigned *\/$/;"	t	line:39
+La_file	../la1/la.h	/^ } La_file;$/;"	t	line:79	typeref:struct:lafile
+La_flag	../la1/la.h	/^typedef int La_flag;$/;"	t	line:40
+La_fsd	../la1/la.h	/^ } La_fsd;$/;"	t	line:55	typeref:struct:lafsd
+La_linelength	../la1/la.h	/^typedef unsigned int La_linelength; \/* A 'long' doesn't yet work *\/$/;"	t	line:61
+La_linepos	../la1/la.h	/^ typedef long La_linepos;        \/* must not be unsigned *\/$/;"	t	line:29
+La_linepos	../la1/la.h	/^typedef short La_linepos;       \/* must not be unsigned *\/$/;"	t	line:32
+La_linesize	../la1/la.h	/^  typedef long  La_linesize;    \/* must not be unsigned *\/$/;"	t	line:21
+La_linesize	../la1/la.h	/^  typedef short La_linesize;    \/* must not be unsigned *\/$/;"	t	line:24
+La_stream	../la1/la.h	/^ } La_stream;$/;"	t	line:106	typeref:struct:lastream
+MAXLINE	../la1/test.c	/^#define MAXLINE /;"	d	line:8	file:
+MIN	../la1/laopen.c	/^#define MIN(/;"	d	line:521	file:
+NO	../la1/la.h	/^#define NO /;"	d	line:11
+NO	../la1/test.c	/^    la_lflush (tlas1, (La_linepos) 0, la_lsize (tlas1), 1, NO);$/;"	l	line:227
+NO	../la1/test.c	/^    la_lflush (tlas1, (La_linepos) 0, la_lsize (tlas1), 1, NO);$/;"	l	line:286
+OUT_FILE	../la1/test.c	/^#define OUT_FILE /;"	d	line:6	file:
+REALLOC	../la1/labreak.c	/^#define REALLOC /;"	d	line:30	file:
+Reg1	../la1/lalocal.h	/^#define Reg1$/;"	d	line:16
+Reg1	../la1/lalocal.h	/^#undef Reg1$/;"	d	line:10
+Reg2	../la1/lalocal.h	/^#define Reg2$/;"	d	line:17
+Reg2	../la1/lalocal.h	/^#undef Reg2$/;"	d	line:11
+Reg3	../la1/lalocal.h	/^#define Reg3$/;"	d	line:18
+Reg3	../la1/lalocal.h	/^#undef Reg3$/;"	d	line:12
+Reg4	../la1/lalocal.h	/^#define Reg4$/;"	d	line:19
+Reg4	../la1/lalocal.h	/^#undef Reg4$/;"	d	line:13
+Reg5	../la1/lalocal.h	/^#define Reg5$/;"	d	line:20
+Reg5	../la1/lalocal.h	/^#undef Reg5$/;"	d	line:14
+Reg6	../la1/lalocal.h	/^#define Reg6$/;"	d	line:21
+Reg6	../la1/lalocal.h	/^#undef Reg6$/;"	d	line:15
+STRUCTASSIGN	../la1/lalocal.h	/^#define STRUCTASSIGN /;"	d	line:6
+STRUCT_COPY	../la1/lalocal.h	/^#define STRUCT_COPY(/;"	d	line:48
+STRUCT_COPY	../la1/lalocal.h	/^#define STRUCT_COPY(/;"	d	line:50
+YES	../la1/la.h	/^#define YES /;"	d	line:10
+_bchr	../la1/laopen.c	/^	    char        _bchr[6];$/;"	m	line:349	struct:fsb::__anon1	file:
+_schr	../la1/laopen.c	/^	    char        _schr[8];$/;"	m	line:353	struct:fsb::__anon2	file:
+abs	../la1/lalcnt.c	/^#define abs(/;"	d	line:6	file:
+arg	../la1/test.c	/^    Reg3 int *arg;$/;"	l	line:538
+b	../la1/laopen.c	/^	    char        b[LA_FSDBMAX];  \/* lalocal.h:  255 *\/$/;"	m	line:350	struct:fsb::__anon1	file:
+blas	../la1/lablank.c	/^    static La_stream blas;$/;"	l	line:14	file:
+blnks	../la1/lablank.c	/^    static char blnks[LA_FSDLMAX];$/;"	l	line:12	file:
+blnks_done	../la1/lablank.c	/^    static int blnks_done;$/;"	l	line:13	file:
+bp	../la1/lalseek.c	/^    Reg5 La_bytepos bp;$/;"	l	line:31
+bpos1	../la1/laldel.c	/^    La_bytepos bpos1;$/;"	l	line:17
+brktest	../la1/test.c	/^brktest (argc, argv)$/;"	f	line:103
+buf	../la1/lalcnt.c	/^		Reg3 char *buf = &onechar;$/;"	l	line:60
+buf	../la1/lalflush.c	/^    char buf[BUFSIZ];$/;"	l	line:22
+buf	../la1/test.c	/^	char buf[MAXLINE];$/;"	l	line:265
+buf	../la1/test.c	/^    char buf[28];$/;"	l	line:195
+buf	../la1/test.c	/^    char buf[MAXLINE];$/;"	l	line:450
+bytes	../la1/laopen.c	/^	} bytes;$/;"	m	line:351	union:fsb	typeref:struct:fsb::__anon1	file:
+bzero	../la1/labreak.c	/^    static La_bytepos bzero;    \/* always 0 *\/$/;"	l	line:99	file:
+bzero	../la1/labreak.c	/^    static La_bytepos bzero;$/;"	l	line:20	file:
+cflag	../la1/laopen.c	/^    Reg3 char cflag;$/;"	l	line:51
+cfsd	../la1/labreak.c	/^    Reg3 La_fsd *cfsd;  \/* fast pointer to current fsd *\/$/;"	l	line:84
+cfsd	../la1/laclseek.c	/^	Reg3 La_fsd *cfsd;$/;"	l	line:33
+cfsd	../la1/lalcopy.c	/^    Reg5 La_fsd *cfsd;$/;"	l	line:20
+cfsd	../la1/lalget.c	/^    Reg3 La_fsd    *cfsd;$/;"	l	line:20
+cfsd	../la1/lalink.c	/^    Reg4 La_fsd *cfsd;$/;"	l	line:27
+cfsd	../la1/lalpnt.c	/^    Reg3 La_fsd *cfsd;$/;"	l	line:19
+cfsd	../la1/lalseek.c	/^    Reg3 La_fsd *cfsd;$/;"	l	line:27
+cfsd	../la1/laopen.c	/^    Reg3 La_fsd    *cfsd;       \/* current fsd *\/$/;"	l	line:360
+chglas	../la1/laopen.c	/^	static La_stream chglas;$/;"	l	line:138	file:
+chgpos	../la1/lalcol.c	/^static La_bytepos chgpos;$/;"	v	line:8	file:
+chr	../la1/test.c	/^    Reg2 char chr;$/;"	l	line:537
+claf	../la1/labreak.c	/^    La_file *claf;      \/* fast pointer to current la_file *\/$/;"	l	line:89
+clonetest	../la1/test.c	/^clonetest (argc, argv)$/;"	f	line:156
+cnt	../la1/lablank.c	/^	Reg1 La_linepos cnt;$/;"	l	line:23
+cnt	../la1/lablank.c	/^	Reg3 La_linepos cnt;$/;"	l	line:49
+cnt	../la1/lalflush.c	/^	Reg3 int cnt;$/;"	l	line:52
+collect	../la1/test.c	/^    int collect;$/;"	l	line:242
+collecttest	../la1/test.c	/^collecttest (argc, argv)$/;"	f	line:232
+count	../la1/test.c	/^	int count;$/;"	l	line:432
+cp	../la1/labsize.c	/^	Reg1 char *cp;$/;"	l	line:17
+cp	../la1/lalcopy.c	/^	    Reg1 char *cp;$/;"	l	line:71
+cp	../la1/lalrsize.c	/^    Reg1 char *cp;$/;"	l	line:9
+cp	../la1/lalseek.c	/^    Reg2 char *cp;$/;"	l	line:26
+cp	../la1/lalwsize.c	/^    Reg1 char *cp;$/;"	l	line:9
+cp	../la1/laopen.c	/^	Reg1 char *cp;$/;"	l	line:56
+cp	../la1/laopen.c	/^    Reg1 char      *cp;$/;"	l	line:358
+cp	../la1/test.c	/^	char *cp;$/;"	l	line:433
+cp	../la1/test.c	/^    register char *cp;$/;"	l	line:191
+cp1	../la1/labreak.c	/^	Reg2 char *cp1;$/;"	l	line:209
+cp2	../la1/labreak.c	/^    char *cp2;          \/* pointer to middle portion fsdbyte *\/$/;"	l	line:91
+cp3	../la1/labreak.c	/^    char *cp3;          \/* pointer to third  portion fsdbyte *\/$/;"	l	line:92
+curpos	../la1/laopen.c	/^    long            curpos;     \/* current pos for ff_point *\/$/;"	l	line:373
+d1fsd	../la1/labreak.c	/^    La_fsd    *d1fsd, *d2fsd;$/;"	l	line:17
+d1fsd	../la1/laldel.c	/^	La_fsd *d1fsd;           \/* dummy *\/$/;"	l	line:41
+d2fsd	../la1/labreak.c	/^    La_fsd    *d1fsd, *d2fsd;$/;"	l	line:17
+dbgpr	../la1/test.c	/^dbgpr (fmt)$/;"	f	line:498
+dbgpr_la_fdump	../la1/ladeb.c	/^dbgpr_la_fdump (plaf, txt)$/;"	f	line:202
+dbgpr_la_fschaindump	../la1/ladeb.c	/^dbgpr_la_fschaindump (plas, txt)$/;"	f	line:172
+dbgpr_la_fsddump	../la1/ladeb.c	/^dbgpr_la_fsddump (ffsd, lfsd, fsdbyteflg, txt)$/;"	f	line:227
+dbgpr_la_schaindump	../la1/ladeb.c	/^dbgpr_la_schaindump (txt)$/;"	f	line:188
+dbgpr_la_sdump	../la1/ladeb.c	/^dbgpr_la_sdump (plas, txt)$/;"	f	line:149
+deletetest	../la1/test.c	/^deletetest (argc, argv)$/;"	f	line:291
+dffsd	../la1/laldel.c	/^    Reg5 La_fsd    *dffsd;$/;"	l	line:12
+dlfsd	../la1/laldel.c	/^    La_fsd    *dlfsd;$/;"	l	line:14
+dodbgpr	../la1/test.c	/^dodbgpr (fmt)$/;"	f	line:514
+dopr	../la1/test.c	/^dopr (iop, fmt)$/;"	f	line:532
+errbuf	../la1/laother.c	/^	    static char errbuf[]$/;"	l	line:19	file:
+error	../la1/laerr.c	/^    Reg1 int error;$/;"	l	line:8
+errval	../la1/lalcol.c	/^    Reg2 int \/*La_linepos*\/ errval;$/;"	l	line:17
+errval	../la1/lalcol.c	/^    Reg4 int \/*La_linepos*\/ errval;$/;"	l	line:71
+ffl	../la1/laopen.c	/^	Reg1 Ff_stream *ffl;$/;"	l	line:88
+ffn	../la1/lalget.c	/^	Reg6 Ff_stream *ffn;$/;"	l	line:50
+ffpos	../la1/labreak.c	/^    long \/*short*\/ ffpos;        \/* fast copy of current la_ffpos *\/$/;"	l	line:96
+ffpos	../la1/lalseek.c	/^		Reg4 La_bytepos \/*short*\/ ffpos;$/;"	l	line:233
+ffpos	../la1/lalseek.c	/^	    Reg4 La_bytepos \/*short*\/ ffpos;$/;"	l	line:275
+ffpos	../la1/lalseek.c	/^	    Reg4 La_bytepos \/*unsigned short*\/ ffpos;$/;"	l	line:170
+ffs	../la1/lafins.c	/^    Ff_stream *ffs;$/;"	l	line:17
+ffs	../la1/lalins.c	/^	Reg4 Ff_stream *ffs;$/;"	l	line:30
+ffsd	../la1/lafins.c	/^    La_fsd *ffsd, *lfsd;        \/* first and last fsds to be made for buf *\/$/;"	l	line:16
+ffsd	../la1/lalcol.c	/^    La_fsd *ffsd;               \/* first fsd to be made for buf *\/$/;"	l	line:73
+ffsd	../la1/lalins.c	/^    La_fsd *ffsd, *lfsd;        \/* first and last fsds to be made for buf *\/$/;"	l	line:12
+ffsd	../la1/laopen.c	/^    La_fsd          *ffsd;$/;"	l	line:133
+ffsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd, *n1fsd, *n2fsd;$/;"	l	line:109
+ffsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd;$/;"	l	line:297
+ffsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd;$/;"	l	line:356
+fmtptr	../la1/test.c	/^    char *fmtptr;$/;"	l	line:536
+freelaf	../la1/laclose.c	/^    Reg3 La_flag freelaf;$/;"	l	line:11
+fsb	../la1/laopen.c	/^    union fsb       fsb;        \/* a tmp array for fsdbytes *\/$/;"	l	line:357
+fsb	../la1/laopen.c	/^    union fsb {$/;"	u	line:347	file:
+fsbyte1	../la1/labreak.c	/^    unsigned int \/*short*\/ fsbyte1;      \/* num of fsdbytes in new fsd 1 of 3 *\/$/;"	l	line:93
+fsbyte2	../la1/labreak.c	/^    unsigned int \/*short*\/ fsbyte2;      \/* num of fsdbytes in new fsd 2 of 3 *\/$/;"	l	line:94
+fsbyte3	../la1/labreak.c	/^    unsigned int \/*short*\/ fsbyte3;      \/* num of fsdbytes in new fsd 3 of 3 *\/$/;"	l	line:95
+fsdb	../la1/lalrsize.c	/^    Reg3 int fsdb;$/;"	l	line:10
+fsdb	../la1/lalwsize.c	/^    Reg3 int fsdb;$/;"	l	line:10
+fsdback	../la1/la.h	/^    struct lafsd  *fsdback;     \/* previous fsd in chain                   *\/$/;"	m	line:47	struct:lafsd	typeref:struct:lafsd::lafsd
+fsdbytes	../la1/la.h	/^    char fsdbytes[1];           \/* bytes describing the linelengths.       *\/$/;"	m	line:54	struct:lafsd
+fsdchcnt	../la1/laopen.c	/^    long            fsdchcnt;   \/* fsd character count (long is correct) *\/$/;"	l	line:366
+fsdfile	../la1/la.h	/^    struct lafile *fsdfile;     \/* lafile pointer of file containing lines.*\/$/;"	m	line:48	struct:lafsd	typeref:struct:lafsd::lafile
+fsdforw	../la1/la.h	/^    struct lafsd  *fsdforw;     \/* next fsd in chain; 0 if last fsd        *\/$/;"	m	line:46	struct:lafsd	typeref:struct:lafsd::lafsd
+fsdnbytes	../la1/la.h	/^    long  fsdnbytes;            \/* num of bytes in this fsd if regular fsd *\/$/;"	m	line:51	struct:lafsd
+fsdnlines	../la1/la.h	/^    char fsdnlines;             \/* number of lines in this fsd.            *\/$/;"	m	line:52	struct:lafsd
+fsdpos	../la1/la.h	/^    long fsdpos;                \/* location of first character             *\/$/;"	m	line:50	struct:lafsd
+fsdpos	../la1/lafins.c	/^    long fsdpos;$/;"	l	line:18
+fsdpos	../la1/lalins.c	/^	Reg6 long fsdpos;$/;"	l	line:31
+fsdsize	../la1/lalcopy.c	/^	    long \/*unsigned int*\/ fsdsize;$/;"	l	line:72
+fsline	../la1/labreak.c	/^    long \/*short*\/ fsline;       \/* fast copy of current la_fsline *\/$/;"	l	line:90
+fsln	../la1/labreak.c	/^	    Reg4 long \/*short*\/ fsln;$/;"	l	line:348
+fsoff	../la1/lalseek.c	/^    La_bytepos \/*unsigned short*\/ fsoff;$/;"	l	line:28
+gap	../la1/lalcnt.c	/^	    La_flag gap;$/;"	l	line:45
+gettest	../la1/test.c	/^gettest (argc, argv)$/;"	f	line:441
+i	../la1/test.c	/^    int i;$/;"	l	line:396
+incr	../la1/lablank.c	/^	    Reg2 La_linepos incr;$/;"	l	line:54
+ind	../la1/test.c	/^    int ind;$/;"	l	line:19
+inserted	../la1/lablank.c	/^    static La_flag inserted = NO;$/;"	l	line:16	file:
+inserttest	../la1/test.c	/^inserttest (argc, argv)$/;"	f	line:187
+insret	../la1/test.c	/^    La_linepos insret;$/;"	l	line:241
+j	../la1/labreak.c	/^			Reg1 int \/*short*\/ j;$/;"	l	line:356
+j	../la1/labreak.c	/^	Reg4 int \/*short*\/ j;$/;"	l	line:210
+j	../la1/labsize.c	/^	Reg2 int j;$/;"	l	line:18
+j	../la1/laclseek.c	/^    Reg4 La_linesize j;$/;"	l	line:10
+j	../la1/ladeb.c	/^		Reg1 int j;$/;"	l	line:264
+j	../la1/ladeb.c	/^		Reg1 int j;$/;"	l	line:44
+j	../la1/lalcopy.c	/^	Reg2 int j;$/;"	l	line:67
+j	../la1/lalget.c	/^    Reg1 int        j;$/;"	l	line:21
+j	../la1/lalseek.c	/^	Reg1 long \/*short*\/ j;$/;"	l	line:124
+j	../la1/lalseek.c	/^	Reg1 long \/*short*\/ j;$/;"	l	line:190
+j	../la1/test.c	/^    register int j;$/;"	l	line:162
+j	../la1/test.c	/^    register int j;$/;"	l	line:447
+j	../la1/test.c	/^    register int j;$/;"	l	line:81
+k	../la1/ladeb.c	/^		Reg2 int k;$/;"	l	line:265
+k	../la1/ladeb.c	/^		Reg2 int k;$/;"	l	line:45
+la_abort	../la1/laabort.c	/^la_abort (str)$/;"	f	line:9
+la_active	../la1/la.h	/^#define la_active(/;"	d	line:118
+la_align	../la1/laalign.c	/^la_align (olas, nlas)$/;"	f	line:6
+la_blank	../la1/lablank.c	/^la_blank (plas, nlines)$/;"	f	line:8
+la_bpos	../la1/la.h	/^#define la_bpos /;"	d	line:114
+la_break	../la1/labreak.c	/^la_break (plas, mode, ffsd, lfsd, pnlines$/;"	f	line:70
+la_bsize	../la1/la.h	/^#define la_bsize(/;"	d	line:141
+la_bsize	../la1/labsize.c	/^la_bsize (plas)$/;"	f	line:7
+la_bytepos	../la1/la.h	/^#define la_bytepos(/;"	d	line:134
+la_cfile	../la1/lacfile.c	/^char      *la_cfile = "la_changes"; \/* the file for changes *\/$/;"	v	line:3
+la_cfile	../la1/test.c	/^char *la_cfile = "changes.tmp";$/;"	v	line:4
+la_cfsd	../la1/la.h	/^#define la_cfsd /;"	d	line:116
+la_chan	../la1/la.h	/^#define la_chan(/;"	d	line:131
+la_chans	../la1/laopen.c	/^int         la_chans;           \/* how many channels used by la package *\/$/;"	v	line:22
+la_chgffs	../la1/laopen.c	/^Ff_stream  *la_chgffs;$/;"	v	line:20
+la_chglas	../la1/laopen.c	/^La_stream  *la_chglas;$/;"	v	line:19
+la_chgopen	../la1/laopen.c	/^La_flag     la_chgopen;         \/* change file is open *\/$/;"	v	line:21
+la_clone	../la1/laopen.c	/^la_clone (oldlas, newlas)$/;"	f	line:254
+la_close	../la1/laclose.c	/^la_close (plas)$/;"	f	line:7
+la_clseek	../la1/laclseek.c	/^la_clseek (plas, nchars)$/;"	f	line:6
+la_domodify	../la1/la.h	/^#define la_domodify(/;"	d	line:120
+la_eof	../la1/la.h	/^#define la_eof(/;"	d	line:135
+la_errno	../la1/laopen.c	/^int         la_errno;           \/* last non-La_stream error that occurred *\/$/;"	v	line:26
+la_error	../la1/laerr.c	/^la_error ()$/;"	f	line:6
+la_fback	../la1/la.h	/^    struct lastream *la_fback;  \/* chain of streams into la_file *\/$/;"	m	line:103	struct:lastream	typeref:struct:lastream::lastream
+la_fdump	../la1/ladeb.c	/^la_fdump (plaf, txt)$/;"	f	line:92
+la_ffchan	../la1/la.h	/^#define la_ffchan(/;"	d	line:130
+la_ffopen	../la1/laopen.c	/^la_ffopen (pffs, plas, pos)$/;"	f	line:126
+la_fforw	../la1/la.h	/^    struct lastream *la_fforw;  \/* chain of streams into la_file *\/$/;"	m	line:104	struct:lastream	typeref:struct:lastream::lastream
+la_ffpos	../la1/la.h	/^#define la_ffpos /;"	d	line:113
+la_ffs	../la1/la.h	/^    Ff_stream       *la_ffs;    \/* chain of ff streams for this file       *\/$/;"	m	line:67	struct:lafile
+la_ffsd	../la1/la.h	/^    La_fsd          *la_ffsd;   \/* first fsd in the chain                  *\/$/;"	m	line:65	struct:lafile
+la_file	../la1/la.h	/^    La_file         *la_file;   \/* pointer to stream-independent stuff *\/$/;"	m	line:100	struct:lastream
+la_finsert	../la1/lafins.c	/^la_finsert (plas, stchar, nchars, stline, nlines, filename, pffs, chan)$/;"	f	line:4
+la_firststream	../la1/laopen.c	/^La_stream  *la_firststream;     \/* first stream is always the changes file *\/$/;"	v	line:24
+la_fpos	../la1/la.h	/^    struct la_fpos   la_fpos;$/;"	m	line:92	struct:la_spos	typeref:struct:la_spos::la_fpos
+la_fpos	../la1/la.h	/^struct la_fpos {                \/* used by la_ldelete *\/$/;"	s	line:85
+la_freefsd	../la1/laopen.c	/^la_freefsd (tfsd)$/;"	f	line:626
+la_freplace	../la1/lafrpl.c	/^la_freplace (filename, plas)$/;"	f	line:6
+la_fsbyte	../la1/la.h	/^#define la_fsbyte /;"	d	line:111
+la_fschaindump	../la1/ladeb.c	/^la_fschaindump (plas, txt)$/;"	f	line:132
+la_fsddump	../la1/ladeb.c	/^la_fsddump (ffsd, lfsd, fsdbyteflg, txt)$/;"	f	line:6
+la_fsline	../la1/la.h	/^#define la_fsline /;"	d	line:110
+la_fsrefs	../la1/la.h	/^    La_linepos       la_fsrefs; \/* number of refs by fsds                  *\/$/;"	m	line:71	struct:lafile
+la_fstream	../la1/la.h	/^    struct lastream *la_fstream;\/* first in chain for this lafile          *\/$/;"	m	line:68	struct:lafile	typeref:struct:lafile::lastream
+la_fwfile	../la1/la.h	/^    struct lafile   *la_fwfile; \/* chain of diffed files                   *\/$/;"	m	line:70	struct:lafile	typeref:struct:lafile::lafile
+la_int	../la1/laint.c	/^la_int ()$/;"	f	line:6
+la_laststream	../la1/laopen.c	/^La_stream  *la_laststream;$/;"	v	line:25
+la_lbyte	../la1/la.h	/^#define la_lbyte /;"	d	line:112
+la_lcollect	../la1/lalcol.c	/^la_lcollect (state, buf, nchars)$/;"	f	line:12
+la_lcopy	../la1/lalcopy.c	/^la_lcopy (slas, dlas, nlines)$/;"	f	line:14
+la_lcount	../la1/lalcnt.c	/^la_lcount (plas, start, number, mode)$/;"	f	line:17
+la_ldelete	../la1/laldel.c	/^la_ldelete (plas, nlines, dlas)$/;"	f	line:6
+la_lflalarm	../la1/lalflush.c	/^la_lflalarm (const int i __attribute__((unused)))$/;"	f	line:127
+la_lflush	../la1/lalflush.c	/^la_lflush (plas, start, nlines, chan, oktoint, timeout)$/;"	f	line:13
+la_lfsd	../la1/la.h	/^    La_fsd          *la_lfsd;   \/* last fsd in the chain                   *\/$/;"	m	line:66	struct:lafile
+la_lget	../la1/lalget.c	/^la_lget (plas, buf, nchars)$/;"	f	line:15
+la_linepos	../la1/la.h	/^#define la_linepos(/;"	d	line:133
+la_link	../la1/lalink.c	/^la_link (plas, ffsd, lfsd, nl$/;"	f	line:13
+la_linsert	../la1/lalins.c	/^la_linsert (plas, buf, nchars)$/;"	f	line:6
+la_lmax	../la1/la.h	/^#define la_lmax(/;"	d	line:137
+la_lpnt	../la1/lalpnt.c	/^la_lpnt (plas, buf)$/;"	f	line:14
+la_lpos	../la1/la.h	/^#define la_lpos /;"	d	line:115
+la_lrcollect	../la1/lalcol.c	/^la_lrcollect (plas, nlines, dlas)$/;"	f	line:65
+la_lreplace	../la1/lalrpl.c	/^la_lreplace (plas, buf, nchars, nlines, dlas)$/;"	f	line:6
+la_lrsize	../la1/lalrsize.c	/^la_lrsize (plas)$/;"	f	line:6
+la_lseek	../la1/lalseek.c	/^la_lseek (plas, nlines, type)$/;"	f	line:21
+la_lsize	../la1/la.h	/^#define la_lsize(/;"	d	line:136
+la_lstream	../la1/la.h	/^    struct lastream *la_lstream;\/* last  in chain for this lafile          *\/$/;"	m	line:69	struct:lafile	typeref:struct:lafile::lastream
+la_ltrunc	../la1/la.h	/^#define la_ltrunc(/;"	d	line:139
+la_lwsize	../la1/lalwsize.c	/^la_lwsize (plas)$/;"	f	line:6
+la_makestream	../la1/laopen.c	/^la_makestream (plas, plaf)$/;"	f	line:312
+la_maxchans	../la1/laopen.c	/^int         la_maxchans = 0;	 \/* maximum system opens allowed to la *\/$/;"	v	line:12
+la_maxchans	../la1/laopen.c	/^int         la_maxchans = _NFILE;\/* maximum system opens allowed to la *\/$/;"	v	line:14
+la_maxline	../la1/la.h	/^    La_linesize      la_maxline;\/* max line size in the file               *\/$/;"	m	line:73	struct:lafile
+la_maxline	../la1/laopen.c	/^La_linesize la_maxline = LA_MAXLINE;\/* maximum line length allowed *\/$/;"	v	line:16
+la_mode	../la1/la.h	/^    char             la_mode;   \/* mode bits (see below) *\/$/;"	m	line:78	struct:lafile
+la_modified	../la1/la.h	/^#define la_modified(/;"	d	line:119
+la_nbufs	../la1/laopen.c	/^int         la_nbufs = 10;      \/* how many cache buffers to use *\/$/;"	v	line:23
+la_nbytes	../la1/la.h	/^    La_bytepos       la_nbytes; \/* number of bytes in file *\/$/;"	m	line:76	struct:lafile
+la_newstream	../la1/laopen.c	/^la_newstream (plas)$/;"	f	line:296
+la_nlines	../la1/la.h	/^    La_linepos       la_nlines; \/* number of lines in file                 *\/$/;"	m	line:74	struct:lafile
+la_nstreams	../la1/la.h	/^#define la_nstreams(/;"	d	line:132
+la_open	../la1/laopen.c	/^la_open (filename, modestr, plas, offset, pffs, chan, writeable)$/;"	f	line:41
+la_other	../la1/laother.c	/^la_other (plas)$/;"	f	line:6
+la_parse	../la1/laopen.c	/^la_parse (pffs, seekpos, ffsd, lfsd, plaf, nchars, buf)$/;"	f	line:335
+la_refs	../la1/la.h	/^    short            la_refs;   \/* number of refs by La_streams            *\/$/;"	m	line:72	struct:lafile
+la_reserved	../la1/la.h	/^#define la_reserved(/;"	d	line:123
+la_rlines	../la1/la.h	/^    La_linepos       la_rlines; \/* reserved lines from cur position *\/$/;"	m	line:99	struct:lastream
+la_sback	../la1/la.h	/^    struct lastream *la_sback;  \/* chain of all streams *\/$/;"	m	line:101	struct:lastream	typeref:struct:lastream::lastream
+la_schaindump	../la1/ladeb.c	/^la_schaindump (txt)$/;"	f	line:118
+la_sdump	../la1/ladeb.c	/^la_sdump (plas, txt)$/;"	f	line:69
+la_setrlines	../la1/la.h	/^#define la_setrlines(/;"	d	line:124
+la_sflags	../la1/la.h	/^    char             la_sflags; \/* stream flags *\/$/;"	m	line:105	struct:lastream
+la_sforw	../la1/la.h	/^    struct lastream *la_sforw;  \/* chain of all streams *\/$/;"	m	line:102	struct:lastream	typeref:struct:lastream::lastream
+la_spos	../la1/la.h	/^    struct la_spos   la_spos;$/;"	m	line:98	struct:lastream	typeref:struct:lastream::la_spos
+la_spos	../la1/la.h	/^struct la_spos {                \/* used by la_align *\/$/;"	s	line:91
+la_stay	../la1/la.h	/^#define la_stay(/;"	d	line:126
+la_stayclr	../la1/la.h	/^#define la_stayclr(/;"	d	line:128
+la_stayset	../la1/la.h	/^#define la_stayset(/;"	d	line:127
+la_sync	../la1/la.h	/^#define la_sync(/;"	d	line:138
+la_tcollect	../la1/lalcol.c	/^la_tcollect (pos)$/;"	f	line:52
+la_unmodify	../la1/la.h	/^#define la_unmodify(/;"	d	line:121
+la_verify	../la1/laopen.c	/^la_verify (plas)$/;"	f	line:283
+la_zbreak	../la1/labreak.c	/^la_zbreak (plas)$/;"	f	line:14
+la_zero	../la1/lalocal.h	/^union la_zero {$/;"	u	line:53
+la_zero	../la1/laopen.c	/^union la_zero la_zero;$/;"	v	line:18	typeref:union:la_zero
+laf	../la1/lalocal.h	/^    La_file   laf;$/;"	m	line:55	union:la_zero
+lafile	../la1/la.h	/^typedef struct lafile {$/;"	s	line:64
+lafsd	../la1/la.h	/^typedef struct lafsd {$/;"	s	line:45
+las	../la1/lalocal.h	/^    La_stream las;$/;"	m	line:54	union:la_zero
+lastream	../la1/la.h	/^typedef struct lastream {$/;"	s	line:97
+lbyte	../la1/lalseek.c	/^    La_linesize lbyte;$/;"	l	line:30
+lbyte	../la1/test.c	/^    int lbyte;$/;"	l	line:448
+lcnt	../la1/lalflush.c	/^	Reg2 int lcnt;$/;"	l	line:51
+lcnt	../la1/laopen.c	/^    short           lcnt;       \/* fsd line count *\/$/;"	l	line:367
+lcp	../la1/lalrsize.c	/^	long lcp = *cp;$/;"	l	line:80
+ldelta	../la1/lalseek.c	/^	La_linepos ldelta;$/;"	l	line:59
+len	../la1/laopen.c	/^	    La_linelength len; \/* len must be on a long boundary AND be *\/$/;"	m	line:354	struct:fsb::__anon2	file:
+lfsd	../la1/lafins.c	/^    La_fsd *ffsd, *lfsd;        \/* first and last fsds to be made for buf *\/$/;"	l	line:16
+lfsd	../la1/lalcol.c	/^    La_fsd *lfsd;               \/* last  fsd to be made for buf *\/$/;"	l	line:74
+lfsd	../la1/lalins.c	/^    La_fsd *ffsd, *lfsd;        \/* first and last fsds to be made for buf *\/$/;"	l	line:12
+lfsd	../la1/laopen.c	/^    La_fsd          *lfsd;$/;"	l	line:134
+lfsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd, *n1fsd, *n2fsd;$/;"	l	line:109
+lfsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd;$/;"	l	line:297
+lfsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd;$/;"	l	line:356
+line	../la1/test.c	/^    La_linepos line;$/;"	l	line:110
+line	../la1/test.c	/^    La_linepos line;$/;"	l	line:194
+line	../la1/test.c	/^    La_linepos line;$/;"	l	line:238
+line	../la1/test.c	/^    La_linepos line;$/;"	l	line:298
+line	../la1/test.c	/^    La_linepos line;$/;"	l	line:357
+line	../la1/test.c	/^    La_linepos line;$/;"	l	line:411
+llas	../la1/lalcnt.c	/^	    La_stream llas;$/;"	l	line:46
+llas	../la1/lalflush.c	/^    La_stream llas;     \/* can't be in a block *\/$/;"	l	line:24
+lnchcnt	../la1/laopen.c	/^	Reg4 long lnchcnt;     \/* character count in current line *\/$/;"	l	line:415
+lntmp	../la1/lafins.c	/^    La_linepos lntmp;$/;"	l	line:15
+lntmp	../la1/lalcopy.c	/^    La_linepos lntmp;$/;"	l	line:24
+lntmp	../la1/lalins.c	/^	    La_linepos lntmp;$/;"	l	line:44
+longline	../la1/laopen.c	/^    La_flag         longline;$/;"	l	line:376
+lpos1	../la1/laldel.c	/^    Reg2 La_linepos lpos1;$/;"	l	line:11
+lptr	../la1/test.c	/^		long *lptr;$/;"	l	line:562
+lsize	../la1/laclseek.c	/^	    Reg4 La_linesize lsize;$/;"	l	line:14
+lzero	../la1/labreak.c	/^    static La_linepos lzero;    \/* always 0 *\/$/;"	l	line:97	file:
+lzero	../la1/labreak.c	/^    static La_linepos lzero;$/;"	l	line:18	file:
+m	../la1/laopen.c	/^	    int m;$/;"	l	line:104
+main	../la1/test.c	/^main (argc, argv)$/;"	f	line:14
+maxline	../la1/laopen.c	/^    La_linesize     maxline;    \/* maximum chars in any line we have parsed *\/$/;"	l	line:374
+min	../la1/lablank.c	/^#define min(/;"	d	line:5	file:
+min	../la1/lalcnt.c	/^#define min(/;"	d	line:5	file:
+mode	../la1/laopen.c	/^    Reg2 char mode;$/;"	l	line:50
+n	../la1/lalrsize.c	/^	La_linesize n = 0;$/;"	l	line:69
+n	../la1/lalrsize.c	/^	La_linesize n;$/;"	l	line:43
+n	../la1/lalwsize.c	/^	    La_linesize n;$/;"	l	line:28
+n	../la1/lalwsize.c	/^	La_linesize n = 0;$/;"	l	line:45
+n1fsd	../la1/labreak.c	/^    La_fsd *n1fsd;      \/* new fsd 1 of 3 *\/$/;"	l	line:86
+n1fsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd, *n1fsd, *n2fsd;$/;"	l	line:109
+n2fsd	../la1/labreak.c	/^    La_fsd *n2fsd;      \/* new fsd 2 of 3 *\/$/;"	l	line:87
+n2fsd	../la1/test.c	/^    La_fsd *ffsd, *lfsd, *n1fsd, *n2fsd;$/;"	l	line:109
+n3fsd	../la1/labreak.c	/^    La_fsd *n3fsd;      \/* new fsd 3 of 3 *\/$/;"	l	line:88
+nb2	../la1/labreak.c	/^	Reg1 int \/*short*\/ nb2;$/;"	l	line:208
+nbytes	../la1/labsize.c	/^    Reg4 La_bytepos nbytes;$/;"	l	line:11
+nbytes	../la1/lalcopy.c	/^    La_bytepos    nbytes;$/;"	l	line:26
+nbytes	../la1/laldel.c	/^    La_bytepos nbytes;$/;"	l	line:18
+nbytes	../la1/test.c	/^    La_bytepos nbytes;$/;"	l	line:112
+nbytes	../la1/test.c	/^    int nbytes;$/;"	l	line:240
+nbytes	../la1/test.c	/^    int nbytes;$/;"	l	line:449
+nbytes2	../la1/labreak.c	/^    long \/*short*\/ nbytes2;      \/* number of bytes described by  middle fsd portion *\/$/;"	l	line:101
+nchars	../la1/lalpnt.c	/^    Reg1 La_linesize nchars;$/;"	l	line:18
+ndel	../la1/lalcol.c	/^	    La_linepos ndel;$/;"	l	line:108
+ndel	../la1/lalrpl.c	/^	Reg4 La_linepos ndel;$/;"	l	line:25
+ndel	../la1/test.c	/^    La_linepos ndel;$/;"	l	line:239
+newcp	../la1/laopen.c	/^		    char *newcp;$/;"	l	line:512
+newl	../la1/lalpnt.c	/^    static char newl[] = { LA_NEWLINE };$/;"	l	line:20	file:
+nffsd	../la1/lalcopy.c	/^    La_fsd *nffsd;$/;"	l	line:22
+nfsb	../la1/laopen.c	/^    int \/*short*\/   nfsb;       \/* number of fsdbytes *\/$/;"	l	line:364
+nfsd	../la1/laldel.c	/^    La_fsd    *nfsd;$/;"	l	line:13
+nfsd	../la1/laopen.c	/^    Reg2 La_fsd *nfsd;$/;"	l	line:629
+ngap	../la1/lalcnt.c	/^	    Reg5 La_linepos ngap;$/;"	l	line:43
+nget	../la1/lalflush.c	/^	    Reg1 int nget;$/;"	l	line:57
+ngot	../la1/lalflush.c	/^	    int ngot;$/;"	l	line:58
+nins	../la1/lablank.c	/^	    Reg1 La_linepos nins;$/;"	l	line:53
+nins	../la1/lalrpl.c	/^    Reg1 La_linepos nins;$/;"	l	line:13
+nl	../la1/lafins.c	/^    La_linepos nl;$/;"	l	line:14
+nl	../la1/lalcol.c	/^    Reg3 La_linepos nl;$/;"	l	line:70
+nl	../la1/lalins.c	/^    Reg3 La_linepos nl;$/;"	l	line:11
+nlaf	../la1/laclose.c	/^    Reg2 La_file *nlaf;$/;"	l	line:10
+nlaf	../la1/laldel.c	/^    Reg6 La_file   *nlaf;$/;"	l	line:15
+nlaf	../la1/lalink.c	/^    Reg3 La_file *nlaf;$/;"	l	line:26
+nlaf	../la1/laother.c	/^    Reg3 La_file *nlaf;$/;"	l	line:10
+nlas	../la1/labreak.c	/^	La_stream nlas;$/;"	l	line:159
+nlas	../la1/laopen.c	/^		La_stream *nlas;$/;"	l	line:94
+nlas	../la1/laopen.c	/^    Reg1 La_stream *nlas;$/;"	l	line:258
+nlas	../la1/laopen.c	/^    Reg4 La_stream  *nlas;     \/* the new La_stream struct we are making *\/$/;"	l	line:131
+nlfsd	../la1/lalcopy.c	/^    La_fsd *nlfsd;$/;"	l	line:23
+nlft	../la1/laopen.c	/^    Reg2 int \/*short*\/ nlft;       \/* number of chars left in current block *\/$/;"	l	line:359
+nlines	../la1/labreak.c	/^    Reg5 La_linepos nlines;     \/* fast copy of *pnlines *\/$/;"	l	line:85
+nlines	../la1/labsize.c	/^    Reg5 La_linepos nlines;$/;"	l	line:12
+nlines	../la1/lalcnt.c	/^	    Reg1 La_linepos nlines;$/;"	l	line:28
+nlines	../la1/lalcnt.c	/^	    Reg2 La_linepos nlines;$/;"	l	line:42
+nlines	../la1/test.c	/^    La_linepos nlines;$/;"	l	line:111
+nlines	../la1/test.c	/^    La_linepos nlines;$/;"	l	line:299
+nlines	../la1/test.c	/^    La_linepos nlines;$/;"	l	line:358
+nlines	../la1/test.c	/^    La_linepos nlines;$/;"	l	line:412
+nlns	../la1/laldel.c	/^	La_linepos nlns;$/;"	l	line:42
+nlsize	../la1/lalcol.c	/^	Reg1 La_linepos nlsize;$/;"	l	line:96
+nonewl	../la1/lalget.c	/^    Reg4 La_flag    nonewl;$/;"	l	line:22
+nonewl	../la1/laopen.c	/^	char nonewl;    \/* must be char *\/$/;"	l	line:193
+nonewl	../la1/laopen.c	/^	char nonewl;    \/* must be char *\/$/;"	l	line:222
+nonewline	../la1/laopen.c	/^    Reg6 La_flag    nonewline;$/;"	l	line:363
+nwr	../la1/lalflush.c	/^	    Reg1 int nwr;$/;"	l	line:89
+nxchgpos	../la1/lalcol.c	/^static La_bytepos nxchgpos;$/;"	v	line:9	file:
+ocp	../la1/laopen.c	/^	    char *ocp;$/;"	l	line:558
+onechar	../la1/lalcnt.c	/^		char onechar;$/;"	l	line:58
+opened	../la1/lablank.c	/^    static La_flag opened = NO;$/;"	l	line:15	file:
+orignum	../la1/lalcnt.c	/^    register La_linepos orignum = number;$/;"	l	line:23
+ototlft	../la1/laopen.c	/^    La_bytepos      ototlft;    \/* old totlft *\/$/;"	l	line:362
+out	../la1/test.c	/^	int out;$/;"	l	line:341
+picktest	../la1/test.c	/^picktest (argc, argv)$/;"	f	line:350
+plaslpos	../la1/lalink.c	/^	Reg2 La_linepos plaslpos;$/;"	l	line:49
+pointtest	../la1/test.c	/^pointtest (argc, argv)$/;"	f	line:405
+prevstate	../la1/lalcol.c	/^static La_flag prevstate = DORMANT;$/;"	v	line:7	file:
+prfmt	../la1/test.c	/^    static char prfmt[] = "%lxxxxxxxx";$/;"	l	line:539	file:
+rc	../la1/lalget.c	/^	int rc;$/;"	l	line:55
+regi	../la1/laopen.c	/^	Reg1 int regi;$/;"	l	line:137
+rlas	../la1/lalseek.c	/^#   define rlas /;"	d	line:33	file:
+savelength	../la1/laopen.c	/^	La_linesize savelength = 0;$/;"	l	line:416
+seektest	../la1/test.c	/^seektest (argc, argv)$/;"	f	line:75
+sflags	../la1/laopen.c	/^	Reg1 char sflags;$/;"	l	line:239
+sflags	../la1/laopen.c	/^	Reg4 char sflags;$/;"	l	line:271
+shorttmp	../la1/laopen.c	/^		short shorttmp;$/;"	l	line:590
+sig	../la1/test.c	/^sig ()$/;"	f	line:482
+size	../la1/lalcnt.c	/^		Reg4 La_linesize size;$/;"	l	line:61
+slas	../la1/test.c	/^    La_stream slas;$/;"	l	line:410
+slas1	../la1/test.c	/^    La_stream slas1, slas2, slas3;$/;"	l	line:355
+slas1	../la1/test.c	/^    La_stream slas1, slas2;$/;"	l	line:161
+slas1	../la1/test.c	/^    La_stream slas1, slas2;$/;"	l	line:237
+slas1	../la1/test.c	/^    La_stream slas1, slas2;$/;"	l	line:296
+slas1	../la1/test.c	/^    La_stream slas1;$/;"	l	line:108
+slas1	../la1/test.c	/^    La_stream slas1;$/;"	l	line:193
+slas1	../la1/test.c	/^    La_stream slas1;$/;"	l	line:446
+slas1	../la1/test.c	/^    La_stream slas1;$/;"	l	line:80
+slas2	../la1/test.c	/^    La_stream slas1, slas2, slas3;$/;"	l	line:355
+slas2	../la1/test.c	/^    La_stream slas1, slas2;$/;"	l	line:161
+slas2	../la1/test.c	/^    La_stream slas1, slas2;$/;"	l	line:237
+slas2	../la1/test.c	/^    La_stream slas1, slas2;$/;"	l	line:296
+slas3	../la1/test.c	/^    La_stream slas1, slas2, slas3;$/;"	l	line:355
+spcl	../la1/laopen.c	/^	} spcl;$/;"	m	line:355	union:fsb	typeref:struct:fsb::__anon2	file:
+speclength	../la1/labsize.c	/^	    La_linelength speclength;$/;"	l	line:33
+speclength	../la1/ladeb.c	/^		La_linelength speclength;$/;"	l	line:33
+speclength	../la1/ladeb.c	/^		La_linesize speclength;$/;"	l	line:253
+speclength	../la1/lalrsize.c	/^	La_linelength speclength = 0;$/;"	l	line:68
+speclength	../la1/lalseek.c	/^		    La_linelength speclength = 0;$/;"	l	line:148
+speclength	../la1/lalseek.c	/^		    La_linelength speclength = 0;$/;"	l	line:216
+speclength	../la1/lalseek.c	/^		    my_move (cp, (char *) &speclength, sizeof speclength);$/;"	l	line:153
+speclength	../la1/lalseek.c	/^		    my_move (cp, (char *) &speclength, sizeof speclength);$/;"	l	line:221
+speclength	../la1/lalseek.c	/^		La_linelength speclength = 0;$/;"	l	line:262
+speclength	../la1/lalseek.c	/^		my_move (cp, (char *) &speclength, sizeof speclength);$/;"	l	line:267
+speclength	../la1/lalwsize.c	/^	La_linelength speclength = 0;$/;"	l	line:44
+st	../la1/laopen.c	/^	    struct stat st;$/;"	l	line:103
+start	../la1/test.c	/^	    Reg1 char *start;$/;"	l	line:546
+t1fsd	../la1/lalcopy.c	/^    Reg6 La_fsd *t1fsd;$/;"	l	line:21
+t2fsd	../la1/lalcopy.c	/^	Reg3 La_fsd *t2fsd;$/;"	l	line:68
+test	../la1/test.c	/^    char test;$/;"	l	line:18
+tffs	../la1/lafrpl.c	/^    Reg2 Ff_stream *tffs;$/;"	l	line:10
+tfsd	../la1/labreak.c	/^	Reg1 La_fsd *tfsd;$/;"	l	line:158
+tfsd	../la1/labreak.c	/^	Reg1 La_fsd *tfsd;$/;"	l	line:256
+tfsd	../la1/labreak.c	/^	Reg1 La_fsd *tfsd;$/;"	l	line:271
+tfsd	../la1/labreak.c	/^	Reg1 La_fsd *tfsd;$/;"	l	line:289
+tfsd	../la1/labsize.c	/^    Reg3 La_fsd *tfsd;$/;"	l	line:10
+tlaf	../la1/laopen.c	/^    Reg2 La_file   *tlaf;$/;"	l	line:259
+tlaf	../la1/laopen.c	/^    Reg3 La_file    *tlaf;$/;"	l	line:132
+tlas	../la1/labreak.c	/^	    Reg2 La_stream *tlas;$/;"	l	line:347
+tlas	../la1/ladeb.c	/^    Reg1 La_stream *tlas;$/;"	l	line:121
+tlas	../la1/ladeb.c	/^    Reg1 La_stream *tlas;$/;"	l	line:136
+tlas	../la1/ladeb.c	/^    Reg1 La_stream *tlas;$/;"	l	line:176
+tlas	../la1/ladeb.c	/^    Reg1 La_stream *tlas;$/;"	l	line:191
+tlas	../la1/lalcnt.c	/^	    Reg1 La_stream *tlas;$/;"	l	line:41
+tlas	../la1/laldel.c	/^	Reg1 La_stream *tlas;$/;"	l	line:78
+tlas	../la1/lalflush.c	/^    Reg5 La_stream *tlas;$/;"	l	line:21
+tlas	../la1/lalink.c	/^	Reg1 La_stream *tlas;$/;"	l	line:48
+tlas	../la1/laopen.c	/^	    Reg1 La_stream *tlas;$/;"	l	line:163
+tlas	../la1/laopen.c	/^    Reg1 La_stream *tlas;$/;"	l	line:286
+tlas	../la1/laother.c	/^    Reg1 La_stream *tlas;$/;"	l	line:9
+tlas	../la1/test.c	/^    La_stream *tlas;$/;"	l	line:409
+tlas1	../la1/test.c	/^    La_stream *tlas1, *tlas2, *tlas3;$/;"	l	line:354
+tlas1	../la1/test.c	/^    La_stream *tlas1, *tlas2;$/;"	l	line:160
+tlas1	../la1/test.c	/^    La_stream *tlas1, *tlas2;$/;"	l	line:236
+tlas1	../la1/test.c	/^    La_stream *tlas1, *tlas2;$/;"	l	line:295
+tlas1	../la1/test.c	/^    La_stream *tlas1;$/;"	l	line:107
+tlas1	../la1/test.c	/^    La_stream *tlas1;$/;"	l	line:192
+tlas1	../la1/test.c	/^    La_stream *tlas1;$/;"	l	line:445
+tlas1	../la1/test.c	/^    La_stream *tlas1;$/;"	l	line:79
+tlas2	../la1/test.c	/^    La_stream *tlas1, *tlas2, *tlas3;$/;"	l	line:354
+tlas2	../la1/test.c	/^    La_stream *tlas1, *tlas2;$/;"	l	line:160
+tlas2	../la1/test.c	/^    La_stream *tlas1, *tlas2;$/;"	l	line:236
+tlas2	../la1/test.c	/^    La_stream *tlas1, *tlas2;$/;"	l	line:295
+tlas3	../la1/test.c	/^    La_stream *tlas1, *tlas2, *tlas3;$/;"	l	line:354
+tlines	../la1/lalcopy.c	/^    Reg4 La_linepos tlines;$/;"	l	line:19
+toobigfsd	../la1/laopen.c	/^    La_flag         toobigfsd;$/;"	l	line:378
+totchars	../la1/lalcol.c	/^    Reg5 La_bytepos totchars;$/;"	l	line:72
+totchcnt	../la1/laopen.c	/^    La_bytepos      totchcnt;   \/* total character count *\/$/;"	l	line:365
+totlcnt	../la1/laopen.c	/^    long            totlcnt;    \/* total # lines in this new chain *\/$/;"	l	line:369
+totlcnt	../la1/laopen.c	/^    short           totlcnt;    \/* total # lines in this new chain *\/$/;"	l	line:371
+totlft	../la1/laopen.c	/^	long totlft;$/;"	l	line:192
+totlft	../la1/laopen.c	/^    Reg5 La_bytepos totlft;     \/* total characters left to parse *\/$/;"	l	line:361
+totlines	../la1/lalflush.c	/^    La_linepos totlines;$/;"	l	line:23
+wcp	../la1/lalflush.c	/^	Reg4 char *wcp;$/;"	l	line:53
+x	../la1/lalcol.c	/^    char x;$/;"	l	line:75
+xla_bpos	../la1/la.h	/^    La_bytepos       xla_bpos;  \/* current byte position in file *\/$/;"	m	line:93	struct:la_spos
+xla_cfsd	../la1/la.h	/^    La_fsd          *xla_cfsd;  \/* current fsd *\/$/;"	m	line:95	struct:la_spos
+xla_ffpos	../la1/la.h	/^    long            xla_ffpos; \/* fsd fsdpos + this = offset in la_ffs *\/$/;"	m	line:89	struct:la_fpos
+xla_fsbyte	../la1/la.h	/^    long            xla_fsbyte;\/* index into fsdbytes in current fsd *\/$/;"	m	line:87	struct:la_fpos
+xla_fsline	../la1/la.h	/^    long            xla_fsline;\/* which line of current fsd starting at 0 *\/$/;"	m	line:86	struct:la_fpos
+xla_lbyte	../la1/la.h	/^    long            xla_lbyte; \/* offset from beginning of current line *\/$/;"	m	line:88	struct:la_fpos
+xla_lpos	../la1/la.h	/^    La_linepos       xla_lpos;  \/* current line number *\/$/;"	m	line:94	struct:la_spos

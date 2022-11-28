@@ -1,0 +1,193 @@
+BOUND	../ff3/fill.c	/^#define BOUND /;"	d	line:174	file:
+BOUND	../ff3/fill.c	/^#define BOUND /;"	d	line:176	file:
+Block	../ff3/ff.local.h	/^#define Block$/;"	d	line:40
+CHKBLK	../ff3/ff.local.h	/^#define CHKBLK /;"	d	line:17
+FF_BSIZE	../ff3/ff.h	/^#define FF_BSIZE /;"	d	line:27
+FF_CHKF	../ff3/ff.local.h	/^#define FF_CHKF /;"	d	line:15
+F_READ	../ff3/ff.h	/^#define F_READ	/;"	d	line:66
+F_WRITE	../ff3/ff.h	/^#define F_WRITE /;"	d	line:67
+Ff_buf	../ff3/ff.h	/^} Ff_buf;$/;"	t	line:81	typeref:struct:ff_buf
+Ff_file	../ff3/ff.h	/^} Ff_file;$/;"	t	line:54	typeref:struct:ff_file
+Ff_rbuf	../ff3/ff.h	/^} Ff_rbuf;$/;"	t	line:90	typeref:struct:ff_rbuf
+Ff_stats	../ff3/ff.h	/^} Ff_stats;$/;"	t	line:100	typeref:struct:ff_st
+Ff_stream	../ff3/ff.h	/^} Ff_stream;			\/*  or buffered amount	*\/$/;"	t	line:64	typeref:struct:ff_stream
+MIN	../ff3/point.c	/^#define MIN(/;"	d	line:4	file:
+NOFFFDS	../ff3/ff.h	/^#define NOFFFDS /;"	d	line:31
+NOFILE	../ff3/ff.h	/^#define NOFILE /;"	d	line:30
+NULL	../ff3/ff.local.h	/^#define NULL /;"	d	line:37
+_NFILE	../ff3/ff.h	/^#define _NFILE /;"	d	line:15
+_doffopen	../ff3/open.c	/^_doffopen (path, chan, mode, arena)$/;"	f	line:63
+addr	../ff3/open.c	/^	Reg1 long addr;$/;"	l	line:268
+alph	../ff3/fill.c	/^char alph[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";$/;"	v	line:179
+b	../ff3/fill.c	/^    char         *b;$/;"	m	line:125	union:bw	file:
+b	../ff3/fill.c	/^    char         *b;$/;"	m	line:67	union:bw	file:
+block	../ff3/getc.c	/^    Reg4 long block;$/;"	l	line:13
+block	../ff3/putc.c	/^    Reg4 long block;$/;"	l	line:13
+block	../ff3/read.c	/^	long block;$/;"	l	line:34
+block	../ff3/write.c	/^	    Reg6 long block;$/;"	l	line:33
+buf	../ff3/test.c	/^        char buf[100];$/;"	l	line:14
+bw	../ff3/fill.c	/^union bw {$/;"	u	line:124	file:
+bw	../ff3/fill.c	/^union bw {$/;"	u	line:66	file:
+change	../ff3/sort.c	/^    Reg3 char change;$/;"	l	line:15
+chr	../ff3/read.c	/^	Reg2 int chr;$/;"	l	line:85
+chr	../ff3/test.c	/^        int chr;$/;"	l	line:13
+cnt	../ff3/fill.c	/^    unsigned int cnt;$/;"	l	line:188
+cnt	../ff3/open.c	/^    Reg5 int cnt;$/;"	l	line:372
+cnt	../ff3/read.c	/^    Reg5 int  cnt;$/;"	l	line:19
+cnt	../ff3/write.c	/^    Reg4 int cnt;$/;"	l	line:16
+dest	../ff3/fill.c	/^    char *dest;$/;"	l	line:187
+dev	../ff3/test.c	/^        int dev, ino = -1;$/;"	l	line:60
+dn	../ff3/read.c	/^	    Reg1 long dn;$/;"	l	line:44
+f_count	../ff3/ff.h	/^		f_count;	\/* Reference count	*\/$/;"	m	line:61	struct:ff_stream
+f_file	../ff3/ff.h	/^    Ff_file    *f_file; 	\/* Fnode pointer	*\/$/;"	m	line:62	struct:ff_stream
+f_mode	../ff3/ff.h	/^    char        f_mode,         \/* Open mode for handle *\/$/;"	m	line:60	struct:ff_stream
+f_offset	../ff3/ff.h	/^    long	f_offset;	\/* Current file position*\/$/;"	m	line:63	struct:ff_stream
+fb	../ff3/close.c	/^	    Reg1 Ff_buf *fb;$/;"	l	line:24
+fb	../ff3/flush.c	/^	Reg2 Ff_buf  *fb;$/;"	l	line:19
+fb	../ff3/free.c	/^	Reg1 Ff_buf *fb;$/;"	l	line:21
+fb	../ff3/getc.c	/^	Reg1 Ff_buf *fb;$/;"	l	line:27
+fb	../ff3/grow.c	/^	Reg1 Ff_buf *fb;$/;"	l	line:24
+fb	../ff3/open.c	/^	Reg1 Ff_buf *fb;$/;"	l	line:207
+fb	../ff3/open.c	/^    Reg1 Ff_buf *fb;$/;"	l	line:357
+fb	../ff3/open.c	/^    Reg2 Ff_buf *fb;$/;"	l	line:258
+fb	../ff3/open.c	/^#define fb /;"	d	line:224	file:
+fb	../ff3/open.c	/^#undef fb$/;"	d	line:241	file:
+fb	../ff3/putc.c	/^	Reg1 Ff_buf *fb;$/;"	l	line:27
+fb	../ff3/read.c	/^	Ff_buf *fb;$/;"	l	line:35
+fb	../ff3/sort.c	/^    Reg2 Ff_buf  *fb;$/;"	l	line:14
+fb	../ff3/write.c	/^	Reg3 Ff_buf *fb;$/;"	l	line:31
+fb1	../ff3/open.c	/^	Reg1 Ff_buf *fb1;$/;"	l	line:329
+fb1	../ff3/open.c	/^	Reg1 Ff_buf *fb1;$/;"	l	line:408
+fb1	../ff3/sort.c	/^	    Reg1 Ff_buf  *fb1;$/;"	l	line:20
+fb_back	../ff3/ff.h	/^		  *fb_back;     \/* last buf in chain *\/$/;"	m	line:88	struct:ff_rbuf	typeref:struct:ff_rbuf::
+fb_back	../ff3/ff.h	/^	       *fb_back;        \/* back ptr *\/$/;"	m	line:75	struct:ff_buf	typeref:struct:ff_buf::
+fb_bnum	../ff3/ff.h	/^    long        fb_bnum;        \/* Block # of this blk  *\/$/;"	m	line:77	struct:ff_buf
+fb_buf	../ff3/ff.h	/^    char       *fb_buf;         \/* Actual data buffer [FF_BSIZE]  *\/$/;"	m	line:80	struct:ff_buf
+fb_count	../ff3/ff.h	/^    short       fb_count,       \/* Byte count of block  *\/$/;"	m	line:78	struct:ff_buf
+fb_file	../ff3/ff.h	/^    Ff_file    *fb_file;	\/* Fnode blk is q'd on	*\/$/;"	m	line:76	struct:ff_buf
+fb_forw	../ff3/ff.h	/^		  *fb_forw,     \/* first buf in chain *\/$/;"	m	line:87	struct:ff_rbuf	typeref:struct:ff_rbuf::
+fb_forw	../ff3/ff.h	/^	       *fb_forw,        \/* forw ptr *\/$/;"	m	line:74	struct:ff_buf	typeref:struct:ff_buf::
+fb_qb	../ff3/ff.h	/^		  *fb_qb,       \/* not used *\/$/;"	m	line:86	struct:ff_rbuf	typeref:struct:ff_rbuf::
+fb_qb	../ff3/ff.h	/^	       *fb_qb,          \/*  with this file      *\/$/;"	m	line:73	struct:ff_buf	typeref:struct:ff_buf::
+fb_qf	../ff3/ff.h	/^    struct ff_buf *fb_qf,       \/* Q of blks associated *\/$/;"	m	line:72	struct:ff_buf	typeref:struct:ff_buf::ff_buf
+fb_qf	../ff3/ff.h	/^    struct ff_buf *fb_qf,       \/* not used *\/$/;"	m	line:85	struct:ff_rbuf	typeref:struct:ff_rbuf::ff_buf
+fb_qf	../ff3/ff.h	/^    struct ff_buf *fb_qf;       \/* Queue of blks associated with this file *\/$/;"	m	line:36	struct:ff_file	typeref:struct:ff_file::ff_buf
+fb_wflg	../ff3/ff.h	/^		fb_wflg;        \/* Block modified flag  *\/$/;"	m	line:79	struct:ff_buf
+fd	../ff3/grow.c	/^	Reg1 int fd;$/;"	l	line:32
+ff_alloc	../ff3/open.c	/^ff_alloc (nbuf, arena)$/;"	f	line:200
+ff_buf	../ff3/ff.h	/^typedef struct  ff_buf {$/;"	s	line:71
+ff_close	../ff3/close.c	/^ff_close (ff)$/;"	f	line:10
+ff_fd	../ff3/fd.c	/^ff_fd(ff)$/;"	f	line:10
+ff_fdopen	../ff3/open.c	/^ff_fdopen (chan, mode, arena)$/;"	f	line:54
+ff_file	../ff3/ff.h	/^struct ff_file {$/;"	s	line:35
+ff_files	../ff3/open.c	/^Ff_file   ff_files[NOFILE];$/;"	v	line:31
+ff_flist	../ff3/open.c	/^Ff_rbuf   ff_flist =$/;"	v	line:32
+ff_flush	../ff3/flush.c	/^ff_flush (ff)$/;"	f	line:10
+ff_free	../ff3/free.c	/^ff_free (nbuf, arena)$/;"	f	line:10
+ff_gblk	../ff3/open.c	/^ff_gblk (fp, blk, rdflg)$/;"	f	line:253
+ff_getblk	../ff3/open.c	/^ff_getblk (afp, blk)$/;"	f	line:245
+ff_getc	../ff3/getc.c	/^ff_getc(ff)$/;"	f	line:10
+ff_gfil	../ff3/open.c	/^ff_gfil (fnp, mode)$/;"	f	line:181
+ff_grow	../ff3/grow.c	/^ff_grow (ff)$/;"	f	line:10
+ff_haveblk	../ff3/open.c	/^ff_haveblk (fp, blk)$/;"	f	line:353
+ff_open	../ff3/open.c	/^ff_open (path, mode, arena)$/;"	f	line:43
+ff_point	../ff3/point.c	/^ff_point (ff, addr, buf, nchars)$/;"	f	line:12
+ff_pos	../ff3/pos.c	/^long ff_pos(ff)$/;"	f	line:9
+ff_putblk	../ff3/open.c	/^ff_putblk (fb, release)$/;"	f	line:366
+ff_putc	../ff3/putc.c	/^ff_putc(chr, ff)$/;"	f	line:9
+ff_rbuf	../ff3/ff.h	/^typedef struct ff_rbuf {$/;"	s	line:84
+ff_read	../ff3/read.c	/^ff_read (ff, buf, count, brkcnt, brklst)$/;"	f	line:12
+ff_seek	../ff3/seek.c	/^ff_seek (ff, pos, whence)$/;"	f	line:9
+ff_size	../ff3/size.c	/^ff_size(ff)$/;"	f	line:9
+ff_sort	../ff3/sort.c	/^ff_sort(fp)$/;"	f	line:11
+ff_st	../ff3/ff.h	/^typedef struct ff_st {$/;"	s	line:93
+ff_stats	../ff3/open.c	/^Ff_stats ff_stats;$/;"	v	line:40
+ff_stream	../ff3/ff.h	/^struct ff_stream {$/;"	s	line:59
+ff_streams	../ff3/open.c	/^Ff_stream ff_streams[NOFFFDS];$/;"	v	line:30
+ff_sync	../ff3/sync.c	/^ff_sync (int syssync)$/;"	f	line:9
+ff_use	../ff3/open.c	/^ff_use (cp, arena)$/;"	f	line:220
+ff_write	../ff3/write.c	/^ff_write(ff, buf, count)$/;"	f	line:11
+ffbuf	../ff3/point.c	/^    Ff_buf *ffbuf;$/;"	l	line:19
+ffi	../ff3/open.c	/^		    Reg1 Ff_stream *ffi;$/;"	l	line:101
+fflg	../ff3/test.c	/^        int fflg = 0;$/;"	l	line:57
+ffp	../ff3/open.c	/^	Reg1 Ff_stream *ffp;$/;"	l	line:120
+ffstdin	../ff3/test.c	/^        Ff_stream *ffstdin;$/;"	l	line:62
+ffstdout	../ff3/test.c	/^        Ff_stream *ffstdout;$/;"	l	line:63
+fi	../ff3/test.c	/^        Ff_stream *fi;$/;"	l	line:11
+fi	../ff3/test.c	/^        register Ff_stream *fi;$/;"	l	line:58
+fill	../ff3/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:131
+fill	../ff3/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:14
+fill	../ff3/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:28
+fill	../ff3/fill.c	/^fill (dest, count, fillchar)$/;"	f	line:74
+fillchar	../ff3/fill.c	/^    char fillchar;$/;"	l	line:186
+fn_dev	../ff3/ff.h	/^    dev_t       fn_dev;         \/* Device file is on    *\/$/;"	m	line:41	struct:ff_file
+fn_fd	../ff3/ff.h	/^    char	fn_fd,		\/* File Descriptor	*\/$/;"	m	line:37	struct:ff_file
+fn_ino	../ff3/ff.h	/^    ino_t       fn_ino;         \/* Inode of file        *\/$/;"	m	line:42	struct:ff_file
+fn_ino	../ff3/ff.h	/^    short       fn_ino;         \/* Inode of file        *\/$/;"	m	line:47	struct:ff_file
+fn_major	../ff3/ff.h	/^		fn_major;$/;"	m	line:46	struct:ff_file
+fn_memaddr	../ff3/ff.h	/^    char       *fn_memaddr;     \/* address of in-core file *\/$/;"	m	line:52	struct:ff_file
+fn_minor	../ff3/ff.h	/^    char        fn_minor,       \/* Device file is on    *\/$/;"	m	line:45	struct:ff_file
+fn_mode	../ff3/ff.h	/^		fn_mode,	\/* Open mode for file	*\/$/;"	m	line:38	struct:ff_file
+fn_realblk	../ff3/ff.h	/^    long        fn_realblk;     \/* Image of sys fil pos *\/$/;"	m	line:49	struct:ff_file
+fn_refs	../ff3/ff.h	/^		fn_refs;	\/* # of references	*\/$/;"	m	line:39	struct:ff_file
+fn_size	../ff3/ff.h	/^    long        fn_size;        \/* Current file size    *\/$/;"	m	line:50	struct:ff_file
+fo	../ff3/test.c	/^        Ff_stream *fo;$/;"	l	line:12
+fp	../ff3/close.c	/^	Reg2 Ff_file *fp;$/;"	l	line:19
+fp	../ff3/flush.c	/^	Reg1 Ff_file *fp;$/;"	l	line:18
+fp	../ff3/getc.c	/^	Reg2 Ff_file *fp;$/;"	l	line:28
+fp	../ff3/open.c	/^	Reg2 Ff_file *fp;$/;"	l	line:87
+fp	../ff3/open.c	/^    Reg1 Ff_stream *fp;$/;"	l	line:185
+fp	../ff3/open.c	/^    Reg2 Ff_file *fp;$/;"	l	line:370
+fp	../ff3/putc.c	/^	Reg2 Ff_file *fp;$/;"	l	line:28
+fp	../ff3/sync.c	/^    Reg1 Ff_stream *fp;$/;"	l	line:11
+fp1	../ff3/open.c	/^    Reg3 Ff_file *fp1;$/;"	l	line:69
+fr_count	../ff3/ff.h	/^    short          fr_count;    \/* total number of buffers *\/$/;"	m	line:89	struct:ff_rbuf
+from	../ff3/read.c	/^	    Reg1 char *from;$/;"	l	line:52
+from	../ff3/read.c	/^    Reg4 char *from;$/;"	l	line:81
+from	../ff3/write.c	/^    Reg5 char *from;$/;"	l	line:17
+fs_ffread	../ff3/ff.h	/^		fs_ffread,      \/*       read   "   *\/$/;"	m	line:98	struct:ff_st
+fs_ffseek	../ff3/ff.h	/^    int         fs_ffseek,      \/* Total seek calls *\/$/;"	m	line:97	struct:ff_st
+fs_ffwrite	../ff3/ff.h	/^		fs_ffwrite;     \/*       write  "   *\/$/;"	m	line:99	struct:ff_st
+fs_read	../ff3/ff.h	/^		fs_read,	\/*	 read  "    "	*\/$/;"	m	line:95	struct:ff_st
+fs_seek	../ff3/ff.h	/^    int 	fs_seek,	\/* Total seek sys calls *\/$/;"	m	line:94	struct:ff_st
+fs_write	../ff3/ff.h	/^		fs_write;	\/*	 write "    "	*\/$/;"	m	line:96	struct:ff_st
+fstbf	../ff3/open.c	/^    struct stat fstbf;$/;"	l	line:70
+i	../ff3/fill.c	/^    unsigned int  i;$/;"	m	line:127	union:bw	file:
+i	../ff3/fill.c	/^    unsigned int  i;$/;"	m	line:70	union:bw	file:
+ino	../ff3/test.c	/^        int dev, ino = -1;$/;"	l	line:60
+j	../ff3/test.c	/^        register int j;$/;"	l	line:15
+l	../ff3/fill.c	/^    long         *l;$/;"	m	line:69	union:bw	file:
+ldiv	../ff3/div.c	/^ldiv (a, b, remainder)$/;"	f	line:7
+lenbrk	../ff3/read.c	/^lenbrk (buf, rn, brkcnt, brklst)$/;"	f	line:75
+main	../ff3/fill.c	/^main (argc, argv)$/;"	f	line:182
+main	../ff3/test.c	/^main(argc, argv)$/;"	f	line:54
+main	../ff3/test.c	/^main(argc, argv)$/;"	f	line:8
+md	../ff3/open.c	/^    Reg4 int md;$/;"	l	line:71
+memfb	../ff3/open.c	/^	static Ff_buf *memfb;$/;"	l	line:262	file:
+my_ldiv	../ff3/ff.local.h	/^#define my_ldiv(/;"	d	line:31
+nbrk	../ff3/read.c	/^	Reg3 int nbrk;$/;"	l	line:86
+newsize	../ff3/grow.c	/^	Reg2 long newsize;$/;"	l	line:33
+nsave	../ff3/fill.c	/^    unsigned int nsave;$/;"	l	line:140
+nsave	../ff3/fill.c	/^    unsigned int nsave;$/;"	l	line:83
+num	../ff3/write.c	/^	Reg1 int num;$/;"	l	line:29
+offset	../ff3/getc.c	/^    int offset;$/;"	l	line:14
+offset	../ff3/point.c	/^    Reg2 int offset;$/;"	l	line:18
+offset	../ff3/putc.c	/^    int offset;$/;"	l	line:14
+offset	../ff3/read.c	/^	int  offset;$/;"	l	line:36
+offset	../ff3/write.c	/^	int offset;$/;"	l	line:30
+oldseek	../ff3/grow.c	/^	Reg4 long oldseek;$/;"	l	line:34
+retval	../ff3/fill.c	/^    char *retval;$/;"	l	line:33
+rn	../ff3/read.c	/^	Reg2 int rn;$/;"	l	line:33
+seekpos	../ff3/open.c	/^	Reg2 long seekpos;$/;"	l	line:121
+sp	../ff3/read.c	/^	Reg1 char *sp;$/;"	l	line:84
+statb	../ff3/test.c	/^                fstat(ff_fd(fi), &statb);$/;"	l	line:96
+statb	../ff3/test.c	/^        fstat(ff_fd (ffstdout), &statb);$/;"	l	line:77
+statb	../ff3/test.c	/^        struct stat statb;$/;"	l	line:61
+stdbuf	../ff3/test.c	/^char    stdbuf[BUFSIZ];$/;"	v	line:52
+test	../ff3/fill.c	/^char test[BOUND+500] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";$/;"	v	line:180
+tmp	../ff3/read.c	/^	    Reg4 int tmp;$/;"	l	line:53
+to	../ff3/read.c	/^    Reg6 char *to;$/;"	l	line:20
+to	../ff3/write.c	/^	    Reg6 char *to;$/;"	l	line:42
+try	../ff3/open.c	/^    Reg4 int try;$/;"	l	line:371
+w	../ff3/fill.c	/^    short        *w;$/;"	m	line:126	union:bw	file:
+w	../ff3/fill.c	/^    short        *w;$/;"	m	line:68	union:bw	file:
