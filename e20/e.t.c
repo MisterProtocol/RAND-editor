@@ -136,9 +136,9 @@ extern int get_profilekey (Flag);
 extern int d_vmove ();
 extern void doMouseReplay(int, int);
 extern int WinNumber(S_window *);
+extern void ResizeWindows(int h, int w);
 
 /*void dbg_winlist();*/
-
 
 void MesgHack (Small, char *);
 
@@ -3269,7 +3269,8 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 	     * which screws up keystroke definitions
 	     * under "ncurses".
 	     */
-	    timeout(60000); /* change to 60000 after debugging */
+
+	    timeout(60000);
 	    c = wgetch(stdscr);
 	    if (c == ERR) {  /* timer went off,  no input avail */
 		if (numtyp) {
@@ -3511,6 +3512,21 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	    }
 	    else {
 		doMouseReplay(y, x);
+		return NOCHAR;  /* or, CCNULL ? */
+	    }
+	}
+
+	if( c == CCRESIZE ) {  /* 11/2022 */
+	    int h, w;
+	    int rc = fscanf(replay_fp, "%3d%3d", &h, &w);
+	    if( rc != 2 || feof(replay_fp)) {
+		// skip resize
+	    //  dbgpr("replay err, fscanf returned (%d) expected (%d)\n", rc, 2);
+		goto endreplay;
+	    }
+	    else {
+		dbgpr("replay, calling ResizeWindows h=%d w=%d\n", h, w);
+		ResizeWindows(h, w);
 		return NOCHAR;  /* or, CCNULL ? */
 	    }
 	}

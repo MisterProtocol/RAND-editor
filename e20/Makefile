@@ -95,10 +95,12 @@ OFILES  = \
 	$(O)e.resize.o \
 	$(O)e.tag.o \
 	$(O)e.brace.o \
+	$(O)e.buttons.o \
 	$(CHKMALLOC)
 
 CFILES  = \
 	e.brace.c \
+	e.buttons.c \
 	e.c \
 	e.cm.c \
 	e.d.c \
@@ -164,6 +166,7 @@ $(E):   $(O) newrev $(OFILES) $(LALIB) $(FFLIB) $(MISCLIB)
 	   $(O)e.resize.o \
 	   $(O)e.tag.o \
 	   $(O)e.brace.o \
+	   $(O)e.buttons.o \
 	$(LALIB) \
 	$(FFLIB) \
 	$(MISCLIB) \
@@ -234,6 +237,10 @@ clean:
 $(O)e.brace.o: e.brace.c
 	$(CC) $(CFLAGS) $(INCL) -c e.brace.c
 	mv e.brace.o $(O)e.brace.o
+
+$(O)e.buttons.o: e.buttons.c
+	$(CC) $(CFLAGS) $(INCL) -c e.buttons.c
+	mv e.buttons.o $(O)e.buttons.o
 
 $(O)e.cm.o: e.cm.c
 	$(CC) $(CFLAGS) $(INCL) -c e.cm.c

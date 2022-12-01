@@ -88,14 +88,6 @@
 
 #define BUTTON_FONT  /* highlight the buttons in eg, bold */
 
-typedef struct button_table {
-    short bnum;
-    short begx;
-    short endx;
-    int   ecmd;
-    char *label;
-} mouse_button_table;
-
 /* force cursor position, used in highlighting buttons  */
 #define MVCUR(l,c)      (*term.tt_addr)  (l,c)
 
@@ -632,12 +624,12 @@ typedef struct savebuf {
 
 #ifdef TAGS
 #define CCTAG          0251     /* tag cmd */
-/*#define CCTAGSRCH      0253   don't need this afterall */
 #endif
 
 #define CCLWINDOW      0252 /*  window left, use ^X^L or <esc>"l":<wleft> */
+#define CCRESIZE       0253 /*  for replays */
 
-#define CCHIGHEST      0252     /* nxt is 0253 */
+#define CCHIGHEST      0253     /* nxt is 0254 */
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */

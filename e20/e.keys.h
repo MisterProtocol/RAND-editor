@@ -1,6 +1,6 @@
 /* useful for debugging */
 
-#define CCHIGHEST      0252
+#define CCHIGHEST      0253
 
 /* because we're inialized here,
  * don't #include in multiple files
@@ -88,7 +88,7 @@ KeyNameTable E_Keys[] = {
 {0250,           "CCMIRECORD"},
 {0251,           "CCTAG"},
 {0252,           "CCLWINDOW"},
-/*{0253,           "CCTAGSRCH"}, */
+{0253,           "CCRESIZE"},
 {0400,           "NOCHAR"},
 {-1,             ""}
 };

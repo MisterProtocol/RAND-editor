@@ -1,0 +1,81 @@
+#  Usage:  le -buttonfile=xxx or install as ~/.e_buttons
+#
+#  FORMAT:   "label":<efunction>  (akin to keyboard files)
+#
+#  If a label (column 1) begins with a '/', it is appended to the preceeding
+#  entry and displayed as one button.  Each side of the '/' is a different
+#  e command.  Eg, displayed as:   [+src/-sch]
+#
+#  -ROW1 and -ROW2 identify the start of a button row.  Two rows are required.
+#
+#  blank lines and those starting with # are skipped
+#
+
+-ROW1   # start
+"CMD":<cmd>
+
+"ins":<insmd>    # toggle insert mode
+
+"+sch":<+sch>
+"/-sch":<-sch>
+
+"mark":<mark>
+"/-mk":<-mark>
+
+"delC":<dchar>
+#"/delW":<dword>
+
+"+Win":<+win>     # create new window
+"/-W":<-win>      # close window
+
+"tag":<tag>
+"tg+":<cmd>tag +1<ret>  # comment
+"/-":<cmd>tag -1<ret>
+
+-ROW2
+
+"+Pg":<+page>
+"/-Pg":<-page>
+
+"+L":<+line>
+"/-L":<-line>
+
+"wR":<wright>    # shift window right
+"/wL":<wleft>    # shift window left
+
+"open":<open>
+
+"close":<close>
+"/-cl":<-close>
+
+"pick":<pick>
+"/put":<put>
+
+"rec":<record>
+"/play":<play>
+
+"{}":<brace>
+
+"^C":<cchar>
+
+"exit":<exit>
+
+#
+# unused but available
+#
+#"rec":<record>   # enter/toggle record mode
+
+#"play":<play>
+
+#"up":<up>
+#"/dn":<down>
+
+#"repl":<replace>   # replace key, used with CMD: replace interactive
+#"mouse":<mouse>    # toggle mouse on/off, to copy/paste in/out of E, F6 restores
+#"dword":<dword>    # delete word
+#"^C":<cchar>       # insert a ctrl character
+
+#"+tab":<tab>
+#"/-tab":<-tab>
+
+#"tag":<tag>

@@ -1,0 +1,11 @@
+The files named "kb_*" are sample keyboard definition files, used with the
+environment variable "EKBFILE".
+
+The "e_profile" and "e_profile20" files are sample ".e_profile" and
+".e_profile20" files, respectively
+
+The "*buttons*" files are sample button definition files for the
+"-buttonfile=/path/to/buttonfile" command-line argument, which would
+generally be placed in a ".e_profile" file.  The file "e_buttons.demo"
+file has examples demonstrating a button definition that allows an
+"e" command with arguments ("tg+":<cmd>tag +1<ret>).

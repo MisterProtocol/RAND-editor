@@ -44,7 +44,7 @@ extern void initwindows(Flag);
 extern void buttoninit();
 extern Uchar *image;
 extern void infoinit(void);
-extern Flag freshputup;
+//extern Flag freshputup;
 extern Nlines marklines;
 Flag noresizeall = NO;
 
@@ -102,7 +102,7 @@ ResizeWindows (int h, int w)
     dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d term(h=%d,w=%d)\n",
 	h, w, LINES, COLS, h_chg, w_chg, term.tt_height, term.tt_width);
 
-    debugAllWindows();
+//  debugAllWindows();
 
     blanks = realloc (blanks, (size_t)w);
     fill (blanks, (Uint) w, ' ');
@@ -270,10 +270,10 @@ adj_winnum, alternate_w, alternate_h);
 	}
     }
 
-/**/
+/** /
 dbgpr("after\n");
     debugAllWindows();
-/**/
+/ **/
 
     infoinit(); /* redraw the info line */
 
@@ -1883,7 +1883,6 @@ isBMmoveable(S_window __attribute__((unused)) *wp)
 }
 
 
-#ifdef OUT
 /* for tips on how to "release" an inactive file
  * see dlfile() and the delete file command in e.nm.c
  */
@@ -1957,6 +1956,4 @@ isFdinWindow(int fd)
 
     return NO;
 }
-
-#endif /* OUT */
 

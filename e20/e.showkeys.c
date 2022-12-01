@@ -2,7 +2,7 @@
 
 extern void exit();
 
-#define CCLAST         0236
+#define CCLAST         0253
 #define CMD 0
 
 #ifndef INPLACE
@@ -57,7 +57,7 @@ showkeys(FILE *fp, long filesize)
 	/*struct keymap low_keys[] = {*/
 	keymap low_keys[] = {
 		{"<cmd>"},
-		{"<wleft>"},
+		{"<cmd>"},      // was <wleft>, moved to 0252
 		{"<edit>"},
 		{"<int>"},
 		{"<open>"},
@@ -90,8 +90,8 @@ showkeys(FILE *fp, long filesize)
 		{"<right>"}
 	};
 
-	/*struct keymap hi_keys[] = { */    /* 0200 - 0236 */
-	keymap hi_keys[] = {     /* 0200 - 0236 */
+	/*struct keymap hi_keys[] = { */    /* 0200 - 0253 */
+	keymap hi_keys[] = {     /* 0200 - 0253 */
 		{"<stop>"},
 		{"<erase>"},
 		{"<undef>"},
@@ -122,7 +122,20 @@ showkeys(FILE *fp, long filesize)
 		{"<unass>"},
 		{"<record>"},
 		{"<play>"},
-		{"<mouse>"}
+		{"<mouse>"},   // 0236
+		{"<mouseonoff>"},
+		{"<brace>"},  // 0240
+		{"<put>"},
+		{"<unmark>"},
+		{"<regexonoff>"},
+		{"<+win>"},
+		{"<-win>"},   // 0245
+		{"<-close>"},
+		{"<-erase>"}, // 0247
+		{"<-rec>"},   // 0250
+		{"<tag>"},
+		{"<wleft"},   // 252
+		{"<resize>"}, // 253
 	};
 
 	register int c;
@@ -171,14 +184,21 @@ exit(1);
 
 		/*fprintf(stderr, "c=(%o)idx=(%d)\n", c, c-0200);*/
 
-		if( c == 0236 ) { /* CCMOUSE */
-		    fscanf(fp, "%3d%3d", &y, &x);
-		    printf("<CCMOUSE(%d,%d)>", y,x);
-		}
-		else {
-		  printf("%s", hi_keys[c - 0200].keysym);
-		}
+		switch (c) {
+		    case 0236:  // CCMOUSE
+			fscanf(fp, "%3d%3d", &y, &x);
+			printf("<CCMOUSE(%d,%d)>", y,x);
+			break;
 
+		    case 0253:  // CCRESIZE
+			fscanf(fp, "%3d%3d", &y, &x);
+			printf("<CCRESIZE(%d,%d)>", y,x);
+			break;
+
+		    default:
+			printf("%s", hi_keys[c - 0200].keysym);
+			break;
+		}
 	    }
 	    else
 		fprintf( stderr, "key %o unrecognized\n", c );
