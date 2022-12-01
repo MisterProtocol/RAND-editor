@@ -29,8 +29,8 @@
 "/-W":<-win>      # close window
 
 "tag":<tag>
-"tg+":<cmd>tag +1<ret>  # comment
-"/-":<cmd>tag -1<ret>
+"tg+":<cmd>tag +<ret>  # comment
+"/-":<cmd>tag -<ret>
 
 -ROW2
 
