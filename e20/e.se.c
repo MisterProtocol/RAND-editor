@@ -228,7 +228,7 @@ Small delta;
 	moved = gtumark (YES);
 	unmark ();
     }
-    if ((moved && rplshow) || rplinteractive)
+//Ncols   col;
 	putupwin ();
     if (rplinteractive) {
 	if (searchkey)
@@ -860,7 +860,7 @@ void
 aborted (line)
 Nlines line;
 {
-    char lstr[16];
+    char lstr[32];
 #ifdef LA_LONGFILES
     sprintf (lstr, "%ld", line + 1);  /* was srchline, which is the arg */
 #else /* LA_LONGFILES */

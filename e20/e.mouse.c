@@ -529,15 +529,26 @@ exitCurses()
     endwin_done = 1;
 
 
+#ifdef OUT
     /*  If the case of a resize, leave the cursor
      *  at the bottom of the window.
      */
     extern int h_orig;
     if (term.tt_height > h_orig) {
-	int n = term.tt_height - h_orig;
+	int n = (int) (term.tt_height - h_orig);
 	while (n--)
 	    printf("\r\n");
     }
+#endif
+
+
+    extern int startup_h;
+ // extern int h_orig;
+ // dbgpr("startup_h=%d h_orig=%d tt_h=%d\n", startup_h, h_orig, term.tt_height);
+
+    term.tt_addr( max(startup_h,term.tt_height), 0);
+    printf("\r\n");
+    fflush(stdout);
 
     return;
 }
@@ -1522,11 +1533,7 @@ dbgpr("doChgWin: y=%d x=%d, lin=%d col=%d\n", y,x, lin,col);
     d_put(0);
     chgwindow(wn);
     limitcursor();
-
-/*
-    poscursor(col, lin);
-    d_put(0);
-*/
+    fresh();    /* added after a replay may contained resize cmds */
 
     /* used in calcRange2Clear() */
     from_topline = curwin->ttext;

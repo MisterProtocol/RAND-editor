@@ -20,7 +20,6 @@ Cmdret edkey (Char, Flag);
 extern Cmdret chgcase (Flag);
 
 
-#ifdef NCURSES
 extern void debug_inputkey ();
 extern void testart();      /* what is this? */
 extern Flag entering;
@@ -38,6 +37,7 @@ extern int brace_marked;
 extern void hiliteTopBorder(S_window *);
 extern void hiliteLeftBorder(S_window *);
 extern Flag borderChanged;
+extern Flag didReplayResize;
 
 #ifdef MOUSE_BUTTONS
 extern int mouseFuncKey;
@@ -51,7 +51,6 @@ extern void PushTagCmds(void);
 extern Flag editTagFile;
 #endif
 
-#endif /* NCURSES */
 
 #ifdef COMMENT
 void
@@ -62,15 +61,16 @@ mainloop ()
 void
 mainloop ()
 {
-	char *nix = "\0";
-	char *abortstg = "ab\0";
-	char *quitstg = "q\0";
-	char *pickstg = "pick\0";
-	char *boardstg = "l\0";
-	char *s2, *tmpb, b[BUFSIZ]; /* added 10/18/82 MAB */
+    char *nix = "\0";
+    char *abortstg = "ab\0";
+    char *quitstg = "q\0";
+    char *pickstg = "pick\0";
+    char *boardstg = "l\0";
+    char *s2, *tmpb, b[BUFSIZ]; /* added 10/18/82 MAB */
 
     for (;;) {
 	key = (Char) 0;
+
 funcdone:
 	loopflags.clear = YES;
 newnumber:
@@ -216,13 +216,26 @@ dbgpr("e.m.c, mainloop(), waiting for mGetkey\n");
 
 	/** /
 	if( key < ' ' || key >= 0177 ) {
-	  dbgpr("e.m.c: mGetkey returned key=(%d)(%04o)(%s)\n\n", key, key, getEkeyname(key));
+	  dbgpr("e.m.c: mGetkey returned key=(%d)(%04o)(%s)\n\n",
+	    key, key, getEkeyname(key));
 	}
 	else {
 	  dbgpr("e.m.c, mGetkey returned key=(%d)(%04o)('%c') line=%d col=%d\n\n",
 	    key, key, (char)key, cursorline, cursorcol);
 	}
 	/ **/
+
+	/*
+	 *  When the main window is resized, ncurses sends a stream of KEY_RESIZE chars,
+	 *  which we map to CCRESIZE. mGetKey() now updates the keystroke file at
+	 *  the first non-CCRESIZE key with the new screen dimensions.
+	 */
+	if (key == CCRESIZE) {
+	//  dbgpr("e.m.c: got CCRESIZE\n");
+	    fresh();
+	    d_put(0);
+	    continue;
+	}
 
 /* /
 dbgpr("mainloop:  curwin=(%o) wholescreen=(%o) enterwin=(%o) infowin=(%o)\n",
@@ -374,10 +387,13 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 			chgwindow (-1);
 			loopflags.bullet = YES;
 		    }
+		    if (didReplayResize) {  /* redraw borders issue */
+			fresh();
+			d_put(0);
+		    }
 		    goto funcdone;
 
 		case CCPUT:         /* convert to a CMD: pick which is a put */
-		/*  dbgpr("CCPUT line 395\n"); */
 		    key = CCPICK;
 		    paramtype = 0;  /* no cmdline arguments */
 		    donetype = edkey (key, YES);
@@ -628,8 +644,8 @@ dbgpr("mainloop:  curwksp=(%o) wholescreen.wksp=(%o) enterwin.wksp=(%o) infowin.
 gotcmd:
 	    param ();
 /** /
-dbgpr("after param(): key=(%03o)(%d)(%c) cmdmode=%d,paramtype=%d paramv=(%s)\n",
-key, key, key, cmdmode, paramtype, paramv);
+dbgpr("after param(): key=(%03o)(%d) cmdmode=%d,paramtype=%d paramv=(%s)\n",
+key, key, cmdmode, paramtype, paramv);
 / **/
 	    if (cmdmode && key != CCRETURN)
 		goto notcmderr;
@@ -744,7 +760,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		    if (searchkey)
 			sfree (searchkey);
 		    searchkey = append (paramv, "");
-#ifdef OUT
+#if 0 //#ifdef OUT
 		    { int i;
 		      int len = (int)strlen(searchkey);
 		      dbgpr("srch,len=%d:");
@@ -954,6 +970,10 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 			    goto notposerr;
 			chgwindow ((Small)(parmlines - 1));
 			loopflags.bullet = YES;
+			if (didReplayResize) {  /* 12/2022: redraw borders issue */
+			    fresh();
+			    d_put(0);
+			}
 			break;
 
 		    case 2:
@@ -1056,7 +1076,7 @@ key, getEkeyname(key), cmdmode, paramv, paramtype);
 		case CCDEL:
 		default:
 		//  dbgpr("key=(%03o)(%d) not implemented, entering=%d cmdmode=%d\n",
-		//      key,key,entering,cmdmode);
+		//     key,key,entering,cmdmode);
 		    goto notimperr;
 	    }
 
@@ -1152,7 +1172,7 @@ doneswitch:
 	    continue;
 
 	    badkeyerr:
-	//  dbgpr("bad key error: key=(%o)(%d)\n", key, key);
+	    dbgpr("bad key error: key=(%o)(%d)\n", key, key);
 	    mesg (ERRALL + 1, "Bad key error - editor error");
 	    continue;
 	}

@@ -134,9 +134,11 @@ extern void fsynckeys ();
 extern Flag vinsdel (Slines, Slines, Flag);
 extern int get_profilekey (Flag);
 extern int d_vmove ();
-extern void doMouseReplay(int, int);
-extern int WinNumber(S_window *);
-extern void ResizeWindows(int h, int w);
+extern void doMouseReplay (int, int);
+extern int WinNumber (S_window *);
+extern void replayResize (FILE *);
+extern void addResizeKeyfile(void);
+
 
 /*void dbg_winlist();*/
 
@@ -351,7 +353,7 @@ dbgpr("putup1(%d): rlimit=(%d) fc=(%d), col=(%d) offendflg=(%d) fc_rval=(%d) ncl
 /** /
 dbgpr("putup2(%d), leading blanks: rlimit=(%d) fc=(%d), col=(%d)\n", win_n,rlimit, fc, col);
 / **/
-#ifdef OUT
+#if 0 //#ifdef OUT
 	if (stdout->_cnt < 100)   /* smooth any outputting breaks  */
 	    d_put (0);
 #endif /* OUT */
@@ -872,7 +874,7 @@ Flag __attribute__((unused)) wt;
 /*  MSSO,  putch (' ', NO),  MSSE; */
     movecursor (LT, 1);
     d_put (0);
-#ifdef OUT  /* no longer needed */
+#if 0 //#ifdef OUT  /* no longer needed */
     if (wt) {
 	Block {
 	    static struct timeval onesec = { 1, 0 };
@@ -1275,7 +1277,7 @@ if( 1 || DebugVal ) {
 //dbgpr("poscursor, VCCAAD: col=%d lin=%d col+ltext=%d, lin+ttext=%d\n",
 //     col, lin, col+curwin->ltext, lin+curwin->ttext);
 
-#ifdef OUT
+#if 0 //#ifdef OUT
     putscbuf[0] = VCCAAD;
     putscbuf[1] = (Uchar) (041 + curwin->ltext + col);
     putscbuf[2] = (Uchar) (041 + curwin->ttext + lin);
@@ -1549,7 +1551,7 @@ dintrup ()
     /* returns 1 if CCINT, 0 otherwise */
     return pendINTkey();
 
-#ifdef OUT
+#if 0 //#ifdef OUT
 /*  No one can type fast enough via this method to interrupt
  *  a putup().  On a 300 baud terminal, maybe...
  */
@@ -1657,7 +1659,7 @@ sintrup ()                        /* Whether to intrup search/exec      */
     if (rc) keyused = YES;
     return rc;
 
-#ifdef OUT
+#if 0 //#ifdef OUT
     struct timeval k_timeval = {1, 0}; /* one-second timer */
     struct timeval k_t = {1, 0};
 
@@ -1892,7 +1894,7 @@ else {
 	     * are ignored */
 	    switch ((unsigned) key) {
 
-#ifdef OUT
+#if 0 //#ifdef OUT
 	    /* not sure about this one... */
 	    case CCMOVEDOWN:    // ^J for tag srch
 		ccmdp[ppos++] = (char) key;
@@ -2376,7 +2378,7 @@ mesg (parm, msgs)
       ERRALL  0170
 #endif
 
-#ifdef OUT
+#if 0 //#ifdef OUT
 /* VARARGS 1 */
 #include <stdarg.h>
 void
@@ -3138,6 +3140,8 @@ struct timeval *timeout;
     Reg1 unsigned Short rkey;
     static Flag knockdown  = NO;
     /*extern*/ /*unsigned Short mGetkey1 ();*/
+    static unsigned Short lastKey;
+
 
 /*dbgpr("mGetkey, top:  peekflg=%d\n", peekflg);*/
 
@@ -3151,10 +3155,13 @@ dbgpr("mGetkey: peekflg=%d keyused=%d (key=%03o) \n", peekflg, keyused, key);
 
     rkey = mGetkey1 (peekflg, timeout);
 
-#ifdef NCURSES
+    /* update keystroke file at first non-CCRESIZE key */
+    if (lastKey == CCRESIZE && rkey != CCRESIZE)
+	addResizeKeyfile();
+    lastKey = rkey;
+
 /** /dbgpr("e.t.c, mGetkey() knockdown=(%d) return=(%d)(%04o)('%c') \n",
       knockdown, rkey,rkey,(char)rkey); / **/
-#endif /* NCURSES */
 
     if (knockdown && rkey < 040)
 	rkey |= 0100;
@@ -3171,7 +3178,8 @@ dbgpr("mGetkey: peekflg=%d keyused=%d (key=%03o) \n", peekflg, keyused, key);
 	    }
 	}
 #endif /* RECORDING */
-	if (keyfile != NULL && rkey != CCINT && rkey != CCMOUSE) {
+	if (keyfile != NULL && rkey != CCINT && rkey != CCMOUSE
+		 && rkey != CCRESIZE) {  /* handled in e.m.c */
 	    putc ((int)rkey, keyfile);
 	    if (numtyp > MAXTYP) {
 		flushkeys ();
@@ -3204,10 +3212,9 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 / **/
 
     if (replaying) {    /* a crash */
-	while (replaying) {
-	    return getReplayChar();
-	}
+	return getReplayChar();
     }
+
 #ifdef RECORDING
     else if (playing) {
 	return getPlayChar(peekflg);
@@ -3296,7 +3303,7 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 	    while((c = wgetch(stdscr)) == KEY_MOUSE) {
 		getmouse(&evt);
 		if (evt.bstate & REPORT_MOUSE_POSITION) {
-		//  dbgpr("e.t.c, skipping REPORT_MOUSE_POSITION\n");
+		    dbgpr("e.t.c, skipping REPORT_MOUSE_POSITION\n");
 		    continue;
 		}
 		ungetmouse(&evt);   /* push back the event */
@@ -3312,7 +3319,7 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 
 #endif /* USE_MOUSE_POSITION */
 
-	    //dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c);
+	 // dbgpr("mGetkey1: key input, c=(%04o)(%d)\n", c, c);
 
 	    if (c == KEY_BACKSPACE && bs_flag == 1) c = 010;  /* true ^H */
 
@@ -3320,7 +3327,7 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 	    //dbgpr("e.t.c:  c = (%o)(%d),  after mapInputCh (%o)(%d)\n", c,c, c1,c1);
 	    return (Uint) c1;
 
-#ifdef OUT
+#if 0 //#ifdef OUT
 /*  This section was moved to mapInputCh(c) so that
  *  the decoding can be used in other routines interested in
  *  peeking at the next input char, w/wout a delay
@@ -3349,7 +3356,7 @@ dbgpr("mGetkey1: curwin=(%o) enterwin=(%o)\n", curwin, &enterwin);
 }
 
 
-#ifdef OUT
+#if 0 //#ifdef OUT
 void
 dbg_winlist()
 {
@@ -3381,6 +3388,8 @@ getReplayChar()
 	/*  dbgpr("mGetkey1, replaying, at EOF, entering=%d\n", entering); */
 	    replaydone++;
 	}
+
+    //  dbgpr("getReplayChar(): c=(%o)(%d)('%c')\n", c, c, c);
 
 	if (replaydone) {
  finishreplay:
@@ -3415,7 +3424,7 @@ getReplayChar()
 	    }
 
 	 /* int c1; */
-	    nodelay(stdscr, FALSE);
+	 /* nodelay(stdscr, FALSE); */
 	 /* c1 =*/ wgetch(stdscr);
 	/*  dbgpr(" c1=(%o)(%c) after continue msg\n", c1, c1 ); */
 
@@ -3481,6 +3490,7 @@ dbgpr("---replaydone\n");
 	    }
 	}
 	    /* don't think we need this anymore...*/
+#ifdef OUT
 	if( !recovering ) {
 	    nodelay(stdscr,TRUE);
 	    int rc = wgetch(stdscr);  /* keyboard input, not keystroke file */
@@ -3491,7 +3501,7 @@ dbgpr("---replaydone\n");
 		goto endreplay;
 	    }
 	}
-
+#endif /* OUT */
 
 /*
 dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
@@ -3517,18 +3527,8 @@ dbgpr("replaying, *cp=(%o)(%c) col=%d lin=%d, cnt=%d\n",
 	}
 
 	if( c == CCRESIZE ) {  /* 11/2022 */
-	    int h, w;
-	    int rc = fscanf(replay_fp, "%3d%3d", &h, &w);
-	    if( rc != 2 || feof(replay_fp)) {
-		// skip resize
-	    //  dbgpr("replay err, fscanf returned (%d) expected (%d)\n", rc, 2);
-		goto endreplay;
-	    }
-	    else {
-		dbgpr("replay, calling ResizeWindows h=%d w=%d\n", h, w);
-		ResizeWindows(h, w);
-		return NOCHAR;  /* or, CCNULL ? */
-	    }
+	    replayResize(replay_fp);
+	    return CCNULL;
 	}
 
 	if ( c == CCSTOP ) {
@@ -3580,7 +3580,7 @@ pendINTkey()
     if (c == defINTchar || (altINTchar && (c == altINTchar)))
 	return 1;
 
-#ifdef OUT
+#if 0 //#ifdef OUT
     /* very unlikely a user would add CCINT to a multi-char Fn sequence,
      * but here's how to check, if we ever need it.
      */

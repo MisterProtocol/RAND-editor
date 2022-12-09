@@ -143,9 +143,10 @@ dbgpr("MapCursesKey: c=%04o, idx=%d, .keycode=%04o\n",
 	case KEY_IC:                /* insert key */
 	    return CCINSMODE;
 	case KEY_RESIZE:            /* ncurses SIGWINCH event */
-	    return CCNULL;          /* sent by older versions */
+	 // dbgpr("got KEY_RESIZE\n");
+	    return CCRESIZE;          /* sent by older versions */
 
-#ifdef OUT
+#if 0 //#ifdef OUT
 	/*  We could provide defaults for various
 	 *  F1-F12 keys, but, instead let the user
 	 *  define them in a keyboard file

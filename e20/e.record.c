@@ -584,7 +584,7 @@ SaveMacros()
     }
 
     if( (fp = fopen( macfile, "w" )) == NULL ) {
-	sprintf( tmp, "Can't open %s for writing.", macfile );
+	sprintf( tmp, "Can't open %.32s for writing.", macfile );
 	mesg( ERRALL+1, tmp );
 	return;
     }

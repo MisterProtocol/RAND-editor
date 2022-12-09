@@ -1,5 +1,14 @@
 /*
- * handle resize windows events
+ * handle resize windows events, 3 cases:
+ *
+ * 1.  a SIGWINCH by resizing the terminal window results in
+ *     resizing e's internal windows to fit.
+ *
+ * 2.  a border move between two adjacent e windows, terminal
+ *     window remains unchanged
+ *
+ * 3.  handle resize's while replaying a keyboard filel
+ *
  */
 
 #include "e.h"
@@ -15,6 +24,7 @@
 
 void hiliteactive(void);
 
+//  case 1:
 void ResizeWindows (int h, int w);
 void debugWindow (S_window *, char *);
 void debugAllWindows (void);
@@ -23,8 +33,13 @@ void debugLMchars(S_window *wp);
 void debugMrk(void);
 void debug_fileflags(void);
 Flag isFdinWindow(int fd);
+void updateKeyfile(int, int);
+extern int resized_max_h, resized_max_w;
 
 int  CheckWindowValues(void);
+
+// case 2
+
 void adj_h_borders(ASlines bm_orig, ASlines h_chg);
 void adj_w_borders(AScols rm_orig, AScols w_chg);
 void alt_h_winresize(ASlines bm_orig, ASlines h_chg, int adjwin);
@@ -48,6 +63,11 @@ extern void infoinit(void);
 extern Nlines marklines;
 Flag noresizeall = NO;
 
+extern char *hilite_str;
+extern char *bold_str;
+extern char *gray255;
+extern char *sgr0;       /* reset all modes */
+
 void MoveHorBorder (S_window *, S_window *, ASlines);
 void MoveVerBorder (S_window *, S_window *, AScols);
 int CheckWindowValues(void);
@@ -58,14 +78,22 @@ extern int moveBorder(MEVENT *);
 extern int doHborder(MEVENT *ev, S_window *, S_window *);
 extern int doVborder(MEVENT *ev, S_window *, S_window *);
 
-extern char *hilite_str;
-extern char *bold_str;
-extern char *gray255;
-extern char *sgr0;       /* reset all modes */
-
-extern char *mouse_decode(MEVENT *ep);
+//extern char *mouse_decode(MEVENT *ep);
 extern int WinNumber(S_window *);
 
+// case 3
+void addResizeKeyfile(void);
+void replayResize(FILE *);
+void setResizeWindows (int, int);
+
+Flag didReplayResize = NO;
+extern int startup_h, startup_w;
+
+/* Case 1*/
+
+/*
+ * called by SIGWINCH signal
+ */
 void
 ResizeWindows (int h, int w)
 {
@@ -98,9 +126,9 @@ ResizeWindows (int h, int w)
     static int cnt = 0;
 
     cnt++;
-    dbgpr("%03d -----------\n", cnt);
-    dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d term(h=%d,w=%d)\n",
-	h, w, LINES, COLS, h_chg, w_chg, term.tt_height, term.tt_width);
+//  dbgpr("%03d -----------\n", cnt);
+//  dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d term(h=%d,w=%d)\n",
+//      h, w, LINES, COLS, h_chg, w_chg, term.tt_height, term.tt_width);
 
 //  debugAllWindows();
 
@@ -308,11 +336,14 @@ dbgpr("after\n");
     fresh();
     d_put (0);
 
+#ifdef OUT
+// now handled in e.m.c, via key=CCRESIZE
     ungetch('\015');    /* force redraw */
     ungetch('d');
     ungetch('e');
     ungetch('r');
     ungetch(CCCMD);
+#endif
 
     /* seems we need to redraw borders again */
     for (i=0; i<nwinlist; i++) {
@@ -439,7 +470,6 @@ debugAllWindows()
 
     dbgpr("------\n");
 }
-
 
 
 void
@@ -814,6 +844,16 @@ lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
   curwin->lmarg, curwin->ltext, curwin->rmarg, curwin->rtext);
 / **/
 
+    /* if we've recovered from a crash, or replayed a session
+     * our full window size may be less than the terminal window size
+     * and resizing is not a good idea.
+     */
+    if (didReplayResize && ((startup_h > term.tt_height)
+	    || (startup_w > term.tt_width))) {
+	mesg(ERRALL+1, "Border resizing not allowed after a replay.");
+	return 0;
+    }
+
     /* are the boundaries ok */
     {
 	if (ev->y < 2)  return 0;
@@ -845,49 +885,6 @@ lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
 	    rc = 0;
 	}
     }
-
-#ifdef OUT
-    if (ev->y == curwin->tmarg) {  /* a horizontal border */
-	for (i=0; i<nwinlist; i++) {
-	    wp = winlist[i];
-		/* and share top/bot margin, and same width */
-	    if ((wp->bmarg == curwin->tmarg) &&
-		    (wp->lmarg == curwin->lmarg) &&
-		    (wp->rmarg == curwin->rmarg)) {
-	    //  dbgpr("Window above curwin at %d\n", wp->bmarg);
-		rc = 0;
-		bwin = curwin;
-		twin = wp;
-		haveHmove = 1;
-		break;
-	    }
-	}
-    }
-#endif /* OUT */
-
-#ifdef OUT
-    if (!haveHmove ) {  /* not horiz, is it vert? */
-	 /* if press is on lm, find win whose rm matches the lm of curwin */
-	if (ev->x == curwin->lmarg && (ev->x >= 2) ) {
-	    for (i=0; i<nwinlist; i++) {
-		wp = winlist[i];
-		    /* and share top/bot margins, and same height */
-		if ((wp->rmarg == curwin->lmarg) &&
-			(wp->tmarg == curwin->tmarg) &&
-			(wp->bmarg == curwin->bmarg)) {
-
-		    //dbgpr("Window left of curwin at %d\n", wp->rmarg);
-		    rc = 0;
-		    rwin = curwin;
-		    lwin = wp;
-		    haveVmove = 1;
-		    break;
-
-		}
-	    }
-	}
-    }
-#endif /* OUT */
 
     if (!haveHmove ) {
 	 /* if press is on lm, find win whose rm matches the lm of curwin */
@@ -1006,6 +1003,8 @@ lmarg=%d, ltext=%d, rmarg=%d, rtext=%d\n",
 
     infoinit();
     unmark();
+
+    addResizeKeyfile(); // save resize info in keystroke file
 
     return rc;
 
@@ -1186,7 +1185,6 @@ xlateBorderChar(int border_ch)      /* 129-142, see e.t.h */
 	default:
 	    break;
     }
-
 
     dbgpr("xlate: unknown %d\n", border_ch);
 
@@ -1477,6 +1475,15 @@ doVborder(MEVENT *ev, S_window *rwin, S_window *lwin)
 
     int w = term.tt_width;
     int h = term.tt_height;
+#ifdef OUT
+    /* after a replay/recovery, our screensize may be larger
+     * than our max window size.  Should probably just
+     * post a can't do error.
+     */
+    int w = (int) (wholescreen.rmarg - wholescreen.lmarg + 1);
+    int h = (int) (wholescreen.bmarg - wholescreen.tmarg + 1);
+#endif /* OUT */
+
 //  Uchar __attribute__((unused)) buf[w+1];
     Uchar *cp;
     int bline = ev->y;      /* border line */
@@ -1760,6 +1767,7 @@ void
 hiliteTopBorder(S_window *wp) /* active window */
 {
 
+    if (didReplayResize) return;
     if (wp->tmarg == 0) return;
     if (isTMmoveable(wp) < 0) return;
 
@@ -1786,6 +1794,7 @@ void
 hiliteLeftBorder(S_window *wp) /* active window */
 {
 
+    if (didReplayResize) return;
     if (wp->lmarg == 0) return;
     if (isLMmoveable(wp) < 0) return;
 
@@ -1957,3 +1966,356 @@ isFdinWindow(int fd)
     return NO;
 }
 
+
+/* case 3, keystroke file */
+
+/* record a resize event in the keystroke file */
+
+void
+addResizeKeyfile()
+{
+
+    /*   update keystroke file with new window size info
+     */
+
+    /* Start with "{CCRESIZE} h=nn w=nn nwin=nn\n"
+     * Subsequent *lines* will contain info for each window.
+     */
+
+    /* Write {CCRESIZE} h=nn w=nn nwin=nn\n to keys file, and flushkeys */
+    fprintf(keyfile, "%c h=%d w=%d nwin=%d\n",
+	CCRESIZE, term.tt_height, term.tt_width, nwinlist);
+
+    int i;
+    S_window *wp;
+
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	fprintf(keyfile, "win %d tm=%d bm=%d lm=%d rm=%d ",
+	    i, wp->tmarg, wp->bmarg, wp->lmarg, wp->rmarg);
+
+	/*  these can be calculated, but since we have the values
+	 *  use them for simplicity
+	 */
+	fprintf(keyfile, "tt=%d bt=%d lt=%d rt=%d ",
+	    wp->ttext, wp->btext, wp->ltext, wp->rtext);
+
+	fprintf(keyfile, "te=%d be=%d le=%d re=%d ",
+	    wp->tedit, wp->bedit, wp->ledit, wp->redit);
+
+	/* wksp values */
+	fprintf(keyfile, "clin=%d ccol=%d wlin=%d wcol=%d\n",
+	    (int) wp->wksp->clin, (int) wp->wksp->ccol,
+	    (int) wp->wksp->wlin, (int) wp->wksp->wcol);
+    }
+
+    flushkeys();
+//  dbgpr("writing keyfile: CCRESIZE h=%d w=%d nwin=%d\n",
+//     term.tt_height, term.tt_width, nwinlist);
+
+    if ((term.tt_height > resized_max_h) || (term.tt_width > resized_max_w))
+	updateKeyfile(term.tt_height, (int)term.tt_width);
+
+    return;
+}
+
+
+void
+replayResize(FILE *fp)
+{
+
+    int w, h;
+    int nwin, wnum;
+    int tm, bm, lm, rm;          /* margins */
+    int tt, bt, lt, rt;          /* text positions */
+    int te, be, le, re;          /* edit values */
+    int clin, ccol, wlin, wcol;  /* wksp vars*/
+
+    int __attribute__((unused)) rc, i;
+
+    /* 1st read win info into local buf[]; may need to
+     * 'adjust' an item
+     */
+    char buf[256], *s;
+    fgets(buf, (int) sizeof(buf), fp);
+    s = buf;
+
+    //dbgpr("%o %o %c%c%c%c\n", buf[0],buf[1],buf[2],buf[3],buf[4],buf[5]);
+
+    rc = sscanf(s, " h=%d w=%d nwin=%d\n", &h, &w, &nwin);
+//  dbgpr("----\nbuf=%s", s);
+//  dbgpr("rc=%d h=%d w=%d nwin=%d nwinlist=%d\n", rc, h, w, nwin, nwinlist);
+
+    /* update window values */
+
+    S_window *wp;
+
+    for (i=0; i<nwin; i++) {
+	fgets(buf, (int) sizeof(buf), fp);
+	if(feof(fp)) break;
+
+	s = buf;
+//      dbgpr("buf=%s", s);
+
+	rc = sscanf(s, "win %d", &wnum);
+	s += wnum > 9 ? 6 : 5;  /* skip "win n[n]" */
+
+	wp = winlist[wnum];
+
+	if (wp == NULL) {   /* should NOT see this */
+	    dbgpr("wp is NULL wnum=%d nwinlist=%d\n", wnum, nwinlist);
+	    continue;
+	}
+
+	rc = sscanf(s, " tm=%d bm=%d lm=%d rm=%d tt=%d bt=%d lt=%d rt=%d \
+		 te=%d be=%d le=%d re=%d \
+		 clin=%d ccol=%d wlin=%d wcol=%d\n",
+	     &tm, &bm, &lm, &rm, &tt, &bt, &lt, &rt, &te, &be, &le, &re,
+	     &clin, &ccol, &wlin, &wcol);
+
+	wp->tmarg = (ASlines) tm;
+	wp->bmarg = (ASlines) bm;
+	wp->lmarg = (AScols) lm;
+	wp->rmarg = (AScols) rm;
+
+	wp->ttext = (ASlines) tt;
+	wp->btext = (ASlines) bt;
+	wp->ltext = (AScols) lt;
+	wp->rtext = (AScols) rt;
+
+	wp->tedit = (ASlines) te;
+	wp->bedit = (ASlines) be;
+	wp->ledit = (AScols) le;
+	wp->redit = (AScols) re;
+
+	wp->wksp->clin = (ASlines) clin;
+	wp->wksp->ccol = (AScols) ccol;
+	wp->wksp->wlin = (ANlines) wlin;
+	wp->wksp->wcol = (ANcols) wcol;
+
+    /** /
+	dbgpr("rc=%d win %d tm=%d bm=%d lm=%d tm=%d ", rc, wnum, tm, bm, lm, rm);
+	dbgpr("tt=%d bt=%d lt=%d rt=%d ", tt, bt, lt, rt);
+	dbgpr("te=%d be=%d le=%d re=%d ", te, be, le, re);
+	dbgpr("clin=%d ccol=%d wlin=%d wcol=%d\n", clin, ccol, wlin, wcol);
+    / **/
+    }
+
+    setResizeWindows(h, w);
+
+    return;
+}
+
+
+/*
+ *    Called when a replay sees a CCRESIZE ecmd.
+ *    Resize the main and utility windows if changed, and redraw.
+ *    The edit windows already contain new values.
+ */
+void
+setResizeWindows (int h, int w)
+{
+    int h_chg = (h - term.tt_height);
+    int w_chg = (w - term.tt_width);
+    int i;
+
+    S_window *oldwin = curwin;
+//  S_wksp *wksp_old = curwksp;
+
+    int ccol = cursorcol;
+    int clin = cursorline;
+
+
+//  dbgpr("setResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d term(h=%d,w=%d)\n",
+//      h, w, LINES, COLS, h_chg, w_chg, term.tt_height, term.tt_width);
+//  dbgpr("ccol=%d clin=%d\n");
+
+
+//  debugAllWindows();
+
+    if (h_chg || w_chg ) {
+	blanks = realloc (blanks, (size_t)w);
+	fill (blanks, (Uint) w, ' ');
+
+	/* clear utility windows */
+	ClearUtilityWindows();
+
+	term.tt_width = (short) w;
+	term.tt_height = (char) h;  /* todo, chg to short in e.tt.h/tcap.c */
+
+	/* curses needs to adjust new sizes, reset LINES and COLS */
+	resizeterm(h, w);
+	refresh();
+	/* my guess is that ncurses isn't seeing the SIGWINCH signal
+	 * and is not updating these
+	 */
+	if (COLS != w) COLS = w;
+	if (LINES != h) LINES = h;
+
+	didReplayResize = YES;
+    }
+//dbgpr("After resizeterm: COLS=%d, LINES=%d\n", COLS, LINES);
+
+
+    extern Short screensize;
+    extern Uchar *image;
+    if (screensize) sfree (image);
+    image = (Uchar *)NULL;
+
+    d_init(YES,NO);     /* YES for clearmem, NO clearscr */
+
+    if (h_chg) {
+	ASlines bmarg;
+	//bmarg = (ASlines) (wholescreen.bmarg + h_chg);
+	bmarg = (ASlines) (h - 1);
+
+	wholescreen.bmarg = bmarg;
+	wholescreen.btext = bmarg;
+	wholescreen.bedit = bmarg;
+
+	//enterwin.tmarg = (ASlines) (enterwin.tmarg + h_chg);
+	enterwin.tmarg = (ASlines) (h - 1 - NINFOLINES - nButtonLines);
+	enterwin.bmarg = enterwin.tmarg;
+	enterwin.ttext = enterwin.tmarg;
+
+	//infowin.tmarg = (ASlines) (infowin.tmarg + h_chg);
+	infowin.tmarg = (ASlines) (h - NINFOLINES - nButtonLines);
+	infowin.bmarg = infowin.tmarg;
+	infowin.ttext = infowin.tmarg;
+
+	if (nButtonLines) {
+	    //buttonwin.tmarg = (ASlines) (buttonwin.tmarg + h_chg);
+	    buttonwin.tmarg = (ASlines) (h - nButtonLines);
+	    buttonwin.ttext = buttonwin.tmarg;
+	    //buttonwin.bmarg = (ASlines) (buttonwin.bmarg + h_chg);
+	    buttonwin.bmarg = (ASlines) (h - 1);
+	    buttonwin.btext = buttonwin.bmarg; /* not used */
+	}
+    }
+
+    if (w_chg) {
+	AScols rmarg;
+
+	//rmarg = (AScols) (wholescreen.rmarg + w_chg);
+	rmarg = (AScols) (w - 1);
+
+	wholescreen.rmarg = rmarg;
+	wholescreen.rtext = rmarg;
+	wholescreen.redit = rmarg;
+
+	enterwin.rmarg = rmarg;
+	enterwin.rtext = rmarg;
+	enterwin.redit = rmarg;
+
+	infowin.rmarg = rmarg;
+	infowin.rtext = rmarg;
+	infowin.redit = rmarg;
+
+	if (nButtonLines) {
+	    buttonwin.rmarg = rmarg;
+	    buttonwin.rtext = rmarg;
+	    buttonwin.tedit = 0;
+	}
+    }
+
+/** /
+dbgpr("after\n");
+    debugAllWindows();
+/ **/
+
+    infoinit(); /* redraw the info line */
+
+    if (nButtonLines) {
+	buttoninit();
+    }
+
+    Small chgborders_save = chgborders;
+    chgborders = 0;  /* ? */
+    for (i=0; i<nwinlist; i++) {
+	switchwindow(winlist[i]);
+	limitcursor();  /* see e.t.c */
+	poscursor(0, 0);
+
+	putupwin();
+	if (curwin == winlist[i]) {
+	    //chgborders = 1;
+	    drawborders (winlist[i], WIN_ACTIVE | WIN_DRAWSIDES);
+	    //chgborders = 0;
+	}
+	else
+	    drawborders (winlist[i], WIN_INACTIVE | WIN_DRAWSIDES);
+	fresh();
+	d_put(0);
+    }
+
+    curwin = oldwin;
+    switchwindow(curwin);
+    chgborders = chgborders_save;
+    drawborders (curwin, WIN_ACTIVE | WIN_DRAWSIDES);
+
+    fresh();
+    d_put (0);
+
+    /* Move the cursor to its original position; or if its
+     * no longer on the screen, move it to just within
+     * the current window's borders.
+     */
+    if (ccol > curwin->rtext) ccol = curwin->rtext;
+    if (clin > curwin->btext) clin = curwin->btext;
+
+    poscursor(ccol, clin);
+    d_put(0);
+
+    /* as per limitcursor() in e.t.c */
+    for (i=0; i<nwinlist; i++) {
+	winlist[i]->wksp->ccol = min (winlist[i]->wksp->ccol, winlist[i]->rtext);
+	winlist[i]->wksp->clin = min (winlist[i]->wksp->clin, winlist[i]->btext);
+	winlist[i]->altwksp->ccol = min (winlist[i]->altwksp->ccol, winlist[i]->rtext);
+	winlist[i]->altwksp->clin = min (winlist[i]->altwksp->clin, winlist[i]->btext);
+    }
+
+    return;
+}
+
+void
+updateKeyfile(int h, int w)
+{
+    long fpos;
+    char buf[256], *s;
+
+    if ((h <= resized_max_h) && (w <= resized_max_w))
+	return;
+
+    resized_max_h = max (h, resized_max_h);
+    resized_max_w = max (w, resized_max_w);
+
+    // save current file location
+    fpos = ftell(keyfile);
+    fseek(keyfile, 0, 0);   // beg of keyfile
+
+    if (fgets(buf, sizeof(buf), keyfile) == NULL) {
+	dbgpr("can't update keyfile with new values (%d,%d)\n", h, w);
+	fseek(keyfile, fpos, 0);
+	return;
+    }
+
+    /*   1st line example:
+     *   "version=20 ichar=  term=xterm-256color h=43 w=95 ....."
+     *
+     *   note:  the extra "."'s provide space for larger width values.
+     */
+
+    if ((s = strstr(buf, "h=")) != NULL) {
+	sprintf(s, "h=%d w=%d", resized_max_h, resized_max_w);
+	// remove the \0 introduced by sprintf()
+	s = index(s, '\0');
+	*s = ' ';
+	fseek(keyfile, 0, 0); // back to beg to rewrite 1st line
+	fputs(buf, keyfile);
+//      dbgpr("keystroke file update:  h,w reszized to %d,%d\n", resized_max_h, resized_max_w);
+    }
+
+    fseek(keyfile, fpos, 0); /* restore file position */
+
+    return;
+}

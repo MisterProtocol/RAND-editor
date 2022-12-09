@@ -13,8 +13,8 @@ typedef struct KeyNameTable {
 
 KeyNameTable E_Keys[] = {
 {0236,          "CCMOUSE"},
-{000,           "CCCMD"},
-{001,           "CCCMD1"},
+{000,           "CCCMD0"},
+{001,           "CCCMD"},
 {002,           "CCSETFILE"},
 {003,           "CCINT"},
 {004,           "CCOPEN"},

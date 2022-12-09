@@ -245,7 +245,7 @@ mesg(TELALL+3, "File ", file, xyz);}
 		loopflags.hold = YES;
 	    }
 	    else if (1 < nlink) Block {
-		    char numstr[10];
+		    char numstr[16];
 		hasmultlinks = YES;
 		sprintf (numstr, "%d", nlink);
 		mesg (3, "  (has ", numstr, " links)");

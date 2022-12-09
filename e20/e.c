@@ -156,10 +156,13 @@ char *optmouse_stop;
  */
 Flag needResize = NO;
 Flag optnoresize = NO;
-int resize_h, resize_w; /* save new term w/h values */
+int resize_h, resize_w; /* save new term w/h values, for startup */
 extern Flag noresizeall;
 
 extern void ResizeWindows(int h, int w);
+
+/* used to determine if resizing is ok while replaying */
+int startup_w, startup_h;
 
 
 /*************************/
@@ -285,6 +288,10 @@ extern Flag initCursesDone;
 
 void debugAllWindows(void);
 int h_orig; /* starting term.tt_height value */
+int w_orig; /* starting term.tt_width value */
+/* keep track of max resize values in order to update w,h in keystroke file */
+int resized_max_h;
+int resized_max_w;
 
 #ifdef  NOCMDCMD
 Flag optnocmd;          /* YES = -nocmdcmd; <cmd><cmd> functions disabled */
@@ -555,7 +562,7 @@ Reg2 char *argv[];
 	    char a_term[50];
 
 	    fgets(buf, sizeof(buf), replay_fp);
-dbgpr("buf=%s\n", buf);
+//dbgpr("buf=%s\n", buf);
 	    sscanf (buf, "version=%hd ichar=%c term=%s h=%d w=%d",
 		&a_ver, &a_ichar, a_term, &a_h, &a_w);
 /****/
@@ -578,6 +585,13 @@ Your current screensize is %d w X %d h.\n",
 		    inpfname, a_w, a_h, term.tt_width, term.tt_height );
 	    }
 	    ichar = a_ichar;
+
+	    /*  The terminal screen h,w may be larger than the replay values.
+	     *  Save for later to perhaps disable border moving attempts.
+	     */
+	    startup_w = term.tt_width;
+	    startup_h = term.tt_height;
+
 	    term.tt_width = (short)a_w;
 	    term.tt_height = (char)a_h;
 	    initwindows (YES);
@@ -612,7 +626,10 @@ Your current screensize is %d w X %d h.\n",
 #endif /* ENVIRON */
     getstate (ichar);
 #ifdef ASCIIKEYINFO
-    fprintf(keyfile, "version=%d ichar=%c term=%s h=%d w=%d\n",
+    /* 4/2022:  Pad a few chars in case a resize rewrites the h,w values
+     * with more digits (eg, w going from 90 to 105)
+     */
+    fprintf(keyfile, "version=%d ichar=%c term=%s h=%d w=%d  .....\n",
 	-revision, ichar, tname, term.tt_height, term.tt_width);
 #else
     putshort (revision, keyfile);
@@ -1462,7 +1479,8 @@ dbgpr("main1:  dp->d_name=(%s)\n", dp->d_name);
     if (access(bkeytmp, 0) == 0)
 	HaveBkeytmp = 1;
 #endif /* SAVETMPFILES */
-    if ((keyfile = fopen (keytmp, "w")) == NULL)
+  //if ((keyfile = fopen (keytmp, "w")) == NULL)
+    if ((keyfile = fopen (keytmp, "w+")) == NULL)
 	getout (YES, "Can't create keystroke file (%s).", keytmp);
 
 #ifdef  FILELOCKING
@@ -1900,7 +1918,8 @@ gettermtype ()
     else if (borderbullets)
 	borderbullets = term.tt_bullets;
 
-    h_orig = term.tt_height;
+    resized_max_h = h_orig = term.tt_height;
+    resized_max_w = w_orig = term.tt_width;
 
     return;
 }
