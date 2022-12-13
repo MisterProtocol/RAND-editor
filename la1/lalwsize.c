@@ -28,8 +28,8 @@ dbgpr("la_lwsize, TOP:  fsdb=(%d) lnum=(%d) plas->(la_fsbyte=(%ld) refs=%d la_nl
 	    La_linesize n;
 	    n = (-fsdb << LA_NLLINE) + *cp;
 	    /*return (-fsdb << LA_NLLINE) + *cp;*/
-	    dbgpr("la_lwsize1:  n=%ld vs fsdb=%d cp=(%d) la_lbyte=(%ld)\n",
-	       n, fsdb, *cp, plas->la_lbyte);
+	    // dbgpr("la_lwsize1:  n=%ld vs fsdb=%d cp=(%d) la_lbyte=(%ld)\n",
+	    //   n, fsdb, *cp, plas->la_lbyte);
 	    return n;
 	}
 #else
