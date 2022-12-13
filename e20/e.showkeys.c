@@ -19,6 +19,7 @@ void doResize(FILE *);
 extern void exit(int);
 long ftell();
 int fstat();
+int fileno(FILE *);
 extern void dbgpr();
 
 int
