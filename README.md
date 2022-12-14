@@ -279,6 +279,9 @@ Currently, option "2" recovers the previous session, so answering
 session.  If those keystrokes were "<cmd>b q<ret>", this would prevent
 the editor from exiting at the end of the recovery.
 
+The "showkeys" program is so generally useful that it has been added
+to the "original" branch of the editor as well as the "main" version.
+
 ### Ancillary Files ###
 
 At times, the editor must display messages longer than a single line to
