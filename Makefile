@@ -278,6 +278,9 @@ s5.lint:
 		"LINTFLAGS=$(S5LINTFLAGS)" \
 		lint
 
+showkeys:
+	cd e19; $(CC) -o showkeys e.showkeys.c
+
 learn:
 	cp doc/man/e.1 $(DOC)
 	-mkdir $(LEARN)

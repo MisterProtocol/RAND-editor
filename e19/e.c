@@ -248,6 +248,12 @@ extern void initwindows();
 _Noreturn void getout (Flag, char *, ...);
 extern int fileno();
 void resize_handler (int sig);
+void usr1_handler (int sig);
+
+/* used to determine if resizing is ok while replaying */
+int startup_w, startup_h;
+int resized_max_h;
+int resized_max_w;
 
 #ifdef COMMENT
 void
@@ -1159,7 +1165,7 @@ startup ()
     if (access(bkeytmp, 0) == 0)
 	HaveBkeytmp = 1;
 #endif /* SAVETMPFILES */
-    if ((keyfile = fopen (keytmp, "w")) == NULL)
+    if ((keyfile = fopen (keytmp, "w+")) == NULL)
 	getout (YES, "Can't create keystroke file (%s).", keytmp);
 
 #ifdef  FILELOCKING
@@ -1484,6 +1490,10 @@ gettermtype ()
 	borderbullets = optbullets;
     else if (borderbullets)
 	borderbullets = term.tt_bullets;
+
+    resized_max_h = term.tt_height;
+    resized_max_w = term.tt_width;
+
     return;
 }
 
@@ -2393,4 +2403,6 @@ resize_handler (int sig)
     signal(SIGWINCH, resize_handler);
 
 }
+
+
 

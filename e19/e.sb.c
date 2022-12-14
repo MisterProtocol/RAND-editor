@@ -813,6 +813,7 @@ void
 flushkeys ()
 {
     fflush (keyfile);
+    numtyp = 0;
     if (ferror (keyfile))
 	fatal (FATALIO, "ERROR WRITING keys FILE.");
     return;

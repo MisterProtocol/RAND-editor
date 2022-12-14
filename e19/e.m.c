@@ -64,7 +64,7 @@ newnumber:
 #ifdef LA_LONGFILES
 		snprintf (ich, 32, "%-5ld", nlines);
 #else /* LA_LONGFILES */
-		snprintf (ich, "32, %-5d", nlines);
+		snprintf (ich, 32, "%-5d", nlines);
 #endif /* LA_LONGFILES */
 		info (inf_line, 5, ich);
 		infoline = nlines;
@@ -152,6 +152,14 @@ contin:
 	if (loopflags.hold) {
 	    loopflags.hold = NO;
 	    mesg (TELALL);
+	}
+
+	/* help resizing .... */
+	if (key == CCREDRAW) {
+	    fresh();
+	    d_put(0);
+	    fflush(stdout);
+	    continue;
 	}
 
 	Block {
@@ -819,6 +827,10 @@ gotcmd:
 		    goto doneswitch;
 
 		case CCREDRAW:
+		    command (CMDREDRAW, nix);
+		    goto funcdone;
+
+	    /*  case CCREDRAW: */
 		case CCBOX:
 		case CCABORT:
 		case CCCLRTABS:

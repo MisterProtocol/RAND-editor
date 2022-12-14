@@ -158,8 +158,10 @@ Flag peekflg;
 {
     Uchar *cp;
 
-    if (peekflg != WAIT_KEY)
+    if (peekflg != WAIT_KEY) {
+//      dbgpr("PlayChar:  peekflg != WAIT_KEY, return (%o)\n", *play_ptr);
 	return play_ptr;
+    }
 
     cp = play_ptr;
     play_ptr++;
@@ -174,6 +176,8 @@ Flag peekflg;
 	    play_ptr = rec_text;
 	}
     }
+//  dbgpr("PlayChar, end:  peekflg=%d, return (%o) play_len=%d\n",
+//      peekflg, *cp, play_len);
     return cp;
 }
 
@@ -458,16 +462,19 @@ AddDefaultMacros()
 {
     struct macros *mp;
 
-    /* 1.  Add  name=REDRAW  text="\0red\015"
+    /* 1.  Add  name=REDRAW  text[0] = CCREDRAW
      *
      */
     mp = &macros[n_macrosdefined++];
     mp->name = salloc(7, NO);
     strcpy(mp->name, "REDRAW");
-    mp->text = (unsigned char *)salloc(6, NO);
-    mp->text[0] = CCCMD;
-    strncpy((char *)mp->text+1, "red\015", 5);
-    mp->len = 5;
+    mp->text = (unsigned char *)salloc(2, NO);
+    mp->text[0] = CCREDRAW;
+
+//  mp->text[0] = CCCMD;
+//  strncpy((char *)mp->text+1, "red\015", 5);
+
+    mp->len = 1;
     mp->text[mp->len+1] = '\0';
 
     return;
@@ -545,7 +552,7 @@ SaveMacros()
     }
 
     if( (fp = fopen( macfile, "w" )) == NULL ) {
-	sprintf( tmp, "Can't open %s for writing.", macfile );
+	sprintf( tmp, "Can't open %.32s for writing.", macfile );
 	mesg( ERRALL+1, tmp );
 	return;
     }

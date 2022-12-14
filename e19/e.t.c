@@ -22,6 +22,7 @@ file e.t.c
 
 #ifdef  SYSSELECT
 #include <sys/time.h>
+#include <sys/select.h>   /* added 12/2002 */
 #else /* SYSSELECT */
 #include SIG_INCL
 #endif /* SYSSELECT */
@@ -105,6 +106,14 @@ extern int d_vmove ();
 
 void MesgHack ();
 void setmarg ();
+
+extern Flag resized;
+extern void addResizeKeyfile();
+extern void replayResize(int fd);
+
+int pselect(int nfds, fd_set *readfds, fd_set *writefds,
+    fd_set *exceptfds, const struct timespec *timeout,
+    const sigset_t *sigmask);
 
 #define SIGSEGV_PATCH  /* tmp to deal with mem violation */
 
@@ -208,6 +217,7 @@ Scols   ncols;      /* number of columns for partial line redraw */
 		&& !entfstline
 		&& ( replaying || (++intrupnum > DPLYPOL) )
 		&& !nodintrup
+		&& !resized
 		&& dintrup ()
 	       ) {
 		needputup = YES;
@@ -1119,6 +1129,7 @@ poscursor (col, lin)
 Reg1 Scols  col;
 Reg2 Slines lin;
 {
+
     if (cursorline == lin) {
 	/* only need to change column?  */
 	switch (col - cursorcol) {  /* fortran arithmetic if!!      */
@@ -1263,9 +1274,9 @@ getkey (peekflg, timeout)
     wasn't used up (keyused == NO) don't read after all.
 .
     peekflg is one of
-      WAIT_KEY      wait for a character, ignore interrupted read calls.
-      PEEK_KEY      peek for a character
-      WAIT_PEEK_KEY wait for a character, then peek at it;
+  0   WAIT_KEY      wait for a character, ignore interrupted read calls.
+  1   PEEK_KEY      peek for a character
+  2   WAIT_PEEK_KEY wait for a character, then peek at it;
 		    if read times out, return NOCHAR.
 #endif /* COMMENT */
 unsigned Short
@@ -1282,9 +1293,9 @@ getkey (peekflg)
     wasn't used up (keyused == NO) don't read after all.
 .
     peekflg is one of
-      WAIT_KEY      wait for a character, ignore interrupted read calls.
-      PEEK_KEY      peek for a character
-      WAIT_PEEK_KEY wait for a character, then peek at it;
+  0    WAIT_KEY      wait for a character, ignore interrupted read calls.
+  1    PEEK_KEY      peek for a character
+  2    WAIT_PEEK_KEY wait for a character, then peek at it;
 		   if read is interrupted, return NOCHAR.
 #endif
 unsigned Short
@@ -1295,20 +1306,55 @@ Reg2 Flag peekflg;
     Reg1 unsigned Short rkey;
     static Flag knockdown  = NO;
     /*extern*/ unsigned Short getkey1 ();
+    static unsigned Short lastKey;
 
-    if (peekflg == WAIT_KEY && keyused == NO)
+    if (peekflg == WAIT_KEY && keyused == NO) {
+//dbgpr("getkey: keyused = NO, return (%o)(%c) peekflg=%d\n", key, key, peekflg);
 	return key; /* then getkey is really a no-op */
+    }
+
 #ifdef  SYSSELECT
     rkey = getkey1 (peekflg, timeout);
 #else /* SYSSELECT */
     rkey = getkey1 (peekflg);
 #endif /* SYSSELECT */
+
+//dbgpr("getkey:(%o)(%d)(%c) peekflg=%d lastKey=(%3o)\n",
+//  rkey, rkey, rkey, peekflg, lastKey);
+
+    /* update keystroke file at first non-CCREDRAW key */
+    if (lastKey == CCREDRAW && rkey != NOCHAR && rkey != CCREDRAW) {
+	//dbgpr("lastKey=%03o rkey=%03o\n", lastKey, rkey);
+	addResizeKeyfile();
+	poscursor(cursorcol, cursorline);
+	fresh();
+	d_put(0);
+	fflush(stdout);
+    }
+    lastKey = rkey;
+
     if (knockdown && rkey < 040)
 	rkey |= 0100;
     if (peekflg != WAIT_KEY)
 	return rkey;
     knockdown = rkey == CCCTRLQUOTE;
     keyused = NO;
+
+    if (rkey == CCREDRAW)
+	resized = NO;
+
+#ifdef RECORDING
+    if (recording)
+	RecordChar (rkey);
+#endif /* RECORDING */
+
+    if (keyfile != NULL && rkey != CCINT && rkey != CCREDRAW) {
+	putc ((int)rkey, keyfile);
+	if (numtyp > MAXTYP) {
+	    flushkeys ();
+	}
+    }
+
     return key = rkey;
 }
 
@@ -1356,6 +1402,16 @@ Small peekflg;
     static Uchar chbuf[NREAD];
     static Uchar *lp;
 
+#ifdef OUT
+extern Flag resized;
+if(resized) {
+    fresh();
+//  fflush(stdout);
+    resized = 0;
+    dbgpr("getkey1: win resized, redraw...\n");
+}
+#endif
+
     if (replaying) Block {
 	static Small replaydone = 0;
 	if (replaydone) {
@@ -1390,6 +1446,13 @@ Small peekflg;
 		dot_profile = NO;
 	    }
 #endif /* STARTUPFILE */
+
+	    if (resized) {
+		fflush(stdout);
+		//DoMacro($REDRAW, 1);
+		return CCREDRAW;
+	    }
+
 	    goto nonreplay;
 	}
 	if (   !recovering
@@ -1412,8 +1475,7 @@ Small peekflg;
 		cp = lp = chbuf;
 		if (charsaved)
 		    *cp++ = svchar;
-		if ((lcnt = xread (inputfile, (char *) cp, NREAD - charsaved))
-		    >= 0) {
+		if ((lcnt = xread (inputfile, (char *) cp, NREAD - charsaved)) >= 0) {
 		    if (lcnt > 0) {
 			svchar = cp[lcnt - 1];
 			if (!charsaved) {
@@ -1428,6 +1490,22 @@ Small peekflg;
 		    fatal (FATALIO, "Error reading input.");
 	    }
 	}
+
+	if( *lp == CCRESIZE ) {  /* 11/2022 */
+	    //int n = (int) (lp - chbuf);  /* dbg */
+	    off_t __attribute__((unused)) pos = lseek(inputfile, 0, SEEK_CUR);
+	    //dbgpr("got CCRESIZE:  lp-chbuf=%d, lcnt=%d, pos=%ld\n", n, lcnt, pos);
+	    lp++;
+
+	    /* seek back lcnt chars to the 1st char after CCRESIZE */
+	    pos = lseek(inputfile, -lcnt, SEEK_CUR);
+	    //dbgpr(" pos=%ld before calling replayResize\n", pos);
+	    replayResize(inputfile);
+	    lcnt = 0;
+	    lp = chbuf;
+	    return CCNULL;  // or NOCHAR ?
+	}
+
 	if (   lcnt == 0
 #ifdef UNSCHAR
 	    || *lp == CCSTOP
@@ -1451,7 +1529,15 @@ Small peekflg;
     else if (playing) {
 	    extern Flag play_silent;
 
+	/* an input char may be pending */
+	if (!xempty(STDIN)) {
+	    char c;
+	    read (inputfile, &c, 1);
+	    //dbgpr(" playback, top got c=(%o)(%c)\n", c, c);
+	}
+
 	lp = (Uchar *)PlayChar (peekflg);
+	//dbgpr("PlayChar returned (%o) peekflg=%d\n", *lp, peekflg);
 	if (!playing && play_silent) {
 	    silent = 0;
 	    fresh();
@@ -1466,6 +1552,7 @@ Small peekflg;
 	     */
 	    do {
 		read (inputfile, &c, 1);
+		dbgpr(" playback, skipping c=%d\n", c);
 	    } while (!xempty(STDIN));
 	    if( play_silent )
 		silent = 0;
@@ -1474,6 +1561,7 @@ Small peekflg;
 	    return (CCINT);
 	}
 	/*goto endGetkey1;*/
+
 	return (unsigned Short)*lp;
     }
 #endif /* RECORDING */
@@ -1515,8 +1603,10 @@ Small peekflg;
 		/*dbgpr("inputfile=(%d)\n", inputfile); **/
 		if (   peekflg == WAIT_PEEK_KEY
 		    && select (inputfile + 1, &readmask, NULL, NULL, timeout) <= 0
-		   )
+		   ) {
+		    dbgpr("getkey1, 1. returning NOCHAR, resized=%d\n", resized);
 		    return NOCHAR;
+		}
 	    }
 #else /* FDSET */
 	    Block {
@@ -1572,6 +1662,40 @@ Small peekflg;
 #endif /* FDSET */
 #endif /* FSYNCKEYS */
 #endif /* SYSSELECT */
+//dbgpr("\ngetkey1:  just before main xread, resized=%d \n", resized);
+
+		/*  12/2022:
+		 *  Wakeup when input is ready on stdin, or after a signal.
+		 *  For a SIGWINCH, return a CCREDRAW cmd.
+		 */
+		static Flag didResize = 0;
+		Block {
+		    /* cursor is sometimes out of place after resizing... */
+		    if (didResize) {
+			Block {
+			  int c = cursorcol + curwin->ltext;
+			  int l = cursorline + curwin->ttext;
+			  (*term.tt_addr) (l, c);
+			  fflush(stdout);
+			}
+			didResize = 0;
+		    }
+
+		    fd_set readmask;
+		    FD_SET(0, &readmask);
+		    int rc = pselect(1, &readmask, NULL, NULL, NULL, NULL);
+		    if (rc == -1 && resized) {
+			didResize = YES;
+			//dbgpr("pselect() interrupted by SIGWINCH\n");
+			return CCREDRAW;   // SIGWINCH received & processed
+		    }
+		    if (rc != 1) {
+			dbgpr("*** rc=%d from pselect(); resized=%d\n", rc, resized);
+		    }
+		}
+		/* end pselect changes */
+
+
 		if ((nread = xread (inputfile, (char *) &chbuf[lcnt], nread))
 		    > 0) Block {
 		    Reg4 Uchar *stcp;
@@ -1601,6 +1725,8 @@ Small peekflg;
 			lcnt += lexrem;
 		}
 		else if (nread < 0) {
+		    //dbgpr("getkey1, read return < 0, resized=%d \n", resized);
+
 		    if (errno != EINTR)
 			fatal (FATALIO, "Error reading input.");
 		    if (peekflg == WAIT_PEEK_KEY)
@@ -1612,17 +1738,30 @@ Small peekflg;
 	}
     }
 
-    if (   lcnt - lexrem <= 0
-	&& peekflg != WAIT_KEY
-       )
-	return NOCHAR;
+    if ( lcnt - lexrem <= 0 && peekflg != WAIT_KEY ) {
+	if (resized && playing) {
+	    Uchar *chp;
+	    chp = (Uchar *)PlayChar(peekflg);
+	    //dbgpr("\ngetkey1, 2. returning (%o)(%d)(%c), resized=%d\n",*chp,*chp,*chp, resized);
+	    resized = 0;
+	    return *chp;
+	}
+	else {
+	    //dbgpr("\ngetkey1, 2. returning NOCHAR, playing=%d, resized=%d\n",playing, resized);
+	    return NOCHAR;
+	}
+    }
 
-    if (peekflg != WAIT_KEY)
+    if (peekflg != WAIT_KEY) {
+    //  dbgpr("getkey1, end, resized=%d peekflg != WAIT_KEY, *lp=(%o)(%c)\n",
+    //      resized, *lp, *lp);
+
 #ifdef UNSCHAR
 	return *lp;
 #else
 	return *lp & CHARMASK;
 #endif
+    }
 
     Block {
 	Reg1 unsigned Short rchar;
@@ -1635,7 +1774,9 @@ Small peekflg;
 	rchar = *lp++ & CHARMASK;
 #endif
 
-	if (keyfile != NULL && rchar != CCINT) {
+/* moved to getkey() so CMD is written in correct place if a resize occurs */
+#ifdef OUT
+	if (keyfile != NULL && rchar != CCINT && rchar != CCREDRAW) {
 	    putc (rchar, keyfile);
 	    if (numtyp > MAXTYP) {
 		flushkeys ();
@@ -1646,6 +1787,8 @@ Small peekflg;
 	if (recording)
 	    RecordChar (rchar);
 #endif /* RECORDING */
+    //  dbgpr("getkey1, end, returning rchar=(%o)(%c)\n",rchar,rchar);
+#endif /* OUT */
 	return rchar;
     }
 }
@@ -2058,12 +2201,14 @@ param ()
 #ifdef  NOCMDCMD
 rmcmd:
 #endif /* NOCMDCMD */
+
 #ifdef SYSSELECT
 	getkey (WAIT_KEY, &k_timeval);
 #else
 	getkey (WAIT_KEY);
 #endif /* SYSSELECT */
 	switch (key) {
+	case CCREDRAW:      /* added, 10/2020 */
 	case CCDELCH:
 	case CCMOVELEFT:
 	case CCMOVERIGHT:

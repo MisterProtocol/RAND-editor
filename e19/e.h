@@ -530,7 +530,10 @@ typedef struct savebuf {
 #define CCRECORD       0234
 #define CCPLAY         0235
 #endif
-#define CCHIGHEST      0235
+
+#define CCRESIZE       0236 /*  for replays */
+
+#define CCHIGHEST      0236
 
 extern
 Scols   cursorcol;              /* physical screen position of cursor   */
