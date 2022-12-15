@@ -16,6 +16,7 @@ void ResizeWindows (int h, int w);
 void debugWindow (S_window *, char *);
 void debugAllWindows (void);
 Cmdret DoMacro(char *, char *);
+int  CheckWindowValues(void);
 
 extern Flag optshowbuttons;
 extern int nButtonLines;
@@ -53,10 +54,10 @@ ResizeWindows (int h, int w)
     int ccol = cursorcol;
     int clin = cursorline;
 
-//  dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d\n",
-//      h, w, LINES, COLS, h_chg, w_chg);
+    dbgpr("ResizeWindow: h=%d w=%d LINES=%d COLS=%d, h_chg=%d w_chg=%d\n",
+	h, w, LINES, COLS, h_chg, w_chg);
 
-/*  debugAllWindows(); */
+    debugAllWindows();
 
     term.tt_width = (short) w;
     term.tt_height = (char) h;  /* todo, chg to short in e.tt.h/tcap.c */
@@ -100,7 +101,7 @@ ResizeWindows (int h, int w)
 	infowin.bmarg = infowin.tmarg;
 	infowin.ttext = infowin.tmarg;
 
-	/* now adjust vertical size of edit widnows */
+	/* now adjust vertical size of edit windows */
 	for (i=0; i<nwinlist; i++) {
 		/* for now, only adjust windows touching bmarg */
 	    if (bm_orig == winlist[i]->bmarg) {
@@ -137,7 +138,7 @@ ResizeWindows (int h, int w)
 	infowin.rmarg = rmarg;
 	infowin.rtext = rmarg;
 
-	/* now adjust horizontal size of edit widnows */
+	/* now adjust horizontal size of edit windows */
 	for (i=0; i<nwinlist; i++) {
 		/* for now, only adjust windows touching rmarg */
 	    if (rm_orig == winlist[i]->rmarg) {
@@ -156,11 +157,13 @@ ResizeWindows (int h, int w)
 	}
     }
 
-/** /
+/**/
 dbgpr("after\n");
     debugAllWindows();
-/ **/
+/**/
     /* ??? todo, make sure curwin is winlist[0] */
+
+    resized = YES;
 
     infoinit();
 
@@ -172,9 +175,9 @@ dbgpr("after\n");
 	poscursor(0, 0);
 	putupwin();
 	if (curwin == winlist[i]) {
-	    chgborders = 1;
+	//  chgborders = 1;
 	    drawborders (winlist[i], WIN_ACTIVE | WIN_DRAWSIDES);
-	    chgborders = 0;
+	//  chgborders = 0;
 	}
 	else
 	    drawborders (winlist[i], WIN_INACTIVE | WIN_DRAWSIDES);
@@ -211,14 +214,15 @@ dbgpr("after\n");
     if (ccol > curwin->rtext) ccol = curwin->rtext;
     if (clin > curwin->btext) clin = curwin->btext;
     poscursor(ccol, clin);
-    fresh();
+    //fresh();
     d_put(0);
 
     /* The REDRAW macro is auto-defined by AddDefaultMacros() */
     DoMacro("$REDRAW", "2");
     resized = YES;
 
-#if 0
+
+#ifdef OUT
     /* until a better redraw method ... */
     (*term.tt_addr) (term.tt_height-2, 1);
     fprintf(stdout, "  *** Hit <RETURN> to continue.");
@@ -281,6 +285,11 @@ debugAllWindows()
 	/*debugMrk();*/
     }
 /*    dbgpr("curwin=(%o) winlist[%d]=(%o)\n", curwin, --i, winlist[0]); */
+
+    dbgpr("\n");
+
+    dbgpr("%12s %s\n", "win values", CheckWindowValues() ? "errors" : "ok");
+
     dbgpr("%d------\n", n++);
 }
 
@@ -688,3 +697,43 @@ updateKeyfile(int h, int w)
 
     return;
 }
+
+
+int
+CheckWindowValues()
+{
+    S_window *wp;
+    int rc = 0;
+    int i;
+
+    /* check for valid entries */
+    for (i=0; i<nwinlist; i++) {
+	wp = winlist[i];
+	if (wp->ltext != wp->lmarg + 1) {
+	    dbgpr("win %d bad ltext=%d should be %d\n",
+		i, wp->ltext, wp->lmarg + 1);
+	    rc = 1;
+	}
+
+	if (wp->ttext != wp->tmarg + 1) {
+	    dbgpr("win %d bad ttext=%d should be %d\n",
+		i, wp->ttext, wp->tmarg + 1);
+	    rc = 1;
+	}
+
+	if (wp->rtext != (wp->rmarg - wp->lmarg - 2)) {
+	    dbgpr("win %d bad rtext=%d should be %d\n",
+		i, wp->rtext,  (wp->rmarg - wp->lmarg - 2));
+	    rc = 1;
+	}
+
+	if (wp->btext != (wp->bmarg - wp->tmarg - 2)) {
+	    dbgpr("win %d bad btext=%d should be %d\n",
+		i, wp->btext,  (wp->bmarg - wp->tmarg - 2));
+	    rc = 1;
+	}
+    }
+
+    return rc;
+}
+

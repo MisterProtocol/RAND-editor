@@ -248,7 +248,7 @@ extern void initwindows();
 _Noreturn void getout (Flag, char *, ...);
 extern int fileno();
 void resize_handler (int sig);
-void usr1_handler (int sig);
+extern void ResizeWindows(int h, int w);
 
 /* used to determine if resizing is ok while replaying */
 int startup_w, startup_h;
@@ -2368,35 +2368,6 @@ resize_handler (int sig)
 	w = winsize.ws_col;
     }
 
-#ifdef OUT
-    /* if the window is smaller, advice how best to recover */
-    char buf[128] = "";
-    if (h < term.tt_height || w < term.tt_width) {
-	snprintf(buf, 80, "Enlarge to at least %d x %d, then <cmd>redraw to recover.",
-	   term.tt_height, term.tt_width);
-    }
-    if (h != term.tt_height || w != term.tt_width) {
-	mesg(ERRALL + 2, "Window size changes are not supported. ",  buf);
-	fflush(stdout);
-    }
-#endif /* OUT */
-
-#ifdef OUT
-    if (nwinlist > 8) {
-	mesg(ERRALL + 1, "Win size changes are limited to 8 E windows.");
-	fflush(stdout);
-	signal(SIGWINCH, resize_handler);
-	return;
-    }
-#endif /* OUT */
-
-/*
-    if (h == term.tt_height && w == term.tt_width)
-	return;
-*/
-
-    /* early testing, see e.resize.c  ... */
-    extern void ResizeWindows(int h, int w);
 
     ResizeWindows(h, w);
 
