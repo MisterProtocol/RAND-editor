@@ -282,6 +282,11 @@ the editor from exiting at the end of the recovery.
 The "showkeys" program is so generally useful that it has been added
 to the "original" branch of the editor as well as the "main" version.
 
+"showkeys" may be found in the e20 directory of the "main" branch,
+or the "e19" directory of the "original" branch.  The Makefile
+can compile this program, but does not install it by default.
+If you find it useful you may wish to install it yourself.
+
 ### Ancillary Files ###
 
 At times, the editor must display messages longer than a single line to
