@@ -56,7 +56,8 @@ ifdef MacOSX
 #STD     = /Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/usr/include/
 #STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX12.3.sdk/usr/include/
 #STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX13.0.sdk/usr/include/
-STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX13.1.sdk/usr/include/
+#STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX13.1.sdk/usr/include/
+STD	= /Library/Developer/CommandLinetools/SDKs/MacOSX12.1.sdk/usr/include/
 endif
 
 # --begin 2/21/2020 comments, amended MOB 3/8/2021

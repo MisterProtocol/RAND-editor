@@ -1321,6 +1321,11 @@ If
 .SM WP
 mode is entered while a marked area is in effect, the boundaries of
 the marked area become the left and right margin settings.
+N.B.: Every line break introduced by
+.SM WP
+will cause the line involved to be added to the
+.B #o
+pseudo-file.
 .RE
 .SH FUNCTION KEYS
 E supports a set of \fIfunctions\fR that are normally executed by hitting one
@@ -4118,7 +4123,7 @@ terminals. ("_" is correct ASCII.)
 .\}
 .ps 10
 .vs 12
-.lf 1464 ./e.man
+.lf 1469 ./e.man
 .\".bp
 .ps 10
 .vs 12
@@ -4713,7 +4718,7 @@ on an individual user basis.
 .fc
 .cp \n(3c
 .lf 28
-.lf 1485 ./e.man
+.lf 1490 ./e.man
 .SH PLATFORMS SUPPORTED
 .sp
 This version of the editor has been ported to, and tested on,

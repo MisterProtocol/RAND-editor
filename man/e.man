@@ -1316,6 +1316,11 @@ If
 .SM WP
 mode is entered while a marked area is in effect, the boundaries of
 the marked area become the left and right margin settings.
+N.B.: Every line break introduced by
+.SM WP
+will cause the line involved to be added to the
+.B #o
+pseudo-file.
 .RE
 .SH FUNCTION KEYS
 E supports a set of \fIfunctions\fR that are normally executed by hitting one
